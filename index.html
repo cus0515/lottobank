@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LottoBank | 가상 시뮬레이션 & 진짜 당첨자 커뮤니티</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Courier+New&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root {
+  --bg-floor: #f1f5f9;
+  --paper-white: #ffffff;
+  --lotto-red: #d61c4e;
+  --lotto-purple: #6b21a8;
+  --pen-mark: #111111;
+  --border-dashed: #cbd5e1;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --b-yellow: #f59e0b;
+  --b-blue: #2563eb;
+  --b-red: #dc2626;
+  --b-gray: #4b5563;
+  --b-green: #16a34a;
+}
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-floor); color: var(--text-dark); line-height: 1.5; }
+
+header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+.nav-container { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 70px; }
+.logo-title { font-size: 22px; font-weight: 900; color: var(--lotto-red); letter-spacing: -1px; }
+.logo-title span { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+.menu-tabs { display: flex; height: 100%; gap: 4px; }
+.menu-btn { height: 70px; padding: 0 16px; font-size: 14px; font-weight: 700; color: var(--text-muted); border: none; background: none; cursor: pointer; display: flex; align-items: center; position: relative; }
+.menu-btn.on { color: var(--lotto-red); }
+.menu-btn.on::after { content: ''; position: absolute; bottom: -3px; left: 0; right: 0; height: 4px; background: var(--lotto-red); }
+.auth-zone { display: flex; align-items: center; gap: 10px; }
+.btn-login { padding: 6px 14px; font-size: 13px; font-weight: 700; background: var(--text-dark); color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+.user-profile { display: none; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
+
+main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 3.5fr 5fr 4fr; gap: 20px; height: calc(100vh - 110px); min-height: 700px; }
+@media (max-width: 1200px) { main { grid-template-columns: 1fr; height: auto; } }
+
+.panel { background: var(--paper-white); border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; height: 100%; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.panel-header { padding: 15px 20px; border-bottom: 2px solid var(--lotto-red); font-size: 15px; font-weight: 900; color: var(--lotto-red); display: flex; justify-content: space-between; align-items: center; background: #fff; }
+.panel-body { padding: 20px; overflow-y: auto; flex: 1; }
+
+.lotto-slip { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; position: relative; }
+.slip-header { border-bottom: 1px dashed var(--lotto-red); padding-bottom: 8px; margin-bottom: 12px; text-align: center; }
+.slip-header h2 { color: var(--lotto-red); font-size: 17px; font-weight: 900; }
+.slip-header p { font-size: 11px; color: var(--text-muted); }
+
+.ball-context { display: flex; gap: 5px; justify-content: center; align-items: center; margin: 12px 0; }
+.ball { width: 32px; height: 32px; border-radius: 50%; font-size: 13px; font-weight: 700; color: #fff; display: inline-flex; align-items: center; justify-content: center; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2); }
+.ball.y { background: var(--b-yellow); }
+.ball.bl { background: var(--b-blue); }
+.ball.r { background: var(--b-red); }
+.ball.g { background: var(--b-gray); }
+.ball.gr { background: var(--b-green); }
+.ball.match { box-shadow: 0 0 0 3px #111; font-weight: 900; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.stats-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; }
+.stats-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+.stats-value { font-size: 15px; font-weight: 900; margin-top: 2px; }
+.lotto-receipt { background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 4px; font-family: 'Courier New', monospace; margin-bottom: 8px; font-size: 12px; }
+
+.live-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.live-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; min-height: 68px; }
+.live-card strong { display: block; color: var(--lotto-red); font-size: 18px; line-height: 1.1; margin-top: 4px; }
+.live-card span { color: var(--text-muted); font-size: 11px; font-weight: 700; }
+.section-mini-title { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 900; color: var(--text-dark); margin: 14px 0 8px; }
+.section-mini-title em { font-style: normal; color: var(--text-muted); font-size: 11px; font-weight: 600; }
+.hot-number-strip { display: flex; gap: 6px; flex-wrap: wrap; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; margin-bottom: 10px; }
+.insight-list { display: grid; gap: 8px; margin-bottom: 12px; }
+.insight-item { display: flex; justify-content: space-between; gap: 12px; align-items: center; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; font-size: 12px; }
+.insight-item b { color: var(--lotto-red); white-space: nowrap; }
+.ticket-feedback { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 6px; padding: 10px 12px; font-size: 12px; font-weight: 700; margin-bottom: 12px; }
+.result-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.result-metric { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; text-align: center; }
+.result-metric span { display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; }
+.result-metric strong { display: block; margin-top: 4px; color: var(--text-dark); font-size: 14px; }
+.prize-table { margin-top: 12px; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; background: #fff; }
+.prize-row { display: grid; grid-template-columns: 48px 1fr 1fr 70px; gap: 8px; align-items: center; padding: 9px 10px; border-top: 1px solid #e2e8f0; font-size: 12px; }
+.prize-row:first-child { border-top: none; background: #f8fafc; color: var(--text-muted); font-weight: 900; }
+.prize-row b { color: var(--lotto-red); }
+
+.badge { display: inline-flex; align-items: center; padding: 3px 6px; font-size: 11px; font-weight: 900; color: #fff; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+.badge.b-real-1 { background: linear-gradient(135deg, #ef4444, #b91c1c); box-shadow: 0 0 8px rgba(239,68,68,0.5); animation: pulse 1s infinite alternate; }
+.badge.b-real-2 { background: linear-gradient(135deg, #a855f7, #6b21a8); }
+.badge.b-real-3 { background: linear-gradient(135deg, #10b981, #047857); }
+.badge.b-guest { background: #94a3b8; color: #fff; font-weight: 500; }
+@keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
+
+.chat-messages { height: calc(100% - 65px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+.chat-row { font-size: 13px; line-height: 1.4; }
+.chat-user { font-weight: 700; color: #334155; }
+.chat-text { color: #0f172a; background: #fff; padding: 6px 10px; border-radius: 6px; display: inline-block; max-width: 85%; margin-top: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.chat-input-area { padding: 12px; background: #fff; display: flex; gap: 6px; }
+.chat-input { flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; outline: none; }
+.chat-input:focus { border-color: var(--lotto-red); }
+.btn-send { background: var(--lotto-red); color: #fff; border: none; padding: 0 14px; font-weight: 700; border-radius: 4px; cursor: pointer; }
+
+.select-custom, .input-custom { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: 700; background: #fff; margin-bottom: 10px; font-size: 13px; }
+.select-custom { border-color: var(--lotto-red); }
+.btn-action { width: 100%; background: var(--lotto-red); color: #fff; font-weight: 700; padding: 11px; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; }
+.omr-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; background: #fffdf9; border: 1px solid #fbcfe8; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
+.omr-box { height: 28px; background: #fff; border: 1px solid var(--lotto-purple); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--lotto-purple); user-select: none; border-radius: 3px; }
+.omr-box.marked { background: var(--lotto-purple); color: #fff; }
+
+.api-status { font-size: 11px; padding: 4px 8px; border-radius: 3px; font-weight: 700; }
+.api-status.loading { background: #fef3c7; color: #92400e; }
+.api-status.ok { background: #dcfce7; color: #166534; }
+.api-status.err { background: #fee2e2; color: #991b1b; }
+
+#toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; z-index: 2000; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+#toast.on { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-container">
+    <div class="logo-area">
+      <div class="logo-title">LottoBank <span>| 집단지성 대시보드</span></div>
+    </div>
+    <div class="menu-tabs">
+      <button id="m-home" class="menu-btn on" onclick="go('home')">종합 데스크</button>
+      <button id="m-result" class="menu-btn" onclick="go('result')">회차별 조회</button>
+      <button id="m-ticket" class="menu-btn" onclick="go('ticket')">번호 추천 &amp; QR인증</button>
+      <button id="m-fortune" class="menu-btn" onclick="go('fortune')">투자 가이드</button>
+    </div>
+    <div class="auth-zone">
+      <span id="api-indicator" class="api-status loading">API 로딩중...</span>
+      <button id="btn-auth" class="btn-login" onclick="toggleAuth()">가상 로그인</button>
+      <div id="user-profile" class="user-profile">
+        <span id="my-badge-space"></span>
+        <span id="user-name" style="color:var(--text-dark);">금손유저_익명</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- 좌측: 실시간 분석 스코어보드 -->
+  <section class="panel">
+    <div class="panel-header">📊 실시간 분석 데스크</div>
+    <div class="panel-body" style="display:flex; flex-direction:column; gap:15px;">
+      <div class="lotto-slip">
+        <div class="slip-header">
+          <h2 id="h-rec-title">최신 회차 로딩 중...</h2>
+          <p id="h-rec-date">동행복권 API 연결 중</p>
+        </div>
+        <div id="h-balls" class="ball-context"><span style="color:var(--text-muted);font-size:12px;">불러오는 중...</span></div>
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13px; border-top:1px dashed #cbd5e1; padding-top:8px;">
+          <span style="color:var(--text-muted);">1등 당첨금</span>
+          <span id="h-amt" style="color:var(--lotto-red);">-</span>
+        </div>
+      </div>
+
+      <div style="font-size:13px; font-weight:700; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">가상 시뮬레이션 자산</div>
+      <div class="stats-grid">
+        <div class="stats-box"><div class="stats-label">가상 투자금</div><div id="h-cost" class="stats-value" style="color:var(--b-red);">0원</div></div>
+        <div class="stats-box"><div class="stats-label">가상 수령액</div><div id="h-earned" class="stats-value" style="color:var(--b-green);">0원</div></div>
+        <div class="stats-box"><div class="stats-label">저장 추천번호</div><div id="h-total" class="stats-value">0게임</div></div>
+        <div class="stats-box"><div class="stats-label">인증된 타이틀</div><div id="h-best-badge" class="stats-value" style="font-size:12px;">없음</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 가운데: 탭별 메인 콘텐츠 -->
+  <section class="panel">
+    <div id="mid-title" class="panel-header">🧾 저장된 추천번호 보관함</div>
+    <div class="panel-body" style="background:#f8fafc;">
+
+      <!-- 1. 종합 데스크 -->
+      <div id="pg-home" class="page-content">
+        <div id="home-live"></div>
+        <div id="ticket-feedback"></div>
+        <div id="tl"></div>
+      </div>
+
+      <!-- 2. 회차별 조회 -->
+      <div id="pg-result" class="page-content" style="display:none;">
+        <select id="res-sel" onchange="chgRes()" class="select-custom">
+          <option>회차 목록 로딩 중...</option>
+        </select>
+        <div class="lotto-slip" style="margin-top:10px;">
+          <div id="res-balls" class="ball-context"></div>
+          <div id="res-list" style="font-size:13px;"></div>
+        </div>
+      </div>
+
+      <!-- 3. 번호 추천 & QR 인증 -->
+      <div id="pg-ticket" class="page-content" style="display:none;">
+        <div style="font-size:12px; font-weight:700; margin-bottom:5px; color:var(--lotto-purple);">[옵션 1] 분석 기반 번호 추천</div>
+        <select id="add-mode" onchange="chgMode()" class="select-custom">
+          <option value="auto">📈 최근 패턴 기반 추천번호 (실제 데이터)</option>
+          <option value="manual">✍️ 직접 번호 입력 후 비교</option>
+        </select>
+        <div id="manual-panel" style="display:none; margin-bottom:12px;">
+          <div class="omr-grid" id="omr-buttons"></div>
+          <div id="manual-slots" class="ball-context"></div>
+        </div>
+        <button class="btn-action" onclick="saveT()" style="margin-bottom:20px;">💾 추천번호 보관함에 저장</button>
+
+        <div style="font-size:12px; font-weight:700; margin-bottom:5px; color:var(--lotto-red); border-top:1px solid #cbd5e1; padding-top:15px;">[옵션 2] 실제 로또 영수증 QR 고유 타이틀 인증</div>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">동행복권 모바일 QR 주소를 입력하면 실제 당첨번호와 대조하여 정확한 등수 뱃지를 부여합니다. (중복 방지)</p>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">예시: <code style="background:#f1f5f9;padding:2px 4px;border-radius:2px;">https://m.dhlottery.co.kr/qr.do?method=winQr&v=1122q030621303444</code></p>
+        <input type="text" id="qr-url-input" class="input-custom" placeholder="동행복권 QR URL 붙여넣기...">
+        <button class="btn-action" onclick="verifyRealQR()" style="background:#1e293b;">🔍 실제 당첨 영수증 인증하기</button>
+        <div id="qr-result-display" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- 4. 투자 가이드 -->
+      <div id="pg-fortune" class="page-content" style="display:none;">
+        <div class="lotto-slip" style="background:#fff; line-height:1.7; font-size:13px;">
+          <h4 style="color:var(--lotto-red); font-weight:900; margin-bottom:10px;">💡 금주 집단지성 투자 가이드</h4>
+          <div id="fortune-content">
+            <p>• 실제 동행복권 API 데이터 기반으로 최신 패턴을 분석합니다.</p>
+            <p style="margin-top:5px;">• <strong>커뮤니티 팁:</strong> QR 인증 뱃지가 있는 유저의 회차+등수 정보는 실제 당첨번호와 대조 완료된 검증 정보입니다.</p>
+            <p style="margin-top:5px;">• <strong>주의:</strong> 로또는 확률 게임입니다. 이 사이트는 가상 시뮬레이션 목적으로만 운영됩니다.</p>
+          </div>
+          <div id="fortune-stats" style="margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:12px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 우측: 라이브 커뮤니티 -->
+  <section class="panel">
+    <div class="panel-header">💬 라이브 토크 (진짜만 말한다)</div>
+    <div style="display:flex; flex-direction:column; height:calc(100% - 49px);">
+      <div class="chat-messages" id="chat-box">
+        <div class="chat-row"><span class="badge b-guest">일반</span><span class="chat-user">시스템:</span><br><span class="chat-text">동행복권 API 연동 버전입니다. QR 인증 시 실제 당첨번호와 대조합니다.</span></div>
+        <div class="chat-row"><span class="badge b-guest">일반</span><span class="chat-user">로또는기세다:</span><br><span class="chat-text">QR 인증 어떻게 하나요?</span></div>
+        <div class="chat-row"><span class="badge b-guest">일반</span><span class="chat-user">시스템:</span><br><span class="chat-text">동행복권 앱에서 구매이력 → QR코드 → URL 복사 후 [번호추천&QR인증] 탭에 붙여넣으세요.</span></div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" class="chat-input" placeholder="로그인 후 실시간 대화에 참여해보세요." onkeyup="if(event.key==='Enter')sendChat()" disabled>
+        <button class="btn-send" onclick="sendChat()">전송</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<script>
+// =====================================================
+// 유틸리티
+// =====================================================
+const $ = id => document.getElementById(id);
+function toast(m) {
+  const t = $('toast'); t.textContent = m; t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 2500);
+}
+function fmtM(v) { return new Intl.NumberFormat('ko-KR').format(v) + '원'; }
+function fmtMShort(v) {
+  if (!v) return '-';
+  if (v >= 1e8) return (v / 1e8).toFixed(1) + '억원';
+  if (v >= 1e4) return (v / 1e4).toFixed(0) + '만원';
+  return fmtM(v);
+}
+function getBCls(n) {
+  if (n <= 10) return 'y'; if (n <= 20) return 'bl';
+  if (n <= 30) return 'r'; if (n <= 40) return 'g'; return 'gr';
+}
+function bH(n, isMatch = false) {
+  return `<span class="ball ${getBCls(n)} ${isMatch ? 'match' : ''}">${n}</span>`;
+}
+
+// =====================================================
+// 동행복권 API
+// =====================================================
+const PROXY = 'https://api.allorigins.win/get?url=';
+const LOTTO_API = 'https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=';
+
+// 최신 회차 계산 (2002-11-23 기준)
+function getLatestRound() {
+  const start = new Date('2002-11-23');
+  const now = new Date();
+  return Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000));
+}
+
+// 단일 회차 조회 (캐시 포함)
+const apiCache = {};
+async function fetchLotto(round) {
+  if (apiCache[round]) return apiCache[round];
+  try {
+    const url = LOTTO_API + round;
+    const res = await fetch(PROXY + encodeURIComponent(url));
+    const json = await res.json();
+    const data = JSON.parse(json.contents);
+    if (data.returnValue !== 'success') return null;
+    const result = {
+      round: data.drwNo,
+      date: data.drwNoDate,
+      nums: [data.drwtNo1, data.drwtNo2, data.drwtNo3, data.drwtNo4, data.drwtNo5, data.drwtNo6],
+      bonus: data.bnusNo,
+      prize_1st: data.firstWinamnt,
+      win_count_1st: data.firstPrzwnerCo,
+      totalSales: data.totSellamnt
+    };
+    apiCache[round] = result;
+    return result;
+  } catch (e) {
+    console.warn('API 오류:', round, e);
+    return null;
+  }
+}
+
+// =====================================================
+// 상태 & localStorage
+// =====================================================
+const STORAGE_KEY = 'lottobank_tickets_v2';
+const QR_USED_KEY = 'lottobank_qr_used';
+const BADGE_KEY = 'lottobank_badge';
+
+let MY = [];
+let isLoggedIn = false;
+let myVerifiedTitle = null;
+let usedQrKeys = [];
+let latestRound = getLatestRound();
+let latestData = null;
+let recentData = {}; // 최근 10회차 캐시
+
+function loadStorage() {
+  try { MY = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { MY = []; }
+  try { usedQrKeys = JSON.parse(localStorage.getItem(QR_USED_KEY) || '[]'); } catch { usedQrKeys = []; }
+  try { myVerifiedTitle = localStorage.getItem(BADGE_KEY) || null; } catch { myVerifiedTitle = null; }
+}
+function saveStorage() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(MY));
+  localStorage.setItem(QR_USED_KEY, JSON.stringify(usedQrKeys));
+  if (myVerifiedTitle) localStorage.setItem(BADGE_KEY, myVerifiedTitle);
+  else localStorage.removeItem(BADGE_KEY);
+}
+
+// =====================================================
+// 분석 함수들
+// =====================================================
+function analyzeNumbers(nums) {
+  const odd = nums.filter(n => n % 2).length;
+  const low = nums.filter(n => n <= 22).length;
+  const sorted = [...nums].sort((a, b) => a - b);
+  let seq = 0;
+  sorted.forEach((n, i) => { if (i && n === sorted[i-1] + 1) seq++; });
+  return { odd, even: nums.length - odd, low, high: nums.length - low, seq };
+}
+
+function getHotNums() {
+  const counts = {};
+  Object.values(recentData).forEach(d => {
+    if (d) d.nums.forEach(n => counts[n] = (counts[n] || 0) + 1);
+  });
+  if (Object.keys(counts).length === 0) return [3, 6, 13, 21, 30, 35]; // 폴백
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1] || a[0] - b[0])
+    .slice(0, 6).map(([n]) => Number(n));
+}
+
+function getColdNums() {
+  const appeared = new Set();
+  Object.values(recentData).forEach(d => { if (d) d.nums.forEach(n => appeared.add(n)); });
+  return Array.from({length: 45}, (_, i) => i + 1).filter(n => !appeared.has(n));
+}
+
+function makeRecommendedNums() {
+  const hot = getHotNums();
+  const cold = getColdNums();
+  let arr = [hot[0], hot[1]]; // 핫 2개
+  if (cold.length > 0) arr.push(cold[Math.floor(Math.random() * Math.min(cold.length, 5))]); // 콜드 1개
+  // 나머지 무작위 (중복 없이)
+  const pool = Array.from({length: 45}, (_, i) => i + 1).filter(n => !arr.includes(n));
+  while (arr.length < 6) {
+    const n = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+    arr.push(n);
+  }
+  return arr.sort((a, b) => a - b);
+}
+
+function checkWinRank(myNums, winNums, bonus) {
+  const matched = myNums.filter(n => winNums.includes(n)).length;
+  const hasBonus = myNums.includes(bonus);
+  if (matched === 6) return { rank: 1, label: '🎉 1등 당첨!', badge: '1등' };
+  if (matched === 5 && hasBonus) return { rank: 2, label: '🥈 2등 당첨!', badge: '2등' };
+  if (matched === 5) return { rank: 3, label: '🥉 3등 당첨!', badge: '3등' };
+  if (matched === 4) return { rank: 4, label: '🏅 4등 당첨', badge: null };
+  if (matched === 3) return { rank: 5, label: '🔹 5등 당첨', badge: null };
+  return { rank: 0, label: '낙첨', badge: null };
+}
+
+// QR URL 파싱 (동행복권 실제 포맷)
+// 형식: https://m.dhlottery.co.kr/qr.do?method=winQr&v=1122q030621303444
+// v값: 회차4자리 + q + 번호6개 2자리씩
+function parseQRUrl(url) {
+  try {
+    let v = '';
+    // URL 파라미터 v= 추출
+    if (url.includes('v=')) {
+      v = url.split('v=')[1].split('&')[0].trim();
+    } else {
+      return null;
+    }
+    // 로또: 4자리 + q + 12자리(2자리×6)
+    const m = v.match(/^(\d{4})q(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+    if (m) {
+      return {
+        type: 'lotto',
+        round: parseInt(m[1]),
+        nums: [parseInt(m[2]), parseInt(m[3]), parseInt(m[4]), parseInt(m[5]), parseInt(m[6]), parseInt(m[7])].sort((a,b)=>a-b),
+        key: v
+      };
+    }
+    return null;
+  } catch { return null; }
+}
+
+// =====================================================
+// UI 렌더링
+// =====================================================
+function prizeTableHtml(data) {
+  if (!data) return '';
+  // API에서 상세 등수 데이터는 없으므로 1등 정보만
+  return `
+    <div class="prize-table">
+      <div class="prize-row"><span>항목</span><span>내용</span><span>금액</span><span>인원</span></div>
+      <div class="prize-row"><b>1등</b><span>6개 일치</span><span>${fmtMShort(data.prize_1st)}</span><span>${data.win_count_1st}명</span></div>
+    </div>`;
+}
+
+function renderLatestOnLeft(data) {
+  if (!data) {
+    $('h-rec-title').textContent = 'API 연결 실패';
+    $('h-rec-date').textContent = 'allorigins 프록시 오류';
+    $('h-balls').innerHTML = '<span style="color:var(--b-red);font-size:11px;">데이터 로딩 실패 - 잠시 후 새로고침</span>';
+    $('h-amt').textContent = '-';
+    $('api-indicator').textContent = 'API 오류';
+    $('api-indicator').className = 'api-status err';
+    return;
+  }
+  $('h-rec-title').textContent = `제 ${data.round}회 공식 당첨번호`;
+  $('h-rec-date').textContent = `추첨일: ${data.date}`;
+  $('h-balls').innerHTML = data.nums.map(n => bH(n)).join('') +
+    '<span style="font-weight:900;color:var(--text-muted);font-size:16px;margin:0 3px;">+</span>' + bH(data.bonus);
+  $('h-amt').textContent = fmtMShort(data.prize_1st);
+  $('api-indicator').textContent = `실시간 ${data.round}회`;
+  $('api-indicator').className = 'api-status ok';
+}
+
+function renderHomeLive() {
+  const d = latestData;
+  if (!d) { $('home-live').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px;">데이터 로딩 중...</div>'; return; }
+  const a = analyzeNumbers(d.nums);
+  const hot = getHotNums();
+  $('home-live').innerHTML = `
+    <div class="live-summary">
+      <div class="live-card"><span>최신 회차</span><strong>${d.round}회</strong><span>${d.date}</span></div>
+      <div class="live-card"><span>1등 당첨금</span><strong style="font-size:14px;">${fmtMShort(d.prize_1st)}</strong><span>${d.win_count_1st}명 당첨</span></div>
+      <div class="live-card"><span>홀짝 비율</span><strong>${a.odd}:${a.even}</strong><span>최신 회차</span></div>
+    </div>
+    <div class="section-mini-title"><span>최근 10회차 반복 출현 번호 (실제 데이터)</span><em>핫 넘버</em></div>
+    <div class="hot-number-strip">${hot.map(n => bH(n)).join('')}</div>
+    <div class="insight-list">
+      <div class="insight-item"><span>저번호/고번호 분포</span><b>${a.low}개 / ${a.high}개</b></div>
+      <div class="insight-item"><span>연속 번호</span><b>${a.seq ? a.seq + '쌍 발견' : '없음'}</b></div>
+      <div class="insight-item"><span>데이터 출처</span><b>동행복권 공식 API</b></div>
+    </div>
+    <div class="section-mini-title"><span>내 추천번호</span><em>${MY.length}게임</em></div>`;
+}
+
+function updateGlobalStats() {
+  let inv = MY.length * 1000, priz = 0;
+  MY.forEach(tk => {
+    const target = apiCache[tk.drw];
+    if (!target) return;
+    const r = checkWinRank(tk.nums, target.nums, target.bonus);
+    if (r.rank === 1) priz += target.prize_1st;
+    else if (r.rank === 2) priz += 50000000;
+    else if (r.rank === 3) priz += 1500000;
+    else if (r.rank === 4) priz += 50000;
+    else if (r.rank === 5) priz += 5000;
+  });
+  $('h-cost').textContent = fmtM(inv);
+  $('h-earned').textContent = fmtM(priz);
+  $('h-total').textContent = MY.length + '게임';
+}
+
+function rList() {
+  renderHomeLive();
+  const w = $('tl');
+  if (MY.length === 0) {
+    w.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--text-muted);font-size:12px;">보관된 추천번호가 없습니다.<br>번호 추천 탭에서 저장해 보세요!</div>';
+    return;
+  }
+  let html = '';
+  MY.forEach(tk => {
+    const target = apiCache[tk.drw];
+    let rankText = target ? checkWinRank(tk.nums, target.nums, target.bonus).label : '⏳ 결과대기';
+    html += `<div class="lotto-receipt">
+      <div style="font-weight:700;margin-bottom:4px;font-size:11px;color:var(--text-muted);">제 ${tk.drw}회차 (${tk.type==='recommend'?'추천':'수동'})</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>${tk.nums.map(n => bH(n, target && target.nums.includes(n))).join(' ')}</div>
+        <span style="font-weight:900;font-size:12px;color:var(--lotto-red);min-width:75px;text-align:right;">${rankText}</span>
+      </div>
+    </div>`;
+  });
+  w.innerHTML = html;
+}
+
+function renderTicketFeedback(tk) {
+  if (!tk) { $('ticket-feedback').innerHTML = ''; return; }
+  const target = apiCache[tk.drw];
+  if (!target) { $('ticket-feedback').innerHTML = ''; return; }
+  const match = tk.nums.filter(n => target.nums.includes(n));
+  $('ticket-feedback').innerHTML = `<div class="ticket-feedback">
+    방금 저장한 번호는 ${tk.drw}회 당첨번호와 ${match.length}개 일치합니다.
+    ${match.length === 6 ? '🎉 1등!' : match.length >= 3 ? `일치: ${match.join(', ')}번` : '아쉽네요!'}
+  </div>`;
+}
+
+// =====================================================
+// 회차별 조회
+// =====================================================
+async function initRoundSelector() {
+  const sel = $('res-sel');
+  sel.innerHTML = '';
+  for (let r = latestRound; r >= Math.max(1, latestRound - 19); r--) {
+    sel.innerHTML += `<option value="${r}">제 ${r}회차 결과 보기</option>`;
+  }
+  await chgRes();
+}
+
+async function chgRes() {
+  const round = parseInt($('res-sel').value);
+  if (!round) return;
+  $('res-balls').innerHTML = '<span style="color:var(--text-muted);font-size:12px;">조회 중...</span>';
+  $('res-list').innerHTML = '';
+  const d = await fetchLotto(round);
+  if (!d) {
+    $('res-balls').innerHTML = '<span style="color:var(--b-red);font-size:12px;">데이터 없음</span>';
+    return;
+  }
+  const a = analyzeNumbers(d.nums);
+  $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
+    '<span style="font-weight:900;color:var(--text-muted);font-size:16px;margin:0 3px;">+</span>' + bH(d.bonus);
+  $('res-list').innerHTML = `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;">
+      <span>추첨일</span><span style="font-weight:700;">${d.date}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;">
+      <span>1등 당첨금</span><span style="font-weight:900;color:var(--lotto-red);">${fmtMShort(d.prize_1st)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;">
+      <span>1등 당첨자 수</span><span style="font-weight:700;">${d.win_count_1st}명</span>
+    </div>
+    <div class="result-metrics">
+      <div class="result-metric"><span>홀짝</span><strong>${a.odd}:${a.even}</strong></div>
+      <div class="result-metric"><span>저/고</span><strong>${a.low}:${a.high}</strong></div>
+      <div class="result-metric"><span>연속</span><strong>${a.seq ? a.seq + '쌍' : '없음'}</strong></div>
+    </div>`;
+}
+
+// =====================================================
+// 번호 추천 & 수동 입력
+// =====================================================
+let manualSelected = [];
+
+function buildOMRGrid() {
+  const c = $('omr-buttons'); c.innerHTML = '';
+  for (let i = 1; i <= 45; i++) {
+    c.innerHTML += `<div class="omr-box" id="omr-${i}" onclick="toggleOMR(${i})">${String(i).padStart(2,'0')}</div>`;
+  }
+}
+function toggleOMR(n) {
+  const idx = manualSelected.indexOf(n);
+  if (idx > -1) { manualSelected.splice(idx, 1); $('omr-'+n).classList.remove('marked'); }
+  else { if (manualSelected.length >= 6) { toast('6개만 선택 가능합니다'); return; } manualSelected.push(n); $('omr-'+n).classList.add('marked'); }
+  $('manual-slots').innerHTML = manualSelected.sort((a,b)=>a-b).map(n=>bH(n)).join('');
+}
+function chgMode() {
+  $('manual-panel').style.display = ($('add-mode').value === 'manual') ? 'block' : 'none';
+  manualSelected = []; buildOMRGrid(); $('manual-slots').innerHTML = '';
+}
+
+function saveT() {
+  let arr = [];
+  if ($('add-mode').value === 'auto') {
+    if (!latestData) { toast('⚠️ API 데이터 로딩 완료 후 시도해주세요'); return; }
+    arr = makeRecommendedNums();
+  } else {
+    if (manualSelected.length !== 6) { toast('⚠️ 6개 숫자를 선택해주세요'); return; }
+    arr = [...manualSelected].sort((a,b)=>a-b);
+  }
+  MY.unshift({ drw: latestRound, nums: arr, type: $('add-mode').value === 'auto' ? 'recommend' : 'manual', date: new Date().toLocaleDateString('ko-KR') });
+  saveStorage();
+  toast('✅ 추천번호가 보관함에 저장되었습니다');
+  manualSelected = [];
+  if ($('add-mode').value === 'manual') chgMode();
+  renderTicketFeedback(MY[0]);
+  renderHomeLive(); rList(); updateGlobalStats();
+}
+
+// =====================================================
+// QR 실제 인증 (동행복권 API 대조)
+// =====================================================
+async function verifyRealQR() {
+  if (!isLoggedIn) { toast('⚠️ 먼저 로그인해 주세요'); return; }
+  const url = $('qr-url-input').value.trim();
+  if (!url) { toast('⚠️ QR URL을 입력해 주세요'); return; }
+
+  const parsed = parseQRUrl(url);
+  if (!parsed) {
+    $('qr-result-display').innerHTML = '<div style="color:var(--b-red);font-size:12px;padding:8px;background:#fee2e2;border-radius:4px;">⚠️ 올바른 동행복권 QR 형식이 아닙니다.<br>예시: https://m.dhlottery.co.kr/qr.do?method=winQr&amp;v=1122q030621303444</div>';
+    return;
+  }
+
+  // 중복 체크
+  if (usedQrKeys.includes(parsed.key)) {
+    $('qr-result-display').innerHTML = '<div style="color:var(--b-red);font-size:12px;padding:8px;background:#fee2e2;border-radius:4px;">❌ 이미 인증된 영수증입니다. 중복 인증 불가.</div>';
+    return;
+  }
+
+  $('qr-result-display').innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px;">🔍 당첨번호 조회 중...</div>';
+
+  const winData = await fetchLotto(parsed.round);
+  if (!winData) {
+    $('qr-result-display').innerHTML = '<div style="color:var(--b-red);font-size:12px;padding:8px;background:#fee2e2;border-radius:4px;">⚠️ 해당 회차 당첨번호를 조회할 수 없습니다. 잠시 후 다시 시도해주세요.</div>';
+    return;
+  }
+
+  const result = checkWinRank(parsed.nums, winData.nums, winData.bonus);
+  const myBallsHtml = parsed.nums.map(n => bH(n, winData.nums.includes(n))).join('');
+  const winBallsHtml = winData.nums.map(n => bH(n)).join('') +
+    '<span style="font-weight:900;color:var(--text-muted);font-size:14px;margin:0 3px;">+</span>' + bH(winData.bonus);
+
+  let resultMsg = '';
+  let badgeAwarded = false;
+
+  if (result.rank <= 2) {
+    myVerifiedTitle = `${parsed.round}회 ${result.badge}`;
+    usedQrKeys.push(parsed.key);
+    saveStorage();
+    updateBadgeUI();
+    badgeAwarded = true;
+    resultMsg = `<div style="background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:10px;margin-top:8px;font-size:12px;font-weight:700;color:#166534;">
+      🎉 인증 완료! [${myVerifiedTitle}] 뱃지가 활성화되었습니다!
+    </div>`;
+  } else if (result.rank >= 3 && result.rank <= 5) {
+    usedQrKeys.push(parsed.key);
+    saveStorage();
+    resultMsg = `<div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:4px;padding:10px;margin-top:8px;font-size:12px;font-weight:700;color:#1e40af;">
+      ✅ ${result.label} 인증 완료 (타이틀 뱃지는 1~2등만 발급)
+    </div>`;
+  } else {
+    usedQrKeys.push(parsed.key);
+    saveStorage();
+    resultMsg = `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:10px;margin-top:8px;font-size:12px;color:var(--text-muted);">
+      영수증 인증 완료 — 낙첨권입니다.
+    </div>`;
+  }
+
+  $('qr-result-display').innerHTML = `
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:12px;font-size:12px;">
+      <div style="margin-bottom:8px;font-weight:700;">${parsed.round}회 내 번호:</div>
+      <div class="ball-context" style="justify-content:flex-start;margin:6px 0;">${myBallsHtml}</div>
+      <div style="margin-top:8px;margin-bottom:4px;font-weight:700;">공식 당첨번호:</div>
+      <div class="ball-context" style="justify-content:flex-start;margin:6px 0;">${winBallsHtml}</div>
+      <div style="margin-top:8px;font-weight:900;color:var(--lotto-red);">결과: ${result.label}</div>
+      ${resultMsg}
+    </div>`;
+
+  $('qr-url-input').value = '';
+}
+
+// =====================================================
+// 인증 뱃지 UI
+// =====================================================
+function getMyBadgeHtml() {
+  if (!myVerifiedTitle) return `<span class="badge b-guest">일반</span>`;
+  if (myVerifiedTitle.includes('1등')) return `<span class="badge b-real-1">${myVerifiedTitle}</span>`;
+  if (myVerifiedTitle.includes('2등')) return `<span class="badge b-real-2">${myVerifiedTitle}</span>`;
+  return `<span class="badge b-real-3">${myVerifiedTitle}</span>`;
+}
+
+function updateBadgeUI() {
+  $('my-badge-space').innerHTML = getMyBadgeHtml();
+  $('h-best-badge').innerHTML = myVerifiedTitle ? getMyBadgeHtml() : '없음';
+}
+
+// =====================================================
+// 로그인 / 로그아웃
+// =====================================================
+function toggleAuth() {
+  isLoggedIn = !isLoggedIn;
+  if (isLoggedIn) {
+    $('btn-auth').textContent = '로그아웃';
+    $('user-profile').style.display = 'flex';
+    $('chat-input').disabled = false;
+    $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
+    updateBadgeUI();
+    toast('🔓 가상 로그인 완료');
+  } else {
+    $('btn-auth').textContent = '가상 로그인';
+    $('user-profile').style.display = 'none';
+    $('chat-input').disabled = true;
+    $('chat-input').placeholder = '로그인 후 대화에 참여해보세요.';
+    toast('🔒 로그아웃 처리됨');
+  }
+}
+
+// =====================================================
+// 채팅
+// =====================================================
+function sendChat() {
+  if (!isLoggedIn) { toast('⚠️ 가상 로그인이 필요합니다'); return; }
+  const inp = $('chat-input'); if (!inp.value.trim()) return;
+  const box = $('chat-box');
+  const row = document.createElement('div');
+  row.className = 'chat-row';
+  row.innerHTML = `${getMyBadgeHtml()}<span class="chat-user">${$('user-name').textContent}:</span><br>
+    <span class="chat-text">${inp.value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`;
+  box.appendChild(row); inp.value = ''; box.scrollTop = box.scrollHeight;
+}
+
+// =====================================================
+// 탭 전환
+// =====================================================
+function go(id) {
+  document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('on'));
+  $('pg-' + id).style.display = 'block';
+  $('m-' + id).classList.add('on');
+  const titles = { home: '🧾 저장된 추천번호 보관함', result: '🔍 회차별 추첨 기록 상세 조회', ticket: '📈 번호 추천 & 실물 인증', fortune: '💡 오늘의 종합 투자 리포트' };
+  $('mid-title').textContent = titles[id];
+  if (id === 'home') { renderHomeLive(); rList(); }
+  if (id === 'result') { initRoundSelector(); }
+  if (id === 'ticket') { chgMode(); }
+  if (id === 'fortune') { renderFortune(); }
+}
+
+// =====================================================
+// 투자 가이드 (실제 데이터 기반)
+// =====================================================
+function renderFortune() {
+  const hot = getHotNums();
+  const cold = getColdNums().slice(0, 6);
+  const d = latestData;
+  if (!d) return;
+  const a = analyzeNumbers(d.nums);
+  $('fortune-stats').innerHTML = `
+    <div style="margin-bottom:10px;font-weight:700;font-size:12px;">📊 최근 ${Object.keys(recentData).length}회차 실제 분석</div>
+    <div class="insight-list">
+      <div class="insight-item"><span>핫 번호 (최다 출현)</span><b>${hot.join(', ')}</b></div>
+      <div class="insight-item"><span>콜드 번호 (미출현)</span><b>${cold.length > 0 ? cold.join(', ') : '모든 번호 출현'}</b></div>
+      <div class="insight-item"><span>최신 회차 홀짝</span><b>${a.odd}홀 ${a.even}짝</b></div>
+      <div class="insight-item"><span>최신 회차 저/고</span><b>저번호 ${a.low}개 / 고번호 ${a.high}개</b></div>
+    </div>`;
+}
+
+// =====================================================
+// 초기화 (앱 시작)
+// =====================================================
+async function init() {
+  loadStorage();
+  updateGlobalStats();
+  buildOMRGrid();
+  renderHomeLive();
+  rList();
+  $('chat-box').scrollTop = $('chat-box').scrollHeight;
+
+  // 최신 회차부터 API로 실제 데이터 로드
+  latestRound = getLatestRound();
+  $('api-indicator').textContent = 'API 연결 중...';
+  $('api-indicator').className = 'api-status loading';
+
+  // 최신 회차 조회
+  latestData = await fetchLotto(latestRound);
+
+  // 최신 회차 실패 시 1회 이전 시도 (토요일 미추첨 케이스)
+  if (!latestData) {
+    latestData = await fetchLotto(latestRound - 1);
+    if (latestData) latestRound = latestRound - 1;
+  }
+
+  renderLatestOnLeft(latestData);
+  if (latestData) {
+    recentData[latestRound] = latestData;
+    renderHomeLive();
+    updateGlobalStats();
+    rList();
+
+    // 백그라운드로 최근 9회차 추가 로드 (핫넘버 분석용)
+    for (let r = latestRound - 1; r >= Math.max(1, latestRound - 9); r--) {
+      fetchLotto(r).then(d => {
+        if (d) { recentData[r] = d; }
+        // 마지막 회차 로드 완료 시 UI 갱신
+        if (r === Math.max(1, latestRound - 9)) { renderHomeLive(); }
+      });
+    }
+  }
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
