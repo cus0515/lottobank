@@ -29,7 +29,7 @@ header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); positio
 .logo-title { font-size: 22px; font-weight: 900; color: var(--lotto-red); letter-spacing: -1px; }
 .logo-title span { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 .menu-tabs { display: flex; height: 100%; gap: 4px; }
-.menu-btn { height: 70px; padding: 0 16px; font-size: 14px; font-weight: 700; color: var(--text-muted); border: none; background: none; cursor: pointer; display: flex; align-items: center; position: relative; }
+.menu-btn { height: 70px; padding: 0 11px; font-size: 13px; font-weight: 700; color: var(--text-muted); border: none; background: none; cursor: pointer; display: flex; align-items: center; position: relative; white-space: nowrap; }
 .menu-btn.on { color: var(--lotto-red); }
 .menu-btn.on::after { content: ''; position: absolute; bottom: -3px; left: 0; right: 0; height: 4px; background: var(--lotto-red); }
 .auth-zone { display: flex; align-items: center; gap: 10px; }
@@ -113,6 +113,83 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 
 #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; z-index: 2000; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
 #toast.on { opacity: 1; }
+
+/* ===== 전적 페이지 ===== */
+.kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+.kpi-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; }
+.kpi-box.hl { border-color: var(--lotto-red); background: linear-gradient(to bottom, #fff5f7, #fff); }
+.kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; }
+.kpi-value { font-size: 20px; font-weight: 900; color: var(--text-dark); }
+.kpi-value.red { color: var(--lotto-red); }
+.kpi-value.green { color: var(--b-green); }
+.kpi-value.blue { color: var(--b-blue); }
+.kpi-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+.rank-history-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+.rank-history-table th { font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 8px 10px; background: #f8fafc; text-align: left; border-bottom: 2px solid #e2e8f0; }
+.rank-history-table td { font-size: 12px; padding: 9px 10px; border-bottom: 1px solid #f1f5f9; }
+.rank-history-table tr:last-child td { border-bottom: none; }
+.roi-bar-wrap { background: #f1f5f9; border-radius: 4px; height: 8px; margin-top: 6px; overflow: hidden; }
+.roi-bar { height: 100%; border-radius: 4px; background: var(--b-green); transition: width 0.5s; }
+.roi-bar.neg { background: var(--b-red); }
+
+/* ===== 뱃지 페이지 ===== */
+.badge-page-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.badge-card-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; text-align: center; }
+.badge-card-item.earned { border-color: var(--lotto-red); background: linear-gradient(to bottom, #fff5f5, #fff); }
+.badge-card-item.locked { opacity: 0.35; filter: grayscale(1); }
+.badge-icon-big { font-size: 28px; display: block; margin-bottom: 6px; }
+.badge-name-text { font-size: 12px; font-weight: 900; margin-bottom: 3px; color: var(--text-dark); }
+.badge-desc-text { font-size: 10px; color: var(--text-muted); line-height: 1.4; }
+.badge-earned-mark { font-size: 10px; font-weight: 700; color: var(--lotto-red); margin-top: 4px; }
+.badge-progress-bar { background: #f1f5f9; border-radius: 3px; height: 4px; margin-top: 5px; overflow: hidden; }
+.badge-progress-fill { height: 100%; background: var(--lotto-red); border-radius: 3px; }
+
+/* ===== 랭킹 페이지 ===== */
+.rank-tab-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.rank-tab-pill { padding: 5px 12px; font-size: 12px; font-weight: 700; border: 1px solid #e2e8f0; border-radius: 20px; background: #fff; cursor: pointer; color: var(--text-muted); white-space: nowrap; }
+.rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); }
+.rank-board-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+.rank-board-table th { font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 8px 10px; background: #f8fafc; text-align: left; border-bottom: 2px solid #e2e8f0; }
+.rank-board-table td { font-size: 12px; padding: 10px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.rank-board-table tr:last-child td { border-bottom: none; }
+.rank-no-cell { font-weight: 900; font-size: 15px; color: var(--lotto-red); }
+.rank-medal { font-size: 18px; }
+.rank-name-cell { font-weight: 700; }
+.rank-val-cell { font-weight: 900; color: var(--b-blue); }
+.my-row td { background: #fff5f7; }
+
+/* ===== 커뮤니티 페이지 ===== */
+.comm-tab-row { display: flex; gap: 6px; margin-bottom: 12px; }
+.comm-tab-btn { padding: 5px 14px; font-size: 12px; font-weight: 700; border: 1px solid #e2e8f0; border-radius: 4px; background: #fff; cursor: pointer; color: var(--text-muted); }
+.comm-tab-btn.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); }
+.post-write-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+.post-write-input { flex: 1; padding: 9px 12px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; }
+.post-write-btn { background: var(--lotto-red); color: #fff; border: none; padding: 0 16px; border-radius: 4px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.post-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s; }
+.post-card:hover { border-color: var(--lotto-red); }
+.post-card-top { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+.post-tag-chip { padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 700; color: #fff; }
+.tag-free { background: #64748b; }
+.tag-verify { background: var(--lotto-red); }
+.post-card-title { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+.post-card-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 12px; margin-top: 5px; }
+.post-like-btn { background: none; border: 1px solid #e2e8f0; border-radius: 3px; padding: 2px 8px; font-size: 11px; cursor: pointer; color: var(--text-muted); }
+.post-like-btn:hover { border-color: var(--lotto-red); color: var(--lotto-red); }
+
+/* ===== 프로필 페이지 ===== */
+.profile-hero { text-align: center; padding: 18px 0 14px; border-bottom: 1px solid #e2e8f0; margin-bottom: 14px; }
+.profile-avatar-circle { width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, var(--lotto-red), var(--lotto-purple)); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; font-weight: 900; margin: 0 auto 10px; }
+.profile-nick { font-size: 17px; font-weight: 900; margin-bottom: 4px; }
+.profile-sub-text { font-size: 12px; color: var(--text-muted); }
+.profile-stats-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+.profile-stat-cell { background: #fff; padding: 12px; text-align: center; }
+.profile-stat-val { font-size: 18px; font-weight: 900; color: var(--text-dark); }
+.profile-stat-lbl { font-size: 10px; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
+.profile-block { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+.profile-block-title { font-size: 11px; font-weight: 900; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.profile-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+.profile-row:last-child { border-bottom: none; }
+.profile-row-val { font-weight: 700; color: var(--text-dark); }
 </style>
 </head>
 <body>
@@ -127,6 +204,11 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
       <button id="m-result" class="menu-btn" onclick="go('result')">회차별 조회</button>
       <button id="m-ticket" class="menu-btn" onclick="go('ticket')">번호 추천 &amp; QR인증</button>
       <button id="m-fortune" class="menu-btn" onclick="go('fortune')">투자 가이드</button>
+      <button id="m-stats" class="menu-btn" onclick="go('stats')">전적</button>
+      <button id="m-badge" class="menu-btn" onclick="go('badge')">뱃지</button>
+      <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
+      <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
+      <button id="m-profile" class="menu-btn" onclick="go('profile')">프로필</button>
     </div>
     <div class="auth-zone">
       <span id="api-indicator" class="api-status loading">API 로딩중...</span>
@@ -223,6 +305,40 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
         </div>
       </div>
 
+      <!-- 5. 전적 -->
+      <div id="pg-stats" class="page-content" style="display:none;">
+        <div id="stats-content"></div>
+      </div>
+
+      <!-- 6. 뱃지 -->
+      <div id="pg-badge" class="page-content" style="display:none;">
+        <div id="badge-content"></div>
+      </div>
+
+      <!-- 7. 랭킹 -->
+      <div id="pg-rank" class="page-content" style="display:none;">
+        <div class="rank-tab-row" id="rank-tab-row"></div>
+        <div id="rank-content"></div>
+      </div>
+
+      <!-- 8. 커뮤니티 -->
+      <div id="pg-community" class="page-content" style="display:none;">
+        <div class="comm-tab-row">
+          <button class="comm-tab-btn on" id="ct-free" onclick="commTab('free')">자유게시판</button>
+          <button class="comm-tab-btn" id="ct-verify" onclick="commTab('verify')">인증게시판</button>
+        </div>
+        <div class="post-write-bar">
+          <input type="text" id="post-input" class="post-write-input" placeholder="로그인 후 글 작성..." disabled>
+          <button class="post-write-btn" onclick="writePost()">글쓰기</button>
+        </div>
+        <div id="community-content"></div>
+      </div>
+
+      <!-- 9. 프로필 -->
+      <div id="pg-profile" class="page-content" style="display:none;">
+        <div id="profile-content"></div>
+      </div>
+
     </div>
   </section>
 
@@ -272,25 +388,26 @@ function bH(n, isMatch = false) {
 // =====================================================
 // 동행복권 API
 // =====================================================
-const PROXY = 'https://api.allorigins.win/get?url=';
-const LOTTO_API = 'https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=';
 
-// 최신 회차 계산 (2002-11-23 기준)
+
+
+// 최신 회차 계산 (2002-12-07 = 1회 추첨일 기준)
 function getLatestRound() {
-  const start = new Date('2002-11-23');
+  const start = new Date('2002-12-07');
   const now = new Date();
-  return Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000));
+  return Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000)) + 1;
 }
 
-// 단일 회차 조회 (캐시 포함)
+// 단일 회차 조회 — Cloudflare Pages Function 프록시 사용
 const apiCache = {};
 async function fetchLotto(round) {
   if (apiCache[round]) return apiCache[round];
   try {
-    const url = LOTTO_API + round;
-    const res = await fetch(PROXY + encodeURIComponent(url));
-    const json = await res.json();
-    const data = JSON.parse(json.contents);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000);
+    const res = await fetch(`/api/lotto?round=${round}`, { signal: controller.signal });
+    clearTimeout(timer);
+    const data = await res.json();
     if (data.returnValue !== 'success') return null;
     const result = {
       round: data.drwNo,
@@ -432,7 +549,7 @@ function prizeTableHtml(data) {
 function renderLatestOnLeft(data) {
   if (!data) {
     $('h-rec-title').textContent = 'API 연결 실패';
-    $('h-rec-date').textContent = 'allorigins 프록시 오류';
+    $('h-rec-date').textContent = 'API 연결 오류 - 잠시 후 새로고침';
     $('h-balls').innerHTML = '<span style="color:var(--b-red);font-size:11px;">데이터 로딩 실패 - 잠시 후 새로고침</span>';
     $('h-amt').textContent = '-';
     $('api-indicator').textContent = 'API 오류';
@@ -601,6 +718,7 @@ function saveT() {
   renderHomeLive(); rList(); updateGlobalStats();
 }
 
+
 // =====================================================
 // QR 실제 인증 (동행복권 API 대조)
 // =====================================================
@@ -615,7 +733,6 @@ async function verifyRealQR() {
     return;
   }
 
-  // 중복 체크
   if (usedQrKeys.includes(parsed.key)) {
     $('qr-result-display').innerHTML = '<div style="color:var(--b-red);font-size:12px;padding:8px;background:#fee2e2;border-radius:4px;">❌ 이미 인증된 영수증입니다. 중복 인증 불가.</div>';
     return;
@@ -635,14 +752,12 @@ async function verifyRealQR() {
     '<span style="font-weight:900;color:var(--text-muted);font-size:14px;margin:0 3px;">+</span>' + bH(winData.bonus);
 
   let resultMsg = '';
-  let badgeAwarded = false;
 
   if (result.rank <= 2) {
     myVerifiedTitle = `${parsed.round}회 ${result.badge}`;
     usedQrKeys.push(parsed.key);
     saveStorage();
     updateBadgeUI();
-    badgeAwarded = true;
     resultMsg = `<div style="background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:10px;margin-top:8px;font-size:12px;font-weight:700;color:#166534;">
       🎉 인증 완료! [${myVerifiedTitle}] 뱃지가 활성화되었습니다!
     </div>`;
@@ -707,6 +822,12 @@ function toggleAuth() {
     $('chat-input').placeholder = '로그인 후 대화에 참여해보세요.';
     toast('🔒 로그아웃 처리됨');
   }
+  const active = document.querySelector('.menu-btn.on');
+  if (active) {
+    const id = active.id.replace('m-', '');
+    if (id === 'community') renderCommunity();
+    if (id === 'profile') renderProfile();
+  }
 }
 
 // =====================================================
@@ -731,16 +852,31 @@ function go(id) {
   document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('on'));
   $('pg-' + id).style.display = 'block';
   $('m-' + id).classList.add('on');
-  const titles = { home: '🧾 저장된 추천번호 보관함', result: '🔍 회차별 추첨 기록 상세 조회', ticket: '📈 번호 추천 & 실물 인증', fortune: '💡 오늘의 종합 투자 리포트' };
-  $('mid-title').textContent = titles[id];
-  if (id === 'home') { renderHomeLive(); rList(); }
-  if (id === 'result') { initRoundSelector(); }
-  if (id === 'ticket') { chgMode(); }
-  if (id === 'fortune') { renderFortune(); }
+  const titles = {
+    home:      '🧾 저장된 추천번호 보관함',
+    result:    '🔍 회차별 추첨 기록 상세 조회',
+    ticket:    '📈 번호 추천 & 실물 인증',
+    fortune:   '💡 오늘의 종합 투자 리포트',
+    stats:     '📊 나의 전적 현황',
+    badge:     '🏅 뱃지 컬렉션',
+    rank:      '🏆 랭킹보드',
+    community: '💬 커뮤니티',
+    profile:   '👤 내 프로필',
+  };
+  $('mid-title').textContent = titles[id] || '';
+  if (id === 'home')      { renderHomeLive(); rList(); }
+  if (id === 'result')    { initRoundSelector(); }
+  if (id === 'ticket')    { chgMode(); }
+  if (id === 'fortune')   { renderFortune(); }
+  if (id === 'stats')     { renderStats(); }
+  if (id === 'badge')     { renderBadge(); }
+  if (id === 'rank')      { renderRank(); }
+  if (id === 'community') { renderCommunity(); }
+  if (id === 'profile')   { renderProfile(); }
 }
 
 // =====================================================
-// 투자 가이드 (실제 데이터 기반)
+// 투자 가이드
 // =====================================================
 function renderFortune() {
   const hot = getHotNums();
@@ -759,7 +895,7 @@ function renderFortune() {
 }
 
 // =====================================================
-// 초기화 (앱 시작)
+// 초기화
 // =====================================================
 async function init() {
   loadStorage();
@@ -769,15 +905,11 @@ async function init() {
   rList();
   $('chat-box').scrollTop = $('chat-box').scrollHeight;
 
-  // 최신 회차부터 API로 실제 데이터 로드
   latestRound = getLatestRound();
   $('api-indicator').textContent = 'API 연결 중...';
   $('api-indicator').className = 'api-status loading';
 
-  // 최신 회차 조회
   latestData = await fetchLotto(latestRound);
-
-  // 최신 회차 실패 시 1회 이전 시도 (토요일 미추첨 케이스)
   if (!latestData) {
     latestData = await fetchLotto(latestRound - 1);
     if (latestData) latestRound = latestRound - 1;
@@ -790,15 +922,272 @@ async function init() {
     updateGlobalStats();
     rList();
 
-    // 백그라운드로 최근 9회차 추가 로드 (핫넘버 분석용)
     for (let r = latestRound - 1; r >= Math.max(1, latestRound - 9); r--) {
       fetchLotto(r).then(d => {
         if (d) { recentData[r] = d; }
-        // 마지막 회차 로드 완료 시 UI 갱신
         if (r === Math.max(1, latestRound - 9)) { renderHomeLive(); }
       });
     }
   }
+}
+
+// =====================================================
+// 전적 페이지
+// =====================================================
+function renderStats() {
+  let totalBuy = MY.length;
+  let totalInvest = totalBuy * 1000;
+  let totalPrize = 0, winCount = 0, bestRank = 0;
+  let rankCounts = {1:0, 2:0, 3:0, 4:0, 5:0};
+
+  MY.forEach(tk => {
+    const target = apiCache[tk.drw];
+    if (!target) return;
+    const r = checkWinRank(tk.nums, target.nums, target.bonus);
+    if (r.rank > 0) {
+      winCount++;
+      if (bestRank === 0 || r.rank < bestRank) bestRank = r.rank;
+      rankCounts[r.rank] = (rankCounts[r.rank] || 0) + 1;
+      if (r.rank === 1) totalPrize += target.prize_1st;
+      else if (r.rank === 2) totalPrize += 50000000;
+      else if (r.rank === 3) totalPrize += 1500000;
+      else if (r.rank === 4) totalPrize += 50000;
+      else if (r.rank === 5) totalPrize += 5000;
+    }
+  });
+
+  const isMock = (totalBuy === 0);
+  if (isMock) {
+    totalBuy = 32; totalInvest = 32000; totalPrize = 35000; winCount = 5; bestRank = 5;
+    rankCounts = {1:0, 2:0, 3:0, 4:0, 5:5};
+  }
+
+  const roi = totalInvest > 0 ? ((totalPrize - totalInvest) / totalInvest * 100) : 0;
+  const roiPos = roi >= 0;
+  const roiPct = Math.min(Math.abs(roi), 100);
+  const bestLabel = bestRank > 0 ? bestRank + '등' : '-';
+
+  $('stats-content').innerHTML = `
+    <div class="kpi-grid">
+      <div class="kpi-box"><div class="kpi-label">총 구매 횟수</div><div class="kpi-value">${totalBuy}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">총 ${fmtM(totalInvest)} 투자</div></div>
+      <div class="kpi-box"><div class="kpi-label">총 당첨 횟수</div><div class="kpi-value blue">${winCount}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">당첨률 ${totalBuy > 0 ? (winCount/totalBuy*100).toFixed(1) : 0}%</div></div>
+      <div class="kpi-box hl"><div class="kpi-label">총 당첨금</div><div class="kpi-value red">${fmtMShort(totalPrize)}</div><div class="kpi-sub">투자 대비 ${roi.toFixed(1)}%</div></div>
+      <div class="kpi-box"><div class="kpi-label">최고 등수</div><div class="kpi-value">${bestLabel}</div><div class="kpi-sub">역대 최고 당첨 등수</div></div>
+    </div>
+    <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">ROI 분석</div>
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:12px;color:var(--text-muted);">수익률</span>
+        <span style="font-size:14px;font-weight:900;color:${roiPos ? 'var(--b-green)' : 'var(--b-red)'};">${roiPos ? '+' : ''}${roi.toFixed(1)}%</span>
+      </div>
+      <div class="roi-bar-wrap"><div class="roi-bar${roiPos ? '' : ' neg'}" style="width:${roiPct}%;"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:6px;">
+        <span>투자 ${fmtMShort(totalInvest)}</span><span>회수 ${fmtMShort(totalPrize)}</span>
+      </div>
+    </div>
+    <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">등수별 당첨 이력</div>
+    <table class="rank-history-table">
+      <thead><tr><th>등수</th><th>조건</th><th>당첨 횟수</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr><td><b style="color:var(--lotto-red);">1등</b></td><td>6개 일치</td><td style="font-weight:700;">${rankCounts[1]}회</td><td style="font-size:11px;color:var(--text-muted);">평균 20~30억</td></tr>
+        <tr><td><b style="color:#a855f7;">2등</b></td><td>5개+보너스</td><td style="font-weight:700;">${rankCounts[2]}회</td><td style="font-size:11px;color:var(--text-muted);">약 5천만원</td></tr>
+        <tr><td><b style="color:var(--b-green);">3등</b></td><td>5개 일치</td><td style="font-weight:700;">${rankCounts[3]}회</td><td style="font-size:11px;color:var(--text-muted);">약 150만원</td></tr>
+        <tr><td>4등</td><td>4개 일치</td><td style="font-weight:700;">${rankCounts[4]}회</td><td style="font-size:11px;color:var(--text-muted);">5만원</td></tr>
+        <tr><td>5등</td><td>3개 일치</td><td style="font-weight:700;">${rankCounts[5]}회</td><td style="font-size:11px;color:var(--text-muted);">5천원</td></tr>
+      </tbody>
+    </table>
+    ${isMock ? '<div style="margin-top:10px;font-size:11px;color:var(--text-muted);text-align:center;">* QR 등록 후 실제 데이터로 업데이트됩니다</div>' : ''}
+  `;
+}
+
+// =====================================================
+// 뱃지 페이지
+// =====================================================
+const BADGE_DEFS = [
+  { id: 'first_reg',  icon: '🎟️', name: '첫 등록',    desc: '처음으로 QR을 등록했습니다',       cond: () => usedQrKeys.length >= 1 },
+  { id: 'first_win',  icon: '🎉', name: '첫 당첨',    desc: '처음으로 당첨을 경험했습니다',       cond: () => false, mockEarned: true },
+  { id: 'reg_10',     icon: '📋', name: '인증 10회',  desc: 'QR을 10회 등록했습니다',           cond: () => usedQrKeys.length >= 10,  progress: () => [usedQrKeys.length, 10] },
+  { id: 'reg_50',     icon: '📦', name: '인증 50회',  desc: 'QR을 50회 등록했습니다',           cond: () => usedQrKeys.length >= 50,  progress: () => [usedQrKeys.length, 50] },
+  { id: 'game_100',   icon: '🎯', name: '100게임',    desc: '100게임 이상 구매했습니다',          cond: () => MY.length >= 100,          progress: () => [MY.length, 100] },
+  { id: 'game_500',   icon: '⭐', name: '500게임',    desc: '500게임 이상 구매했습니다',          cond: () => MY.length >= 500,          progress: () => [MY.length, 500] },
+  { id: 'game_1000',  icon: '🔥', name: '1000게임',   desc: '1000게임 달성! 진정한 로또인',      cond: () => MY.length >= 1000,         progress: () => [MY.length, 1000] },
+  { id: 'rank5',      icon: '🔹', name: '5등 헌터',   desc: '5등 당첨 5회 이상',                cond: () => false, mockEarned: true },
+  { id: 'rank4',      icon: '🏅', name: '4등 헌터',   desc: '4등 당첨 3회 이상',                cond: () => false },
+  { id: 'rank3',      icon: '🥉', name: '3등 수집가', desc: '3등 당첨 경험',                    cond: () => false },
+  { id: 'rank2',      icon: '🥈', name: '2등 인증자', desc: 'QR로 2등 인증 완료',               cond: () => myVerifiedTitle && myVerifiedTitle.includes('2등') },
+  { id: 'rank1',      icon: '🏆', name: '1등 인증자', desc: 'QR로 1등 인증 완료 — 전설',        cond: () => myVerifiedTitle && myVerifiedTitle.includes('1등') },
+];
+
+function renderBadge() {
+  const earned = BADGE_DEFS.filter(b => b.cond() || b.mockEarned);
+  let html = `
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:700;">획득한 뱃지</div>
+        <div style="font-size:22px;font-weight:900;color:var(--lotto-red);">${earned.length}<span style="font-size:13px;color:var(--text-muted);font-weight:500;"> / ${BADGE_DEFS.length}</span></div>
+      </div>
+      <div style="font-size:28px;">🎖️</div>
+    </div>
+    <div class="badge-page-grid">`;
+  BADGE_DEFS.forEach(b => {
+    const isEarned = b.cond() || b.mockEarned;
+    const prog = b.progress ? b.progress() : null;
+    html += `<div class="badge-card-item ${isEarned ? 'earned' : 'locked'}">
+      <span class="badge-icon-big">${b.icon}</span>
+      <div class="badge-name-text">${b.name}</div>
+      <div class="badge-desc-text">${b.desc}</div>
+      ${isEarned ? '<div class="badge-earned-mark">✅ 획득</div>' : ''}
+      ${prog && !isEarned ? `<div class="badge-progress-bar"><div class="badge-progress-fill" style="width:${Math.min(prog[0]/prog[1]*100,100)}%"></div></div><div style="font-size:10px;color:var(--text-muted);margin-top:3px;">${prog[0]} / ${prog[1]}</div>` : ''}
+    </div>`;
+  });
+  html += '</div>';
+  $('badge-content').innerHTML = html;
+}
+
+// =====================================================
+// 랭킹 페이지
+// =====================================================
+const RANK_CATS = [
+  { id: 'buy_count',   label: '구매 횟수', unit: '회' },
+  { id: 'qr_count',    label: '인증 횟수', unit: '회' },
+  { id: 'roi',         label: 'ROI',       unit: '%'  },
+  { id: 'total_prize', label: '총 당첨금', unit: ''   },
+  { id: 'rank5',       label: '5등 최다',  unit: '회' },
+  { id: 'rank3',       label: '3등 이상',  unit: '회' },
+];
+const RANK_MOCK = {
+  buy_count:   [{n:'로또천재',v:1280},{n:'주간구매왕',v:986},{n:'금손유저_익명',v:312,me:true},{n:'행운부자',v:201},{n:'도전자A',v:145}],
+  qr_count:    [{n:'인증왕',v:312},{n:'로또천재',v:244},{n:'행운부자',v:130},{n:'금손유저_익명',v:32,me:true},{n:'도전자A',v:18}],
+  roi:         [{n:'행운부자',v:'+312.5'},{n:'인증왕',v:'+45.2'},{n:'도전자A',v:'+12.0'},{n:'금손유저_익명',v:'-9.4',me:true},{n:'로또천재',v:'-78.2'}],
+  total_prize: [{n:'행운부자',v:'3.2억'},{n:'인증왕',v:'5000만'},{n:'로또천재',v:'450만'},{n:'금손유저_익명',v:'3.5만',me:true},{n:'도전자A',v:'5천'}],
+  rank5:       [{n:'로또천재',v:48},{n:'주간구매왕',v:31},{n:'금손유저_익명',v:5,me:true},{n:'인증왕',v:4},{n:'행운부자',v:2}],
+  rank3:       [{n:'행운부자',v:3},{n:'인증왕',v:1},{n:'로또천재',v:1},{n:'금손유저_익명',v:0,me:true},{n:'도전자A',v:0}],
+};
+let curRankCat = 'buy_count';
+
+function renderRank(catId) {
+  catId = catId || curRankCat;
+  curRankCat = catId;
+  const cat = RANK_CATS.find(c => c.id === catId);
+  const data = RANK_MOCK[catId] || [];
+  const medals = ['🥇','🥈','🥉','',''];
+  $('rank-tab-row').innerHTML = RANK_CATS.map(c =>
+    `<button class="rank-tab-pill ${c.id===catId?'on':''}" onclick="renderRank('${c.id}')">${c.label}</button>`
+  ).join('');
+  let html = `<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;">[ ${cat.label} 랭킹 ] · Mock 데이터</div>
+    <table class="rank-board-table">
+      <thead><tr><th style="width:36px;">순위</th><th>닉네임</th><th style="text-align:right;">${cat.label}</th></tr></thead>
+      <tbody>`;
+  data.forEach((row, i) => {
+    html += `<tr ${row.me?'class="my-row"':''}>
+      <td class="rank-no-cell">${medals[i]||(i+1)}</td>
+      <td class="rank-name-cell">${row.me?'👉 ':''}${row.n}${row.me?' <span style="font-size:10px;color:var(--lotto-red);">(나)</span>':''}</td>
+      <td style="text-align:right;" class="rank-val-cell">${row.v}${cat.unit}</td>
+    </tr>`;
+  });
+  html += `</tbody></table><div style="margin-top:10px;font-size:11px;color:var(--text-muted);text-align:center;">* 실제 회원 데이터 연동 후 실시간 업데이트됩니다</div>`;
+  $('rank-content').innerHTML = html;
+}
+
+// =====================================================
+// 커뮤니티 페이지
+// =====================================================
+let curCommTab = 'free';
+const MOCK_POSTS = {
+  free: [
+    {tag:'free', title:'이번 주 번호 예측 공유합니다!', author:'로또분석가', time:'10분 전', likes:24, comments:8},
+    {tag:'free', title:'연속번호 3개 이상 나온 회차 통계 정리', author:'통계매니아', time:'1시간 전', likes:41, comments:15},
+    {tag:'free', title:'10년째 사고 안됩니다... 포기해야할까요', author:'희망이없나', time:'3시간 전', likes:88, comments:32},
+    {tag:'free', title:'핫번호 vs 콜드번호 어느 전략이 맞나요?', author:'고민중', time:'5시간 전', likes:19, comments:7},
+    {tag:'free', title:'이번달 구매금액 공유 (나 좀 심각한 것 같아)', author:'반성중', time:'1일 전', likes:136, comments:47},
+  ],
+  verify: [
+    {tag:'verify', title:'[1225회 5등] QR 인증 완료 🔹 번호: 3 11 22 31 38 42', author:'금손유저_익명', time:'2시간 전', likes:5, comments:2},
+    {tag:'verify', title:'[1224회 4등] 4개 맞혔습니다! 5만원 쏜다', author:'행운부자', time:'1일 전', likes:28, comments:9},
+    {tag:'verify', title:'[1220회 3등] 드디어 3등!! QR 인증 완료', author:'인증왕', time:'3일 전', likes:182, comments:64},
+    {tag:'verify', title:'[1218회 5등] 3개 맞음... 5천원이라도 감사', author:'소소한기쁨', time:'4일 전', likes:12, comments:3},
+    {tag:'verify', title:'[1215회 5등] 이달 첫 당첨! QR 인증', author:'새싹로또', time:'1주 전', likes:8, comments:1},
+  ],
+};
+let commPosts = { free: [...MOCK_POSTS.free], verify: [...MOCK_POSTS.verify] };
+
+function commTab(tab) {
+  curCommTab = tab;
+  $('ct-free').classList.toggle('on', tab==='free');
+  $('ct-verify').classList.toggle('on', tab==='verify');
+  renderCommunityList();
+}
+function renderCommunityList() {
+  const posts = commPosts[curCommTab] || [];
+  if (!posts.length) { $('community-content').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px;">게시글이 없습니다.</div>'; return; }
+  $('community-content').innerHTML = posts.map((p,i) => `
+    <div class="post-card">
+      <div class="post-card-top">
+        <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='free'?'자유':'인증'}</span>
+        <span class="post-card-title">${p.title}</span>
+      </div>
+      <div class="post-card-meta">
+        <span>${p.author}</span><span>${p.time}</span><span>💬 ${p.comments}</span>
+        <button class="post-like-btn" onclick="likePost('${curCommTab}',${i})">❤️ ${p.likes}</button>
+      </div>
+    </div>`).join('');
+}
+function likePost(tab, idx) { commPosts[tab][idx].likes++; renderCommunityList(); }
+function writePost() {
+  if (!isLoggedIn) { toast('⚠️ 가상 로그인이 필요합니다'); return; }
+  const inp = $('post-input');
+  const text = inp.value.trim();
+  if (!text) { toast('⚠️ 내용을 입력해주세요'); return; }
+  commPosts[curCommTab].unshift({ tag:curCommTab, title:text, author:$('user-name').textContent, time:'방금 전', likes:0, comments:0 });
+  inp.value = '';
+  renderCommunityList();
+  toast('✅ 게시글이 등록되었습니다');
+}
+function renderCommunity() {
+  $('post-input').disabled = !isLoggedIn;
+  $('post-input').placeholder = isLoggedIn ? '게시글 제목을 입력하세요...' : '로그인 후 글 작성 가능합니다';
+  renderCommunityList();
+}
+
+// =====================================================
+// 프로필 페이지
+// =====================================================
+function renderProfile() {
+  const nick = $('user-name').textContent;
+  const totalBuy = MY.length || 32;
+  const qrCount = usedQrKeys.length || 5;
+  const earnedCount = BADGE_DEFS.filter(b => b.cond() || b.mockEarned).length;
+  $('profile-content').innerHTML = `
+    <div class="profile-hero">
+      <div class="profile-avatar-circle">${nick.charAt(0)||'?'}</div>
+      <div class="profile-nick">${nick}</div>
+      <div class="profile-sub-text">${getMyBadgeHtml()}&nbsp;LottoBank 회원</div>
+    </div>
+    <div class="profile-stats-strip">
+      <div class="profile-stat-cell"><div class="profile-stat-val">${totalBuy}</div><div class="profile-stat-lbl">총 구매</div></div>
+      <div class="profile-stat-cell"><div class="profile-stat-val">${qrCount}</div><div class="profile-stat-lbl">QR 인증</div></div>
+      <div class="profile-stat-cell"><div class="profile-stat-val">${earnedCount}</div><div class="profile-stat-lbl">보유 뱃지</div></div>
+    </div>
+    <div class="profile-block">
+      <div class="profile-block-title">계정 정보</div>
+      <div class="profile-row"><span>닉네임</span><span class="profile-row-val">${nick}</span></div>
+      <div class="profile-row"><span>인증 등급</span><span class="profile-row-val">${myVerifiedTitle||'일반 회원'}</span></div>
+      <div class="profile-row"><span>가입 방식</span><span class="profile-row-val">가상 로그인</span></div>
+    </div>
+    <div class="profile-block">
+      <div class="profile-block-title">나의 활동 요약</div>
+      <div class="profile-row"><span>추천번호 저장</span><span class="profile-row-val">${MY.length}게임</span></div>
+      <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
+      <div class="profile-row"><span>획득 뱃지</span><span class="profile-row-val">${earnedCount} / ${BADGE_DEFS.length}개</span></div>
+    </div>
+    <div class="profile-block">
+      <div class="profile-block-title">설정 (2단계 개발 예정)</div>
+      <div class="profile-row" style="color:var(--text-muted);"><span>닉네임 변경</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
+      <div class="profile-row" style="color:var(--text-muted);"><span>알림 설정</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
+      <div class="profile-row" style="color:var(--text-muted);"><span>데이터 내보내기</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
+    </div>
+    ${!isLoggedIn ? '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [가상 로그인] 버튼을 눌러 서비스를 이용해보세요</div>' : ''}
+  `;
 }
 
 window.onload = init;
