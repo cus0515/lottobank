@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LottoBank | 가상 시뮬레이션 & 진짜 당첨자 커뮤니티</title>
+<title>LottoBank | QR 기반 로또 인증 & 전적 관리</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Courier+New&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -197,7 +197,7 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 <header>
   <div class="nav-container">
     <div class="logo-area">
-      <div class="logo-title">LottoBank <span>| 집단지성 대시보드</span></div>
+      <div class="logo-title">LottoBank <span>| QR 인증 플랫폼</span></div>
     </div>
     <div class="menu-tabs">
       <button id="m-home" class="menu-btn on" onclick="go('home')">종합 데스크</button>
@@ -212,7 +212,7 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
     </div>
     <div class="auth-zone">
       <span id="api-indicator" class="api-status loading">API 로딩중...</span>
-      <button id="btn-auth" class="btn-login" onclick="toggleAuth()">가상 로그인</button>
+      <button id="btn-auth" class="btn-login" onclick="toggleAuth()">로그인</button>
       <div id="user-profile" class="user-profile">
         <span id="my-badge-space"></span>
         <span id="user-name" style="color:var(--text-dark);">금손유저_익명</span>
@@ -238,10 +238,10 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
         </div>
       </div>
 
-      <div style="font-size:13px; font-weight:700; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">가상 시뮬레이션 자산</div>
+      <div style="font-size:13px; font-weight:700; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">내 구매 현황</div>
       <div class="stats-grid">
-        <div class="stats-box"><div class="stats-label">가상 투자금</div><div id="h-cost" class="stats-value" style="color:var(--b-red);">0원</div></div>
-        <div class="stats-box"><div class="stats-label">가상 수령액</div><div id="h-earned" class="stats-value" style="color:var(--b-green);">0원</div></div>
+        <div class="stats-box"><div class="stats-label">총 구매 금액</div><div id="h-cost" class="stats-value" style="color:var(--b-red);">0원</div></div>
+        <div class="stats-box"><div class="stats-label">총 당첨 금액</div><div id="h-earned" class="stats-value" style="color:var(--b-green);">0원</div></div>
         <div class="stats-box"><div class="stats-label">저장 추천번호</div><div id="h-total" class="stats-value">0게임</div></div>
         <div class="stats-box"><div class="stats-label">인증된 타이틀</div><div id="h-best-badge" class="stats-value" style="font-size:12px;">없음</div></div>
       </div>
@@ -295,11 +295,11 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
       <!-- 4. 투자 가이드 -->
       <div id="pg-fortune" class="page-content" style="display:none;">
         <div class="lotto-slip" style="background:#fff; line-height:1.7; font-size:13px;">
-          <h4 style="color:var(--lotto-red); font-weight:900; margin-bottom:10px;">💡 금주 집단지성 투자 가이드</h4>
+          <h4 style="color:var(--lotto-red); font-weight:900; margin-bottom:10px;">💡 번호 분석 가이드</h4>
           <div id="fortune-content">
             <p>• 실제 동행복권 API 데이터 기반으로 최신 패턴을 분석합니다.</p>
             <p style="margin-top:5px;">• <strong>커뮤니티 팁:</strong> QR 인증 뱃지가 있는 유저의 회차+등수 정보는 실제 당첨번호와 대조 완료된 검증 정보입니다.</p>
-            <p style="margin-top:5px;">• <strong>주의:</strong> 로또는 확률 게임입니다. 이 사이트는 가상 시뮬레이션 목적으로만 운영됩니다.</p>
+            <p style="margin-top:5px;">• <strong>참고:</strong> 로또는 확률 게임입니다. 번호 분석은 참고 자료로만 활용하세요.</p>
           </div>
           <div id="fortune-stats" style="margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:12px;"></div>
         </div>
@@ -344,7 +344,7 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 
   <!-- 우측: 라이브 커뮤니티 -->
   <section class="panel">
-    <div class="panel-header">💬 라이브 토크 (진짜만 말한다)</div>
+    <div class="panel-header">💬 실시간 커뮤니티</div>
     <div style="display:flex; flex-direction:column; height:calc(100% - 49px);">
       <div class="chat-messages" id="chat-box">
         <div class="chat-row"><span class="badge b-guest">일반</span><span class="chat-user">시스템:</span><br><span class="chat-text">동행복권 API 연동 버전입니다. QR 인증 시 실제 당첨번호와 대조합니다.</span></div>
@@ -814,9 +814,9 @@ function toggleAuth() {
     $('chat-input').disabled = false;
     $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
     updateBadgeUI();
-    toast('🔓 가상 로그인 완료');
+    toast('🔓 로그인 완료');
   } else {
-    $('btn-auth').textContent = '가상 로그인';
+    $('btn-auth').textContent = '로그인';
     $('user-profile').style.display = 'none';
     $('chat-input').disabled = true;
     $('chat-input').placeholder = '로그인 후 대화에 참여해보세요.';
@@ -834,7 +834,7 @@ function toggleAuth() {
 // 채팅
 // =====================================================
 function sendChat() {
-  if (!isLoggedIn) { toast('⚠️ 가상 로그인이 필요합니다'); return; }
+  if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
   const inp = $('chat-input'); if (!inp.value.trim()) return;
   const box = $('chat-box');
   const row = document.createElement('div');
@@ -1134,7 +1134,7 @@ function renderCommunityList() {
 }
 function likePost(tab, idx) { commPosts[tab][idx].likes++; renderCommunityList(); }
 function writePost() {
-  if (!isLoggedIn) { toast('⚠️ 가상 로그인이 필요합니다'); return; }
+  if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
   const inp = $('post-input');
   const text = inp.value.trim();
   if (!text) { toast('⚠️ 내용을 입력해주세요'); return; }
@@ -1172,25 +1172,10 @@ function renderProfile() {
       <div class="profile-block-title">계정 정보</div>
       <div class="profile-row"><span>닉네임</span><span class="profile-row-val">${nick}</span></div>
       <div class="profile-row"><span>인증 등급</span><span class="profile-row-val">${myVerifiedTitle||'일반 회원'}</span></div>
-      <div class="profile-row"><span>가입 방식</span><span class="profile-row-val">가상 로그인</span></div>
+      <div class="profile-row"><span>가입 방식</span><span class="profile-row-val">이메일 로그인</span></div>
     </div>
     <div class="profile-block">
       <div class="profile-block-title">나의 활동 요약</div>
       <div class="profile-row"><span>추천번호 저장</span><span class="profile-row-val">${MY.length}게임</span></div>
       <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
-      <div class="profile-row"><span>획득 뱃지</span><span class="profile-row-val">${earnedCount} / ${BADGE_DEFS.length}개</span></div>
-    </div>
-    <div class="profile-block">
-      <div class="profile-block-title">설정 (2단계 개발 예정)</div>
-      <div class="profile-row" style="color:var(--text-muted);"><span>닉네임 변경</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
-      <div class="profile-row" style="color:var(--text-muted);"><span>알림 설정</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
-      <div class="profile-row" style="color:var(--text-muted);"><span>데이터 내보내기</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
-    </div>
-    ${!isLoggedIn ? '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [가상 로그인] 버튼을 눌러 서비스를 이용해보세요</div>' : ''}
-  `;
-}
-
-window.onload = init;
-</script>
-</body>
-</html>
+      <div class="profile-row
