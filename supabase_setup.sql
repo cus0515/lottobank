@@ -254,6 +254,3 @@ create policy "관리자 게시글 삭제" on public.posts
 -- 관리자: comments 삭제
 create policy "관리자 댓글 삭제" on public.comments
   for delete using ((select auth.jwt() ->> 'email') = 'jobdevil23@gmail.com');
- 삭제
-create policy "관리자 댓글 삭제" on public.comments
-  for delete using ((select auth.jwt() ->> 'email') = 'jobdevil23@gmail.com');
