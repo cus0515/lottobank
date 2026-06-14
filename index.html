@@ -1076,8 +1076,8 @@ function renderTicketFeedback(tk) {
 // 회차별 조회
 // =====================================================
 async function initRoundSelector() {
-  // latestData 확정 회차 우선 사용 (getLatestRound()는 추정치)
-  const base = latestData?.round || latestRound;
+  // getLatestRound() 계산값 사용 — 항상 최신 회차(1228 등)부터 표시
+  const base = getLatestRound();
   const sel = $('res-sel');
   sel.innerHTML = '';
   for (let r = base; r >= Math.max(1, base - 19); r--) {
@@ -1097,19 +1097,7 @@ async function chgRes() {
   $('res-list').innerHTML = '';
   const d = await fetchLotto(round);
   if (!d) {
-    // 데이터 없으면 이전 회차 자동 시도
-    const prev = round - 1;
-    if (prev > 0) {
-      const sel = $('res-sel');
-      if (sel) { sel.value = prev; }
-      const dp = await fetchLotto(prev);
-      if (dp) {
-        if (latestRound === round) { latestRound = prev; latestData = dp; }
-        $('res-balls').innerHTML = dp.nums.map(n => bH(n)).join('') + '<span style="font-weight:900;color:var(--text-muted);font-size:16px;margin:0 3px;">+</span>' + bH(dp.bonus);
-        return;
-      }
-    }
-    $('res-balls').innerHTML = '<span style="color:var(--b-red);font-size:12px;">데이터 없음</span>';
+    $('res-balls').innerHTML = '<span style="color:var(--b-red);font-size:12px;">데이터 없음 — 추첨 전이거나 API 오류</span>';
     return;
   }
   // 좌측 패널 연동 — 선택 회차가 최신이 아니면 표시
