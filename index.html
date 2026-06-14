@@ -331,7 +331,7 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 
         <div style="font-size:12px; font-weight:700; margin-bottom:5px; color:var(--lotto-red); border-top:1px solid #cbd5e1; padding-top:15px;">실물 로또 QR 당첨 인증</div>
         <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">동행복권 앱의 구매 QR 주소를 입력하면 실제 당첨번호와 대조해 등수를 자동 확인하고 인증 뱃지를 부여합니다.</p>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">예시: <code style="background:#f1f5f9;padding:2px 4px;border-radius:2px;">https://m.dhlottery.co.kr/qr.do?method=winQr&v=1122q030621303444</code></p>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">동행복권 앱 → 구매내역 → QR코드 → URL 복사 후 붙여넣기</p>
         <input type="text" id="qr-url-input" class="input-custom" placeholder="동행복권 QR URL 붙여넣기...">
         <button class="btn-action" onclick="verifyRealQR()" style="background:#1e293b;">🔍 실제 당첨 영수증 인증하기</button>
         <div id="qr-result-display" style="margin-top:10px;"></div>
@@ -559,27 +559,38 @@ function checkWinRank(myNums, winNums, bonus) {
 }
 
 // QR URL 파싱 (동행복권 실제 포맷)
-// 형식: https://m.dhlottery.co.kr/qr.do?method=winQr&v=1122q030621303444
-// v값: 회차4자리 + q + 번호6개 2자리씩
+// 신 포맷: https://qr.dhlottery.co.kr/?v=1222m082226323641s020516213139...{시리얼}
+//   v값: 회차4 + m + 12자리(게임1) + [s + 12자리(게임N)]* + 시리얼
+// 구 포맷: https://m.dhlottery.co.kr/qr.do?method=winQr&v=1122q030621303444
+//   v값: 회차4 + q + 12자리(게임1)
 function parseQRUrl(url) {
   try {
-    let v = '';
-    // URL 파라미터 v= 추출
-    if (url.includes('v=')) {
-      v = url.split('v=')[1].split('&')[0].trim();
-    } else {
-      return null;
+    if (!url.includes('v=')) return null;
+    const v = decodeURIComponent(url.split('v=')[1].split('&')[0].trim());
+
+    // 신 포맷: {4}m{12}[s{12}]*{시리얼}
+    const newFmt = v.match(/^(\d{4})m(\d{12})((?:s\d{12})*)(\d+)$/);
+    if (newFmt) {
+      const round = parseInt(newFmt[1]);
+      const rawGames = [newFmt[2], ...newFmt[3].split('s').filter(Boolean)];
+      const games = rawGames.map(g => {
+        const nums = [];
+        for (let i = 0; i < 12; i += 2) nums.push(parseInt(g.slice(i, i+2)));
+        return nums.sort((a, b) => a - b);
+      });
+      return { type: 'lotto', round, games, nums: games[0], key: v };
     }
-    // 로또: 4자리 + q + 12자리(2자리×6)
-    const m = v.match(/^(\d{4})q(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
-    if (m) {
-      return {
-        type: 'lotto',
-        round: parseInt(m[1]),
-        nums: [parseInt(m[2]), parseInt(m[3]), parseInt(m[4]), parseInt(m[5]), parseInt(m[6]), parseInt(m[7])].sort((a,b)=>a-b),
-        key: v
-      };
+
+    // 구 포맷: {4}q{12}
+    const oldFmt = v.match(/^(\d{4})q(\d{12})/);
+    if (oldFmt) {
+      const g = oldFmt[2];
+      const nums = [];
+      for (let i = 0; i < 12; i += 2) nums.push(parseInt(g.slice(i, i+2)));
+      nums.sort((a, b) => a - b);
+      return { type: 'lotto', round: parseInt(oldFmt[1]), games: [nums], nums, key: v };
     }
+
     return null;
   } catch { return null; }
 }
@@ -780,7 +791,7 @@ async function verifyRealQR() {
 
   const parsed = parseQRUrl(url);
   if (!parsed) {
-    $('qr-result-display').innerHTML = '<div style="color:var(--b-red);font-size:12px;padding:8px;background:#fee2e2;border-radius:4px;">⚠️ 올바른 동행복권 QR 형식이 아닙니다.<br>예시: https://m.dhlottery.co.kr/qr.do?method=winQr&amp;v=1122q030621303444</div>';
+    $('qr-result-display').innerHTML = '<div style="color:var(--b-red);font-size:12px;padding:8px;background:#fee2e2;border-radius:4px;">⚠️ 올바른 동행복권 QR 형식이 아닙니다.<br>동행복권 앱에서 복사한 URL을 그대로 붙여넣어 주세요.</div>';
     return;
   }
 
@@ -797,43 +808,55 @@ async function verifyRealQR() {
     return;
   }
 
-  const result = checkWinRank(parsed.nums, winData.nums, winData.bonus);
-  const myBallsHtml = parsed.nums.map(n => bH(n, winData.nums.includes(n))).join('');
+  // 전체 게임 결과 계산
   const winBallsHtml = winData.nums.map(n => bH(n)).join('') +
     '<span style="font-weight:900;color:var(--text-muted);font-size:14px;margin:0 3px;">+</span>' + bH(winData.bonus);
 
-  let resultMsg = '';
+  let bestRank = 6;
+  let bestLabel = '낙첨';
+  let gamesHtml = '';
 
-  if (result.rank <= 2) {
-    myVerifiedTitle = `${parsed.round}회 ${result.badge}`;
-    usedQrKeys.push(parsed.key);
-    saveStorage();
+  parsed.games.forEach((nums, idx) => {
+    const result = checkWinRank(nums, winData.nums, winData.bonus);
+    if (result.rank < bestRank) { bestRank = result.rank; bestLabel = result.label; }
+    const myBallsHtml = nums.map(n => bH(n, winData.nums.includes(n))).join('');
+    const rankLabel = result.rank <= 5
+      ? `<span style="color:var(--lotto-red);font-weight:900;">${result.label}</span>`
+      : `<span style="color:var(--text-muted);">낙첨</span>`;
+    gamesHtml += `
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f1f5f9;">
+        <span style="font-size:11px;color:var(--text-muted);font-weight:700;white-space:nowrap;min-width:32px;">${String.fromCharCode(64+idx+1)}게임</span>
+        <div class="ball-context" style="margin:0;gap:3px;">${myBallsHtml}</div>
+        <span style="font-size:12px;font-weight:700;margin-left:auto;">${rankLabel}</span>
+      </div>`;
+  });
+
+  // 저장 처리
+  if (bestRank <= 2) {
+    myVerifiedTitle = `${parsed.round}회 ${bestLabel}`;
     updateBadgeUI();
-    resultMsg = `<div style="background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:10px;margin-top:8px;font-size:12px;font-weight:700;color:#166534;">
-      🎉 인증 완료! [${myVerifiedTitle}] 뱃지가 활성화되었습니다!
-    </div>`;
-  } else if (result.rank >= 3 && result.rank <= 5) {
-    usedQrKeys.push(parsed.key);
-    saveStorage();
-    resultMsg = `<div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:4px;padding:10px;margin-top:8px;font-size:12px;font-weight:700;color:#1e40af;">
-      ✅ ${result.label} 인증 완료 (타이틀 뱃지는 1~2등만 발급)
-    </div>`;
-  } else {
-    usedQrKeys.push(parsed.key);
-    saveStorage();
-    resultMsg = `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:10px;margin-top:8px;font-size:12px;color:var(--text-muted);">
-      영수증 인증 완료 — 낙첨권입니다.
-    </div>`;
   }
+  usedQrKeys.push(parsed.key);
+  saveStorage();
+
+  const isWin = bestRank <= 5;
+  const summaryBg    = bestRank <= 2 ? '#dcfce7' : bestRank <= 5 ? '#dbeafe' : '#f8fafc';
+  const summaryBorder = bestRank <= 2 ? '#86efac' : bestRank <= 5 ? '#93c5fd' : '#e2e8f0';
+  const summaryColor = bestRank <= 2 ? '#166534' : bestRank <= 5 ? '#1e40af' : '#64748b';
+  const summaryMsg   = bestRank <= 2
+    ? `🎉 ${bestLabel} 인증 완료! 뱃지가 활성화되었습니다`
+    : bestRank <= 5 ? `✅ ${bestLabel} 인증 완료`
+    : '영수증 인증 완료 — 낙첨권입니다';
 
   $('qr-result-display').innerHTML = `
     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:12px;font-size:12px;">
-      <div style="margin-bottom:8px;font-weight:700;">${parsed.round}회 내 번호:</div>
-      <div class="ball-context" style="justify-content:flex-start;margin:6px 0;">${myBallsHtml}</div>
-      <div style="margin-top:8px;margin-bottom:4px;font-weight:700;">공식 당첨번호:</div>
-      <div class="ball-context" style="justify-content:flex-start;margin:6px 0;">${winBallsHtml}</div>
-      <div style="margin-top:8px;font-weight:900;color:var(--lotto-red);">결과: ${result.label}</div>
-      ${resultMsg}
+      <div style="font-weight:700;margin-bottom:6px;">${parsed.round}회 공식 당첨번호</div>
+      <div class="ball-context" style="justify-content:flex-start;margin:0 0 12px;">${winBallsHtml}</div>
+      <div style="font-weight:700;margin-bottom:4px;">내 번호 (${parsed.games.length}게임)</div>
+      ${gamesHtml}
+      <div style="background:${summaryBg};border:1px solid ${summaryBorder};border-radius:4px;padding:10px;margin-top:10px;font-size:12px;font-weight:700;color:${summaryColor};">
+        ${summaryMsg}
+      </div>
     </div>`;
 
   $('qr-url-input').value = '';
