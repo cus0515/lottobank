@@ -165,6 +165,16 @@ main.chat-hidden .chat-panel { display: none; }
 .roi-bar { height: 100%; border-radius: 4px; background: var(--b-green); transition: width 0.5s; }
 .roi-bar.neg { background: var(--b-red); }
 
+
+/* ===== 실시간 활동 피드 ===== */
+.feed-item { display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid #f1f5f9; }
+.feed-item:last-child { border-bottom:none; }
+.feed-avatar { width:30px;height:30px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0; }
+.feed-body { min-width:0;flex:1; }
+.feed-nick { font-size:12px;font-weight:700;color:#1e293b; }
+.feed-label { font-size:11px;color:#64748b;margin-top:1px; }
+.feed-time { font-size:10px;color:#94a3b8;white-space:nowrap;flex-shrink:0;margin-top:2px; }
+
 /* ===== 뱃지 페이지 ===== */
 .badge-page-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .badge-card-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; text-align: center; }
@@ -818,7 +828,10 @@ function renderHomeLive() {
       <div class="insight-item"><span>연속 번호</span><b>${a.seq ? a.seq + '쌍 발견' : '없음'}</b></div>
       <div class="insight-item"><span>데이터 출처</span><b>동행복권 공식 API</b></div>
     </div>
-    <div class="section-mini-title"><span>내 추천번호</span><em>${MY.length}게임</em></div>`;
+    <div class="section-mini-title"><span>내 추천번호</span><em>${MY.length}게임</em></div>
+    <div class="section-mini-title" style="margin-top:14px;"><span>실시간 활동 피드</span><em>최신순</em></div>
+    <div id="feed-list" style="min-height:40px;"></div>`;
+  renderFeed();
 }
 
 function updateGlobalStats() {
@@ -1467,6 +1480,19 @@ async function saveTicketToDB(parsed, winData, gameResults) {
 
     await upsertUserStats(parsed.games.length, gameResults, totalPrize, winData);
     await loadUserDataFromDB();
+    // 활동 피드 삽입
+    insertActivity('qr_register', { round: parsed.round, games: parsed.games.length });
+    if (bestResult.rank <= 5) {
+      insertActivity('win', { round: parsed.round, rank: bestResult.rank, prize: totalPrize });
+    }
+    // 새 뱃지 획득 체크
+    const prevEarned = (window._prevBadgeIds || []);
+    const nowEarned  = BADGE_DEFS.filter(b => b.cond()).map(b => b.id);
+    nowEarned.filter(id => !prevEarned.includes(id)).forEach(id => {
+      const bd = BADGE_DEFS.find(b => b.id === id);
+      if (bd) insertActivity('badge', { badge_id: id, badge_name: bd.name, icon: bd.icon });
+    });
+    window._prevBadgeIds = nowEarned;
   } catch (e) {
     console.warn('saveTicketToDB:', e.message);
   }
@@ -1525,7 +1551,7 @@ function go(id) {
     profile:   '👤 내 프로필',
   };
   $('mid-title').textContent = titles[id] || '';
-  if (id === 'home')      { renderHomeLive(); }
+  if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(); }
   if (id === 'ticket')    { chgMode(); }
   if (id === 'fortune')   { renderFortune(); }
@@ -1561,6 +1587,7 @@ function renderFortune() {
 async function init() {
   go('result');
   initAuth();
+  subscribeFeed();
   loadStorage();
   updateGlobalStats();
   buildOMRGrid();
@@ -1695,6 +1722,74 @@ function renderStats() {
     ${isMock ? '<div style="margin-top:14px;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:6px;text-align:center;font-size:12px;color:var(--text-muted);">QR 인증 탭에서 실제 복권 QR을 등록하면 전적이 자동으로 기록됩니다</div>' : ''}
   `;
 }
+
+
+// =====================================================
+// 실시간 활동 피드
+// =====================================================
+async function insertActivity(type, data = {}) {
+  if (!isLoggedIn || !currentUser || !sb) return;
+  try {
+    const nick = currentUser.user_metadata?.nick || currentUser.email?.split('@')[0] || '익명';
+    await sb.from('activity_feed').insert({ user_id: currentUser.id, nick, type, data });
+  } catch(e) { console.warn('insertActivity:', e.message); }
+}
+
+function relativeTime(isoStr) {
+  const diff = (Date.now() - new Date(isoStr).getTime()) / 1000;
+  if (diff < 60) return '방금 전';
+  if (diff < 3600) return Math.floor(diff/60) + '분 전';
+  if (diff < 86400) return Math.floor(diff/3600) + '시간 전';
+  return Math.floor(diff/86400) + '일 전';
+}
+
+function feedItemHtml(a) {
+  const icons = { qr_register:'🎟️', win:'🏆', badge:'🏅', rank_enter:'📊' };
+  const labels = {
+    qr_register: d => `${d.games||1}게임 QR 등록 완료 (${d.round}회)`,
+    win:         d => `${d.rank}등 당첨! ${fmtMShort(d.prize||0)} 인증`,
+    badge:       d => `뱃지 획득 — ${d.badge_name}`,
+    rank_enter:  d => `${d.category} 랭킹 진입`,
+  };
+  const icon  = icons[a.type] || '📌';
+  const label = labels[a.type] ? labels[a.type](a.data || {}) : a.type;
+  const time  = relativeTime(a.created_at);
+  return `<div class="feed-item">
+    <div class="feed-avatar">${icon}</div>
+    <div class="feed-body">
+      <div class="feed-nick">${a.nick}</div>
+      <div class="feed-label">${label}</div>
+    </div>
+    <div class="feed-time">${time}</div>
+  </div>`;
+}
+
+async function renderFeed() {
+  const el = document.getElementById('feed-list');
+  if (!el || !sb) return;
+  try {
+    const { data } = await sb.from('activity_feed')
+      .select('*').order('created_at', { ascending: false }).limit(20);
+    if (!data || !data.length) {
+      el.innerHTML = '<div style="text-align:center;padding:12px;font-size:11px;color:#94a3b8;">아직 활동이 없습니다. QR을 등록해보세요!</div>';
+      return;
+    }
+    el.innerHTML = data.map(feedItemHtml).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="font-size:11px;color:#94a3b8;padding:8px 0;">피드를 불러올 수 없습니다</div>';
+  }
+}
+
+let _feedChannel = null;
+function subscribeFeed() {
+  if (!sb || _feedChannel) return;
+  _feedChannel = sb.channel('activity-feed-rt')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_feed' }, () => {
+      renderFeed();
+    })
+    .subscribe();
+}
+
 
 // =====================================================
 // 뱃지 페이지
