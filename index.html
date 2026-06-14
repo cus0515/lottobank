@@ -297,10 +297,9 @@ main.chat-hidden .chat-panel { display: none; }
 <header>
   <div class="nav-container">
     <div class="logo-area">
-      <div class="logo-title" onclick="go('home')" style="cursor:pointer;">LottoBank <span>| 로또 전적 &amp; 당첨 인증</span></div>
+      <div class="logo-title" onclick="go('result')" style="cursor:pointer;">LottoBank <span>| 로또 전적 &amp; 당첨 인증</span></div>
     </div>
     <div class="menu-tabs">
-      <button id="m-home" class="menu-btn" onclick="go('home')">홈</button>
       <button id="m-result" class="menu-btn on" onclick="go('result')">회차 조회</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
@@ -343,7 +342,6 @@ main.chat-hidden .chat-panel { display: none; }
     <span class="mob-drawer-logo">🎱 LottoBank</span>
     <button class="mob-drawer-close" onclick="closeMobMenu()">✕</button>
   </div>
-  <button class="mob-menu-item" onclick="go('home');closeMobMenu()">📋 홈</button>
   <button class="mob-menu-item" onclick="go('result');closeMobMenu()">🔍 회차 조회</button>
   <button class="mob-menu-item" onclick="go('rank');closeMobMenu()">🏆 랭킹</button>
   <button class="mob-menu-item" onclick="go('community');closeMobMenu()">💬 커뮤니티</button>
@@ -360,7 +358,7 @@ main.chat-hidden .chat-panel { display: none; }
 
 <!-- 바텀 네비게이션 -->
 <nav class="mob-bottom-nav">
-  <button class="mob-nav-btn on" id="mob-btn-home" onclick="go('home')"><span class="mob-nav-icon">🏠</span>홈</button>
+  <button class="mob-nav-btn on" id="mob-btn-result" onclick="go('result')"><span class="mob-nav-icon">🔍</span>회차조회</button>
   <button class="mob-nav-btn" id="mob-btn-ticket" onclick="go('ticket')"><span class="mob-nav-icon">🎯</span>QR인증</button>
   <button class="mob-nav-btn" id="mob-btn-stats" onclick="go('stats')"><span class="mob-nav-icon">📈</span>전적</button>
   <button class="mob-nav-btn" id="mob-btn-badge" onclick="go('badge')"><span class="mob-nav-icon">🏅</span>뱃지</button>
@@ -423,6 +421,11 @@ main.chat-hidden .chat-panel { display: none; }
           <span style="color:#64748b;">총 구매비용</span><span id="h-cost" style="font-weight:700;text-align:right;">0원</span>
           <span style="color:#64748b;">총 당첨금</span><span id="h-earned" style="font-weight:700;color:var(--lotto-red);text-align:right;">0원</span>
         </div>
+      </div>
+      <!-- 실시간 활동 피드 (왼쪽 패널 하단) -->
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid #e2e8f0;">
+        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">⚡ 실시간 활동 피드</div>
+        <div id="feed-list-left" style="min-height:32px;"></div>
       </div>
       <!-- 다른 탭에서 참조하는 숨김 요소 -->
       <div style="display:none">
@@ -1588,6 +1591,7 @@ async function init() {
   go('result');
   initAuth();
   subscribeFeed();
+  renderFeed();
   loadStorage();
   updateGlobalStats();
   buildOMRGrid();
@@ -1765,18 +1769,22 @@ function feedItemHtml(a) {
 }
 
 async function renderFeed() {
-  const el = document.getElementById('feed-list');
-  if (!el || !sb) return;
+  if (!sb) return;
   try {
     const { data } = await sb.from('activity_feed')
       .select('*').order('created_at', { ascending: false }).limit(20);
-    if (!data || !data.length) {
-      el.innerHTML = '<div style="text-align:center;padding:12px;font-size:11px;color:#94a3b8;">아직 활동이 없습니다. QR을 등록해보세요!</div>';
-      return;
-    }
-    el.innerHTML = data.map(feedItemHtml).join('');
+    const html = (!data || !data.length)
+      ? '<div style="text-align:center;padding:8px;font-size:11px;color:#94a3b8;">아직 활동이 없습니다</div>'
+      : data.map(feedItemHtml).join('');
+    const el1 = document.getElementById('feed-list');
+    const el2 = document.getElementById('feed-list-left');
+    if (el1) el1.innerHTML = html;
+    if (el2) el2.innerHTML = data && data.length
+      ? data.slice(0,5).map(feedItemHtml).join('')
+      : '<div style="font-size:11px;color:#94a3b8;padding:4px 0;">활동 없음</div>';
   } catch(e) {
-    el.innerHTML = '<div style="font-size:11px;color:#94a3b8;padding:8px 0;">피드를 불러올 수 없습니다</div>';
+    const msg = '<div style="font-size:11px;color:#94a3b8;">로드 실패</div>';
+    ['feed-list','feed-list-left'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=msg; });
   }
 }
 
