@@ -380,7 +380,6 @@ main.chat-hidden .chat-panel { display: none; }
           <tr><td colspan="5" style="color:#94a3b8;padding:16px 0;">데이터 로딩 중...</td></tr>
         </tbody>
       </table>
-      <div id="h-region" class="region-list" style="display:none;"></div>
       <!-- 내 구매 현황 (최하단 visible) -->
       <div style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;">
         <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">📌 내 구매 현황</div>
@@ -757,12 +756,7 @@ function renderLatestOnLeft(data) {
     </tr>`;
   }).join('');
 
-  // 당첨 지역
-  if (data.regions && data.regions.length) {
-    const regionHtml = data.regions.map(r => `<span style="display:inline-block;background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:1px 6px;margin:2px;font-size:11px;">${r}</span>`).join('');
-    $('h-region').innerHTML = `<div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">🗺️ 1등 당첨 지역</div>${regionHtml}`;
-    $('h-region').style.display = 'block';
-  }
+
 }
 
 function renderHomeLive() {
@@ -871,11 +865,6 @@ async function chgRes() {
     { rank:5, cond:'3개 일치',   cls:'pr5', amt: 5000,             cnt: d.win_count_5th||'?', auto: null, manual: null },
   ];
 
-  const regionHtml = (d.regions && d.regions.length)
-    ? `<div style="margin-top:8px;padding:6px 8px;background:#f8fafc;border-radius:6px;">
-        <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">🗺️ 1등 당첨 지역</div>
-        ${d.regions.map(r => `<span style="display:inline-block;background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:1px 6px;margin:2px;font-size:11px;">${r}</span>`).join('')}
-      </div>` : '';
 
   $('res-list').innerHTML = `
     <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0;font-size:12px;">
@@ -905,8 +894,49 @@ async function chgRes() {
       <div class="result-metric"><span>홀짝</span><strong>${a.odd}:${a.even}</strong></div>
       <div class="result-metric"><span>저/고</span><strong>${a.low}:${a.high}</strong></div>
       <div class="result-metric"><span>연속</span><strong>${a.seq ? a.seq + '쌍' : '없음'}</strong></div>
-    </div>
-    ${regionHtml}`;
+    <div id="store-section" style="margin-top:10px;"><div style="font-size:11px;color:#94a3b8;padding:4px 0;">📍 판매소 데이터 로딩 중...</div></div>
+  `;
+  // 1등/2등 판매소 비동기 로드
+  fetch(`/api/lotto-region?round=${round}`, {cache: 'no-cache'})
+    .then(r => r.json())
+    .then(j => {
+      const s1 = j.stores1 || [];
+      const s2 = j.stores2 || [];
+      const storeHtml = `
+        <div style="margin-top:6px;">
+          <div style="font-size:12px;font-weight:700;color:#dc2626;margin-bottom:4px;">🏆 1등 당첨 판매소 (${s1.length}곳)</div>
+          ${s1.length ? `<table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead><tr style="background:#fef2f2;">
+              <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #fecaca;font-weight:600;">판매점</th>
+              <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #fecaca;font-weight:600;">주소</th>
+              <th style="padding:4px 6px;text-align:center;border-bottom:1px solid #fecaca;font-weight:600;">구분</th>
+            </tr></thead>
+            <tbody>${s1.map(s => `<tr style="border-bottom:1px solid #f1f5f9;">
+              <td style="padding:4px 6px;font-weight:600;">${s.name}</td>
+              <td style="padding:4px 6px;color:#475569;font-size:10px;">${s.addr}</td>
+              <td style="padding:4px 6px;text-align:center;color:#64748b;">${s.auto}</td>
+            </tr>`).join('')}</tbody>
+          </table>` : '<div style="font-size:11px;color:#94a3b8;">데이터 없음</div>'}
+          <div style="font-size:12px;font-weight:700;color:#2563eb;margin-top:10px;margin-bottom:4px;">🥈 2등 당첨 판매소 (${s2.length}곳)</div>
+          ${s2.length ? `<table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead><tr style="background:#eff6ff;">
+              <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #bfdbfe;font-weight:600;">판매점</th>
+              <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #bfdbfe;font-weight:600;">주소</th>
+              <th style="padding:4px 6px;text-align:center;border-bottom:1px solid #bfdbfe;font-weight:600;">구분</th>
+            </tr></thead>
+            <tbody>${s2.map(s => `<tr style="border-bottom:1px solid #f1f5f9;">
+              <td style="padding:4px 6px;font-weight:600;">${s.name}</td>
+              <td style="padding:4px 6px;color:#475569;font-size:10px;">${s.addr}</td>
+              <td style="padding:4px 6px;text-align:center;color:#64748b;">${s.auto}</td>
+            </tr>`).join('')}</tbody>
+          </table>` : '<div style="font-size:11px;color:#94a3b8;">데이터 없음</div>'}
+        </div>`;
+      const sec = document.getElementById('store-section');
+      if (sec) sec.innerHTML = storeHtml;
+    }).catch(() => {
+      const sec = document.getElementById('store-section');
+      if (sec) sec.innerHTML = '';
+    });
 }
 
 // =====================================================
@@ -1489,20 +1519,7 @@ async function init() {
     updateGlobalStats();
     rList();
 
-    // 지역 데이터 비동기 로드 (메인 데이터와 별도)
-    if (!latestData.regions || latestData.regions.length === 0) {
-      fetch(`/api/lotto-region?round=${latestRound}`, {cache: 'no-cache'})
-        .then(r => r.json())
-        .then(j => {
-          if (j.regions && j.regions.length) {
-            latestData.regions = j.regions;
-            apiCache[latestRound] = latestData;
-            const regionHtml = j.regions.map(r => `<span style="display:inline-block;background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:1px 6px;margin:2px;font-size:11px;">${r}</span>`).join('');
-            $('h-region').innerHTML = `<div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">🗺️ 1등 당첨 지역</div>${regionHtml}`;
-            $('h-region').style.display = 'block';
-          }
-        }).catch(() => {});
-    }
+
 
     for (let r = latestRound - 1; r >= Math.max(1, latestRound - 9); r--) {
       fetchLotto(r).then(d => {

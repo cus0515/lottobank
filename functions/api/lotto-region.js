@@ -1,4 +1,4 @@
-// 동행복권 당첨 판매점 지역 조회 전용 Cloudflare Pages Function
+// 동행복권 1등/2등 당첨 판매소 조회 Cloudflare Pages Function
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const round = parseInt(url.searchParams.get('round') || '0');
@@ -34,19 +34,22 @@ export async function onRequest(context) {
     const json = await r.json();
     const list = json?.data?.list ?? [];
 
-    // tm1ShpLctnAddr: 시/도 단위 지역명 (예: "서울", "경기", "부산")
-    const seen = new Set();
-    const regions = [];
+    const stores1 = [];
+    const stores2 = [];
+
     for (const item of list) {
-      const reg = (item.tm1ShpLctnAddr || '').trim();
-      if (reg && !seen.has(reg)) {
-        seen.add(reg);
-        regions.push(reg);
-      }
+      const store = {
+        name: item.shpNm || '',
+        addr: item.shpAddr ? item.shpAddr.trim() : '',
+        tel: item.shpTelno || '',
+        auto: item.atmtPsvYnTxt || '',
+      };
+      if (item.wnShpRnk === 1) stores1.push(store);
+      else if (item.wnShpRnk === 2) stores2.push(store);
     }
 
-    return new Response(JSON.stringify({ regions, total: list.length }), { headers: cors });
+    return new Response(JSON.stringify({ stores1, stores2, total: list.length }), { headers: cors });
   } catch (e) {
-    return new Response(JSON.stringify({ regions: [], error: e.message }), { headers: cors });
+    return new Response(JSON.stringify({ stores1: [], stores2: [], error: e.message }), { headers: cors });
   }
 }
