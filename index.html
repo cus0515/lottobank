@@ -304,8 +304,11 @@ main.chat-hidden .chat-panel { display: none; }
   .nav-container { height:56px; padding:0 14px; }
   .logo-title { font-size:18px; }
   .logo-title span { display:none; }
-  main { grid-template-columns: 1fr !important; margin: 16px 12px 80px; padding: 0; height: auto; min-height: unset; gap: 12px; }
+  main { display:flex !important; flex-direction:column; margin: 16px 12px 80px; padding: 0; height: auto; min-height: unset; gap: 12px; }
   .panel:last-child { display:none; }
+  /* 모바일: 중앙 패널(콘텐츠)이 먼저, 좌측 대시보드는 아래에 */
+  main > section:nth-child(2) { order: 1; }
+  main > section:nth-child(1) { order: 2; }
   .mid-panel { min-height: unset; }
   .mid-panel-inner { padding: 12px; }
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1751,7 +1754,6 @@ async function loadUserDataFromDB() {
   const uid = currentUser.id;
   try {
     const { data: profile } = await sb.from('profiles').select('nickname').eq('id', uid).single();
-    if (profile?.nickname) $('user-name').textContent = profile.nickname;
 
     const { data: stats } = await sb.from('user_stats').select('*').eq('user_id', uid).single();
     if (stats) {
@@ -1774,8 +1776,8 @@ async function loadUserDataFromDB() {
         if (!myVerifiedTitle || myVerifiedTitle !== title) { myVerifiedTitle = title; saveStorage(); }
       }
     }
-    // 티켓 유무와 무관하게 항상 헤더/좌측패널 업데이트
-    const nick2 = currentUser?.user_metadata?.nickname || currentUser?.email?.split('@')[0] || '?';
+    // 닉네임: profiles DB 우선, 없으면 user_metadata, 없으면 이메일 앞
+    const nick2 = profile?.nickname || currentUser?.user_metadata?.nickname || currentUser?.email?.split('@')[0] || '?';
     updateHeaderUser(nick2, myVerifiedTitle || '');
     updateBadgeUI();
     updateDropdownStats();
@@ -2098,6 +2100,14 @@ async function ensureRecentData() {
   await Promise.allSettled(fetches);
 }
 
+function saveFortuneSet(numsJson) {
+  const nums = JSON.parse(numsJson);
+  MY.unshift({ drw: latestRound, nums, type: 'recommend', date: new Date().toLocaleDateString('ko-KR') });
+  saveStorage();
+  toast('✅ 번호가 보관함에 저장되었습니다');
+  renderHomeLive(); rList(); updateGlobalStats();
+}
+
 function renderFortune() {
   const rounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
   const d = latestData;
@@ -2197,7 +2207,8 @@ function renderFortune() {
       ${sets.map((nums, i) => `
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
           <span style="font-size:10px;font-weight:800;color:#64748b;min-width:32px;">${['A세트','B세트','C세트'][i]}</span>
-          <div class="ball-context" style="margin:0;gap:4px;">${nums.map(n=>bH(n)).join('')}</div>
+          <div class="ball-context" style="margin:0;gap:4px;flex:1;">${nums.map(n=>bH(n)).join('')}</div>
+          <button onclick="saveFortuneSet('${JSON.stringify(nums)}')" style="flex-shrink:0;font-size:10px;font-weight:700;background:#dc2626;color:#fff;border:none;border-radius:5px;padding:5px 9px;cursor:pointer;white-space:nowrap;">저장</button>
         </div>`).join('')}
       <div style="font-size:10px;color:#94a3b8;margin-top:6px;text-align:center;">※ 최근 ${totalDraws}회차 출현 빈도 기반 통계 추천 · 당첨 보장 없음</div>
     </div>
@@ -2587,7 +2598,7 @@ async function insertActivity(type, data = {}) {
     return;
   }
   try {
-    const nick = currentUser.user_metadata?.nick || currentUser.email?.split('@')[0] || '익명';
+    const nick = currentUser.user_metadata?.nickname || currentUser.email?.split('@')[0] || '익명';
     await sb.from('activity_feed').insert({ user_id: currentUser.id, nick, type, data });
   } catch(e) { console.warn('insertActivity:', e.message); }
 }

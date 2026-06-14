@@ -125,28 +125,3 @@ def main():
             current = json.load(f)
             current_round = int(current.get('drwNo', 0))
         print(f"현재 캐시: {current_round}회")
-    except Exception:
-        print(f"캐시 없음 — 시드 회차 {SEED_ROUND} 사용")
-        current_round = SEED_ROUND - 1  # 다음 회차 = SEED_ROUND
-
-    # 다음 회차 먼저 시도 → 실패 시 현재 회차 갱신
-    for round_num in [current_round + 1, current_round]:
-        if round_num <= 0:
-            continue
-        print(f"시도: {round_num}회...")
-        result = try_new_api(round_num) or try_old_api(round_num)
-        if result and result.get('drwtNo1'):  # 번호가 실제로 있어야 저장
-            result['_cachedAt'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-            result['regions'] = fetch_regions(round_num)
-            with open(CACHE_PATH, 'w', encoding='utf-8') as f:
-                json.dump(result, f, ensure_ascii=False, indent=2)
-            print(f"💾 저장 완료: {result['drwNo']}회 ({result['drwNoDate']})")
-            print(f"   번호: {result['drwtNo1']} {result['drwtNo2']} {result['drwtNo3']} "
-                  f"{result['drwtNo4']} {result['drwtNo5']} {result['drwtNo6']} +{result['bnusNo']}")
-            return
-
-    print("새 데이터 없음 — 기존 캐시 유지")
-
-
-if __name__ == '__main__':
-    main()
