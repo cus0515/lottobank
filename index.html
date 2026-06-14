@@ -331,6 +331,94 @@ main.chat-hidden .chat-panel { display: none; }
 .auth-divider { text-align:center; font-size:13px; color:var(--text-muted); margin:14px 0 4px; }
 .auth-switch { background:none; border:none; color:var(--lotto-purple); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
 .auth-err { color:#dc2626; font-size:12px; font-weight:700; min-height:18px; margin-top:10px; }
+
+/* Dark Mode */
+[data-theme="dark"] { --bg-floor:#0f172a; --paper-white:#1e293b; --text-dark:#f1f5f9; --text-muted:#94a3b8; --border-dashed:#475569; }
+[data-theme="dark"] body { background:var(--bg-floor); color:var(--text-dark); }
+[data-theme="dark"] header { background:#1e293b !important; }
+[data-theme="dark"] .panel { background:#1e293b; border-color:#334155; }
+[data-theme="dark"] .panel-header { background:#1e293b !important; }
+[data-theme="dark"] .panel-body { background:#1e293b; }
+[data-theme="dark"] .lotto-slip { background:#1e293b; border-color:#475569; }
+[data-theme="dark"] .left-dashboard-card { background:#263244; border-color:#334155; }
+[data-theme="dark"] .left-stat-box { background:#1a2537; border-color:#334155; }
+[data-theme="dark"] .left-roi-bar-wrap { background:#334155; }
+[data-theme="dark"] .chat-messages { background:#0f172a; border-color:#334155; }
+[data-theme="dark"] .chat-row .chat-text { background:#1e293b; color:#e2e8f0; }
+[data-theme="dark"] .chat-input-area { background:#1e293b; border-top-color:#334155; }
+[data-theme="dark"] .chat-input { background:#0f172a; border-color:#475569; color:#f1f5f9; }
+[data-theme="dark"] .chat-user { color:#94a3b8; }
+[data-theme="dark"] .select-custom,[data-theme="dark"] .input-custom { background:#1e293b; color:#f1f5f9; border-color:#475569; }
+[data-theme="dark"] .menu-btn { color:#94a3b8; }
+[data-theme="dark"] .menu-btn.on { color:var(--lotto-red); }
+[data-theme="dark"] .user-btn { color:#f1f5f9; }
+[data-theme="dark"] .user-btn:hover { background:#334155; }
+[data-theme="dark"] .user-dropdown { background:#1e293b; border-color:#334155; }
+[data-theme="dark"] .dd-item,[data-theme="dark"] .user-dd-item { color:#f1f5f9; }
+[data-theme="dark"] .dd-item:hover,[data-theme="dark"] .user-dd-item:hover { background:#334155; }
+[data-theme="dark"] .user-dd-nick { color:#f1f5f9; }
+[data-theme="dark"] .user-dd-header { border-color:#334155; }
+[data-theme="dark"] .dd-logout { border-color:#334155 !important; }
+[data-theme="dark"] .live-card { background:#263244; border-color:#334155; }
+[data-theme="dark"] .hot-number-strip { background:#263244; border-color:#334155; }
+[data-theme="dark"] .insight-item { background:#263244; border-color:#334155; }
+[data-theme="dark"] .result-metric { background:#263244; border-color:#334155; }
+[data-theme="dark"] .result-metric strong { color:#f1f5f9; }
+[data-theme="dark"] .prize-table { background:#1e293b; border-color:#334155; }
+[data-theme="dark"] .prize-table th { background:#0f172a; color:#94a3b8; border-color:#334155; }
+[data-theme="dark"] .prize-table td { border-color:#334155; }
+[data-theme="dark"] .prize-table tr:hover td { background:#263244; }
+[data-theme="dark"] .lotto-receipt { background:#1e293b; border-color:#475569; color:#e2e8f0; }
+[data-theme="dark"] .stats-box { background:#0f172a; border-color:#334155; }
+[data-theme="dark"] .kpi-box { background:#263244 !important; border-color:#334155 !important; }
+[data-theme="dark"] .kpi-label { color:#94a3b8 !important; }
+[data-theme="dark"] .roi-bar-wrap { background:#334155 !important; }
+[data-theme="dark"] .rank-board-table th { background:#0f172a; color:#94a3b8; border-color:#334155; }
+[data-theme="dark"] .rank-board-table td { border-color:#334155; color:#f1f5f9; }
+[data-theme="dark"] .rank-board-table tr:hover td { background:#263244; }
+[data-theme="dark"] .my-row td { background:#1a3a5f !important; }
+[data-theme="dark"] .rank-tab-pill { background:#334155; color:#94a3b8; border-color:#475569; }
+[data-theme="dark"] .rank-tab-pill.on { background:var(--lotto-red); color:#fff; }
+[data-theme="dark"] .comm-tab-btn { background:#334155; color:#94a3b8; border-color:#475569; }
+[data-theme="dark"] .comm-tab-btn.on { background:var(--lotto-red); color:#fff; }
+[data-theme="dark"] .post-card { background:#263244; border-color:#334155; }
+[data-theme="dark"] .post-card:hover { background:#2d3e55; }
+[data-theme="dark"] .post-card-title { color:#f1f5f9; }
+[data-theme="dark"] .post-write-bar { background:#263244; border-color:#334155; }
+[data-theme="dark"] .post-write-input { background:#1a2537; color:#f1f5f9; border-color:#475569; }
+[data-theme="dark"] .post-write-btn { background:#334155; color:#f1f5f9; }
+[data-theme="dark"] .post-detail-back { color:#94a3b8; }
+[data-theme="dark"] .post-detail-title { color:#f1f5f9; }
+[data-theme="dark"] .comment-item { background:#263244; border-color:#334155; }
+[data-theme="dark"] .comment-nick { color:#f1f5f9; }
+[data-theme="dark"] .comment-body { color:#cbd5e1; }
+[data-theme="dark"] .comment-input { background:#0f172a; color:#f1f5f9; border-color:#475569; }
+[data-theme="dark"] .badge-card-item { background:#263244; border-color:#334155; }
+[data-theme="dark"] .badge-card-item.earned { background:#1a3020; border-color:#166534; }
+[data-theme="dark"] .badge-name-text { color:#f1f5f9; }
+[data-theme="dark"] .profile-hero { background:#1e293b; border-color:#334155; }
+[data-theme="dark"] .profile-stats-strip { background:#0f172a; border-color:#334155; }
+[data-theme="dark"] .profile-stat-cell { border-color:#334155; }
+[data-theme="dark"] .profile-stat-val { color:#f1f5f9; }
+[data-theme="dark"] .profile-block { background:#1e293b; border-color:#334155; }
+[data-theme="dark"] .profile-block-title { color:#f1f5f9; border-color:#334155; }
+[data-theme="dark"] .profile-row { border-color:#334155; color:#f1f5f9; }
+[data-theme="dark"] .profile-row-val { color:#f1f5f9; }
+[data-theme="dark"] .feed-item { background:#263244; border-color:#334155; }
+[data-theme="dark"] .feed-nick { color:#f1f5f9; }
+[data-theme="dark"] .feed-time { color:#94a3b8; }
+[data-theme="dark"] .feed-avatar { background:#334155 !important; }
+[data-theme="dark"] .mob-bottom-nav { background:#1e293b; border-top-color:#334155; }
+[data-theme="dark"] .mob-nav-btn { color:#94a3b8; }
+[data-theme="dark"] .mob-nav-btn.on { color:var(--lotto-red); }
+[data-theme="dark"] .mob-menu-panel { background:#1e293b; }
+[data-theme="dark"] .mob-menu-item { color:#f1f5f9; border-color:#334155; }
+[data-theme="dark"] .mob-menu-overlay { background:rgba(0,0,0,0.7); }
+[data-theme="dark"] .hamburger span { background:#f1f5f9; }
+[data-theme="dark"] .rank-history-table th { background:#0f172a; color:#94a3b8; }
+[data-theme="dark"] .rank-history-table td { border-color:#334155; color:#f1f5f9; }
+[data-theme="dark"] .section-mini-title { color:#f1f5f9; }
+[data-theme="dark"] .btn-login { background:#334155; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -351,6 +439,7 @@ main.chat-hidden .chat-panel { display: none; }
       <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;color:#dc2626;">관리자</button>
     </div>
     <div class="auth-zone">
+      <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크/라이트 모드 전환" style="background:none;border:1px solid #e2e8f0;border-radius:6px;padding:5px 8px;cursor:pointer;font-size:16px;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="테마 전환">🌙</button>
       <button id="chat-reopen-btn" onclick="toggleChat()" title="채팅 열기"
         style="display:none;align-items:center;gap:4px;padding:4px 10px;font-size:12px;font-weight:700;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 채팅
@@ -598,9 +687,17 @@ main.chat-hidden .chat-panel { display: none; }
 
       <!-- 2. 회차별 조회 -->
       <div id="pg-result" class="page-content">
-        <select id="res-sel" onchange="chgRes()" class="select-custom">
-          <option>회차 목록 로딩 중...</option>
-        </select>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:0;">
+          <button id="res-older-btn" onclick="resNavPage(-1)" title="이전 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#475569;font-size:12px;font-weight:700;cursor:pointer;">◀◀</button>
+          <select id="res-sel" onchange="chgRes()" class="select-custom" style="flex:1;margin:0;">
+            <option>회차 목록 로딩 중...</option>
+          </select>
+          <button id="res-newer-btn" onclick="resNavPage(1)" title="다음 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#475569;font-size:12px;font-weight:700;cursor:pointer;">▶▶</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button onclick="resNavStep(-1)" title="이전 회차" style="flex:1;padding:6px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#475569;font-size:11px;font-weight:700;cursor:pointer;">◀ 이전 회차</button>
+          <button onclick="resNavStep(1)" title="다음 회차" style="flex:1;padding:6px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#475569;font-size:11px;font-weight:700;cursor:pointer;">다음 회차 ▶</button>
+        </div>
         <div class="lotto-slip" style="margin-top:10px;">
           <div id="res-balls" class="ball-context"></div>
           <div id="res-list" style="font-size:13px;"></div>
@@ -612,7 +709,7 @@ main.chat-hidden .chat-panel { display: none; }
         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px;">
           <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> 실물 로또 QR 당첨 인증</div>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">동행복권 앱 → 구매내역 → QR코드 → URL 복사 후 붙여넣기</p>
-          <input type="text" id="qr-url-input" class="input-custom" placeholder="동행복권 QR URL 붙여넣기...">
+          <input type="text" id="qr-url-input" class="input-custom" placeholder="동행복권 QR URL 붙여넣기..." onkeyup="if(event.key==='Enter')verifyRealQR()">
           <div style="display:flex;gap:8px;margin-top:8px;">
             <button class="btn-action" onclick="verifyRealQR()" style="background:var(--lotto-red);flex:1;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 당첨 인증하기</button>
             <button class="btn-action" id="cam-btn" onclick="toggleCameraQR()" style="background:#3b82f6;min-width:44px;padding:0 12px;" title="카메라로 QR 스캔"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
@@ -1097,9 +1194,40 @@ function renderTicketFeedback(tk) {
 // =====================================================
 // 회차별 조회
 // =====================================================
-async function initRoundSelector() {
-  // getLatestRound() 계산값 사용 — 항상 최신 회차(1228 등)부터 표시
-  const base = getLatestRound();
+function resNavStep(delta) {
+  const sel = $('res-sel');
+  if (!sel) return;
+  const cur = parseInt(sel.value) || latestRound;
+  const target = cur + delta;
+  if (target < 1) return;
+  // Check if target is in current select options
+  const opts = Array.from(sel.options).map(o => parseInt(o.value)).filter(Boolean);
+  if (opts.includes(target)) {
+    sel.value = target;
+    chgRes();
+  } else {
+    // Re-initialize selector centered on target
+    initRoundSelector(target);
+  }
+  // Update newer button state
+  const newerBtn = $('res-newer-btn');
+  if (newerBtn) newerBtn.disabled = target >= latestRound;
+}
+
+let _resSelectorBase = null;
+function resNavPage(delta) {
+  // Move selector window by 20 rounds
+  const sel = $('res-sel');
+  const cur = parseInt(sel?.value) || latestRound;
+  const base = _resSelectorBase || latestRound;
+  const newBase = Math.max(1, Math.min(latestRound, base + delta * 20));
+  initRoundSelector(newBase);
+}
+
+async function initRoundSelector(base) {
+  // base 파라미터 없으면 최신 회차 사용
+  base = base || getLatestRound();
+  _resSelectorBase = base;
   const sel = $('res-sel');
   sel.innerHTML = '';
   for (let r = base; r >= Math.max(1, base - 19); r--) {
@@ -1108,7 +1236,12 @@ async function initRoundSelector() {
     opt.textContent = `제 ${r}회차 결과 보기`;
     sel.appendChild(opt);
   }
-  sel.value = base;
+  sel.value = Math.min(base, latestRound);
+  // 버튼 활성/비활성 상태 업데이트
+  const newerBtn = $('res-newer-btn');
+  const olderBtn = $('res-older-btn');
+  if (newerBtn) newerBtn.disabled = base >= latestRound;
+  if (olderBtn) olderBtn.style.opacity = (base - 20 < 1) ? '0.4' : '1';
   await chgRes();
 }
 
@@ -2460,7 +2593,7 @@ function renderStats() {
 
   $('stats-content').innerHTML = `
     <div class="kpi-grid">
-      <div class="kpi-box"><div class="kpi-label">총 구매 횟수</div><div class="kpi-value">${totalBuy}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">총 ${fmtMFull(totalInvest)} 투자</div></div>
+      <div class="kpi-box"><div class="kpi-label">총 구매 게임수</div><div class="kpi-value">${totalBuy}<span style="font-size:13px;font-weight:500;">게임</span></div><div class="kpi-sub">총 ${fmtMFull(totalInvest)} 투자</div></div>
       <div class="kpi-box"><div class="kpi-label">총 당첨 횟수</div><div class="kpi-value blue">${winCount}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">당첨률 ${totalBuy > 0 ? (winCount/totalBuy*100).toFixed(1) : 0}%</div></div>
       <div class="kpi-box hl"><div class="kpi-label">총 당첨금</div><div class="kpi-value red">${fmtMFull(totalPrize)}</div><div class="kpi-sub">투자 대비 ${roi.toFixed(1)}%</div></div>
       <div class="kpi-box"><div class="kpi-label">최고 등수</div><div class="kpi-value">${bestLabel}</div><div class="kpi-sub">역대 최고 당첨 등수</div></div>
@@ -2915,7 +3048,7 @@ async function renderBadge() {
 // 랭킹 페이지
 // =====================================================
 const RANK_CATS = [
-  { id: 'buy_count',   label: '구매 횟수', unit: '회' },
+  { id: 'buy_count',   label: '구매 게임수', unit: '게임' },
   { id: 'total_prize', label: '총 당첨금', unit: ''   },
   { id: 'roi',         label: '수익률',    unit: '%'  },
   { id: 'rank1',       label: '1등 인증',  unit: '회' },
@@ -2938,7 +3071,7 @@ async function renderRank(catId) {
   try {
     // user_stats + profiles JOIN
     const orderCol = catId === 'total_prize' ? 'total_prize' :
-                      catId === 'roi' ? 'total_prize' :
+                      catId === 'roi' ? 'total_tickets' :
                       catId === 'rank1' ? 'rank_1_count' :
                       catId === 'rank2' ? 'rank_2_count' :
                       catId === 'rank3' ? 'rank_3_count' :
@@ -2947,7 +3080,7 @@ async function renderRank(catId) {
     const { data: stats } = await sb.from('user_stats')
       .select('user_id, total_tickets, total_spent, total_wins, total_prize, best_rank, rank_1_count, rank_2_count, rank_3_count, rank_4_count, rank_5_count')
       .order(orderCol, { ascending: false })
-      .limit(50);
+      .limit(catId === 'roi' ? 200 : 50);
 
     if (!stats || !stats.length) {
       $('rank-content').innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
@@ -2965,7 +3098,7 @@ async function renderRank(catId) {
 
     // 카테고리별 정렬
     const COL_MAP = {
-      buy_count:   { field: s => s.total_tickets || 0, unit: '회', label: '구매 횟수' },
+      buy_count:   { field: s => s.total_tickets || 0, unit: '게임', label: '구매 게임수' },
       roi:         { field: s => s.total_spent > 0 ? ((s.total_prize - s.total_spent) / s.total_spent * 100) : -100, unit: '%', label: '수익률', fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%' },
       total_prize: { field: s => s.total_prize || 0,   unit: '',   label: '총 당첨금', fmt: v => fmtMFull(v) },
       rank1:       { field: s => s.rank_1_count || 0,  unit: '회', label: '1등 인증' },
@@ -2975,7 +3108,9 @@ async function renderRank(catId) {
       rank5:       { field: s => s.rank_5_count || 0,  unit: '회', label: '5등 횟수' },
     };
     const col = COL_MAP[catId] || COL_MAP.buy_count;
-    const sorted = [...stats].sort((a, b) => col.field(b) - col.field(a));
+    const sorted = [...stats]
+      .filter(s => catId !== 'roi' || (s.total_spent || 0) > 0)
+      .sort((a, b) => col.field(b) - col.field(a));
     const medals = [`<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#f59e0b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='14' r='6'/><path d='M12 8V2'/><path d='M8.56 2h6.88L17 8H7z'/></svg>`,`<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#94a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='14' r='6'/><path d='M12 8V2'/><path d='M8.56 2h6.88L17 8H7z'/></svg>`,`<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#cd7f32' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='14' r='6'/><path d='M12 8V2'/><path d='M8.56 2h6.88L17 8H7z'/></svg>`];
     const myUid = currentUser?.id;
 
@@ -3037,11 +3172,13 @@ function renderCommunityList() {
   const chatSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
   $('community-content').innerHTML = posts.map(p => {
     const liked = myLikedPostIds.has(p.id);
+    const bodyPreview = p.body ? (p.body.replace(/</g,'&lt;').slice(0,80) + (p.body.length > 80 ? '…' : '')) : '';
     return `<div class="post-card" onclick="openPostDetail('${p.id}')">
       <div class="post-card-top">
         <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='free'?'자유':'인증'}</span>
         <span class="post-card-title">${p.title.replace(/</g,'&lt;')}</span>
       </div>
+      ${bodyPreview ? `<div style="font-size:11px;color:#64748b;margin:4px 0 0 0;line-height:1.5;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${bodyPreview}</div>` : ''}
       <div class="post-card-stats">
         <span>${p.nickname}</span>
         <span>${timeAgo(p.created_at)}</span>
@@ -3115,6 +3252,7 @@ async function loadCommunityPosts() {
       myLikedPostIds = new Set((likes||[]).map(l => l.post_id));
     }
     renderCommunityList();
+    updateCommTabCounts();
   } catch(e) {
     console.warn('loadCommunityPosts:', e.message);
     renderCommunityList();
@@ -3251,6 +3389,13 @@ async function renderCommunity() {
   if (pinput) { pinput.disabled = !isLoggedIn; pinput.placeholder = isLoggedIn ? '클릭하여 글쓰기...' : '로그인 후 글 작성 가능합니다'; }
   collapsePostForm();
   await loadCommunityPosts();
+}
+
+function updateCommTabCounts() {
+  const fBtn = $('ct-free');
+  const vBtn = $('ct-verify');
+  if (fBtn) fBtn.textContent = `자유게시판 (${(commPosts.free||[]).length})`;
+  if (vBtn) vBtn.textContent = `인증게시판 (${(commPosts.verify||[]).length})`;
 }
 
 function expandPostForm() {
@@ -3750,6 +3895,18 @@ function renderProfile() {
     </div>
     ${isLoggedIn ? `
     <div class="profile-block">
+      <div class="profile-block-title">획득한 뱃지</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;padding:8px 0;">
+        ${BADGE_DEFS.map(b => {
+          const ok = b.cond();
+          return `<div title="${b.name}: ${b.desc}" style="width:44px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;border:1.5px solid ${ok?'#fecaca':'#e2e8f0'};background:${ok?'#fff5f5':'#f8fafc'};${ok?'':'filter:grayscale(1);opacity:0.4;'}cursor:default;">
+            <span style="font-size:20px;line-height:1;">${b.icon}</span>
+            <span style="font-size:8px;font-weight:700;color:${ok?'#dc2626':'#94a3b8'};text-align:center;line-height:1.2;max-width:40px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.name}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="profile-block">
       <div class="profile-block-title">닉네임 변경</div>
       <div style="display:flex;gap:8px;align-items:center;padding:8px 0;">
         <input type="text" id="nick-input" value="${nick}" maxlength="12"
@@ -3768,6 +3925,27 @@ function renderProfile() {
     </div>` : '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [로그인] 버튼으로 로그인하면 전체 기능을 이용할 수 있습니다</div>'}
   `;
 }
+
+// 다크모드 토글
+function toggleDarkMode() {
+  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  document.body.setAttribute('data-theme', next);
+  const btn = $('dark-toggle-btn');
+  if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
+  try { localStorage.setItem('lottobank-theme', next); } catch(_) {}
+}
+// 저장된 테마 복원
+(function initTheme() {
+  try {
+    const saved = localStorage.getItem('lottobank-theme') || 'light';
+    if (saved === 'dark') {
+      document.body.setAttribute('data-theme', 'dark');
+      const btn = document.getElementById('dark-toggle-btn');
+      if (btn) btn.textContent = '☀️';
+    }
+  } catch(_) {}
+})();
 
 window.onload = init;
 </script>
