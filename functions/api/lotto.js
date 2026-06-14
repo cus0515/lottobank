@@ -2,9 +2,10 @@
  * Cloudflare Pages Function: /api/lotto?round=1226
  *
  * 우선순위:
- *   1) GitHub Actions 캐시 (raw.githubusercontent.com) — 가장 빠름, IP 차단 없음
- *   2) 새 dhlottery API (2026) — center/right 두 방향
- *   3) 구 dhlottery API (common.do) — 최후 폴백
+ *   1) GitHub Actions 캐시 (raw.githubusercontent.com) — 가장 빠름
+ *   2) 새 dhlottery API (2026) — center/right
+ *   3) 구 dhlottery API (common.do)
+ *   4) HTML 결과 페이지 스크래핑 — 수동/자동, 당첨지역 포함
  */
 
 const GITHUB_CACHE_URL =
@@ -28,8 +29,7 @@ export async function onRequest(context) {
   }
 
   const browserHeaders = {
-    'User-Agent':
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     Accept: 'application/json, text/javascript, */*; q=0.01',
     'Accept-Language': 'ko-KR,ko;q=0.9',
     Referer: 'https://www.dhlottery.co.kr/lt645/result',
@@ -64,94 +64,74 @@ export async function onRequest(context) {
       bnusNo: Number(item.bnsWnNo ?? item.bnusNo),
       firstWinamnt: Number(item.rnk1WnAmt ?? item.firstWinamnt ?? 0),
       firstPrzwnerCo: Number(item.rnk1WnNope ?? item.firstPrzwnerCo ?? 0),
+      // 2~5등 당첨자 수 (새 API 필드명 시도)
+      rnk2WnAmt: Number(item.rnk2WnAmt ?? 0),
+      rnk2WnNope: Number(item.rnk2WnNope ?? 0),
+      rnk3WnNope: Number(item.rnk3WnNope ?? 0),
+      rnk4WnNope: Number(item.rnk4WnNope ?? 0),
+      rnk5WnNope: Number(item.rnk5WnNope ?? 0),
+      // 수동/자동 (새 API 필드명 시도)
+      rnk1AutoNope: Number(item.rnk1AutoWnNope ?? item.rnk1AutoNope ?? 0),
+      rnk1ManualNope: Number(item.rnk1ManualWnNope ?? item.rnk1ManualNope ?? 0),
+      rnk2AutoNope: Number(item.rnk2AutoWnNope ?? item.rnk2AutoNope ?? 0),
+      rnk2ManualNope: Number(item.rnk2ManualWnNope ?? item.rnk2ManualNope ?? 0),
       totSellamnt: Number(item.totSellamnt ?? 0),
     };
   }
 
-  // ── Method 0: GitHub Actions 캐시 (가장 빠름) ─────────────────────────────
-  try {
-    const res = await fetchWithTimeout(GITHUB_CACHE_URL, {}, 4000);
-    if (res.ok) {
-      const cached = await res.json();
-      if (
-        cached?.returnValue === 'success' &&
-        Number(cached.drwNo) === round
-      ) {
-        cached._source = 'github-cache';
-        return new Response(JSON.stringify(cached), { headers: cors });
-      }
-    }
-  } catch (_) {}
-
-  // ── Method 1: 새 API center (2026) ───────────────────────────────────────
-  try {
-    const apiUrl = `https://www.dhlottery.co.kr/lt645/selectPstLt645InfoNew.do?srchDir=center&srchLtEpsd=${round}&_=${Date.now()}`;
-    const res = await fetchWithTimeout(apiUrl, { headers: browserHeaders }, 6000);
-    if (res.ok) {
-      const json = await res.json();
-      const list = json?.data?.list ?? json?.list;
-      if (Array.isArray(list) && list.length > 0) {
-        const item = list.find((x) => Number(x.ltEpsd) === round) ?? list[0];
-        return new Response(
-          JSON.stringify(buildResult(item, 'new-api-center')),
-          { headers: cors }
-        );
-      }
-    }
-  } catch (_) {}
-
-  // ── Method 2: 새 API right ───────────────────────────────────────────────
-  try {
-    const apiUrl2 = `https://www.dhlottery.co.kr/lt645/selectPstLt645InfoNew.do?srchDir=right&srchLtEpsd=${round + 5}&_=${Date.now()}`;
-    const res = await fetchWithTimeout(apiUrl2, { headers: browserHeaders }, 6000);
-    if (res.ok) {
-      const json = await res.json();
-      const list = json?.data?.list ?? json?.list;
-      if (Array.isArray(list) && list.length > 0) {
-        const item = list.find((x) => Number(x.ltEpsd) === round);
-        if (item) {
-          return new Response(
-            JSON.stringify(buildResult(item, 'new-api-right')),
-            { headers: cors }
-          );
-        }
-      }
-    }
-  } catch (_) {}
-
-  // ── Method 3: 구 API (common.do) ─────────────────────────────────────────
-  try {
-    const oldUrl = `https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${round}`;
-    const res = await fetchWithTimeout(
-      oldUrl,
-      {
+  // HTML 결과 페이지에서 상세 데이터 추출
+  async function scrapeDetailPage(r) {
+    try {
+      const pageUrl = `https://www.dhlottery.co.kr/gameResult.do?method=byWin&drwNo=${r}`;
+      const res = await fetchWithTimeout(pageUrl, {
         headers: {
-          ...browserHeaders,
-          Accept: 'application/json, */*',
-          Referer: 'https://www.dhlottery.co.kr/gameResult.do?method=byWin',
-        },
-      },
-      6000
-    );
-    if (res.ok) {
-      const text = await res.text();
-      if (text.trim().startsWith('{')) {
-        const data = JSON.parse(text);
-        if (data?.returnValue === 'success') {
-          data._source = 'old-api';
-          return new Response(JSON.stringify(data), { headers: cors });
+          'User-Agent': browserHeaders['User-Agent'],
+          Accept: 'text/html,application/xhtml+xml',
+          'Accept-Language': 'ko-KR,ko;q=0.9',
         }
+      }, 8000);
+      if (!res.ok) return null;
+      const html = await res.text();
+
+      const detail = { regions: [], rankData: {} };
+
+      // 당첨 번호 테이블 파싱 - 등수별 당첨자 수, 수동/자동
+      // 패턴: <td>1등</td> ... <td>자동:N / 수동:M</td> ... <td>X명</td> ... <td>Y원</td>
+      const rows = html.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) || [];
+      for (const row of rows) {
+        const cells = (row.match(/<td[^>]*>([\s\S]*?)<\/td>/gi) || [])
+          .map(td => td.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/,/g, '').trim());
+        if (cells.length < 3) continue;
+        const rankMatch = cells[0]?.match(/^(\d)등$/);
+        if (!rankMatch) continue;
+        const rank = Number(rankMatch[1]);
+        const cntStr = cells.find(c => /^\d+$/.test(c) && Number(c) < 100000);
+        const amtStr = cells.find(c => /^\d+$/.test(c) && Number(c) > 100000);
+        // 수동/자동 셀
+        const autoCell = cells.find(c => c.includes('자동') || c.includes('수동'));
+        let autoN = 0, manualN = 0;
+        if (autoCell) {
+          const am = autoCell.match(/자동[^\d]*(\d+)/); if (am) autoN = Number(am[1]);
+          const mm = autoCell.match(/수동[^\d]*(\d+)/); if (mm) manualN = Number(mm[1]);
+        }
+        detail.rankData[rank] = {
+          cnt: cntStr ? Number(cntStr) : 0,
+          amt: amtStr ? Number(amtStr) : 0,
+          auto: autoN,
+          manual: manualN,
+        };
       }
-    }
-  } catch (_) {}
 
-  return new Response(
-    JSON.stringify({ returnValue: 'fail', error: 'all methods failed', round }),
-    { status: 500, headers: cors }
-  );
-}
-
-function formatDate(ymd) {
-  if (!ymd || ymd.length !== 8) return ymd || '';
-  return `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
-}
+      // 당첨지역 파싱
+      const regionMatch = html.match(/지역별[\s\S]*?(<table[\s\S]*?<\/table>)/i);
+      if (regionMatch) {
+        const regionCells = regionMatch[1].match(/<td[^>]*>([\s\S]*?)<\/td>/gi) || [];
+        regionCells.forEach(td => {
+          const text = td.replace(/<[^>]+>/g, '').trim();
+          if (text && /[가-힣]/.test(text) && text.length <= 10) detail.regions.push(text);
+        });
+      }
+      // 대안: 1등 지역 목록 파싱
+      if (!detail.regions.length) {
+        const regionPat = /(?:서울|경기|인천|강원|충북|충남|대전|전북|전남|광주|경북|경남|부산|대구|울산|제주|세종)[^\s<]*/g;
+        const regionMatches = html.match(re

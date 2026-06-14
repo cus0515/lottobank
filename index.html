@@ -49,6 +49,22 @@ header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); positio
 .user-dd-item.danger { color:#ef4444; }
 
 main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 3.5fr 5fr 4fr; gap: 20px; height: calc(100vh - 110px); min-height: 700px; }
+main.chat-hidden { grid-template-columns: 3.5fr 8fr; }
+main.chat-hidden .chat-panel { display: none; }
+.chat-toggle-btn { background:none; border:none; cursor:pointer; font-size:14px; color:#94a3b8; padding:2px 6px; border-radius:4px; line-height:1; }
+.chat-toggle-btn:hover { background:#f1f5f9; color:var(--lotto-red); }
+.prize-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
+.prize-table th { background:#f8fafc; color:#64748b; font-weight:700; padding:6px 8px; text-align:center; border-bottom:2px solid #e2e8f0; }
+.prize-table td { padding:6px 8px; text-align:center; border-bottom:1px solid #f1f5f9; }
+.prize-table tr:hover td { background:#fafafa; }
+.prize-rank-badge { display:inline-block; width:22px; height:22px; border-radius:50%; font-size:10px; font-weight:900; line-height:22px; }
+.pr1 { background:#fef08a; color:#854d0e; }
+.pr2 { background:#e2e8f0; color:#334155; }
+.pr3 { background:#fed7aa; color:#9a3412; }
+.pr4 { background:#dbeafe; color:#1e40af; }
+.pr5 { background:#f0fdf4; color:#166534; }
+.winner-type { font-size:10px; color:#64748b; }
+.region-list { font-size:11px; color:#475569; margin-top:6px; padding:6px 8px; background:#f8fafc; border-radius:6px; line-height:1.8; }
 @media (max-width: 1200px) { main { grid-template-columns: 1fr; height: auto; } }
 
 .panel { background: var(--paper-white); border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; height: 100%; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
@@ -360,28 +376,34 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 </div>
 
 <main>
-  <!-- 좌측: 실시간 분석 스코어보드 -->
+  <!-- 좌측: 최신 당첨 현황 -->
   <section class="panel">
-    <div class="panel-header">📊 최신 당첨 현황</div>
-    <div class="panel-body" style="display:flex; flex-direction:column; gap:15px;">
-      <div class="lotto-slip">
+    <div class="panel-header">📊 최신 당첨 현황<span id="h-round-badge" style="font-size:11px;font-weight:600;color:#94a3b8;"></span></div>
+    <div class="panel-body" style="padding:14px;">
+      <div class="lotto-slip" style="margin-bottom:10px;">
         <div class="slip-header">
-          <h2 id="h-rec-title">최신 회차 로딩 중...</h2>
-          <p id="h-rec-date">동행복권 API 연결 중</p>
+          <h2 id="h-rec-title" style="font-size:14px;">로딩 중...</h2>
+          <p id="h-rec-date" style="font-size:11px;">연결 중...</p>
         </div>
-        <div id="h-balls" class="ball-context"><span style="color:var(--text-muted);font-size:12px;">불러오는 중...</span></div>
-        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13px; border-top:1px dashed #cbd5e1; padding-top:8px;">
-          <span style="color:var(--text-muted);">1등 당첨금</span>
-          <span id="h-amt" style="color:var(--lotto-red);">-</span>
-        </div>
+        <div id="h-balls" class="ball-context" style="margin:8px 0;"><span style="color:var(--text-muted);font-size:12px;">불러오는 중...</span></div>
+        <div style="font-size:11px;color:#64748b;margin-top:4px;">보너스 번호 포함 · 동행복권 공식 데이터</div>
       </div>
-
-      <div style="font-size:13px; font-weight:700; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">내 통계</div>
-      <div class="stats-grid">
-        <div class="stats-box"><div class="stats-label">누적 구매 금액</div><div id="h-cost" class="stats-value" style="color:var(--b-red);">0원</div></div>
-        <div class="stats-box"><div class="stats-label">누적 당첨 금액</div><div id="h-earned" class="stats-value" style="color:var(--b-green);">0원</div></div>
-        <div class="stats-box"><div class="stats-label">저장된 번호</div><div id="h-total" class="stats-value">0게임</div></div>
-        <div class="stats-box"><div class="stats-label">획득 뱃지</div><div id="h-best-badge" class="stats-value" style="font-size:12px;">없음</div></div>
+      <table class="prize-table">
+        <thead>
+          <tr><th>등수</th><th>당첨 조건</th><th>당첨자</th><th>1인당 금액</th><th>수동/자동</th></tr>
+        </thead>
+        <tbody id="h-prize-table">
+          <tr><td colspan="5" style="color:#94a3b8;padding:16px 0;">데이터 로딩 중...</td></tr>
+        </tbody>
+      </table>
+      <div id="h-region" class="region-list" style="display:none;"></div>
+      <!-- 숨김 stats (profile/stats 탭에서 참조) -->
+      <div style="display:none">
+        <span id="h-cost">0원</span>
+        <span id="h-earned">0원</span>
+        <span id="h-total">0게임</span>
+        <span id="h-best-badge">없음</span>
+        <span id="h-amt">-</span>
       </div>
     </div>
   </section>
@@ -471,8 +493,10 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
   </section>
 
   <!-- 우측: 라이브 커뮤니티 -->
-  <section class="panel">
-    <div class="panel-header">💬 커뮤니티 피드</div>
+  <section class="panel chat-panel" id="chat-panel-section">
+    <div class="panel-header">💬 실시간 채팅
+      <button class="chat-toggle-btn" onclick="toggleChat()" title="채팅 숨기기" id="chat-toggle-btn">✕</button>
+    </div>
     <div style="display:flex; flex-direction:column; height:calc(100% - 49px);">
       <div class="chat-messages" id="chat-box">
         <div class="chat-row"><span class="badge b-guest">공지</span><span class="chat-user">LottoBank:</span><br><span class="chat-text">실제 구매 QR 코드로 당첨 여부를 인증하고 전적을 기록하세요.</span></div>
@@ -550,7 +574,17 @@ async function fetchLotto(round) {
       bonus: data.bnusNo,
       prize_1st: data.firstWinamnt,
       win_count_1st: data.firstPrzwnerCo,
-      totalSales: data.totSellamnt
+      prize_2nd: data.rnk2WnAmt || 0,
+      win_count_2nd: data.rnk2WnNope || 0,
+      win_count_3rd: data.rnk3WnNope || 0,
+      win_count_4th: data.rnk4WnNope || 0,
+      win_count_5th: data.rnk5WnNope || 0,
+      auto_1st: data.rnk1AutoNope || 0,
+      manual_1st: data.rnk1ManualNope || 0,
+      auto_2nd: data.rnk2AutoNope || 0,
+      manual_2nd: data.rnk2ManualNope || 0,
+      regions: data.regions || [],
+      totalSales: data.totSellamnt || 0,
     };
     apiCache[round] = result;
     return result;
@@ -695,20 +729,50 @@ function prizeTableHtml(data) {
 function renderLatestOnLeft(data) {
   if (!data) {
     $('h-rec-title').textContent = 'API 연결 실패';
-    $('h-rec-date').textContent = 'API 연결 오류 - 잠시 후 새로고침';
-    $('h-balls').innerHTML = '<span style="color:var(--b-red);font-size:11px;">데이터 로딩 실패 - 잠시 후 새로고침</span>';
-    $('h-amt').textContent = '-';
+    $('h-rec-date').textContent = '잠시 후 자동 재시도합니다';
+    $('h-balls').innerHTML = '<span style="color:var(--b-red);font-size:11px;">⚠️ 데이터 로딩 실패</span>';
+    $('h-prize-table').innerHTML = '<tr><td colspan="5" style="color:#ef4444;padding:12px 0;">연결 실패 — 자동 재시도 중</td></tr>';
     $('api-indicator').textContent = 'API 오류';
     $('api-indicator').className = 'api-status err';
     return;
   }
   $('h-rec-title').textContent = `제 ${data.round}회 공식 당첨번호`;
-  $('h-rec-date').textContent = `추첨일: ${data.date}`;
+  $('h-rec-date').textContent = `추첨일: ${data.date}  ·  총 판매액 ${fmtMShort(data.totalSales)}`;
   $('h-balls').innerHTML = data.nums.map(n => bH(n)).join('') +
     '<span style="font-weight:900;color:var(--text-muted);font-size:16px;margin:0 3px;">+</span>' + bH(data.bonus);
   $('h-amt').textContent = fmtMShort(data.prize_1st);
+  $('h-round-badge').textContent = ` ${data.round}회`;
   $('api-indicator').textContent = `실시간 ${data.round}회`;
   $('api-indicator').className = 'api-status ok';
+
+  // 당첨 등급 테이블
+  const prize2 = data.prize_2nd || Math.round((data.totalSales * 0.125) / Math.max(data.win_count_2nd||1,1));
+  const prizes = [
+    { rank:1, cond:'6개 일치', cls:'pr1', amt: data.prize_1st, cnt: data.win_count_1st, auto: data.auto_1st, manual: data.manual_1st },
+    { rank:2, cond:'5개+보너스', cls:'pr2', amt: prize2, cnt: data.win_count_2nd||'?', auto: data.auto_2nd, manual: data.manual_2nd },
+    { rank:3, cond:'5개 일치', cls:'pr3', amt: 1500000, cnt: data.win_count_3rd||'?', auto:null, manual:null },
+    { rank:4, cond:'4개 일치', cls:'pr4', amt: 50000, cnt: data.win_count_4th||'?', auto:null, manual:null },
+    { rank:5, cond:'3개 일치', cls:'pr5', amt: 5000, cnt: data.win_count_5th||'?', auto:null, manual:null },
+  ];
+  $('h-prize-table').innerHTML = prizes.map(p => {
+    const autoStr = (p.auto != null && p.manual != null)
+      ? `<span class="winner-type">자동 ${p.auto}<br>수동 ${p.manual}</span>`
+      : `<span class="winner-type" style="color:#cbd5e1;">—</span>`;
+    return `<tr>
+      <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
+      <td style="font-size:11px;color:#475569;">${p.cond}</td>
+      <td style="font-weight:700;">${p.cnt}명</td>
+      <td style="font-weight:700;color:var(--lotto-red);">${fmtMShort(p.amt)}</td>
+      <td>${autoStr}</td>
+    </tr>`;
+  }).join('');
+
+  // 당첨 지역
+  if (data.regions && data.regions.length) {
+    const regionHtml = data.regions.map(r => `<span style="display:inline-block;background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:1px 6px;margin:2px;font-size:11px;">${r}</span>`).join('');
+    $('h-region').innerHTML = `<div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">🗺️ 1등 당첨 지역</div>${regionHtml}`;
+    $('h-region').style.display = 'block';
+  }
 }
 
 function renderHomeLive() {
@@ -1114,6 +1178,33 @@ async function initAuth() {
 }
 
 // =====================================================
+// 채팅 토글
+// =====================================================
+let chatVisible = true;
+function toggleChat() {
+  chatVisible = !chatVisible;
+  const main = document.querySelector('main');
+  const btn = $('chat-toggle-btn');
+  if (chatVisible) {
+    main.classList.remove('chat-hidden');
+    btn.textContent = '✕';
+    btn.title = '채팅 숨기기';
+  } else {
+    main.classList.add('chat-hidden');
+    btn.textContent = '💬';
+    btn.title = '채팅 열기';
+    // 채팅 닫았을 때 우측 상단에 열기 버튼 표시
+  }
+  try { localStorage.setItem('lottobank_chat_visible', chatVisible ? '1' : '0'); } catch {}
+}
+// 채팅 상태 복원
+try {
+  if (localStorage.getItem('lottobank_chat_visible') === '0') {
+    chatVisible = true; toggleChat();
+  }
+} catch {}
+
+// =====================================================
 // 채팅 (Supabase Realtime)
 // =====================================================
 let chatChannel = null;
@@ -1356,10 +1447,20 @@ async function init() {
   $('api-indicator').textContent = 'API 연결 중...';
   $('api-indicator').className = 'api-status loading';
 
-  latestData = await fetchLotto(latestRound);
+  // 최신 회차 자동 탐색 (최대 3회차 뒤로)
+  for (let r = latestRound; r >= latestRound - 2; r--) {
+    latestData = await fetchLotto(r);
+    if (latestData) { latestRound = r; break; }
+  }
+  // 실패시 5초 후 재시도
   if (!latestData) {
-    latestData = await fetchLotto(latestRound - 1);
-    if (latestData) latestRound = latestRound - 1;
+    setTimeout(async () => {
+      for (let r = latestRound; r >= latestRound - 2; r--) {
+        latestData = await fetchLotto(r);
+        if (latestData) { latestRound = r; break; }
+      }
+      if (latestData) { renderLatestOnLeft(latestData); recentData[latestRound] = latestData; renderHomeLive(); }
+    }, 5000);
   }
 
   renderLatestOnLeft(latestData);
