@@ -41,6 +41,9 @@ header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); positio
 .user-btn-arrow { font-size:10px; color:#94a3b8; }
 .user-dropdown { display:none; position:absolute; top:calc(100% + 6px); right:0; background:#fff; border:1px solid #e2e8f0; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.12); min-width:180px; z-index:9999; overflow:hidden; }
 .user-dropdown.open { display:block; }
+.dd-item { display:block; width:100%; text-align:left; padding:10px 14px; font-size:13px; font-weight:600; color:var(--text-dark); background:none; border:none; cursor:pointer; font-family:inherit; }
+.dd-item:hover { background:#f8fafc; }
+.dd-logout { color:#dc2626 !important; border-top:1px solid #f1f5f9; }
 .user-dd-header { padding:12px 14px 10px; border-bottom:1px solid #f1f5f9; }
 .user-dd-nick { font-size:14px; font-weight:900; color:var(--text-dark); }
 .user-dd-badge { font-size:11px; color:#64748b; margin-top:2px; }
@@ -287,17 +290,30 @@ main.chat-hidden .chat-panel { display: none; }
     <div class="menu-tabs">
       <button id="m-home" class="menu-btn on" onclick="go('home')">홈</button>
       <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
-      <button id="m-ticket" class="menu-btn" onclick="go('ticket')">QR 인증</button>
-      <button id="m-fortune" class="menu-btn" onclick="go('fortune')">번호 분석</button>
-      <button id="m-stats" class="menu-btn" onclick="go('stats')">나의 전적</button>
-      <button id="m-badge" class="menu-btn" onclick="go('badge')">뱃지</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
-      <button id="m-profile" class="menu-btn" onclick="go('profile')">내 프로필</button>
     </div>
     <div class="auth-zone">
       <span id="api-indicator" class="api-status loading">API 로딩중...</span>
       <button id="btn-auth" class="btn-login" onclick="showAuthModal()">로그인</button>
+      <!-- 로그인 후 유저 드롭다운 -->
+      <div id="user-profile" class="user-profile" onclick="toggleUserDropdown()">
+        <div id="user-avatar" class="user-avatar">?</div>
+        <span id="user-name" style="font-size:13px;font-weight:700;color:var(--text-dark);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+        <span style="font-size:10px;color:#94a3b8;">▼</span>
+        <div id="user-dropdown" class="user-dropdown">
+          <div style="padding:10px 14px;border-bottom:1px solid #f1f5f9;">
+            <div id="dd-nick" style="font-size:13px;font-weight:700;color:var(--text-dark);"></div>
+            <div id="dd-badge" style="font-size:11px;color:#dc2626;margin-top:2px;"></div>
+          </div>
+          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('ticket')">🎯 QR 인증</button>
+          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('fortune')">📊 번호 분석</button>
+          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('stats')">📈 나의 전적</button>
+          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('badge')">🏅 뱃지</button>
+          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('profile')">👤 내 프로필</button>
+          <button class="dd-item dd-logout" onclick="event.stopPropagation();doLogout()">🔒 로그아웃</button>
+        </div>
+      </div>
       <button class="hamburger" onclick="openMobMenu()" aria-label="메뉴">
         <span></span><span></span><span></span>
       </button>
@@ -314,13 +330,17 @@ main.chat-hidden .chat-panel { display: none; }
   </div>
   <button class="mob-menu-item" onclick="go('home');closeMobMenu()">📋 홈</button>
   <button class="mob-menu-item" onclick="go('result');closeMobMenu()">🔍 회차 조회</button>
-  <button class="mob-menu-item" onclick="go('ticket');closeMobMenu()">🎯 QR 인증</button>
-  <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()">📊 번호 분석</button>
-  <button class="mob-menu-item" onclick="go('stats');closeMobMenu()">📈 나의 전적</button>
-  <button class="mob-menu-item" onclick="go('badge');closeMobMenu()">🏅 뱃지</button>
   <button class="mob-menu-item" onclick="go('rank');closeMobMenu()">🏆 랭킹</button>
   <button class="mob-menu-item" onclick="go('community');closeMobMenu()">💬 커뮤니티</button>
-  <button class="mob-menu-item" onclick="go('profile');closeMobMenu()">👤 내 프로필</button>
+  <div id="mob-auth-section" style="display:none;border-top:2px solid #f1f5f9;margin-top:4px;">
+    <div style="padding:10px 4px 4px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.5px;">내 계정</div>
+    <button class="mob-menu-item" onclick="go('ticket');closeMobMenu()">🎯 QR 인증</button>
+    <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()">📊 번호 분석</button>
+    <button class="mob-menu-item" onclick="go('stats');closeMobMenu()">📈 나의 전적</button>
+    <button class="mob-menu-item" onclick="go('badge');closeMobMenu()">🏅 뱃지</button>
+    <button class="mob-menu-item" onclick="go('profile');closeMobMenu()">👤 내 프로필</button>
+    <button class="mob-menu-item" style="color:#dc2626;" onclick="doLogout();closeMobMenu()">🔒 로그아웃</button>
+  </div>
 </div>
 
 <!-- 바텀 네비게이션 -->
@@ -1180,6 +1200,8 @@ function applyLoginUI(user) {
   const nick = user.user_metadata?.nickname || user.email.split('@')[0];
   updateHeaderUser(nick, myVerifiedTitle || '');
   $('btn-auth').style.display = 'none';
+  $('user-profile').style.display = 'flex';
+  const mobSec = $('mob-auth-section'); if (mobSec) mobSec.style.display = '';
   $('chat-input').disabled = false;
   $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
   updateBadgeUI();
@@ -1197,6 +1219,8 @@ function applyLogoutUI() {
   currentUser = null;
   dbStats = null;
   $('btn-auth').style.display = '';
+  $('user-profile').style.display = 'none';
+  const mobSec2 = $('mob-auth-section'); if (mobSec2) mobSec2.style.display = 'none';
   $('chat-input').disabled = true;
   $('chat-input').placeholder = '로그인 후 대화에 참여해보세요.';
   toast('🔒 로그아웃되었습니다');
