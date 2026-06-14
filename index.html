@@ -1365,7 +1365,6 @@ async function verifyRealQR() {
         nickname: 'LottoBank',
         verified_title: null,
         message: `${rankEmoji[bestRank]||'🎉'} [${bNick}]님이 제 ${parsed.round}회차 ${bestLabel} 인증 성공!${roiMsg}`,
-        is_system: true
       }).catch(() => {});
     })();
   }
@@ -1405,8 +1404,10 @@ function getMyBadgeHtml() {
 }
 
 function updateBadgeUI() {
-  $('my-badge-space').innerHTML = getMyBadgeHtml();
-  $('h-best-badge').innerHTML = myVerifiedTitle ? getMyBadgeHtml() : '없음';
+  const bsp = $('my-badge-space');
+  if (bsp) bsp.innerHTML = getMyBadgeHtml();
+  const hbb = $('h-best-badge');
+  if (hbb) hbb.innerHTML = myVerifiedTitle ? getMyBadgeHtml() : '없음';
 }
 
 // =====================================================
@@ -3218,7 +3219,7 @@ async function adminTab(tab, btn) {
         <td id="tprize-${t.id}" style="color:var(--lotto-red);font-weight:700;">${fmtMShort(t.prize_amount||0)}</td>
         <td style="font-size:11px;color:var(--text-muted);">${t.created_at?t.created_at.slice(0,10):'-'}</td>
         <td style="display:flex;gap:4px;">
-          <button onclick="adminEditTicket('${t.id}',${t.drw_no||0},${t.game_count||0},${t.prize_amount||0})" style="padding:3px 6px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button>
+          <button onclick="adminEditTicket('${t.id}',${t.round_no||0},${t.game_count||0},${t.prize_amount||0})" style="padding:3px 6px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button>
           <button onclick="adminDelete('tickets','${t.id}')" style="padding:3px 6px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;font-size:11px;cursor:pointer;">삭제</button>
         </td>
       </tr>`).join('')}</tbody></table>`;
@@ -3338,7 +3339,7 @@ async function adminTab(tab, btn) {
           <td style="color:${roiColor};font-weight:700;">${roi !== '-' ? (parseFloat(roi) >= 0 ? '+' : '') + roi + '%' : '-'}</td>
           <td>${s.best_rank ? s.best_rank + '등' : '-'}</td>
           <td>${fmtCnt(s.rank_1_count||0)}회</td>
-          <td><button data-uid="${s.user_id}" data-nick="${s.users?.nickname||''}" data-tickets="${s.total_tickets||0}" data-spent="${s.total_spent||0}" data-prize="${s.total_prize||0}" data-wins="${s.total_wins||0}" data-best="${s.best_rank||0}" onclick="adminEditStat(this.dataset.uid,this.dataset.nick,+this.dataset.tickets,+this.dataset.spent,+this.dataset.prize,+this.dataset.wins,+this.dataset.best)" style="padding:3px 8px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
+          <td><button data-uid="${s.user_id}" data-nick="${sNickMap[s.user_id]||''}" data-tickets="${s.total_tickets||0}" data-spent="${s.total_spent||0}" data-prize="${s.total_prize||0}" data-wins="${s.total_wins||0}" data-best="${s.best_rank||0}" onclick="adminEditStat(this.dataset.uid,this.dataset.nick,+this.dataset.tickets,+this.dataset.spent,+this.dataset.prize,+this.dataset.wins,+this.dataset.best)" style="padding:3px 8px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
         </tr>`;
       }).join('')}</tbody></table>`;
     }
