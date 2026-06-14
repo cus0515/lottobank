@@ -915,11 +915,23 @@ async function doAuth() {
       toast('✅ 가입 완료! 이메일 인증 후 로그인해주세요');
     }
   } catch (e) {
-    const msg = e.message || '';
-    if (msg.includes('Invalid login')) $('auth-err').textContent = '이메일 또는 비밀번호가 올바르지 않습니다';
-    else if (msg.includes('already registered')) $('auth-err').textContent = '이미 가입된 이메일입니다';
-    else if (msg.includes('Password should')) $('auth-err').textContent = '비밀번호는 8자리 이상이어야 합니다';
-    else $('auth-err').textContent = msg || '오류가 발생했습니다. 다시 시도해주세요';
+    const msg = (e.message || '').toLowerCase();
+    if (msg.includes('invalid login') || msg.includes('invalid credentials'))
+      $('auth-err').textContent = '이메일 또는 비밀번호가 올바르지 않습니다';
+    else if (msg.includes('already registered') || msg.includes('user already'))
+      $('auth-err').textContent = '이미 가입된 이메일입니다';
+    else if (msg.includes('password should') || msg.includes('password must'))
+      $('auth-err').textContent = '비밀번호는 8자리 이상이어야 합니다';
+    else if (msg.includes('invalid email') || msg.includes('email is invalid') || msg.includes('validate email') || msg.includes('valid email'))
+      $('auth-err').textContent = '유효하지 않은 이메일 형식입니다';
+    else if (msg.includes('email not confirmed'))
+      $('auth-err').textContent = '이메일 인증이 필요합니다. 받은편지함을 확인해주세요';
+    else if (msg.includes('rate limit') || msg.includes('too many'))
+      $('auth-err').textContent = '잠시 후 다시 시도해주세요';
+    else if (msg.includes('network') || msg.includes('fetch'))
+      $('auth-err').textContent = '네트워크 오류가 발생했습니다. 연결을 확인해주세요';
+    else
+      $('auth-err').textContent = '오류가 발생했습니다. 다시 시도해주세요';
   } finally {
     btn.disabled = false;
     btn.textContent = authMode === 'login' ? '로그인' : '가입하기';
