@@ -405,8 +405,8 @@ main.chat-hidden .chat-panel { display: none; }
           <tr><td colspan="5" style="color:#94a3b8;padding:16px 0;">데이터 로딩 중...</td></tr>
         </tbody>
       </table>
-      <!-- 내 구매 현황 (최하단 visible) -->
-      <div style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;">
+      <!-- 내 구매 현황 (로그인시만 표시) -->
+      <div id="h-my-purchase" style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;display:none;">
         <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">📌 내 구매 현황</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;">
           <span style="color:#64748b;">총 구매</span><span id="h-total" style="font-weight:700;text-align:right;">0게임</span>
@@ -601,6 +601,9 @@ async function fetchLotto(round) {
       manual_1st: data.rnk1ManualNope || 0,
       auto_2nd: data.rnk2AutoNope || 0,
       manual_2nd: data.rnk2ManualNope || 0,
+      prize_3rd: data.rnk3WnAmt || 1500000,
+      prize_4th: data.rnk4WnAmt || 50000,
+      prize_5th: data.rnk5WnAmt || 5000,
       regions: data.regions || [],
       totalSales: data.totSellamnt || 0,
     };
@@ -766,9 +769,9 @@ function renderLatestOnLeft(data) {
   const prizes = [
     { rank:1, cond:'6개 일치', cls:'pr1', amt: data.prize_1st, cnt: data.win_count_1st, auto: data.auto_1st, manual: data.manual_1st },
     { rank:2, cond:'5개+보너스', cls:'pr2', amt: prize2, cnt: data.win_count_2nd||'?', auto: data.auto_2nd, manual: data.manual_2nd },
-    { rank:3, cond:'5개 일치', cls:'pr3', amt: 1500000, cnt: data.win_count_3rd||'?', auto:null, manual:null },
-    { rank:4, cond:'4개 일치', cls:'pr4', amt: 50000, cnt: data.win_count_4th||'?', auto:null, manual:null },
-    { rank:5, cond:'3개 일치', cls:'pr5', amt: 5000, cnt: data.win_count_5th||'?', auto:null, manual:null },
+    { rank:3, cond:'5개 일치', cls:'pr3', amt: data.prize_3rd||1500000, cnt: data.win_count_3rd||'?', auto:null, manual:null },
+    { rank:4, cond:'4개 일치', cls:'pr4', amt: data.prize_4th||50000, cnt: data.win_count_4th||'?', auto:null, manual:null },
+    { rank:5, cond:'3개 일치', cls:'pr5', amt: data.prize_5th||5000, cnt: data.win_count_5th||'?', auto:null, manual:null },
   ];
   $('h-prize-table').innerHTML = prizes.map(p => {
     const autoStr = (p.auto != null && p.manual != null)
@@ -779,11 +782,22 @@ function renderLatestOnLeft(data) {
       <td style="font-size:11px;color:#475569;">${p.cond}</td>
       <td style="font-weight:700;">${p.cnt}명</td>
       <td style="font-weight:700;color:var(--lotto-red);">${fmtMShort(p.amt)}</td>
-      <td>${autoStr}</td>
+      <td${p.rank<=2?` id="h-auto-${p.rank}"`:''}>${autoStr}</td>
     </tr>`;
   }).join('');
-
-
+  // 홈 패널 수동/자동도 판매소 데이터로 업데이트
+  const hr = data.round;
+  fetch(`/api/lotto-region?round=${hr}`, {cache:'no-cache'})
+    .then(r=>r.json())
+    .then(j=>{
+      [[j.stores1||[], 1],[j.stores2||[], 2]].forEach(([stores, rank])=>{
+        const cell = document.getElementById('h-auto-'+rank);
+        if (!cell || !stores.length) return;
+        const aC = stores.filter(s=>s.auto==='자동').length;
+        const mC = stores.filter(s=>s.auto==='수동').length;
+        cell.innerHTML = `<span class="winner-type">자동 ${aC}<br>수동 ${mC}</span>`;
+      });
+    }).catch(()=>{});
 }
 
 function renderHomeLive() {
@@ -887,9 +901,9 @@ async function chgRes() {
   const prizes = [
     { rank:1, cond:'6개 일치',   cls:'pr1', amt: d.prize_1st,     cnt: d.win_count_1st,     auto: d.auto_1st,  manual: d.manual_1st },
     { rank:2, cond:'5개+보너스', cls:'pr2', amt: prize2,           cnt: d.win_count_2nd||'?', auto: d.auto_2nd,  manual: d.manual_2nd },
-    { rank:3, cond:'5개 일치',   cls:'pr3', amt: 1500000,          cnt: d.win_count_3rd||'?', auto: null, manual: null },
-    { rank:4, cond:'4개 일치',   cls:'pr4', amt: 50000,            cnt: d.win_count_4th||'?', auto: null, manual: null },
-    { rank:5, cond:'3개 일치',   cls:'pr5', amt: 5000,             cnt: d.win_count_5th||'?', auto: null, manual: null },
+    { rank:3, cond:'5개 일치',   cls:'pr3', amt: d.prize_3rd||1500000,  cnt: d.win_count_3rd||'?', auto: null, manual: null },
+    { rank:4, cond:'4개 일치',   cls:'pr4', amt: d.prize_4th||50000,     cnt: d.win_count_4th||'?', auto: null, manual: null },
+    { rank:5, cond:'3개 일치',   cls:'pr5', amt: d.prize_5th||5000,      cnt: d.win_count_5th||'?', auto: null, manual: null },
   ];
 
 
@@ -949,7 +963,7 @@ async function chgRes() {
         const chips = Object.entries(regionMap).sort((a,b) => b[1]-a[1])
           .map(([r,c]) => `<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
         const rows = stores.map(s => `<tr style="border-bottom:1px solid #f1f5f9;">
-              <td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;" title="${s.name}">${s.name} 🗺</a></td>
+              <td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;" title="${s.name}">${s.name} <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a></td>
               <td style="padding:4px 6px;font-size:10px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td>
               <td style="padding:4px 6px;font-size:11px;text-align:center;color:#64748b;white-space:nowrap;">${s.auto}</td>
             </tr>`).join('');
@@ -1234,6 +1248,8 @@ document.addEventListener('click', e => {
 
 function applyLoginUI(user) {
   isLoggedIn = true;
+  const mp = document.getElementById('h-my-purchase');
+  if (mp) mp.style.display = '';
   currentUser = user;
   const nick = user.user_metadata?.nickname || user.email.split('@')[0];
   updateHeaderUser(nick, myVerifiedTitle || '');
@@ -1255,6 +1271,8 @@ function applyLoginUI(user) {
 
 function applyLogoutUI() {
   isLoggedIn = false;
+  const mpL = document.getElementById('h-my-purchase');
+  if (mpL) mpL.style.display = 'none';
   currentUser = null;
   dbStats = null;
   $('btn-auth').style.display = '';

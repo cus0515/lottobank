@@ -107,9 +107,14 @@ export async function onRequest(context) {
           rnk3WnNope: Number(item.rnk3WnNope || 0),
           rnk4WnNope: Number(item.rnk4WnNope || 0),
           rnk5WnNope: Number(item.rnk5WnNope || 0),
-          rnk1AutoNope: Number(item.rnk1AutoWnNope || 0),
-          rnk1ManualNope: Number(item.rnk1ManualWnNope || 0),
-          totSellamnt: Number(item.totSellamnt || 0),
+          rnk1AutoNope: 0,
+          rnk1ManualNope: 0,
+          rnk2AutoNope: 0,
+          rnk2ManualNope: 0,
+          rnk3WnAmt: Number(item.rnk3WnAmt || 0),
+          rnk4WnAmt: Number(item.rnk4WnAmt || 0),
+          rnk5WnAmt: Number(item.rnk5WnAmt || 0),
+          totSellamnt: Number(item.rlvtEpsdSumNtslAmt || item.totSellamnt || 0),
         };
         return new Response(JSON.stringify(d), { headers: cors });
       }
