@@ -117,11 +117,24 @@ main.chat-hidden .chat-panel { display: none; }
 .prize-row b { color: var(--lotto-red); }
 
 .badge { display: inline-flex; align-items: center; padding: 3px 6px; font-size: 11px; font-weight: 900; color: #fff; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
-.badge.b-real-1 { background: linear-gradient(135deg, #ef4444, #b91c1c); box-shadow: 0 0 8px rgba(239,68,68,0.5); animation: pulse 1s infinite alternate; }
-.badge.b-real-2 { background: linear-gradient(135deg, #a855f7, #6b21a8); }
-.badge.b-real-3 { background: linear-gradient(135deg, #10b981, #047857); }
+.badge.b-real-1 { background: linear-gradient(135deg, #ff2d2d, #b91c1c); box-shadow: 0 0 10px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.3); animation: neonRed 1.4s ease-in-out infinite alternate; }
+.badge.b-real-2 { background: linear-gradient(135deg, #a855f7, #6b21a8); box-shadow: 0 0 8px rgba(168,85,247,0.6); animation: neonPurple 1.8s ease-in-out infinite alternate; }
+.badge.b-real-3 { background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 0 5px rgba(16,185,129,0.4); }
 .badge.b-guest { background: #94a3b8; color: #fff; font-weight: 500; }
+.badge.b-system { background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; font-weight:900; animation: neonGold 2s ease-in-out infinite alternate; }
 @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
+@keyframes neonRed { 0% { box-shadow: 0 0 6px rgba(239,68,68,0.6), 0 0 12px rgba(239,68,68,0.2); } 100% { box-shadow: 0 0 14px rgba(239,68,68,0.9), 0 0 28px rgba(239,68,68,0.5); } }
+@keyframes neonPurple { 0% { box-shadow: 0 0 5px rgba(168,85,247,0.4); } 100% { box-shadow: 0 0 12px rgba(168,85,247,0.8), 0 0 22px rgba(168,85,247,0.4); } }
+@keyframes neonGold { 0% { box-shadow: 0 0 4px rgba(245,158,11,0.5); } 100% { box-shadow: 0 0 10px rgba(245,158,11,0.9); } }
+@keyframes roiCountUp { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+.left-dashboard-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:10px; }
+.left-stat-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+.left-stat-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:7px; padding:9px 10px; text-align:center; }
+.left-stat-label { font-size:10px; color:#94a3b8; font-weight:700; margin-bottom:3px; }
+.left-stat-val { font-size:14px; font-weight:900; color:var(--text-dark); }
+.left-roi-bar-wrap { height:6px; background:#f1f5f9; border-radius:4px; overflow:hidden; margin-top:4px; }
+.left-roi-bar { height:100%; border-radius:4px; transition:width 0.8s ease; }
+.chat-system-row { background:linear-gradient(90deg,#fff7ed,#fff); border-left:3px solid #f59e0b; padding:8px 10px; border-radius:0 6px 6px 0; margin:4px 0; }
 
 .chat-messages { height: calc(100% - 65px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
 .chat-row { font-size: 13px; line-height: 1.4; }
@@ -312,6 +325,7 @@ main.chat-hidden .chat-panel { display: none; }
 .auth-err { color:#dc2626; font-size:12px; font-weight:700; min-height:18px; margin-top:10px; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -441,44 +455,112 @@ main.chat-hidden .chat-panel { display: none; }
 </div>
 
 <main>
-  <!-- 좌측: 최신 당첨 현황 -->
+  <!-- 좌측: 대시보드 패널 -->
   <section class="panel">
-    <div class="panel-header"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> 최신 당첨 현황<span id="h-round-badge" style="font-size:11px;font-weight:600;color:#94a3b8;"></span></div>
+    <div class="panel-header">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+      LottoBank 대시보드
+    </div>
     <div class="panel-body" style="padding:14px;">
-      <div class="lotto-slip" style="margin-bottom:10px;">
-        <div class="slip-header">
-          <h2 id="h-rec-title" style="font-size:14px;">로딩 중...</h2>
-          <p id="h-rec-date" style="font-size:11px;">연결 중...</p>
+
+      <!-- 비로그인: 플랫폼 통계 + 가입 유도 -->
+      <div id="left-guest">
+        <div class="left-dashboard-card">
+          <div style="font-size:11px;font-weight:800;color:#dc2626;margin-bottom:10px;letter-spacing:0.3px;">📊 플랫폼 전체 통계</div>
+          <div class="left-stat-row">
+            <div class="left-stat-box">
+              <div class="left-stat-label">총 인증 게임</div>
+              <div class="left-stat-val" id="gs-tickets">-</div>
+            </div>
+            <div class="left-stat-box">
+              <div class="left-stat-label">총 당첨 횟수</div>
+              <div class="left-stat-val" id="gs-wins" style="color:#16a34a;">-</div>
+            </div>
+          </div>
+          <div class="left-stat-row">
+            <div class="left-stat-box">
+              <div class="left-stat-label">1등 인증자</div>
+              <div class="left-stat-val" id="gs-rank1" style="color:#dc2626;">-명</div>
+            </div>
+            <div class="left-stat-box">
+              <div class="left-stat-label">플랫폼 평균 ROI</div>
+              <div class="left-stat-val" id="gs-roi">-</div>
+            </div>
+          </div>
+          <div style="padding:10px;background:#fff5f5;border:1px dashed #fca5a5;border-radius:7px;text-align:center;">
+            <div style="font-size:11px;color:#64748b;line-height:1.6;margin-bottom:8px;">🎯 QR 인증으로 내 로또 전적을<br>데이터로 관리해보세요</div>
+            <button onclick="showAuthModal()" style="background:#dc2626;color:#fff;border:none;border-radius:5px;padding:7px 16px;font-size:12px;font-weight:900;cursor:pointer;">1분만에 시작하기 →</button>
+          </div>
         </div>
-        <div id="h-balls" class="ball-context" style="margin:8px 0;"><span style="color:var(--text-muted);font-size:12px;">불러오는 중...</span></div>
-        <div style="font-size:11px;color:#64748b;margin-top:4px;">보너스 번호 포함 · 동행복권 공식 데이터</div>
-      </div>
-      <table class="prize-table">
-        <thead>
-          <tr><th>등수</th><th>당첨 조건</th><th>당첨자</th><th>1인당 금액</th><th>수동/자동</th></tr>
-        </thead>
-        <tbody id="h-prize-table">
-          <tr><td colspan="5" style="color:#94a3b8;padding:16px 0;">데이터 로딩 중...</td></tr>
-        </tbody>
-      </table>
-      <!-- 내 구매 현황 (로그인시만 표시) -->
-      <div id="h-my-purchase" style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;display:none;">
-        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z"/></svg> 내 구매 현황</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;">
-          <span style="color:#64748b;">총 구매</span><span id="h-total" style="font-weight:700;text-align:right;">0게임</span>
-          <span style="color:#64748b;">총 구매비용</span><span id="h-cost" style="font-weight:700;text-align:right;">0원</span>
-          <span style="color:#64748b;">총 당첨금</span><span id="h-earned" style="font-weight:700;color:var(--lotto-red);text-align:right;">0원</span>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;">
+          <div style="font-size:10px;font-weight:800;color:#64748b;margin-bottom:6px;">이번 주 인기 번호 TOP 5</div>
+          <div id="gs-hot-nums" style="display:flex;gap:4px;flex-wrap:wrap;">
+            <span style="font-size:11px;color:#94a3b8;">데이터 로딩 중...</span>
+          </div>
         </div>
       </div>
-      <!-- 실시간 활동 피드 (왼쪽 패널 하단) -->
-      <div style="margin-top:12px;padding-top:10px;border-top:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 실시간 활동 피드</div>
+
+      <!-- 로그인: 내 투자 대시보드 -->
+      <div id="left-user" style="display:none;">
+        <div class="left-dashboard-card">
+          <div style="font-size:11px;font-weight:800;color:#dc2626;margin-bottom:10px;">📈 내 투자 포트폴리오</div>
+          <div class="left-stat-row">
+            <div class="left-stat-box">
+              <div class="left-stat-label">총 구매</div>
+              <div class="left-stat-val" id="my-total-games">-</div>
+            </div>
+            <div class="left-stat-box">
+              <div class="left-stat-label">당첨 횟수</div>
+              <div class="left-stat-val" id="my-total-wins" style="color:#16a34a;">-</div>
+            </div>
+          </div>
+          <div class="left-stat-row">
+            <div class="left-stat-box" style="grid-column:1/-1;">
+              <div class="left-stat-label">ROI (수익률)</div>
+              <div id="my-roi-val" style="font-size:20px;font-weight:900;margin:2px 0;">-</div>
+              <div class="left-roi-bar-wrap">
+                <div id="my-roi-bar" class="left-roi-bar" style="width:0%;background:#dc2626;"></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;margin-top:4px;">
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:7px;text-align:center;">
+              <div style="font-size:10px;color:#64748b;margin-bottom:2px;">총 당첨금</div>
+              <div id="my-total-prize" style="font-weight:900;color:#15803d;">-</div>
+            </div>
+            <div style="background:#fff5f5;border:1px solid #fecaca;border-radius:6px;padding:7px;text-align:center;">
+              <div style="font-size:10px;color:#64748b;margin-bottom:2px;">총 투자금</div>
+              <div id="my-total-cost" style="font-weight:900;color:#dc2626;">-</div>
+            </div>
+          </div>
+        </div>
+        <!-- Chart.js 투자 차트 -->
+        <div class="left-dashboard-card" style="padding:12px;">
+          <div style="font-size:10px;font-weight:800;color:#64748b;margin-bottom:8px;">투자금 vs 당첨금</div>
+          <canvas id="roi-chart" height="110"></canvas>
+        </div>
+      </div>
+
+      <!-- 실시간 활동 피드 (항상 표시) -->
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;">
+        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 실시간 활동 피드
+        </div>
         <div id="feed-list-left" style="min-height:32px;"></div>
       </div>
-      <!-- 다른 탭에서 참조하는 숨김 요소 -->
+
+      <!-- 숨김 참조 요소 (기존 코드 호환) -->
       <div style="display:none">
         <span id="h-best-badge">없음</span>
         <span id="h-amt">-</span>
+        <span id="h-round-badge"></span>
+        <span id="h-rec-title"></span>
+        <span id="h-rec-date"></span>
+        <div id="h-balls"></div>
+        <tbody id="h-prize-table"></tbody>
+        <span id="h-total">0게임</span>
+        <span id="h-cost">0원</span>
+        <span id="h-earned">0원</span>
       </div>
     </div>
   </section>
@@ -1216,6 +1298,17 @@ async function verifyRealQR() {
   }
   usedQrKeys.push(parsed.key);
   saveStorage();
+  // 1~3등 인증 시 채팅 브로드캐스트
+  if (bestRank <= 3 && isLoggedIn && currentUser && !isAdminTestMode) {
+    const bNick = currentUser.user_metadata?.nickname || currentUser.email.split('@')[0];
+    sb.from('chat_messages').insert({
+      user_id: currentUser.id,
+      nickname: 'LottoBank',
+      verified_title: null,
+      message: `🎉 [${bNick}]님이 제 ${parsed.round}회차 ${bestLabel} 인증에 성공하셨습니다!`,
+      is_system: true
+    }).catch(() => {});
+  }
   saveTicketToDB(parsed, winData, gameResults); // DB 저장 (비동기, 결과 대기 안함)
 
   const isWin = bestRank <= 5;
@@ -1455,6 +1548,11 @@ function applyLogoutUI() {
   const mn2 = $('my-numbers-section'); if(mn2) mn2.style.display = 'none';
   $('chat-input').disabled = true;
   $('chat-input').placeholder = '로그인 후 대화에 참여해보세요.';
+  // 좌측 패널 게스트 상태 복귀
+  const lg = $('left-guest'); if (lg) lg.style.display = 'block';
+  const lu = $('left-user');  if (lu) lu.style.display = 'none';
+  if (roiChartInstance) { roiChartInstance.destroy(); roiChartInstance = null; }
+  loadGuestStats();
   toast('<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> 로그아웃되었습니다');
   const active = document.querySelector('.menu-btn.on');
   if (active) {
@@ -1513,9 +1611,14 @@ function getChatBadgeHtml(verifiedTitle) {
 function appendChatRow(msg) {
   const box = $('chat-box');
   const row = document.createElement('div');
-  row.className = 'chat-row';
   const esc = t => (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  row.innerHTML = `${getChatBadgeHtml(msg.verified_title)}<span class="chat-user">${esc(msg.nickname)}:</span><br><span class="chat-text">${esc(msg.message)}</span>`;
+  if (msg.is_system || msg.nickname === 'LottoBank') {
+    row.className = 'chat-system-row';
+    row.innerHTML = `<span class="badge b-system">🏆 시스템</span><span style="font-size:12px;color:#92400e;font-weight:700;">${esc(msg.message)}</span>`;
+  } else {
+    row.className = 'chat-row';
+    row.innerHTML = `${getChatBadgeHtml(msg.verified_title)}<span class="chat-user">${esc(msg.nickname)}:</span><br><span class="chat-text">${esc(msg.message)}</span>`;
+  }
   box.appendChild(row);
   box.scrollTop = box.scrollHeight;
 }
@@ -1639,6 +1742,105 @@ function updateDropdownStats() {
       er.style.color = roi >= 0 ? 'var(--b-green)' : 'var(--b-red)';
     }
   }
+  // 좌측 패널 개인 대시보드 업데이트
+  updateLeftUserPanel(buy, wins, inv, prz, roi);
+}
+
+let roiChartInstance = null;
+
+function updateLeftUserPanel(buy, wins, inv, prz, roi) {
+  $('left-guest').style.display = 'none';
+  $('left-user').style.display  = 'block';
+  const el = (id, val) => { const e = $(id); if(e) e.textContent = val; };
+  el('my-total-games', fmtCnt(buy) + '게임');
+  el('my-total-wins',  fmtCnt(wins) + '회');
+  el('my-total-cost',  fmtMShort(inv));
+  el('my-total-prize', fmtMShort(prz));
+  const roiEl = $('my-roi-val');
+  const barEl = $('my-roi-bar');
+  if (roiEl) {
+    if (roi === null) { roiEl.textContent = '-'; roiEl.style.color = ''; }
+    else {
+      roiEl.textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+      roiEl.style.color = roi >= 0 ? '#15803d' : '#dc2626';
+      roiEl.style.animation = 'roiCountUp 0.4s ease';
+    }
+  }
+  if (barEl) {
+    const pct = roi === null ? 0 : Math.min(100, Math.max(0, (prz / Math.max(inv,1)) * 100));
+    barEl.style.width = pct + '%';
+    barEl.style.background = roi !== null && roi >= 0 ? '#16a34a' : '#dc2626';
+  }
+  // Chart.js 바 차트
+  const canvas = $('roi-chart');
+  if (!canvas || typeof Chart === 'undefined') return;
+  if (roiChartInstance) { roiChartInstance.destroy(); roiChartInstance = null; }
+  roiChartInstance = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: ['투자금', '당첨금'],
+      datasets: [{
+        data: [inv, prz],
+        backgroundColor: ['rgba(220,38,38,0.18)', 'rgba(22,163,74,0.18)'],
+        borderColor:     ['#dc2626', '#16a34a'],
+        borderWidth: 2,
+        borderRadius: 5,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: ctx => fmtMFull(ctx.raw) }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            font: { size: 10 },
+            callback: v => fmtMShort(v)
+          },
+          grid: { color: '#f1f5f9' }
+        },
+        x: { ticks: { font: { size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+async function loadGuestStats() {
+  // 비로그인 상태: 플랫폼 전체 통계 로드
+  try {
+    const { data } = await sb.from('user_stats')
+      .select('total_tickets, total_wins, total_spent, total_prize, rank_1_count');
+    if (!data || !data.length) return;
+    const tot = data.reduce((a, r) => ({
+      tickets: a.tickets + (r.total_tickets||0),
+      wins:    a.wins    + (r.total_wins||0),
+      spent:   a.spent   + (r.total_spent||0),
+      prize:   a.prize   + (r.total_prize||0),
+      rank1:   a.rank1   + (r.rank_1_count||0),
+    }), { tickets:0, wins:0, spent:0, prize:0, rank1:0 });
+    const roi = tot.spent > 0 ? ((tot.prize - tot.spent) / tot.spent * 100).toFixed(1) : null;
+    const el = (id, val) => { const e = $(id); if(e) e.textContent = val; };
+    el('gs-tickets', fmtCnt(tot.tickets) + '게임');
+    el('gs-wins',    fmtCnt(tot.wins) + '회');
+    el('gs-rank1',   fmtCnt(tot.rank1) + '명');
+    const roiEl = $('gs-roi');
+    if (roiEl) {
+      if (roi === null) { roiEl.textContent = '-'; }
+      else {
+        roiEl.textContent = (parseFloat(roi) >= 0 ? '+' : '') + roi + '%';
+        roiEl.style.color = parseFloat(roi) >= 0 ? '#15803d' : '#dc2626';
+      }
+    }
+    // 인기 번호 — tickets 테이블에서 최근 100건 볼 수 있으면 좋지만 없으면 생략
+    // 일단 placeholder
+    const hotEl = $('gs-hot-nums');
+    if (hotEl) hotEl.innerHTML = '<span style="font-size:10px;color:#94a3b8;">데이터 수집 중...</span>';
+  } catch(e) { console.warn('loadGuestStats:', e.message); }
 }
 
 function calcPrizeAmount(rank, winData) {
@@ -1824,6 +2026,7 @@ async function init() {
   }
 
   renderLatestOnLeft(latestData);
+  if (!isLoggedIn) loadGuestStats();
   if (latestData) {
     recentData[latestRound] = latestData;
     renderHomeLive();
