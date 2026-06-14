@@ -40,9 +40,9 @@ export async function onRequest(context) {
     for (const item of list) {
       const store = {
         name: item.shpNm || '',
-        addr: item.shpAddr ? item.shpAddr.trim() : '',
-        tel: item.shpTelno || '',
-        auto: item.atmtPsvYnTxt || '',
+        addr: (item.shpAddr || '').trim(),
+        region: (item.tm1ShpLctnAddr || '').trim(),
+        auto: item.atmtPsvYn === 'Q' ? '자동' : (item.atmtPsvYn === 'S' ? '수동' : (item.atmtPsvYnTxt || '')),
       };
       if (item.wnShpRnk === 1) stores1.push(store);
       else if (item.wnShpRnk === 2) stores2.push(store);
