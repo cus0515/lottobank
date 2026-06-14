@@ -936,9 +936,9 @@ async function chgRes() {
         const chips = Object.entries(regionMap).sort((a,b) => b[1]-a[1])
           .map(([r,c]) => `<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
         const rows = stores.map(s => `<tr style="border-bottom:1px solid #f1f5f9;">
-              <td style="padding:5px 8px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.name}</td>
-              <td style="padding:5px 8px;font-size:10px;color:#475569;word-break:break-all;">${s.addr}</td>
-              <td style="padding:5px 8px;font-size:11px;text-align:center;color:#64748b;">${s.auto}</td>
+              <td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
+              <td style="padding:4px 6px;font-size:10px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td>
+              <td style="padding:4px 6px;font-size:11px;text-align:center;color:#64748b;white-space:nowrap;">${s.auto}</td>
             </tr>`).join('');
         return `<div style="margin-bottom:8px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
           <div onclick="(function(el){var b=document.getElementById('sb-${uid}');var arr=el.querySelector('.sarr');if(b.style.display==='none'){b.style.display='';arr.textContent='▲';}else{b.style.display='none';arr.textContent='▼';}})(this)"
@@ -952,11 +952,11 @@ async function chgRes() {
           <div id="sb-${uid}">
             <div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div>
             <table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;">
-              <colgroup><col style="width:30%"><col style="width:54%"><col style="width:16%"></colgroup>
+              <colgroup><col style="width:32%"><col style="width:46%"><col style="width:22%"></colgroup>
               <thead><tr style="background:#f8fafc;">
-                <th style="padding:5px 8px;text-align:left;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">판매점</th>
-                <th style="padding:5px 8px;text-align:left;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">주소</th>
-                <th style="padding:5px 8px;text-align:center;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">구분</th>
+                <th style="padding:4px 6px;text-align:left;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">판매점</th>
+                <th style="padding:4px 6px;text-align:left;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">주소</th>
+                <th style="padding:4px 6px;text-align:center;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">구분</th>
               </tr></thead>
               <tbody>${rows}</tbody>
             </table>
