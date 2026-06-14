@@ -222,3 +222,35 @@ alter table public.tickets add column if not exists game_count integer default 1
 
 -- posts 테이블 body 컬럼 추가 (게시글 본문)
 ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS body TEXT;
+
+-- =====================================================
+-- 관리자 RLS 우회 정책 (jobdevil23@gmail.com)
+-- =====================================================
+
+-- 관리자: tickets 전체 조회
+create policy "관리자 티켓 전체 조회" on public.tickets
+  for select using ((select auth.jwt() ->> 'email') = 'jobdevil23@gmail.com');
+
+-- 관리자: tickets 수정
+create policy "관리자 티켓 수정" on public.tickets
+  for update using ((select auth.jwt() ->> 'email') = 'jobdevil23@gmail.com');
+
+-- 관리자: tickets 삽입
+create policy "관리자 티켓 삽입" on public.tickets
+  for insert with check ((select auth.jwt() ->> 'email') = 'jobdevil23@gmail.com');
+
+-- 관리자: tickets 삭제
+create policy "관리자 티켓 삭제" on public.tickets
+  for delete using ((select auth.jwt() ->> 'email') = 'jobdevil23@gmail.com');
+
+-- 관리자: user_stats 수정
+create policy "관리자 전적 수정" on public.user_stats
+  for update using ((select auth.jwt() ->> 'email') = 'jobdevil23@gmail.com');
+
+-- 관리자: posts 삭제
+create policy "관리자 게시글 삭제" on public.posts
+  for delete using ((select auth.jwt() ->> 'email') = 'jobdevil23@gmail.com');
+
+-- 관리자: comments 삭제
+create policy "관리자 댓글 삭제" on public.comments
+  for delete using ((select auth.jwt() ->> 'email') = 'jobdevil23@gmail.com');

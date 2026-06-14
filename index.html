@@ -3167,7 +3167,7 @@ async function renderAdmin() {
 async function loadAdminStats() {
   try {
     const [uRes, tRes, pRes, sRes] = await Promise.all([
-      sb.from('users').select('id', { count: 'exact', head: true }),
+      sb.from('profiles').select('id', { count: 'exact', head: true }),
       sb.from('tickets').select('id', { count: 'exact', head: true }),
       sb.from('posts').select('id', { count: 'exact', head: true }),
       sb.from('user_stats').select('total_prize'),
@@ -3190,27 +3190,30 @@ async function adminTab(tab, btn) {
   wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px;">로딩 중...</div>';
   try {
     if (tab === 'users') {
-      const { data } = await sb.from('users').select('id,email,nickname,created_at').order('created_at', { ascending: false }).limit(50);
+      const { data } = await sb.from('profiles').select('id,nickname,created_at').order('created_at', { ascending: false }).limit(50);
       if (!data || !data.length) { wrap.innerHTML = adminEmpty('회원이 없습니다'); return; }
       wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
-        <th>#</th><th>닉네임</th><th>이메일</th><th>가입일</th><th style="width:60px;">수정</th>
+        <th>#</th><th>닉네임</th><th>가입일</th><th style="width:60px;">수정</th>
       </tr></thead><tbody>${data.map((u,i) => `<tr id="urow-${u.id}">
         <td>${i+1}</td>
         <td style="font-weight:700;" id="unick-${u.id}">${u.nickname||'-'}</td>
-        <td style="font-size:11px;color:var(--text-muted);">${u.email||'-'}</td>
         <td style="font-size:11px;color:var(--text-muted);">${u.created_at?u.created_at.slice(0,10):'-'}</td>
-        <td><button data-uid="${u.id}" data-nick="${u.nickname||''}" data-email="${u.email||''}" onclick="adminEditUser(this.dataset.uid,this.dataset.nick,this.dataset.email)" style="padding:3px 8px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
+        <td><button data-uid="${u.id}" data-nick="${u.nickname||''}" onclick="adminEditUser(this.dataset.uid,this.dataset.nick,'')" style="padding:3px 8px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
       </tr>`).join('')}</tbody></table>`;
     } else if (tab === 'tickets') {
-      const { data } = await sb.from('tickets').select('id,drw_no,created_at,users(nickname),game_count,prize_amount').order('created_at', { ascending: false }).limit(100);
+      const { data } = await sb.from('tickets').select('id,round_no,created_at,user_id,game_count,prize_amount').order('created_at', { ascending: false }).limit(100);
+      // 닉네임 별도 조회
+      const tUids = [...new Set((data||[]).map(t => t.user_id))];
+      const { data: tProfs } = tUids.length ? await sb.from('profiles').select('id,nickname').in('id', tUids) : { data: [] };
+      const tNickMap = Object.fromEntries((tProfs||[]).map(p => [p.id, p.nickname]));
       if (!data || !data.length) { wrap.innerHTML = adminEmpty('등록된 티켓이 없습니다'); return; }
       wrap.innerHTML = `<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">각 행의 수정 버튼으로 당첨금·게임수 직접 편집 가능합니다</div>
       <table class="rank-board-table"><thead><tr>
         <th>#</th><th>회원</th><th>회차</th><th>게임수</th><th>당첨금</th><th>등록일</th><th style="width:80px;">수정/삭제</th>
       </tr></thead><tbody>${data.map((t,i) => `<tr id="trow-${t.id}">
         <td>${i+1}</td>
-        <td style="font-weight:700;">${t.users?.nickname||'-'}</td>
-        <td id="tdrw-${t.id}">${t.drw_no||'-'}회</td>
+        <td style="font-weight:700;">${tNickMap[t.user_id]||'-'}</td>
+        <td id="tdrw-${t.id}">${t.round_no||'-'}회</td>
         <td id="tgame-${t.id}">${fmtCnt(t.game_count||0)}게임</td>
         <td id="tprize-${t.id}" style="color:var(--lotto-red);font-weight:700;">${fmtMShort(t.prize_amount||0)}</td>
         <td style="font-size:11px;color:var(--text-muted);">${t.created_at?t.created_at.slice(0,10):'-'}</td>
@@ -3316,7 +3319,10 @@ async function adminTab(tab, btn) {
         </div>
       `;
     } else if (tab === 'stats') {
-      const { data } = await sb.from('user_stats').select('users(nickname),total_tickets,total_spent,total_prize,total_wins,best_rank,rank_1_count').order('total_prize', { ascending: false }).limit(30);
+      const { data } = await sb.from('user_stats').select('user_id,total_tickets,total_spent,total_prize,total_wins,best_rank,rank_1_count').order('total_prize', { ascending: false }).limit(30);
+      const sUids = (data||[]).map(s => s.user_id);
+      const { data: sProfs } = sUids.length ? await sb.from('profiles').select('id,nickname').in('id', sUids) : { data: [] };
+      const sNickMap = Object.fromEntries((sProfs||[]).map(p => [p.id, p.nickname]));
       if (!data || !data.length) { wrap.innerHTML = adminEmpty('전적 데이터가 없습니다'); return; }
       wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
         <th>#</th><th>회원</th><th>구매게임</th><th>구매금액</th><th>당첨금</th><th>수익률</th><th>최고등수</th><th>1등횟수</th><th style="width:50px;">수정</th>
@@ -3325,7 +3331,7 @@ async function adminTab(tab, btn) {
         const roiColor = roi !== '-' && parseFloat(roi) >= 0 ? '#10b981' : '#ef4444';
         return `<tr>
           <td>${i+1}</td>
-          <td style="font-weight:700;">${s.users?.nickname||'-'}</td>
+          <td style="font-weight:700;">${sNickMap[s.user_id]||'-'}</td>
           <td>${fmtCnt(s.total_tickets||0)}게임</td>
           <td>${fmtMShort(s.total_spent||0)}</td>
           <td style="color:var(--lotto-red);font-weight:700;">${fmtMShort(s.total_prize||0)}</td>
@@ -3409,7 +3415,7 @@ async function adminSaveTicket(id) {
   const games = parseInt($(`edit-tgame-${id}`)?.value) || 0;
   const prize = parseInt($(`edit-tprize-${id}`)?.value) || 0;
   try {
-    const { error } = await sb.from('tickets').update({ drw_no: drwNo, game_count: games, prize_amount: prize }).eq('id', id);
+    const { error } = await sb.from('tickets').update({ round_no: drwNo, game_count: games, prize_amount: prize }).eq('id', id);
     if (error) throw error;
     toast('✅ 티켓 수정 완료');
     adminTab('tickets');
@@ -3484,14 +3490,17 @@ async function adminInsertTicket() {
     if (!prof) { resEl.innerHTML = '<span style="color:#dc2626;">해당 닉네임 회원 없음.</span>'; return; }
     const uid = prof.id;
 
-    // tickets insert
+    // tickets insert (qr_url은 관리자 삽입이므로 고유 가상 키 생성)
+    const fakeQrKey = `admin-insert-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const { error: te } = await sb.from('tickets').insert({
       user_id: uid,
-      drw_no: round,
+      qr_url: fakeQrKey,
+      round_no: round,
+      numbers: [1, 2, 3, 4, 5, 6],
       game_count: games,
       prize_amount: prizeAmt,
       prize_rank: rank || null,
-      purchased_at: new Date().toISOString(),
+      result: 'checked',
     });
     if (te) throw te;
 
