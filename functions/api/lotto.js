@@ -1,13 +1,14 @@
 /**
  * Cloudflare Pages Function: /api/lotto?round=1226
  *
- * 새 동행복권 API (2026):
- *   GET /lt645/selectPstLt645InfoNew.do?srchDir=center&srchLtEpsd={회차}
- *   → JSON { data: { list: [ { ltEpsd, tm1WnNo~tm6WnNo, bnsWnNo, ltRflYmd, rnk1WnAmt, ... } ] } }
- *
- * 폴백:
- *   구 API /common.do?method=getLottoNumber&drwNo={회차}
+ * 우선순위:
+ *   1) GitHub Actions 캐시 (raw.githubusercontent.com) — 가장 빠름, IP 차단 없음
+ *   2) 새 dhlottery API (2026) — center/right 두 방향
+ *   3) 구 dhlottery API (common.do) — 최후 폴백
  */
+
+const GITHUB_CACHE_URL =
+  'https://raw.githubusercontent.com/cus0515/lottobank/main/lotto-cache.json';
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
@@ -16,22 +17,26 @@ export async function onRequest(context) {
   const cors = {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'public, max-age=1800',
+    'Cache-Control': 'public, max-age=120, stale-while-revalidate=600',
   };
 
   if (!round || round < 1) {
-    return new Response(JSON.stringify({ error: 'round parameter required' }), { status: 400, headers: cors });
+    return new Response(JSON.stringify({ error: 'round parameter required' }), {
+      status: 400,
+      headers: cors,
+    });
   }
 
   const browserHeaders = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'User-Agent':
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    Accept: 'application/json, text/javascript, */*; q=0.01',
     'Accept-Language': 'ko-KR,ko;q=0.9',
-    'Referer': 'https://www.dhlottery.co.kr/lt645/result',
+    Referer: 'https://www.dhlottery.co.kr/lt645/result',
     'X-Requested-With': 'XMLHttpRequest',
   };
 
-  async function fetchWithTimeout(fetchUrl, opts = {}, ms = 7000) {
+  async function fetchWithTimeout(fetchUrl, opts = {}, ms = 6000) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), ms);
     try {
@@ -48,67 +53,86 @@ export async function onRequest(context) {
     return {
       returnValue: 'success',
       _source: source,
-      drwNo: item.ltEpsd,
-      drwNoDate: formatDate(item.ltRflYmd),
-      drwtNo1: item.tm1WnNo,
-      drwtNo2: item.tm2WnNo,
-      drwtNo3: item.tm3WnNo,
-      drwtNo4: item.tm4WnNo,
-      drwtNo5: item.tm5WnNo,
-      drwtNo6: item.tm6WnNo,
-      bnusNo: item.bnsWnNo,
-      firstWinamnt: item.rnk1WnAmt || 0,
-      firstPrzwnerCo: item.rnk1WnNope || 0,
-      totSellamnt: item.totSellamnt || 0,
+      drwNo: Number(item.ltEpsd ?? item.drwNo),
+      drwNoDate: item.drwNoDate ?? formatDate(item.ltRflYmd),
+      drwtNo1: Number(item.tm1WnNo ?? item.drwtNo1),
+      drwtNo2: Number(item.tm2WnNo ?? item.drwtNo2),
+      drwtNo3: Number(item.tm3WnNo ?? item.drwtNo3),
+      drwtNo4: Number(item.tm4WnNo ?? item.drwtNo4),
+      drwtNo5: Number(item.tm5WnNo ?? item.drwtNo5),
+      drwtNo6: Number(item.tm6WnNo ?? item.drwtNo6),
+      bnusNo: Number(item.bnsWnNo ?? item.bnusNo),
+      firstWinamnt: Number(item.rnk1WnAmt ?? item.firstWinamnt ?? 0),
+      firstPrzwnerCo: Number(item.rnk1WnNope ?? item.firstPrzwnerCo ?? 0),
+      totSellamnt: Number(item.totSellamnt ?? 0),
     };
   }
+
+  // ── Method 0: GitHub Actions 캐시 (가장 빠름) ─────────────────────────────
+  try {
+    const res = await fetchWithTimeout(GITHUB_CACHE_URL, {}, 4000);
+    if (res.ok) {
+      const cached = await res.json();
+      if (
+        cached?.returnValue === 'success' &&
+        Number(cached.drwNo) === round
+      ) {
+        cached._source = 'github-cache';
+        return new Response(JSON.stringify(cached), { headers: cors });
+      }
+    }
+  } catch (_) {}
 
   // ── Method 1: 새 API center (2026) ───────────────────────────────────────
   try {
     const apiUrl = `https://www.dhlottery.co.kr/lt645/selectPstLt645InfoNew.do?srchDir=center&srchLtEpsd=${round}&_=${Date.now()}`;
-    const res = await fetchWithTimeout(apiUrl, { headers: browserHeaders }, 7000);
-
+    const res = await fetchWithTimeout(apiUrl, { headers: browserHeaders }, 6000);
     if (res.ok) {
       const json = await res.json();
-      const list = json?.data?.list;
-
+      const list = json?.data?.list ?? json?.list;
       if (Array.isArray(list) && list.length > 0) {
-        // 요청 회차 우선, 없으면 리스트 첫 번째(최신)
-        const item = list.find(x => x.ltEpsd === round) || list[0];
-        return new Response(JSON.stringify(buildResult(item, 'new-api-center')), { headers: cors });
+        const item = list.find((x) => Number(x.ltEpsd) === round) ?? list[0];
+        return new Response(
+          JSON.stringify(buildResult(item, 'new-api-center')),
+          { headers: cors }
+        );
       }
     }
-  } catch (e) {}
+  } catch (_) {}
 
-  // ── Method 2: 새 API right (과거 회차 탐색) ──────────────────────────────
+  // ── Method 2: 새 API right ───────────────────────────────────────────────
   try {
     const apiUrl2 = `https://www.dhlottery.co.kr/lt645/selectPstLt645InfoNew.do?srchDir=right&srchLtEpsd=${round + 5}&_=${Date.now()}`;
-    const res = await fetchWithTimeout(apiUrl2, { headers: browserHeaders }, 7000);
-
+    const res = await fetchWithTimeout(apiUrl2, { headers: browserHeaders }, 6000);
     if (res.ok) {
       const json = await res.json();
-      const list = json?.data?.list;
-
+      const list = json?.data?.list ?? json?.list;
       if (Array.isArray(list) && list.length > 0) {
-        const item = list.find(x => x.ltEpsd === round);
+        const item = list.find((x) => Number(x.ltEpsd) === round);
         if (item) {
-          return new Response(JSON.stringify(buildResult(item, 'new-api-right')), { headers: cors });
+          return new Response(
+            JSON.stringify(buildResult(item, 'new-api-right')),
+            { headers: cors }
+          );
         }
       }
     }
-  } catch (e) {}
+  } catch (_) {}
 
   // ── Method 3: 구 API (common.do) ─────────────────────────────────────────
   try {
     const oldUrl = `https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${round}`;
-    const res = await fetchWithTimeout(oldUrl, {
-      headers: {
-        ...browserHeaders,
-        'Accept': 'application/json, */*',
-        'Referer': 'https://www.dhlottery.co.kr/gameResult.do?method=byWin',
+    const res = await fetchWithTimeout(
+      oldUrl,
+      {
+        headers: {
+          ...browserHeaders,
+          Accept: 'application/json, */*',
+          Referer: 'https://www.dhlottery.co.kr/gameResult.do?method=byWin',
+        },
       },
-    }, 7000);
-
+      6000
+    );
     if (res.ok) {
       const text = await res.text();
       if (text.trim().startsWith('{')) {
@@ -119,7 +143,7 @@ export async function onRequest(context) {
         }
       }
     }
-  } catch (e) {}
+  } catch (_) {}
 
   return new Response(
     JSON.stringify({ returnValue: 'fail', error: 'all methods failed', round }),
