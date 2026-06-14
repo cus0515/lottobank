@@ -136,3 +136,26 @@ create policy "좋아요 등록" on public.post_likes
 
 create policy "좋아요 취소" on public.post_likes
   for delete using (auth.uid() = user_id);
+
+-- =====================================================
+-- 채팅 메시지 (Realtime)
+-- =====================================================
+create table if not exists public.chat_messages (
+  id             uuid default gen_random_uuid() primary key,
+  user_id        uuid references auth.users(id) on delete cascade,
+  nickname       text not null,
+  verified_title text,
+  message        text not null,
+  created_at     timestamptz default now()
+);
+
+alter table public.chat_messages enable row level security;
+
+create policy "채팅 전체 조회" on public.chat_messages
+  for select using (true);
+
+create policy "로그인 사용자 채팅 전송" on public.chat_messages
+  for insert with check (auth.uid() = user_id);
+
+-- Realtime 활성화
+alter publication supabase_realtime add table public.chat_messages;

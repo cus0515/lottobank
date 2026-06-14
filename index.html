@@ -34,7 +34,19 @@ header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); positio
 .menu-btn.on::after { content: ''; position: absolute; bottom: -3px; left: 0; right: 0; height: 4px; background: var(--lotto-red); }
 .auth-zone { display: flex; align-items: center; gap: 10px; }
 .btn-login { padding: 6px 14px; font-size: 13px; font-weight: 700; background: var(--text-dark); color: #fff; border: none; border-radius: 4px; cursor: pointer; }
-.user-profile { display: none; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
+.user-profile { display: none; align-items: center; position: relative; }
+.user-btn { display:flex; align-items:center; gap:8px; background:none; border:none; cursor:pointer; font-size:13px; font-weight:700; color:var(--text-dark); padding:4px 8px; border-radius:6px; }
+.user-btn:hover { background:#f1f5f9; }
+.user-avatar { width:28px; height:28px; border-radius:50%; background:var(--lotto-red); color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; flex-shrink:0; }
+.user-btn-arrow { font-size:10px; color:#94a3b8; }
+.user-dropdown { display:none; position:absolute; top:calc(100% + 6px); right:0; background:#fff; border:1px solid #e2e8f0; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.12); min-width:180px; z-index:9999; overflow:hidden; }
+.user-dropdown.open { display:block; }
+.user-dd-header { padding:12px 14px 10px; border-bottom:1px solid #f1f5f9; }
+.user-dd-nick { font-size:14px; font-weight:900; color:var(--text-dark); }
+.user-dd-badge { font-size:11px; color:#64748b; margin-top:2px; }
+.user-dd-item { display:block; width:100%; padding:9px 14px; text-align:left; background:none; border:none; cursor:pointer; font-size:13px; font-weight:600; color:var(--text-dark); }
+.user-dd-item:hover { background:#f8fafc; }
+.user-dd-item.danger { color:#ef4444; }
 
 main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 3.5fr 5fr 4fr; gap: 20px; height: calc(100vh - 110px); min-height: 700px; }
 @media (max-width: 1200px) { main { grid-template-columns: 1fr; height: auto; } }
@@ -271,8 +283,20 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
       <span id="api-indicator" class="api-status loading">API 로딩중...</span>
       <button id="btn-auth" class="btn-login" onclick="showAuthModal()">로그인</button>
       <div id="user-profile" class="user-profile">
-        <span id="my-badge-space"></span>
-        <span id="user-name" style="color:var(--text-dark);">금손유저_익명</span>
+        <button class="user-btn" onclick="toggleUserDropdown()">
+          <div class="user-avatar" id="user-avatar">?</div>
+          <span id="user-name">닉네임</span>
+          <span class="user-btn-arrow">▾</span>
+        </button>
+        <div class="user-dropdown" id="user-dropdown">
+          <div class="user-dd-header">
+            <div class="user-dd-nick" id="dd-nick">닉네임</div>
+            <div class="user-dd-badge" id="dd-badge"></div>
+          </div>
+          <button class="user-dd-item" onclick="go('profile');closeUserDropdown()">👤 내 프로필</button>
+          <button class="user-dd-item" onclick="go('stats');closeUserDropdown()">📈 나의 전적</button>
+          <button class="user-dd-item danger" onclick="doLogout()">🚪 로그아웃</button>
+        </div>
       </div>
       <button class="hamburger" onclick="openMobMenu()" aria-label="메뉴">
         <span></span><span></span><span></span>
@@ -385,25 +409,15 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
         </div>
       </div>
 
-      <!-- 3. 번호 추천 & QR 인증 -->
+      <!-- 3. QR 인증 -->
       <div id="pg-ticket" class="page-content" style="display:none;">
-        <div style="font-size:12px; font-weight:700; margin-bottom:5px; color:var(--lotto-purple);">번호 선택 방식</div>
-        <select id="add-mode" onchange="chgMode()" class="select-custom">
-          <option value="auto">📈 최근 패턴 분석 기반 자동 추천</option>
-          <option value="manual">✍️ 직접 번호 입력</option>
-        </select>
-        <div id="manual-panel" style="display:none; margin-bottom:12px;">
-          <div class="omr-grid" id="omr-buttons"></div>
-          <div id="manual-slots" class="ball-context"></div>
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:6px;">🎯 실물 로또 QR 당첨 인증</div>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">동행복권 앱 → 구매내역 → QR코드 → URL 복사 후 붙여넣기</p>
+          <input type="text" id="qr-url-input" class="input-custom" placeholder="동행복권 QR URL 붙여넣기...">
+          <button class="btn-action" onclick="verifyRealQR()" style="background:var(--lotto-red);margin-top:8px;">🔍 당첨 인증하기</button>
+          <div id="qr-result-display" style="margin-top:10px;"></div>
         </div>
-        <button class="btn-action" onclick="saveT()" style="margin-bottom:20px;">💾 추천번호 보관함에 저장</button>
-
-        <div style="font-size:12px; font-weight:700; margin-bottom:5px; color:var(--lotto-red); border-top:1px solid #cbd5e1; padding-top:15px;">실물 로또 QR 당첨 인증</div>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">동행복권 앱의 구매 QR 주소를 입력하면 실제 당첨번호와 대조해 등수를 자동 확인하고 인증 뱃지를 부여합니다.</p>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">동행복권 앱 → 구매내역 → QR코드 → URL 복사 후 붙여넣기</p>
-        <input type="text" id="qr-url-input" class="input-custom" placeholder="동행복권 QR URL 붙여넣기...">
-        <button class="btn-action" onclick="verifyRealQR()" style="background:#1e293b;">🔍 실제 당첨 영수증 인증하기</button>
-        <div id="qr-result-display" style="margin-top:10px;"></div>
       </div>
 
       <!-- 4. 투자 가이드 -->
@@ -1033,12 +1047,32 @@ async function doAuth() {
   }
 }
 
+function updateHeaderUser(nick, badgeText) {
+  $('user-name').textContent = nick;
+  $('dd-nick').textContent = nick;
+  $('user-avatar').textContent = nick.charAt(0).toUpperCase() || '?';
+  $('dd-badge').textContent = badgeText || '';
+}
+function toggleUserDropdown() {
+  $('user-dropdown')?.classList.toggle('open');
+}
+function closeUserDropdown() {
+  $('user-dropdown')?.classList.remove('open');
+}
+async function doLogout() {
+  closeUserDropdown();
+  await sb.auth.signOut();
+}
+document.addEventListener('click', e => {
+  if (!$('user-profile')?.contains(e.target)) closeUserDropdown();
+});
+
 function applyLoginUI(user) {
   isLoggedIn = true;
   currentUser = user;
   const nick = user.user_metadata?.nickname || user.email.split('@')[0];
-  $('user-name').textContent = nick;
-  $('btn-auth').textContent = '로그아웃';
+  updateHeaderUser(nick, myVerifiedTitle || '');
+  $('btn-auth').style.display = 'none';
   $('user-profile').style.display = 'flex';
   $('chat-input').disabled = false;
   $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
@@ -1054,7 +1088,9 @@ function applyLoginUI(user) {
 
 function applyLogoutUI() {
   isLoggedIn = false;
-  $('btn-auth').textContent = '로그인';
+  currentUser = null;
+  dbStats = null;
+  $('btn-auth').style.display = '';
   $('user-profile').style.display = 'none';
   $('chat-input').disabled = true;
   $('chat-input').placeholder = '로그인 후 대화에 참여해보세요.';
@@ -1078,17 +1114,66 @@ async function initAuth() {
 }
 
 // =====================================================
-// 채팅
+// 채팅 (Supabase Realtime)
 // =====================================================
-function sendChat() {
-  if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
-  const inp = $('chat-input'); if (!inp.value.trim()) return;
+let chatChannel = null;
+
+function getChatBadgeHtml(verifiedTitle) {
+  if (!verifiedTitle) return `<span class="badge b-guest">일반</span>`;
+  if (verifiedTitle.includes('1등')) return `<span class="badge b-real-1">${verifiedTitle}</span>`;
+  if (verifiedTitle.includes('2등')) return `<span class="badge b-real-2">${verifiedTitle}</span>`;
+  return `<span class="badge b-real-3">${verifiedTitle}</span>`;
+}
+
+function appendChatRow(msg) {
   const box = $('chat-box');
   const row = document.createElement('div');
   row.className = 'chat-row';
-  row.innerHTML = `${getMyBadgeHtml()}<span class="chat-user">${$('user-name').textContent}:</span><br>
-    <span class="chat-text">${inp.value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`;
-  box.appendChild(row); inp.value = ''; box.scrollTop = box.scrollHeight;
+  const esc = t => (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  row.innerHTML = `${getChatBadgeHtml(msg.verified_title)}<span class="chat-user">${esc(msg.nickname)}:</span><br><span class="chat-text">${esc(msg.message)}</span>`;
+  box.appendChild(row);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function loadRecentChats() {
+  const box = $('chat-box');
+  box.innerHTML = `<div class="chat-row"><span class="badge b-guest">공지</span><span class="chat-user">LottoBank:</span><br><span class="chat-text">실제 구매 QR 코드로 당첨 여부를 인증하고 전적을 기록하세요.</span></div>`;
+  try {
+    const { data } = await sb.from('chat_messages')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (data && data.length) data.reverse().forEach(appendChatRow);
+  } catch(e) { console.warn('loadRecentChats:', e.message); }
+}
+
+function subscribeChat() {
+  if (chatChannel) { sb.removeChannel(chatChannel); chatChannel = null; }
+  chatChannel = sb.channel('chat_realtime')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' },
+      payload => appendChatRow(payload.new))
+    .subscribe();
+}
+
+async function sendChat() {
+  if (!isLoggedIn || !currentUser) { toast('⚠️ 로그인이 필요합니다'); return; }
+  const inp = $('chat-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  const nick = currentUser.user_metadata?.nickname || currentUser.email.split('@')[0];
+  try {
+    await sb.from('chat_messages').insert({
+      user_id: currentUser.id,
+      nickname: nick,
+      verified_title: myVerifiedTitle || null,
+      message: msg
+    });
+  } catch(e) {
+    toast('❌ 메시지 전송 실패');
+    inp.value = msg;
+    console.warn('sendChat:', e.message);
+  }
 }
 
 // =====================================================
@@ -1123,10 +1208,21 @@ async function loadUserDataFromDB() {
       $('h-total').textContent  = (stats.total_tickets || 0) + '게임';
     }
 
-    const { data: tickets } = await sb.from('tickets').select('qr_url').eq('user_id', uid);
+    const { data: tickets } = await sb.from('tickets').select('qr_url, round_no, prize_rank').eq('user_id', uid);
     if (tickets?.length) {
       usedQrKeys = tickets.map(t => t.qr_url);
       saveStorage();
+      const winTickets = tickets.filter(t => t.prize_rank && t.prize_rank <= 5);
+      if (winTickets.length) {
+        winTickets.sort((a, b) => a.prize_rank - b.prize_rank);
+        const best = winTickets[0];
+        const rankLabels = {1:'1등',2:'2등',3:'3등',4:'4등',5:'5등'};
+        const title = `${best.round_no}회 ${rankLabels[best.prize_rank]}`;
+        if (!myVerifiedTitle || myVerifiedTitle !== title) { myVerifiedTitle = title; saveStorage(); }
+      }
+      const nick2 = currentUser?.user_metadata?.nickname || currentUser?.email?.split('@')[0] || '?';
+      updateHeaderUser(nick2, myVerifiedTitle || '');
+      updateBadgeUI();
     }
   } catch (e) {
     console.warn('loadUserDataFromDB:', e.message);
@@ -1253,7 +1349,8 @@ async function init() {
   buildOMRGrid();
   renderHomeLive();
   rList();
-  $('chat-box').scrollTop = $('chat-box').scrollHeight;
+  loadRecentChats();
+  subscribeChat();
 
   latestRound = getLatestRound();
   $('api-indicator').textContent = 'API 연결 중...';
@@ -1652,4 +1749,3 @@ window.onload = init;
 </script>
 </body>
 </html>
-                                                                                                                                               
