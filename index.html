@@ -379,8 +379,12 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .my-row td { background:#1a3a5f !important; }
 [data-theme="dark"] .rank-tab-pill { background:#334155; color:#94a3b8; border-color:#475569; }
 [data-theme="dark"] .rank-tab-pill.on { background:var(--lotto-red); color:#fff; }
+.comm-sort-btn { padding:4px 10px; font-size:11px; font-weight:700; border:1px solid #e2e8f0; border-radius:4px; background:#fff; cursor:pointer; color:var(--text-muted); }
+.comm-sort-btn.on { background:#334155; color:#fff; border-color:#334155; }
 [data-theme="dark"] .comm-tab-btn { background:#334155; color:#94a3b8; border-color:#475569; }
 [data-theme="dark"] .comm-tab-btn.on { background:var(--lotto-red); color:#fff; }
+[data-theme="dark"] .comm-sort-btn { background:#1e293b; color:#94a3b8; border-color:#475569; }
+[data-theme="dark"] .comm-sort-btn.on { background:#f1f5f9; color:#0f172a; border-color:#f1f5f9; }
 [data-theme="dark"] .post-card { background:#263244; border-color:#334155; }
 [data-theme="dark"] .post-card:hover { background:#2d3e55; }
 [data-theme="dark"] .post-card-title { color:#f1f5f9; }
@@ -450,6 +454,15 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .left-dashboard-card > div[style*="background:#fef2f2"] { background:#2a0f0f !important; border-color:#991b1b !important; }
 [data-theme="dark"] #logout-btn { background:#1e293b !important; border-color:#475569 !important; }
 [data-theme="dark"] #nick-input { background:#1e293b !important; border-color:#475569 !important; color:#f1f5f9 !important; }
+[data-theme="dark"] .auth-box { background:#1e293b !important; }
+[data-theme="dark"] .auth-box input { background:#0f172a !important; border-color:#475569 !important; color:#f1f5f9 !important; }
+[data-theme="dark"] #qr-result-display div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #qr-history-section div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #qr-result-display div[style*="background:#f8fafc"] { background:#263244 !important; border-color:#334155 !important; }
+[data-theme="dark"] .post-detail-meta { border-color:#334155 !important; }
+[data-theme="dark"] .comment-item { border-color:#334155 !important; }
+[data-theme="dark"] .comment-write-bar .comment-input { background:#0f172a !important; border-color:#475569 !important; color:#f1f5f9 !important; }
+[data-theme="dark"] #community-content div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #left-prize-card { background:#0f2a18 !important; border-color:#166534 !important; }
 [data-theme="dark"] #left-cost-card { background:#2a0f0f !important; border-color:#991b1b !important; }
 [data-theme="dark"] #left-feed-section { border-top-color:#334155 !important; }
@@ -766,6 +779,8 @@ main.chat-hidden .chat-panel { display: none; }
           </div>
           <div id="qr-result-display" style="margin-top:10px;"></div>
         </div>
+        <!-- 최근 인증 이력 -->
+        <div id="qr-history-section"></div>
       </div>
 
       <!-- 4. 투자 가이드 -->
@@ -793,9 +808,15 @@ main.chat-hidden .chat-panel { display: none; }
 
       <!-- 8. 커뮤니티 -->
       <div id="pg-community" class="page-content" style="display:none;">
-        <div class="comm-tab-row">
-          <button class="comm-tab-btn on" id="ct-free" onclick="commTab('free')">자유게시판</button>
-          <button class="comm-tab-btn" id="ct-verify" onclick="commTab('verify')">인증게시판</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div class="comm-tab-row" style="margin-bottom:0;">
+            <button class="comm-tab-btn on" id="ct-free" onclick="commTab('free')">자유게시판</button>
+            <button class="comm-tab-btn" id="ct-verify" onclick="commTab('verify')">인증게시판</button>
+          </div>
+          <div style="display:flex;gap:4px;">
+            <button class="comm-sort-btn on" id="cs-newest" onclick="commSort('newest')">최신순</button>
+            <button class="comm-sort-btn" id="cs-popular" onclick="commSort('popular')">인기순</button>
+          </div>
         </div>
         <div class="post-write-bar" id="post-write-bar-collapsed">
           <input type="text" id="post-input" class="post-write-input" placeholder="로그인 후 글 작성..." disabled onclick="expandPostForm()">
@@ -1173,8 +1194,7 @@ function renderHomeLive() {
       <div class="insight-item"><span>연속 번호</span><b>${a.seq ? a.seq + '쌍 발견' : '없음'}</b></div>
       <div class="insight-item"><span>데이터 출처</span><b>동행복권 공식 API</b></div>
     </div>
-    <div class="section-mini-title"><span>내 추천번호</span><em>${MY.length}게임</em></div>
-    <div class="section-mini-title" style="margin-top:14px;"><span>실시간 활동 피드</span><em>최신순</em></div>
+    <div class="section-mini-title" style="margin-top:2px;"><span>실시간 활동 피드</span><em>최신순</em></div>
     <div id="feed-list" style="min-height:40px;"></div>`;
   renderFeed();
 }
@@ -1461,6 +1481,39 @@ function saveT() {
 
 
 // =====================================================
+// QR 최근 인증 이력 표시
+// =====================================================
+async function renderQRHistory() {
+  const wrap = document.getElementById('qr-history-section');
+  if (!wrap) return;
+  if (!isLoggedIn || !currentUser || !sb) {
+    wrap.innerHTML = '';
+    return;
+  }
+  try {
+    const { data: tks } = await sb.from('tickets')
+      .select('round_no, prize_rank, prize_amount, purchase_date, game_count')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false })
+      .limit(5);
+    if (!tks || !tks.length) { wrap.innerHTML = ''; return; }
+    const rankLabel = r => r===1?'🥇 1등':r===2?'🥈 2등':r===3?'🥉 3등':r===4?'🎯 4등':r===5?'✅ 5등':'낙첨';
+    const rankColor = r => r<=3?'var(--lotto-red)':r===4?'#3b82f6':r===5?'#64748b':'#94a3b8';
+    wrap.innerHTML = `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-top:4px;">
+      <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">최근 인증 이력</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${tks.map(t => `<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;">
+          <span style="color:var(--text-muted);">${t.round_no||'-'}회 ·${t.game_count||1}게임</span>
+          <span style="font-weight:700;color:${rankColor(t.prize_rank)};">${rankLabel(t.prize_rank)}${t.prize_rank&&t.prize_rank<=5&&t.prize_amount?' · '+fmtMFull(t.prize_amount):''}</span>
+        </div>`).join('')}
+      </div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;text-align:right;">
+        <button onclick="go('stats')" style="font-size:11px;color:var(--lotto-red);background:none;border:none;cursor:pointer;font-weight:700;">전체 이력 보기 →</button>
+      </div>
+    </div>`;
+  } catch(e) { wrap.innerHTML = ''; }
+}
+
 // QR 실제 인증 (동행복권 API 대조)
 // =====================================================
 async function verifyRealQR() {
@@ -1567,6 +1620,7 @@ async function verifyRealQR() {
     </div>`;
 
   $('qr-url-input').value = '';
+  renderQRHistory();
 }
 
 // =====================================================
@@ -2262,7 +2316,7 @@ function go(id) {
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(); }
-  if (id === 'ticket')    { chgMode(); }
+  if (id === 'ticket')    { chgMode(); renderQRHistory(); }
   if (id === 'fortune')   { ensureRecentData().then(() => renderFortune()); }
   if (id === 'stats')     { renderStats(); }
   if (id === 'badge')     { renderBadge(); }
@@ -3233,6 +3287,34 @@ async function renderRank(catId) {
       </tr>`;
     });
     html += '</tbody></table>';
+
+    // 내 순위가 목록에 없으면 하단에 핀 표시
+    const myInList = myUid && sorted.some(r => r.user_id === myUid);
+    if (myUid && !myInList) {
+      try {
+        const { data: myStats } = await sb.from('user_stats').select('*').eq('user_id', myUid).single();
+        const { data: myProf } = await sb.from('profiles').select('nickname').eq('id', myUid).single();
+        if (myStats) {
+          const myVal = col.field(myStats);
+          const myDisplay = col.fmt ? col.fmt(myVal) : (myVal + col.unit);
+          const myNick = myProf?.nickname || '나';
+          // 내 순위 = 나보다 높은 사람 수 + 1
+          const myRankPos = sorted.filter(r => col.field(r) > myVal).length + 1;
+          html = html.replace('</tbody></table>', `</tbody></table>
+<div style="margin-top:8px;border-top:2px dashed #e2e8f0;padding-top:8px;">
+  <table class="rank-board-table"><tbody>
+    <tr class="my-row" style="font-weight:700;">
+      <td class="rank-no-cell" style="color:var(--lotto-red);">${myRankPos}</td>
+      <td class="rank-name-cell">▶ ${myNick} <span style="font-size:10px;color:var(--lotto-red);">(나)</span></td>
+      <td style="text-align:right;" class="rank-val-cell">${myDisplay}</td>
+    </tr>
+  </tbody></table>
+  <div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px;">Top ${sorted.length}위 밖 · 내 현재 순위</div>
+</div>`);
+        }
+      } catch(_) {}
+    }
+
     $('rank-content').innerHTML = html;
   } catch(e) {
     $('rank-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--b-red);font-size:12px;">랭킹 로드 실패: ' + e.message + '</div>';
@@ -3245,11 +3327,19 @@ async function renderRank(catId) {
 let curCommTab = 'free';
 let commPosts = { free: [], verify: [] };
 let myLikedPostIds = new Set();
+let curCommSort = 'newest';
 
 function commTab(tab) {
   curCommTab = tab;
   $('ct-free').classList.toggle('on', tab==='free');
   $('ct-verify').classList.toggle('on', tab==='verify');
+  renderCommunityList();
+}
+
+function commSort(sort) {
+  curCommSort = sort;
+  $('cs-newest').classList.toggle('on', sort==='newest');
+  $('cs-popular').classList.toggle('on', sort==='popular');
   renderCommunityList();
 }
 
@@ -3262,7 +3352,10 @@ function timeAgo(iso) {
 }
 
 function renderCommunityList() {
-  const posts = commPosts[curCommTab] || [];
+  let posts = [...(commPosts[curCommTab] || [])];
+  if (curCommSort === 'popular') {
+    posts.sort((a,b) => (b.likes||0) - (a.likes||0));
+  }
   if (!posts.length) {
     $('community-content').innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
       <div style="margin-bottom:10px;"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
