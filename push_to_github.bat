@@ -13,13 +13,13 @@ git status
 
 git diff --cached --quiet 2>nul
 if errorlevel 1 (
-    git commit -m "fix: lotto.js complete - build fix"
+    git commit -m "feat: latest changes"
     echo [OK] Commit done
 ) else (
     echo [OK] Nothing to commit
 )
 
-git push origin main
+git push --force-with-lease origin main
 
 echo.
 echo Done! https://github.com/cus0515/lottobank
