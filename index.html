@@ -397,11 +397,17 @@ main.chat-hidden .chat-panel { display: none; }
         </tbody>
       </table>
       <div id="h-region" class="region-list" style="display:none;"></div>
-      <!-- 숨김 stats (profile/stats 탭에서 참조) -->
+      <!-- 내 구매 현황 (최하단 visible) -->
+      <div style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;">
+        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">📌 내 구매 현황</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;">
+          <span style="color:#64748b;">총 구매</span><span id="h-total" style="font-weight:700;text-align:right;">0게임</span>
+          <span style="color:#64748b;">총 구매비용</span><span id="h-cost" style="font-weight:700;text-align:right;">0원</span>
+          <span style="color:#64748b;">총 당첨금</span><span id="h-earned" style="font-weight:700;color:var(--lotto-red);text-align:right;">0원</span>
+        </div>
+      </div>
+      <!-- 다른 탭에서 참조하는 숨김 요소 -->
       <div style="display:none">
-        <span id="h-cost">0원</span>
-        <span id="h-earned">0원</span>
-        <span id="h-total">0게임</span>
         <span id="h-best-badge">없음</span>
         <span id="h-amt">-</span>
       </div>
@@ -871,21 +877,52 @@ async function chgRes() {
   const a = analyzeNumbers(d.nums);
   $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
     '<span style="font-weight:900;color:var(--text-muted);font-size:16px;margin:0 3px;">+</span>' + bH(d.bonus);
+
+  const prize2 = d.prize_2nd || Math.round((d.totalSales * 0.125) / Math.max(d.win_count_2nd || 1, 1));
+  const prizes = [
+    { rank:1, cond:'6개 일치',   cls:'pr1', amt: d.prize_1st,     cnt: d.win_count_1st,     auto: d.auto_1st,  manual: d.manual_1st },
+    { rank:2, cond:'5개+보너스', cls:'pr2', amt: prize2,           cnt: d.win_count_2nd||'?', auto: d.auto_2nd,  manual: d.manual_2nd },
+    { rank:3, cond:'5개 일치',   cls:'pr3', amt: 1500000,          cnt: d.win_count_3rd||'?', auto: null, manual: null },
+    { rank:4, cond:'4개 일치',   cls:'pr4', amt: 50000,            cnt: d.win_count_4th||'?', auto: null, manual: null },
+    { rank:5, cond:'3개 일치',   cls:'pr5', amt: 5000,             cnt: d.win_count_5th||'?', auto: null, manual: null },
+  ];
+
+  const regionHtml = (d.regions && d.regions.length)
+    ? `<div style="margin-top:8px;padding:6px 8px;background:#f8fafc;border-radius:6px;">
+        <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">🗺️ 1등 당첨 지역</div>
+        ${d.regions.map(r => `<span style="display:inline-block;background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:1px 6px;margin:2px;font-size:11px;">${r}</span>`).join('')}
+      </div>` : '';
+
   $('res-list').innerHTML = `
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;">
-      <span>추첨일</span><span style="font-weight:700;">${d.date}</span>
+    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0;font-size:12px;">
+      <span style="color:#64748b;">추첨일</span><span style="font-weight:700;">${d.date}</span>
     </div>
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;">
-      <span>1등 당첨금</span><span style="font-weight:900;color:var(--lotto-red);">${fmtMShort(d.prize_1st)}</span>
+    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0;font-size:12px;">
+      <span style="color:#64748b;">총 판매액</span><span style="font-weight:700;">${fmtMShort(d.totalSales)}</span>
     </div>
-    <div style="display:flex;justify-content:space-between;padding:8px 0;">
-      <span>1등 당첨자 수</span><span style="font-weight:700;">${d.win_count_1st}명</span>
-    </div>
+    <table class="prize-table" style="margin-top:6px;">
+      <thead><tr><th>등수</th><th>당첨 조건</th><th>당첨자</th><th>1인당 금액</th><th>수동/자동</th></tr></thead>
+      <tbody>
+        ${prizes.map(p => {
+          const autoStr = (p.auto != null && p.manual != null)
+            ? `<span class="winner-type">자동 ${p.auto}<br>수동 ${p.manual}</span>`
+            : `<span class="winner-type" style="color:#cbd5e1;">—</span>`;
+          return `<tr>
+            <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
+            <td style="font-size:11px;color:#475569;">${p.cond}</td>
+            <td style="font-weight:700;">${p.cnt}명</td>
+            <td style="font-weight:700;color:var(--lotto-red);">${fmtMShort(p.amt)}</td>
+            <td>${autoStr}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
     <div class="result-metrics">
       <div class="result-metric"><span>홀짝</span><strong>${a.odd}:${a.even}</strong></div>
       <div class="result-metric"><span>저/고</span><strong>${a.low}:${a.high}</strong></div>
       <div class="result-metric"><span>연속</span><strong>${a.seq ? a.seq + '쌍' : '없음'}</strong></div>
-    </div>`;
+    </div>
+    ${regionHtml}`;
 }
 
 // =====================================================
@@ -1477,6 +1514,17 @@ async function init() {
       });
     }
   }
+
+  // 5분마다 새 회차 자동 체크
+  setInterval(async () => {
+    const newLatest = getLatestRound();
+    if (newLatest > latestRound) {
+      for (let r = newLatest; r >= newLatest - 2; r--) {
+        const d = await fetchLotto(r);
+        if (d) { latestRound = r; latestData = d; recentData[r] = d; renderLatestOnLeft(d); renderHomeLive(); break; }
+      }
+    }
+  }, 5 * 60 * 1000);
 }
 
 // =====================================================
@@ -1803,48 +1851,4 @@ async function changeNickname() {
   renderProfile();
 }
 
-function renderProfile() {
-  const nick = $('user-name').textContent;
-  const totalBuy = (isLoggedIn && dbStats) ? (dbStats.total_tickets || 0) : MY.length;
-  const qrCount = usedQrKeys.length;
-  const earnedCount = BADGE_DEFS.filter(b => b.cond()).length;
-  const email = currentUser?.email || '-';
-  $('profile-content').innerHTML = `
-    <div class="profile-hero">
-      <div class="profile-avatar-circle">${nick.charAt(0)||'?'}</div>
-      <div class="profile-nick">${nick}</div>
-      <div class="profile-sub-text">${getMyBadgeHtml()}&nbsp;LottoBank 회원</div>
-    </div>
-    <div class="profile-stats-strip">
-      <div class="profile-stat-cell"><div class="profile-stat-val">${totalBuy}</div><div class="profile-stat-lbl">총 구매</div></div>
-      <div class="profile-stat-cell"><div class="profile-stat-val">${qrCount}</div><div class="profile-stat-lbl">QR 인증</div></div>
-      <div class="profile-stat-cell"><div class="profile-stat-val">${earnedCount}</div><div class="profile-stat-lbl">보유 뱃지</div></div>
-    </div>
-    <div class="profile-block">
-      <div class="profile-block-title">계정 정보</div>
-      <div class="profile-row"><span>이메일</span><span class="profile-row-val" style="font-size:12px;">${email}</span></div>
-      <div class="profile-row"><span>인증 등급</span><span class="profile-row-val">${myVerifiedTitle||'일반 회원'}</span></div>
-      <div class="profile-row"><span>가입 방식</span><span class="profile-row-val">이메일 로그인</span></div>
-    </div>
-    <div class="profile-block">
-      <div class="profile-block-title">나의 활동 요약</div>
-      <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
-      <div class="profile-row"><span>획득 뱃지</span><span class="profile-row-val">${earnedCount} / ${BADGE_DEFS.length}개</span></div>
-    </div>
-    ${isLoggedIn ? `
-    <div class="profile-block">
-      <div class="profile-block-title">닉네임 변경</div>
-      <div style="display:flex;gap:8px;align-items:center;padding:8px 0;">
-        <input type="text" id="nick-input" value="${nick}" maxlength="12"
-          style="flex:1;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;outline:none;"
-          onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'">
-        <button id="nick-save-btn" onclick="changeNickname()"
-          style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">저장</button>
-      </div>
-      <div style="font-size:11px;color:var(--text-muted);">2~12자, 한글/영문/숫자 사용 가능</div>
-    </div>` : '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [로그인] 버튼으로 로그인하면 전체 기능을 이용할 수 있습니다</div>'}
-  `;
-}
-
-window.onload = init;
-</script>
+f

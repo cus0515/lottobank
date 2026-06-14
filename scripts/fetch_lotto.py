@@ -4,6 +4,7 @@ LottoBank — GitHub Actions lotto cache updater
 """
 
 import json
+import re
 import urllib.request
 import os
 from datetime import datetime, timezone
@@ -67,6 +68,32 @@ def try_new_api(round_num):
     return None
 
 
+def fetch_regions(round_num):
+    """동행복권 당첨 지역 스크래핑"""
+    try:
+        url = f"https://www.dhlottery.co.kr/gameResult.do?method=byWin&drwNo={round_num}"
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'Accept': 'text/html,application/xhtml+xml',
+            'Referer': 'https://www.dhlottery.co.kr/',
+        })
+        with urllib.request.urlopen(req, timeout=10) as r:
+            html = r.read().decode('euc-kr', errors='replace')
+        # 당첨 지역: <li><strong>서울</strong></li> 또는 테이블 td 형태
+        regions = re.findall(r'<strong[^>]*>\s*([가-힣]+(?:특별시|광역시|특별자치시|도|특별자치도)?)\s*</strong>', html)
+        seen, result = set(), []
+        for r in regions:
+            r = r.strip()
+            if r and r not in seen and len(r) >= 2:
+                seen.add(r)
+                result.append(r)
+        print(f"  지역 스크래핑: {result}")
+        return result[:20]
+    except Exception as e:
+        print(f"  지역 스크래핑 실패: {e}")
+        return []
+
+
 def try_old_api(round_num):
     """구 API (common.do) — 폴백용"""
     try:
@@ -98,27 +125,3 @@ def main():
             current = json.load(f)
             current_round = int(current.get('drwNo', 0))
         print(f"현재 캐시: {current_round}회")
-    except Exception:
-        print(f"캐시 없음 — 시드 회차 {SEED_ROUND} 사용")
-        current_round = SEED_ROUND - 1  # 다음 회차 = SEED_ROUND
-
-    # 다음 회차 먼저 시도 → 실패 시 현재 회차 갱신
-    for round_num in [current_round + 1, current_round]:
-        if round_num <= 0:
-            continue
-        print(f"시도: {round_num}회...")
-        result = try_new_api(round_num) or try_old_api(round_num)
-        if result and result.get('drwtNo1'):  # 번호가 실제로 있어야 저장
-            result['_cachedAt'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-            with open(CACHE_PATH, 'w', encoding='utf-8') as f:
-                json.dump(result, f, ensure_ascii=False, indent=2)
-            print(f"💾 저장 완료: {result['drwNo']}회 ({result['drwNoDate']})")
-            print(f"   번호: {result['drwtNo1']} {result['drwtNo2']} {result['drwtNo3']} "
-                  f"{result['drwtNo4']} {result['drwtNo5']} {result['drwtNo6']} +{result['bnusNo']}")
-            return
-
-    print("새 데이터 없음 — 기존 캐시 유지")
-
-
-if __name__ == '__main__':
-    main()
