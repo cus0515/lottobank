@@ -907,12 +907,13 @@ async function chgRes() {
           const autoStr = (p.auto != null && p.manual != null)
             ? `<span class="winner-type">자동 ${p.auto}<br>수동 ${p.manual}</span>`
             : `<span class="winner-type" style="color:#cbd5e1;">—</span>`;
+          const autoId = (p.rank <= 2) ? ` id="res-auto-${p.rank}"` : '';
           return `<tr>
             <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
             <td style="font-size:11px;color:#475569;">${p.cond}</td>
             <td style="font-weight:700;">${p.cnt}명</td>
             <td style="font-weight:700;color:var(--lotto-red);">${fmtMShort(p.amt)}</td>
-            <td>${autoStr}</td>
+            <td${autoId}>${autoStr}</td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -930,6 +931,14 @@ async function chgRes() {
     .then(j => {
       const s1 = j.stores1 || [];
       const s2 = j.stores2 || [];
+      // 1등/2등 수동/자동 셀 업데이트 (API에 없는 데이터를 판매소 목록에서 산출)
+      [[s1, 1], [s2, 2]].forEach(([stores, rank]) => {
+        const cell = document.getElementById('res-auto-' + rank);
+        if (!cell || !stores.length) return;
+        const aC = stores.filter(s => s.auto === '자동').length;
+        const mC = stores.filter(s => s.auto === '수동').length;
+        cell.innerHTML = `<span class="winner-type">자동 ${aC}<br>수동 ${mC}</span>`;
+      });
       let _storeId = 0;
       function buildStoreBlock(stores, color, emoji, title, uid) {
         if (!stores.length) return `<div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">데이터 없음</div>`;
