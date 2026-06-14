@@ -471,25 +471,6 @@ main.chat-hidden .chat-panel { display: none; }
 
       <!-- 비로그인: 플랫폼 통계 + 가입 유도 -->
       <div id="left-guest">
-        <!-- TOP PLAYER 카드 -->
-        <div id="top-player-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
-          <div style="background:#fff;border:1px solid #fecaca;border-radius:8px;padding:10px;cursor:pointer;" onclick="go('rank')">
-            <div style="font-size:10px;color:#dc2626;font-weight:800;margin-bottom:4px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="#dc2626" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              ROI 1위
-            </div>
-            <div id="top-roi-nick" style="font-size:12px;font-weight:900;color:#1e293b;margin-bottom:2px;">-</div>
-            <div id="top-roi-val" style="font-size:13px;font-weight:900;color:#dc2626;">-%</div>
-          </div>
-          <div style="background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:10px;cursor:pointer;" onclick="go('rank')">
-            <div style="font-size:10px;color:#16a34a;font-weight:800;margin-bottom:4px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg>
-              인증 1위
-            </div>
-            <div id="top-cert-nick" style="font-size:12px;font-weight:900;color:#1e293b;margin-bottom:2px;">-</div>
-            <div id="top-cert-val" style="font-size:13px;font-weight:900;color:#16a34a;">-게임</div>
-          </div>
-        </div>
         <div class="left-dashboard-card">
           <div style="font-size:11px;font-weight:800;color:#dc2626;margin-bottom:10px;letter-spacing:0.3px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>플랫폼 전체 통계</div>
           <div class="left-stat-row">
@@ -650,14 +631,8 @@ main.chat-hidden .chat-panel { display: none; }
 
       <!-- 4. 투자 가이드 -->
       <div id="pg-fortune" class="page-content" style="display:none;">
-        <div class="lotto-slip" style="background:#fff; line-height:1.7; font-size:13px;">
-          <h4 style="color:var(--lotto-red); font-weight:900; margin-bottom:10px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> 당첨 번호 출현 패턴 분석</h4>
-          <div id="fortune-content">
-            <p>• 동행복권 공식 API 데이터를 기반으로 최근 회차 번호 패턴을 분석합니다.</p>
-            <p style="margin-top:5px;">• <strong>인증 데이터 기반:</strong> QR 인증 완료 회원의 당첨 이력은 실제 구매 데이터로만 기록됩니다.</p>
-            <p style="margin-top:5px;">• <strong>안내:</strong> 번호 분석은 통계적 참고 자료입니다. 당첨을 보장하지 않습니다.</p>
-          </div>
-          <div id="fortune-stats" style="margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:12px;"></div>
+        <div id="fortune-content">
+          <div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:12px;">데이터 로딩 중...</div>
         </div>
       </div>
 
@@ -1625,7 +1600,6 @@ function applyLogoutUI() {
   // 좌측 패널 게스트 상태 복귀
   const lg = $('left-guest'); if (lg) lg.style.display = 'block';
   const lu = $('left-user');  if (lu) lu.style.display = 'none';
-  loadTopPlayers();
   if (roiChartInstance) { roiChartInstance.destroy(); roiChartInstance = null; }
   loadGuestStats();
   toast('<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> 로그아웃되었습니다');
@@ -1942,8 +1916,6 @@ async function loadGuestStats() {
       }
     } catch(_) {}
   } catch(e) { console.warn('loadGuestStats:', e.message); }
-  // Top Player 카드 로드
-  loadTopPlayers();
 }
 
 function calcPrizeAmount(rank, winData) {
@@ -2091,7 +2063,7 @@ function go(id) {
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(); }
   if (id === 'ticket')    { chgMode(); }
-  if (id === 'fortune')   { renderFortune(); }
+  if (id === 'fortune')   { ensureRecentData().then(() => renderFortune()); }
   if (id === 'stats')     { renderStats(); }
   if (id === 'badge')     { renderBadge(); }
   if (id === 'rank')      { renderRank(); }
@@ -2103,20 +2075,181 @@ function go(id) {
 // =====================================================
 // 투자 가이드
 // =====================================================
+async function ensureRecentData() {
+  const rounds = Object.keys(recentData).map(Number);
+  if (rounds.length >= 20) return;
+  const base = latestRound || getLatestRound();
+  const fetches = [];
+  for (let r = base; r >= Math.max(1, base - 49); r--) {
+    if (!recentData[r]) fetches.push(fetchLotto(r).then(d => { if (d) recentData[r] = d; }));
+    if (fetches.length >= 30) break;
+  }
+  await Promise.allSettled(fetches);
+}
+
 function renderFortune() {
-  const hot = getHotNums();
-  const cold = getColdNums().slice(0, 6);
+  const rounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
   const d = latestData;
-  if (!d) return;
-  const a = analyzeNumbers(d.nums);
-  $('fortune-stats').innerHTML = `
-    <div style="margin-bottom:10px;font-weight:700;font-size:12px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> 최근 ${Object.keys(recentData).length}회차 실제 분석</div>
-    <div class="insight-list">
-      <div class="insight-item"><span>핫 번호 (최다 출현)</span><b>${hot.join(', ')}</b></div>
-      <div class="insight-item"><span>콜드 번호 (미출현)</span><b>${cold.length > 0 ? cold.join(', ') : '모든 번호 출현'}</b></div>
-      <div class="insight-item"><span>최신 회차 홀짝</span><b>${a.odd}홀 ${a.even}짝</b></div>
-      <div class="insight-item"><span>최신 회차 저/고</span><b>저번호 ${a.low}개 / 고번호 ${a.high}개</b></div>
-    </div>`;
+  if (!d || rounds.length === 0) {
+    $('fortune-content').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px;">회차 데이터 로딩 중...</div>';
+    return;
+  }
+
+  // 번호별 출현 빈도 계산 (최근 50회차)
+  const freq = new Array(46).fill(0);
+  const recentRounds = rounds.slice(0, 50);
+  recentRounds.forEach(r => {
+    const rd = recentData[r];
+    if (!rd) return;
+    rd.nums.forEach(n => freq[n]++);
+    freq[rd.bonus]++;
+  });
+  const totalDraws = recentRounds.length;
+
+  // 핫/콜드 번호
+  const indexed = freq.map((c,i)=>({n:i,c})).slice(1);
+  const sorted = [...indexed].sort((a,b)=>b.c-a.c);
+  const hot6 = sorted.slice(0,6).map(x=>x.n);
+  const cold6 = sorted.slice(-6).map(x=>x.n);
+
+  // 패턴 기반 추천 번호 생성
+  function genRecommended(seed) {
+    const nums = [];
+    const pool = [...indexed].sort((a,b)=>{
+      const weight = (b.c * 0.6) + (Math.random() * totalDraws * 0.4);
+      const wa = (a.c * 0.6) + (Math.random() * totalDraws * 0.4);
+      return weight - wa;
+    });
+    while (nums.length < 6) {
+      const pick = pool.shift();
+      if (!nums.includes(pick.n)) nums.push(pick.n);
+    }
+    return nums.sort((a,b)=>a-b);
+  }
+
+  // 홀짝/고저 분석
+  const recentNums = d.nums;
+  const odd = recentNums.filter(n=>n%2!==0).length;
+  const even = 6 - odd;
+  const low = recentNums.filter(n=>n<=22).length;
+  const high = 6 - low;
+
+  // 구간별 분포 (최근 20회차)
+  const zones = [0,0,0,0,0]; // 1-9, 10-19, 20-29, 30-39, 40-45
+  recentRounds.slice(0,20).forEach(r => {
+    const rd = recentData[r];
+    if (!rd) return;
+    rd.nums.forEach(n => {
+      if (n<=9) zones[0]++;
+      else if (n<=19) zones[1]++;
+      else if (n<=29) zones[2]++;
+      else if (n<=39) zones[3]++;
+      else zones[4]++;
+    });
+  });
+  const zoneTotal = zones.reduce((s,v)=>s+v,0)||1;
+
+  // 추천 번호 3세트 생성
+  const sets = [genRecommended(1), genRecommended(2), genRecommended(3)];
+
+  // 출현 빈도 히트맵 HTML
+  const maxFreq = Math.max(...freq.slice(1));
+  const heatmapRows = [];
+  for (let row=0; row<5; row++) {
+    let cells = '';
+    for (let col=0; col<9; col++) {
+      const n = row*9 + col + 1;
+      if (n > 45) break;
+      const ratio = freq[n] / maxFreq;
+      const alpha = 0.15 + ratio * 0.75;
+      const color = n<=9?`rgba(239,68,68,${alpha})`:n<=19?`rgba(249,115,22,${alpha})`:n<=29?`rgba(234,179,8,${alpha})`:n<=39?`rgba(59,130,246,${alpha})`:`rgba(107,114,128,${alpha})`;
+      const isHot = hot6.includes(n);
+      const isCold = cold6.includes(n);
+      cells += `<div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:${color};font-size:10px;font-weight:${isHot?'900':'600'};color:${ratio>0.5?'#fff':'#1e293b'};position:relative;border:${isHot?'2px solid #dc2626':isCold?'2px dashed #94a3b8':'1px solid transparent'};cursor:default;" title="${totalDraws}회 중 ${freq[n]}회 출현">${n}</div>`;
+    }
+    heatmapRows.push(`<div style="display:flex;gap:3px;justify-content:center;">${cells}</div>`);
+  }
+  // 마지막 행 (37-45)
+  let lastCells = '';
+  for (let n=46; n<=45; n++) {} // skip
+
+  $('fortune-content').innerHTML = `
+    <!-- 1. 번호 추천 -->
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:900;color:var(--text-dark);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          AI 번호 추천
+        </div>
+        <button onclick="renderFortune()" style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;padding:4px 10px;cursor:pointer;color:#64748b;font-weight:700;">🔄 재생성</button>
+      </div>
+      ${sets.map((nums, i) => `
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:10px;font-weight:800;color:#64748b;min-width:32px;">${['A세트','B세트','C세트'][i]}</span>
+          <div class="ball-context" style="margin:0;gap:4px;">${nums.map(n=>bH(n)).join('')}</div>
+        </div>`).join('')}
+      <div style="font-size:10px;color:#94a3b8;margin-top:6px;text-align:center;">※ 최근 ${totalDraws}회차 출현 빈도 기반 통계 추천 · 당첨 보장 없음</div>
+    </div>
+
+    <!-- 2. 출현 빈도 히트맵 -->
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+        번호별 출현 빈도 <span style="font-size:10px;color:#94a3b8;font-weight:500;">(최근 ${totalDraws}회)</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        ${heatmapRows.join('')}
+      </div>
+      <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;font-size:10px;color:#64748b;">
+        <span><span style="display:inline-block;width:8px;height:8px;border:2px solid #dc2626;border-radius:50%;vertical-align:middle;"></span> 핫 번호 TOP6</span>
+        <span><span style="display:inline-block;width:8px;height:8px;border:2px dashed #94a3b8;border-radius:50%;vertical-align:middle;"></span> 콜드 번호 BOTTOM6</span>
+        <span>색 진할수록 출현 빈도 높음</span>
+      </div>
+    </div>
+
+    <!-- 3. 통계 분석 -->
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        패턴 분석
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div style="background:#f8fafc;border-radius:6px;padding:10px;text-align:center;">
+          <div style="font-size:10px;color:#64748b;margin-bottom:4px;">최신 회차 홀/짝</div>
+          <div style="font-size:16px;font-weight:900;">${odd}홀 ${even}짝</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:6px;padding:10px;text-align:center;">
+          <div style="font-size:10px;color:#64748b;margin-bottom:4px;">저번호/고번호</div>
+          <div style="font-size:16px;font-weight:900;">${low}저 ${high}고</div>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">구간별 출현 비율 (최근 20회)</div>
+      ${['1~9','10~19','20~29','30~39','40~45'].map((zone,i)=>{
+        const pct = Math.round(zones[i]/zoneTotal*100);
+        const colors = ['#ef4444','#f97316','#eab308','#3b82f6','#6b7280'];
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+          <span style="font-size:10px;color:#64748b;min-width:36px;">${zone}</span>
+          <div style="flex:1;background:#f1f5f9;border-radius:3px;height:10px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${colors[i]};border-radius:3px;"></div>
+          </div>
+          <span style="font-size:10px;font-weight:700;min-width:26px;text-align:right;">${pct}%</span>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- 4. 핫/콜드 번호 -->
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;">
+      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">핫/콜드 번호</div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:11px;color:#dc2626;font-weight:700;margin-bottom:5px;">🔥 자주 나온 번호 (최근 ${totalDraws}회)</div>
+        <div class="ball-context" style="justify-content:flex-start;gap:5px;">${hot6.map(n=>bH(n)).join('')}</div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:#3b82f6;font-weight:700;margin-bottom:5px;">🧊 적게 나온 번호 (제외 후보)</div>
+        <div class="ball-context" style="justify-content:flex-start;gap:5px;">${cold6.map(n=>bH(n)).join('')}</div>
+      </div>
+    </div>
+  `;
 }
 
 // =====================================================
@@ -2260,8 +2393,73 @@ function renderStats() {
         <tr><td>5등</td><td>3개 일치</td><td style="font-weight:700;">${rankCounts[5]}회</td><td style="font-size:11px;color:var(--text-muted);">고정 5,000원</td></tr>
       </tbody>
     </table>
-    ${isMock ? '<div style="margin-top:14px;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:6px;text-align:center;font-size:12px;color:var(--text-muted);">QR 인증 탭에서 실제 복권 QR을 등록하면 전적이 자동으로 기록됩니다</div>' : ''}
+    ${!isLoggedIn ? '<div style="margin-top:14px;padding:12px;background:#fff5f5;border:1px solid #fecaca;border-radius:6px;text-align:center;font-size:12px;"><b style=\"color:#dc2626;\">로그인</b><span style=\"color:#64748b;">하면 실제 QR 인증 데이터 기반 전적이 기록됩니다</span><br><button onclick=\"showAuthModal()\" style=\"margin-top:8px;background:#dc2626;color:#fff;border:none;border-radius:4px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;\">로그인하기</button></div>' : isMock ? '<div style="margin-top:14px;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:6px;text-align:center;font-size:12px;color:var(--text-muted);">QR 인증 탭에서 실제 복권 QR을 등록하면 전적이 자동으로 기록됩니다</div>' : ''}
   `;
+
+  // 티켓 이력 비동기 로드
+  loadTicketHistory();
+}
+
+async function loadTicketHistory() {
+  const container = $('stats-content');
+  if (!container) return;
+
+  // 이력 섹션 추가
+  let histSection = document.getElementById('ticket-history-section');
+  if (!histSection) {
+    histSection = document.createElement('div');
+    histSection.id = 'ticket-history-section';
+    histSection.style.cssText = 'margin-top:14px;';
+    container.appendChild(histSection);
+  }
+  histSection.innerHTML = '<div style="font-size:12px;color:#94a3b8;padding:8px 0;">이력 로딩 중...</div>';
+
+  if (!isLoggedIn || !currentUser || !sb) {
+    histSection.innerHTML = '';
+    return;
+  }
+
+  try {
+    const { data: tickets } = await sb.from('tickets')
+      .select('round_no, prize_rank, prize_amount, purchase_date, game_count, qr_url')
+      .eq('user_id', currentUser.id)
+      .order('round_no', { ascending: false })
+      .limit(30);
+
+    if (!tickets || !tickets.length) {
+      histSection.innerHTML = '<div style="font-size:12px;color:#94a3b8;padding:8px 0;text-align:center;">아직 인증된 QR이 없습니다</div>';
+      return;
+    }
+
+    const rankLabel = r => r===1?'🥇 1등':r===2?'🥈 2등':r===3?'🥉 3등':r===4?'🎯 4등':r===5?'✅ 5등':'낙첨';
+    const rankColor = r => r===1?'#dc2626':r===2?'#a855f7':r===3?'#10b981':r===4?'#3b82f6':r===5?'#64748b':'#94a3b8';
+
+    histSection.innerHTML = `
+      <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">QR 인증 이력 <span style="font-size:10px;font-weight:500;color:#94a3b8;">(최근 ${tickets.length}건)</span></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+              <th style="padding:8px 10px;text-align:left;font-weight:700;color:#64748b;">회차</th>
+              <th style="padding:8px 6px;text-align:center;font-weight:700;color:#64748b;">결과</th>
+              <th style="padding:8px 10px;text-align:right;font-weight:700;color:#64748b;">당첨금</th>
+              <th style="padding:8px 10px;text-align:right;font-weight:700;color:#64748b;">날짜</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tickets.map((t,i) => `
+              <tr style="border-bottom:1px solid #f1f5f9;${i%2===0?'':'background:#fafafa'}">
+                <td style="padding:7px 10px;font-weight:700;">${t.round_no}회</td>
+                <td style="padding:7px 6px;text-align:center;font-weight:700;color:${rankColor(t.prize_rank)};">${rankLabel(t.prize_rank)}</td>
+                <td style="padding:7px 10px;text-align:right;font-weight:${t.prize_amount>0?'700':'400'};color:${t.prize_amount>0?'#16a34a':'#94a3b8'};">${t.prize_amount>0?fmtMFull(t.prize_amount):'-'}</td>
+                <td style="padding:7px 10px;text-align:right;color:#64748b;font-size:11px;">${t.purchase_date||'-'}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    histSection.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px 0;">이력 로드 실패</div>';
+  }
 }
 
 
@@ -2365,44 +2563,6 @@ function scanCameraLoop() {
   _camLoopId = requestAnimationFrame(scanCameraLoop);
 }
 
-// =====================================================
-// Top Player 카드 로드
-// =====================================================
-async function loadTopPlayers() {
-  if (!sb) return;
-  try {
-    const { data } = await sb.from('user_stats')
-      .select('user_id, total_tickets, total_spent, total_prize, profiles(nickname)')
-      .gt('total_tickets', 0)
-      .limit(100);
-    if (!data || !data.length) return;
-
-    // ROI 1위
-    const withRoi = data
-      .filter(s => s.total_spent > 0)
-      .map(s => ({ ...s, roi: (s.total_prize / s.total_spent) * 100, nick: s.profiles?.nickname || '익명' }))
-      .sort((a, b) => b.roi - a.roi);
-    if (withRoi.length) {
-      const top = withRoi[0];
-      const el1 = document.getElementById('top-roi-nick');
-      const el2 = document.getElementById('top-roi-val');
-      if (el1) el1.textContent = top.nick;
-      if (el2) { el2.textContent = (top.roi >= 0 ? '+' : '') + top.roi.toFixed(1) + '%'; el2.style.color = top.roi >= 0 ? '#dc2626' : '#3b82f6'; }
-    }
-
-    // 인증 횟수 1위
-    const withCert = [...data]
-      .map(s => ({ ...s, nick: s.profiles?.nickname || '익명' }))
-      .sort((a, b) => b.total_tickets - a.total_tickets);
-    if (withCert.length) {
-      const top = withCert[0];
-      const el3 = document.getElementById('top-cert-nick');
-      const el4 = document.getElementById('top-cert-val');
-      if (el3) el3.textContent = top.nick;
-      if (el4) el4.textContent = (top.total_tickets || 0).toLocaleString() + '게임';
-    }
-  } catch(e) { console.warn('loadTopPlayers:', e.message); }
-}
 
 async function insertActivity(type, data = {}) {
   if (!isLoggedIn || !currentUser || !sb) return;
@@ -2505,33 +2665,49 @@ function subscribeFeed() {
 // 뱃지 페이지
 // =====================================================
 const BADGE_DEFS = [
-  { id: 'first_reg',  icon: svgIcon('ticket',24,'#6366f1'), name: '첫 등록',    desc: '처음으로 QR을 등록했습니다',
+  { id: 'first_reg',  icon: '🎟️', name: '첫 등록',    desc: '처음으로 QR을 등록했습니다',
     cond: () => usedQrKeys.length >= 1 },
-  { id: 'first_win',  icon: svgIcon('star',24,'#f59e0b'),   name: '첫 당첨',    desc: '처음으로 당첨을 경험했습니다',
+  { id: 'first_win',  icon: '⭐',  name: '첫 당첨',    desc: '처음으로 당첨을 경험했습니다',
     cond: () => (dbStats?.total_wins || 0) >= 1 },
-  { id: 'reg_10',     icon: svgIcon('qr',24,'#3b82f6'),     name: '인증 10회',  desc: 'QR을 10회 등록했습니다',
+  { id: 'reg_10',     icon: '📱',  name: '인증 10회',  desc: 'QR을 10회 등록했습니다',
     cond: () => usedQrKeys.length >= 10,   progress: () => [usedQrKeys.length, 10] },
-  { id: 'reg_50',     icon: svgIcon('qr',24,'#6366f1'),     name: '인증 50회',  desc: 'QR을 50회 등록했습니다',
+  { id: 'reg_50',     icon: '🔥',  name: '인증 50회',  desc: 'QR을 50회 등록했습니다',
     cond: () => usedQrKeys.length >= 50,   progress: () => [usedQrKeys.length, 50] },
-  { id: 'game_100',   icon: svgIcon('chart',24,'#10b981'),  name: '100게임',    desc: '100게임 이상 구매했습니다',
+  { id: 'reg_100',    icon: '💎',  name: '인증 100회', desc: 'QR을 100회 등록했습니다',
+    cond: () => usedQrKeys.length >= 100,  progress: () => [usedQrKeys.length, 100] },
+  { id: 'game_100',   icon: '📊',  name: '100게임',    desc: '100게임 이상 구매했습니다',
     cond: () => (dbStats?.total_tickets||0) >= 100, progress: () => [dbStats?.total_tickets||0, 100] },
-  { id: 'game_500',   icon: svgIcon('trending',24,'#f59e0b'),name: '500게임',   desc: '500게임 이상 구매했습니다',
+  { id: 'game_500',   icon: '🚀',  name: '500게임',    desc: '500게임 이상 구매했습니다',
     cond: () => (dbStats?.total_tickets||0) >= 500, progress: () => [dbStats?.total_tickets||0, 500] },
-  { id: 'game_1000',  icon: svgIcon('trophy',24,'#dc2626'), name: '1000게임',   desc: '1000게임 달성! 진정한 로또인',
+  { id: 'game_1000',  icon: '👑',  name: '1000게임',   desc: '1000게임 달성! 진정한 로또인',
     cond: () => (dbStats?.total_tickets||0) >= 1000, progress: () => [dbStats?.total_tickets||0, 1000] },
-  { id: 'rank5',      icon: svgIcon('medal',24,'#94a3b8'),  name: '5등 헌터',   desc: '5등 당첨 5회 이상',
+  { id: 'rank5',      icon: '✅',  name: '5등 헌터',   desc: '5등 당첨 5회 이상',
     cond: () => (dbStats?.rank_5_count||0) >= 5, progress: () => [dbStats?.rank_5_count||0, 5] },
-  { id: 'rank4',      icon: svgIcon('medal',24,'#8b5cf6'),  name: '4등 헌터',   desc: '4등 당첨 3회 이상',
+  { id: 'rank4',      icon: '🎯',  name: '4등 헌터',   desc: '4등 당첨 3회 이상',
     cond: () => (dbStats?.rank_4_count||0) >= 3, progress: () => [dbStats?.rank_4_count||0, 3] },
-  { id: 'rank3',      icon: svgIcon('medal',24,'#cd7f32'),  name: '3등 수집가', desc: '3등 당첨 경험',
+  { id: 'rank3',      icon: '🥉',  name: '3등 수집가', desc: '3등 당첨 1회 이상',
     cond: () => (dbStats?.rank_3_count||0) >= 1, progress: () => [dbStats?.rank_3_count||0, 1] },
-  { id: 'rank2',      icon: svgIcon('trophy',24,'#94a3b8'), name: '2등 인증자', desc: 'QR로 2등 인증 완료',
+  { id: 'rank2',      icon: '🥈',  name: '2등 인증자', desc: 'QR로 2등 인증 완료',
     cond: () => (dbStats?.rank_2_count||0) >= 1 || (myVerifiedTitle||'').includes('2등') },
-  { id: 'rank1',      icon: svgIcon('crown',24,'#f59e0b'),  name: '1등 인증자', desc: 'QR로 1등 인증 완료 — 전설',
+  { id: 'rank1',      icon: '🥇',  name: '1등 인증자', desc: 'QR로 1등 인증 완료 — 전설',
     cond: () => (dbStats?.rank_1_count||0) >= 1 || (myVerifiedTitle||'').includes('1등') },
+  { id: 'roi_pos',    icon: '📈',  name: 'ROI 플러스', desc: '수익률이 플러스를 기록했습니다',
+    cond: () => (dbStats?.total_spent||0) > 0 && (dbStats?.total_prize||0) > (dbStats?.total_spent||0) },
+  { id: 'big_spender',icon: '💰',  name: '큰 손',      desc: '총 투자금 100만원 이상',
+    cond: () => (dbStats?.total_spent||0) >= 1000000, progress: () => [dbStats?.total_spent||0, 1000000] },
 ];
 
 function renderBadge() {
+  if (!isLoggedIn) {
+    $('badge-content').innerHTML = `<div style="text-align:center;padding:40px 20px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;">
+      <div style="font-size:36px;margin-bottom:12px;">🏅</div>
+      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">뱃지 시스템</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">QR 인증 활동을 통해 다양한 뱃지를 획득하세요.<br>로그인 후 뱃지 달성 현황을 확인할 수 있습니다.</div>
+      <div class="badge-page-grid" style="opacity:0.4;pointer-events:none;">${BADGE_DEFS.slice(0,6).map(b=>`<div class="badge-card-item locked"><span style="font-size:32px;">${b.icon}</span><div class="badge-name-text">${b.name}</div></div>`).join('')}</div>
+      <button onclick="showAuthModal()" style="margin-top:16px;background:#dc2626;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:900;cursor:pointer;">로그인하고 시작하기</button>
+    </div>`;
+    return;
+  }
   const earned = BADGE_DEFS.filter(b => b.cond());
   let html = `
     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
@@ -2545,12 +2721,13 @@ function renderBadge() {
   BADGE_DEFS.forEach(b => {
     const isEarned = b.cond();
     const prog = b.progress ? b.progress() : null;
-    html += `<div class="badge-card-item ${isEarned ? 'earned' : 'locked'}">
-      <span class="badge-icon-big">${b.icon}</span>
+    const pct = prog ? Math.min(prog[0]/prog[1]*100, 100) : 0;
+    html += `<div class="badge-card-item ${isEarned ? 'earned' : 'locked'}" style="${isEarned?'box-shadow:0 2px 8px rgba(220,38,38,0.12);':''}">
+      <span class="badge-icon-big" style="font-size:32px;">${b.icon}</span>
       <div class="badge-name-text">${b.name}</div>
       <div class="badge-desc-text">${b.desc}</div>
-      ${isEarned ? '<div class="badge-earned-mark"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="20 6 9 17 4 12"/></svg> 획득</div>' : ''}
-      ${prog && !isEarned ? `<div class="badge-progress-bar"><div class="badge-progress-fill" style="width:${Math.min(prog[0]/prog[1]*100,100)}%"></div></div><div style="font-size:10px;color:var(--text-muted);margin-top:3px;">${prog[0]} / ${prog[1]}</div>` : ''}
+      ${isEarned ? '<div class="badge-earned-mark" style="color:#10b981;">✓ 획득완료</div>' : ''}
+      ${prog && !isEarned ? `<div class="badge-progress-bar"><div class="badge-progress-fill" style="width:${pct}%"></div></div><div style="font-size:10px;color:var(--text-muted);margin-top:3px;">${prog[0].toLocaleString()} / ${prog[1].toLocaleString()}</div>` : ''}
     </div>`;
   });
   html += '</div>';
@@ -2562,11 +2739,13 @@ function renderBadge() {
 // =====================================================
 const RANK_CATS = [
   { id: 'buy_count',   label: '구매 횟수', unit: '회' },
-  { id: 'qr_count',    label: '인증 횟수', unit: '회' },
-  { id: 'roi',         label: 'ROI',       unit: '%'  },
   { id: 'total_prize', label: '총 당첨금', unit: ''   },
+  { id: 'roi',         label: '수익률',    unit: '%'  },
+  { id: 'rank1',       label: '1등 인증',  unit: '회' },
+  { id: 'rank2',       label: '2등 최다',  unit: '회' },
+  { id: 'rank3',       label: '3등 최다',  unit: '회' },
+  { id: 'rank4',       label: '4등 최다',  unit: '회' },
   { id: 'rank5',       label: '5등 최다',  unit: '회' },
-  { id: 'rank3',       label: '3등 이상',  unit: '회' },
 ];
 let curRankCat = 'buy_count';
 
@@ -2581,10 +2760,17 @@ async function renderRank(catId) {
 
   try {
     // user_stats + profiles JOIN
+    const orderCol = catId === 'total_prize' ? 'total_prize' :
+                      catId === 'roi' ? 'total_prize' :
+                      catId === 'rank1' ? 'rank_1_count' :
+                      catId === 'rank2' ? 'rank_2_count' :
+                      catId === 'rank3' ? 'rank_3_count' :
+                      catId === 'rank4' ? 'rank_4_count' :
+                      catId === 'rank5' ? 'rank_5_count' : 'total_tickets';
     const { data: stats } = await sb.from('user_stats')
       .select('user_id, total_tickets, total_spent, total_wins, total_prize, best_rank, rank_1_count, rank_2_count, rank_3_count, rank_4_count, rank_5_count')
-      .order('total_tickets', { ascending: false })
-      .limit(20);
+      .order(orderCol, { ascending: false })
+      .limit(50);
 
     if (!stats || !stats.length) {
       $('rank-content').innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
@@ -2603,11 +2789,13 @@ async function renderRank(catId) {
     // 카테고리별 정렬
     const COL_MAP = {
       buy_count:   { field: s => s.total_tickets || 0, unit: '회', label: '구매 횟수' },
-      qr_count:    { field: s => s.total_wins || 0,    unit: '회', label: '당첨 횟수' },
-      roi:         { field: s => s.total_spent > 0 ? Math.round((s.total_prize - s.total_spent) / s.total_spent * 100) : -100, unit: '%', label: 'ROI', fmt: v => (v >= 0 ? '+' : '') + v + '%' },
+      roi:         { field: s => s.total_spent > 0 ? ((s.total_prize - s.total_spent) / s.total_spent * 100) : -100, unit: '%', label: '수익률', fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%' },
       total_prize: { field: s => s.total_prize || 0,   unit: '',   label: '총 당첨금', fmt: v => fmtMFull(v) },
+      rank1:       { field: s => s.rank_1_count || 0,  unit: '회', label: '1등 인증' },
+      rank2:       { field: s => s.rank_2_count || 0,  unit: '회', label: '2등 횟수' },
+      rank3:       { field: s => s.rank_3_count || 0,  unit: '회', label: '3등 횟수' },
+      rank4:       { field: s => s.rank_4_count || 0,  unit: '회', label: '4등 횟수' },
       rank5:       { field: s => s.rank_5_count || 0,  unit: '회', label: '5등 횟수' },
-      rank3:       { field: s => (s.rank_1_count||0)+(s.rank_3_count||0), unit: '회', label: '3등 이상' },
     };
     const col = COL_MAP[catId] || COL_MAP.buy_count;
     const sorted = [...stats].sort((a, b) => col.field(b) - col.field(a));
