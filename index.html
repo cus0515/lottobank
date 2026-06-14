@@ -1850,4 +1850,54 @@ async function changeNickname() {
 
 function renderProfile() {
   const nick = $('user-name').textContent;
-  const totalBuy = (isLoggedIn && dbSt
+  const totalBuy = (isLoggedIn && dbStats) ? (dbStats.total_tickets || 0) : MY.length;
+  const qrCount = usedQrKeys.length;
+  const earnedCount = BADGE_DEFS.filter(b => b.cond()).length;
+  const email = currentUser?.email || '-';
+  $('profile-content').innerHTML = `
+    <div class="profile-hero">
+      <div class="profile-avatar-circle">${nick.charAt(0)||'?'}</div>
+      <div class="profile-nick">${nick}</div>
+      <div class="profile-sub-text">${getMyBadgeHtml()}&nbsp;LottoBank 회원</div>
+    </div>
+    <div class="profile-stats-strip">
+      <div class="profile-stat-cell"><div class="profile-stat-val">${totalBuy}</div><div class="profile-stat-lbl">총 구매</div></div>
+      <div class="profile-stat-cell"><div class="profile-stat-val">${qrCount}</div><div class="profile-stat-lbl">QR 인증</div></div>
+      <div class="profile-stat-cell"><div class="profile-stat-val">${earnedCount}</div><div class="profile-stat-lbl">보유 뱃지</div></div>
+    </div>
+    <div class="profile-block">
+      <div class="profile-block-title">계정 정보</div>
+      <div class="profile-row"><span>이메일</span><span class="profile-row-val" style="font-size:12px;">${email}</span></div>
+      <div class="profile-row"><span>인증 등급</span><span class="profile-row-val">${myVerifiedTitle||'일반 회원'}</span></div>
+      <div class="profile-row"><span>가입 방식</span><span class="profile-row-val">이메일 로그인</span></div>
+    </div>
+    <div class="profile-block">
+      <div class="profile-block-title">나의 활동 요약</div>
+      <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
+      <div class="profile-row"><span>획득 뱃지</span><span class="profile-row-val">${earnedCount} / ${BADGE_DEFS.length}개</span></div>
+    </div>
+    ${isLoggedIn ? `
+    <div class="profile-block">
+      <div class="profile-block-title">닉네임 변경</div>
+      <div style="display:flex;gap:8px;align-items:center;padding:8px 0;">
+        <input type="text" id="nick-input" value="${nick}" maxlength="12"
+          style="flex:1;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;outline:none;"
+          onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'">
+        <button id="nick-save-btn" onclick="changeNickname()"
+          style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">저장</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);">2~12자, 한글/영문/숫자 사용 가능</div>
+    </div>
+    <div style="margin-top:8px;">
+      <button onclick="doLogout()"
+        style="width:100%;padding:11px;background:#fff;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-weight:700;color:#ef4444;cursor:pointer;">
+        🚪 로그아웃
+      </button>
+    </div>` : '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [로그인] 버튼으로 로그인하면 전체 기능을 이용할 수 있습니다</div>'}
+  `;
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
