@@ -746,8 +746,7 @@ function renderLatestOnLeft(data) {
     $('h-rec-date').textContent = '잠시 후 자동 재시도합니다';
     $('h-balls').innerHTML = '<span style="color:var(--b-red);font-size:11px;">⚠️ 데이터 로딩 실패</span>';
     $('h-prize-table').innerHTML = '<tr><td colspan="5" style="color:#ef4444;padding:12px 0;">연결 실패 — 자동 재시도 중</td></tr>';
-    $('api-indicator')?.textContent = 'API 오류';
-    $('api-indicator')?.className = 'api-status err';
+    // api-indicator removed
     return;
   }
   $('h-rec-title').textContent = `제 ${data.round}회 공식 당첨번호`;
@@ -756,8 +755,7 @@ function renderLatestOnLeft(data) {
     '<span style="font-weight:900;color:var(--text-muted);font-size:16px;margin:0 3px;">+</span>' + bH(data.bonus);
   $('h-amt').textContent = fmtMShort(data.prize_1st);
   $('h-round-badge').textContent = ` ${data.round}회`;
-  $('api-indicator')?.textContent = `실시간 ${data.round}회`;
-  $('api-indicator')?.className = 'api-status ok';
+  // api-indicator removed
 
   // 당첨 등급 테이블
   const prize2 = data.prize_2nd || Math.round((data.totalSales * 0.125) / Math.max(data.win_count_2nd||1,1));
@@ -1538,8 +1536,7 @@ async function init() {
   subscribeChat();
 
   latestRound = getLatestRound();
-  $('api-indicator')?.textContent = 'API 연결 중...';
-  $('api-indicator')?.className = 'api-status loading';
+  // api-indicator removed
 
   // 최신 회차 자동 탐색 (최대 3회차 뒤로)
   for (let r = latestRound; r >= latestRound - 2; r--) {
