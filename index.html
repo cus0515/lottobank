@@ -191,6 +191,45 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 .profile-row:last-child { border-bottom: none; }
 .profile-row-val { font-weight: 700; color: var(--text-dark); }
 
+/* ── 모바일 햄버거/드로어 ── */
+.hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:6px; }
+.hamburger span { width:22px; height:2px; background:var(--text-dark); border-radius:2px; display:block; }
+.mob-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; }
+.mob-overlay.open { display:block; }
+.mob-drawer { position:fixed; top:0; right:-280px; width:260px; height:100%; background:#fff; z-index:2001; padding:20px 16px; transition:right .25s ease; overflow-y:auto; box-shadow:-4px 0 24px rgba(0,0,0,0.15); }
+.mob-drawer.open { right:0; }
+.mob-drawer-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:12px; border-bottom:2px solid var(--lotto-red); }
+.mob-drawer-logo { font-size:18px; font-weight:900; color:var(--lotto-red); }
+.mob-drawer-close { background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted); line-height:1; }
+.mob-menu-item { display:block; width:100%; text-align:left; padding:14px 4px; font-size:15px; font-weight:700; color:var(--text-dark); background:none; border:none; border-bottom:1px solid #f1f5f9; cursor:pointer; font-family:inherit; }
+.mob-menu-item:active { background:#f8fafc; }
+
+/* ── 바텀 네비게이션 ── */
+.mob-bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1.5px solid #e2e8f0; z-index:999; justify-content:space-around; padding:6px 0 max(6px, env(safe-area-inset-bottom)); }
+.mob-nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10px; font-weight:700; color:var(--text-muted); background:none; border:none; cursor:pointer; padding:4px 8px; min-width:52px; font-family:inherit; }
+.mob-nav-btn.on { color:var(--lotto-red); }
+.mob-nav-icon { font-size:20px; line-height:1; }
+
+/* ── 모바일 반응형 ── */
+@media (max-width: 768px) {
+  .menu-tabs { display:none; }
+  .hamburger { display:flex; }
+  .mob-bottom-nav { display:flex; }
+  .api-status { display:none; }
+  .auth-zone { gap:6px; }
+  .btn-login { padding:5px 10px; font-size:12px; }
+  .user-profile { font-size:12px; }
+  .nav-container { height:56px; padding:0 14px; }
+  .logo-title { font-size:18px; }
+  .logo-title span { display:none; }
+  main { grid-template-columns: 1fr !important; margin: 16px 12px 80px; padding: 0; height: auto; min-height: unset; gap: 12px; }
+  .panel:last-child { display:none; }
+  .mid-panel { min-height: unset; }
+  .mid-panel-inner { padding: 12px; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .badge-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
 /* ── 로그인 모달 ── */
 .auth-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:none; align-items:center; justify-content:center; }
 .auth-overlay.open { display:flex; }
@@ -235,9 +274,39 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
         <span id="my-badge-space"></span>
         <span id="user-name" style="color:var(--text-dark);">금손유저_익명</span>
       </div>
+      <button class="hamburger" onclick="openMobMenu()" aria-label="메뉴">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </header>
+
+<!-- 모바일 드로어 -->
+<div id="mob-overlay" class="mob-overlay" onclick="closeMobMenu()"></div>
+<div id="mob-drawer" class="mob-drawer">
+  <div class="mob-drawer-head">
+    <span class="mob-drawer-logo">🎱 LottoBank</span>
+    <button class="mob-drawer-close" onclick="closeMobMenu()">✕</button>
+  </div>
+  <button class="mob-menu-item" onclick="go('home');closeMobMenu()">📋 홈</button>
+  <button class="mob-menu-item" onclick="go('result');closeMobMenu()">🔍 회차 조회</button>
+  <button class="mob-menu-item" onclick="go('ticket');closeMobMenu()">🎯 QR 인증</button>
+  <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()">📊 번호 분석</button>
+  <button class="mob-menu-item" onclick="go('stats');closeMobMenu()">📈 나의 전적</button>
+  <button class="mob-menu-item" onclick="go('badge');closeMobMenu()">🏅 뱃지</button>
+  <button class="mob-menu-item" onclick="go('rank');closeMobMenu()">🏆 랭킹</button>
+  <button class="mob-menu-item" onclick="go('community');closeMobMenu()">💬 커뮤니티</button>
+  <button class="mob-menu-item" onclick="go('profile');closeMobMenu()">👤 내 프로필</button>
+</div>
+
+<!-- 바텀 네비게이션 -->
+<nav class="mob-bottom-nav">
+  <button class="mob-nav-btn on" id="mob-btn-home" onclick="go('home')"><span class="mob-nav-icon">🏠</span>홈</button>
+  <button class="mob-nav-btn" id="mob-btn-ticket" onclick="go('ticket')"><span class="mob-nav-icon">🎯</span>QR인증</button>
+  <button class="mob-nav-btn" id="mob-btn-stats" onclick="go('stats')"><span class="mob-nav-icon">📈</span>전적</button>
+  <button class="mob-nav-btn" id="mob-btn-badge" onclick="go('badge')"><span class="mob-nav-icon">🏅</span>뱃지</button>
+  <button class="mob-nav-btn" id="mob-btn-more" onclick="openMobMenu()"><span class="mob-nav-icon">☰</span>더보기</button>
+</nav>
 
 <!-- 로그인 / 회원가입 모달 -->
 <div id="auth-modal" class="auth-overlay" onclick="if(event.target===this)closeAuthModal()">
@@ -486,6 +555,7 @@ const BADGE_KEY = 'lottobank_badge';
 
 let MY = [];
 let isLoggedIn = false;
+let currentUser = null;
 let myVerifiedTitle = null;
 let usedQrKeys = [];
 let latestRound = getLatestRound();
@@ -832,12 +902,14 @@ async function verifyRealQR() {
   });
 
   // 저장 처리
+  const gameResults = parsed.games.map(nums => checkWinRank(nums, winData.nums, winData.bonus));
   if (bestRank <= 2) {
     myVerifiedTitle = `${parsed.round}회 ${bestLabel}`;
     updateBadgeUI();
   }
   usedQrKeys.push(parsed.key);
   saveStorage();
+  saveTicketToDB(parsed, winData, gameResults); // DB 저장 (비동기, 결과 대기 안함)
 
   const isWin = bestRank <= 5;
   const summaryBg    = bestRank <= 2 ? '#dcfce7' : bestRank <= 5 ? '#dbeafe' : '#f8fafc';
@@ -963,6 +1035,7 @@ async function doAuth() {
 
 function applyLoginUI(user) {
   isLoggedIn = true;
+  currentUser = user;
   const nick = user.user_metadata?.nickname || user.email.split('@')[0];
   $('user-name').textContent = nick;
   $('btn-auth').textContent = '로그아웃';
@@ -970,6 +1043,7 @@ function applyLoginUI(user) {
   $('chat-input').disabled = false;
   $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
   updateBadgeUI();
+  loadUserDataFromDB();
   const active = document.querySelector('.menu-btn.on');
   if (active) {
     const id = active.id.replace('m-', '');
@@ -1018,6 +1092,94 @@ function sendChat() {
 }
 
 // =====================================================
+// 모바일 메뉴
+// =====================================================
+function openMobMenu() {
+  $('mob-overlay').classList.add('open');
+  $('mob-drawer').classList.add('open');
+}
+function closeMobMenu() {
+  $('mob-overlay').classList.remove('open');
+  $('mob-drawer').classList.remove('open');
+}
+
+// =====================================================
+// Supabase DB 연동
+// =====================================================
+let dbStats = null;
+
+async function loadUserDataFromDB() {
+  if (!isLoggedIn || !currentUser) return;
+  const uid = currentUser.id;
+  try {
+    const { data: profile } = await sb.from('profiles').select('nickname').eq('id', uid).single();
+    if (profile?.nickname) $('user-name').textContent = profile.nickname;
+
+    const { data: stats } = await sb.from('user_stats').select('*').eq('user_id', uid).single();
+    if (stats) {
+      dbStats = stats;
+      $('h-cost').textContent   = fmtM(stats.total_spent  || 0);
+      $('h-earned').textContent = fmtM(stats.total_prize  || 0);
+      $('h-total').textContent  = (stats.total_tickets || 0) + '게임';
+    }
+
+    const { data: tickets } = await sb.from('tickets').select('qr_url').eq('user_id', uid);
+    if (tickets?.length) {
+      usedQrKeys = tickets.map(t => t.qr_url);
+      saveStorage();
+    }
+  } catch (e) {
+    console.warn('loadUserDataFromDB:', e.message);
+  }
+}
+
+async function saveTicketToDB(parsed, winData, gameResults) {
+  if (!isLoggedIn || !currentUser) return;
+  try {
+    const bestResult = gameResults.reduce((b, r) => r.rank < b.rank ? r : b, gameResults[0]);
+    await sb.from('tickets').upsert({
+      user_id: currentUser.id,
+      qr_url: parsed.key,
+      round_no: parsed.round,
+      numbers: parsed.games[0],
+      purchase_date: winData.drwNoDate || null,
+      result: 'checked',
+      prize_rank: bestResult.rank <= 5 ? bestResult.rank : null,
+      prize_amount: 0,
+    }, { onConflict: 'qr_url' });
+
+    await upsertUserStats(parsed.games.length, gameResults);
+    await loadUserDataFromDB();
+  } catch (e) {
+    console.warn('saveTicketToDB:', e.message);
+  }
+}
+
+async function upsertUserStats(gameCount, gameResults) {
+  if (!isLoggedIn || !currentUser) return;
+  const uid = currentUser.id;
+  const c = dbStats || {};
+  const winCount = gameResults.filter(r => r.rank <= 5).length;
+  const rankNums = gameResults.map(r => r.rank <= 5 ? r.rank : 99);
+  const bestRank = Math.min(...rankNums);
+  const prevBest = c.best_rank || 99;
+  await sb.from('user_stats').upsert({
+    user_id: uid,
+    total_tickets: (c.total_tickets || 0) + gameCount,
+    total_spent:   (c.total_spent   || 0) + gameCount * 1000,
+    total_wins:    (c.total_wins    || 0) + winCount,
+    total_prize:   c.total_prize    || 0,
+    best_rank:     bestRank < prevBest ? bestRank : (prevBest < 99 ? prevBest : null),
+    rank_1_count:  (c.rank_1_count  || 0) + gameResults.filter(r => r.rank === 1).length,
+    rank_2_count:  (c.rank_2_count  || 0) + gameResults.filter(r => r.rank === 2).length,
+    rank_3_count:  (c.rank_3_count  || 0) + gameResults.filter(r => r.rank === 3).length,
+    rank_4_count:  (c.rank_4_count  || 0) + gameResults.filter(r => r.rank === 4).length,
+    rank_5_count:  (c.rank_5_count  || 0) + gameResults.filter(r => r.rank === 5).length,
+    updated_at: new Date().toISOString(),
+  });
+}
+
+// =====================================================
 // 탭 전환
 // =====================================================
 function go(id) {
@@ -1025,6 +1187,10 @@ function go(id) {
   document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('on'));
   $('pg-' + id).style.display = 'block';
   $('m-' + id).classList.add('on');
+  ['home','ticket','stats','badge'].forEach(k => {
+    const btn = $('mob-btn-' + k);
+    if (btn) btn.classList.toggle('on', k === id);
+  });
   const titles = {
     home:      '📋 내 번호 보관함',
     result:    '🔍 회차별 당첨 번호 조회',
@@ -1109,31 +1275,44 @@ async function init() {
 // 전적 페이지
 // =====================================================
 function renderStats() {
-  let totalBuy = MY.length;
-  let totalInvest = totalBuy * 1000;
-  let totalPrize = 0, winCount = 0, bestRank = 0;
-  let rankCounts = {1:0, 2:0, 3:0, 4:0, 5:0};
+  let totalBuy, totalInvest, totalPrize, winCount, bestRank, rankCounts, isMock;
 
-  MY.forEach(tk => {
-    const target = apiCache[tk.drw];
-    if (!target) return;
-    const r = checkWinRank(tk.nums, target.nums, target.bonus);
-    if (r.rank > 0) {
-      winCount++;
-      if (bestRank === 0 || r.rank < bestRank) bestRank = r.rank;
-      rankCounts[r.rank] = (rankCounts[r.rank] || 0) + 1;
-      if (r.rank === 1) totalPrize += target.prize_1st;
-      else if (r.rank === 2) totalPrize += 50000000;
-      else if (r.rank === 3) totalPrize += 1500000;
-      else if (r.rank === 4) totalPrize += 50000;
-      else if (r.rank === 5) totalPrize += 5000;
+  if (isLoggedIn && dbStats) {
+    // DB 실제 데이터 우선
+    const s = dbStats;
+    totalBuy    = s.total_tickets || 0;
+    totalInvest = s.total_spent   || 0;
+    totalPrize  = s.total_prize   || 0;
+    winCount    = s.total_wins    || 0;
+    bestRank    = s.best_rank     || 0;
+    rankCounts  = { 1:s.rank_1_count||0, 2:s.rank_2_count||0, 3:s.rank_3_count||0, 4:s.rank_4_count||0, 5:s.rank_5_count||0 };
+    isMock = false;
+  } else {
+    // 로컬 폴백
+    totalBuy = MY.length;
+    totalInvest = totalBuy * 1000;
+    totalPrize = 0; winCount = 0; bestRank = 0;
+    rankCounts = {1:0, 2:0, 3:0, 4:0, 5:0};
+    MY.forEach(tk => {
+      const target = apiCache[tk.drw];
+      if (!target) return;
+      const r = checkWinRank(tk.nums, target.nums, target.bonus);
+      if (r.rank > 0) {
+        winCount++;
+        if (bestRank === 0 || r.rank < bestRank) bestRank = r.rank;
+        rankCounts[r.rank] = (rankCounts[r.rank] || 0) + 1;
+        if (r.rank === 1) totalPrize += target.prize_1st;
+        else if (r.rank === 2) totalPrize += 50000000;
+        else if (r.rank === 3) totalPrize += 1500000;
+        else if (r.rank === 4) totalPrize += 50000;
+        else if (r.rank === 5) totalPrize += 5000;
+      }
+    });
+    isMock = (totalBuy === 0);
+    if (isMock) {
+      totalBuy = 32; totalInvest = 32000; totalPrize = 35000; winCount = 5; bestRank = 5;
+      rankCounts = {1:0, 2:0, 3:0, 4:0, 5:5};
     }
-  });
-
-  const isMock = (totalBuy === 0);
-  if (isMock) {
-    totalBuy = 32; totalInvest = 32000; totalPrize = 35000; winCount = 5; bestRank = 5;
-    rankCounts = {1:0, 2:0, 3:0, 4:0, 5:5};
   }
 
   const roi = totalInvest > 0 ? ((totalPrize - totalInvest) / totalInvest * 100) : 0;
