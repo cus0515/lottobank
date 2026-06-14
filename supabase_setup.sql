@@ -159,3 +159,19 @@ create policy "로그인 사용자 채팅 전송" on public.chat_messages
 
 -- Realtime 활성화
 alter publication supabase_realtime add table public.chat_messages;
+
+-- ===== comments 테이블 =====
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS comment_count INTEGER DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS public.comments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  post_id UUID REFERENCES public.posts(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  nickname TEXT NOT NULL,
+  body TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY IF NOT EXISTS "댓글 공개" ON public.comments FOR SELECT USING (true);
+CREATE POLICY IF NOT EXISTS "댓글 작성" ON public.comments FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY IF NOT EXISTS "댓글 삭제 본인" ON public.comments FOR DELETE USING (auth.uid() = user_id);

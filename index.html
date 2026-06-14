@@ -201,6 +201,24 @@ main.chat-hidden .chat-panel { display: none; }
 .rank-val-cell { font-weight: 900; color: var(--b-blue); }
 .my-row td { background: #fff5f7; }
 
+
+/* ===== 커뮤니티 상세 / 댓글 ===== */
+.post-detail-back { display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--lotto-red);cursor:pointer;margin-bottom:12px;padding:4px 0; }
+.post-detail-title { font-size:16px;font-weight:900;color:var(--text-dark);margin-bottom:6px;line-height:1.4; }
+.post-detail-meta  { font-size:11px;color:var(--text-muted);display:flex;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #e2e8f0; }
+.post-like-btn     { background:none;border:1px solid #e2e8f0;border-radius:20px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;transition:all .15s; }
+.post-like-btn:hover,.post-like-btn.liked { color:var(--lotto-red);border-color:var(--lotto-red); }
+.comment-section   { margin-top:14px; }
+.comment-section-title { font-size:12px;font-weight:700;color:var(--text-dark);margin-bottom:10px; }
+.comment-item      { padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:12px; }
+.comment-nick      { font-weight:700;color:var(--text-dark);margin-bottom:3px; }
+.comment-body      { color:var(--text-muted);line-height:1.5; }
+.comment-time      { font-size:10px;color:#94a3b8;margin-top:2px; }
+.comment-write-bar { display:flex;gap:8px;margin-top:12px; }
+.comment-input     { flex:1;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;font-family:inherit;outline:none; }
+.comment-input:focus { border-color:var(--lotto-red); }
+.comment-submit-btn { padding:8px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit; }
+.post-card-stats   { font-size:11px;color:var(--text-muted);display:flex;gap:10px;margin-top:4px;align-items:center; }
 /* ===== 커뮤니티 페이지 ===== */
 .comm-tab-row { display: flex; gap: 6px; margin-bottom: 12px; }
 .comm-tab-btn { padding: 5px 14px; font-size: 12px; font-weight: 700; border: 1px solid #e2e8f0; border-radius: 4px; background: #fff; cursor: pointer; color: var(--text-muted); }
@@ -2000,17 +2018,23 @@ function renderCommunityList() {
     </div>`;
     return;
   }
-  $('community-content').innerHTML = posts.map(p => `
-    <div class="post-card">
+  const heartSvg = \`<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>\`;
+  const chatSvg = \`<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>\`;
+  $('community-content').innerHTML = posts.map(p => {
+    const liked = myLikedPostIds.has(p.id);
+    return \`<div class="post-card" onclick="openPostDetail('\${p.id}')">
       <div class="post-card-top">
-        <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='free'?'자유':'인증'}</span>
-        <span class="post-card-title">${p.title.replace(/</g,'&lt;')}</span>
+        <span class="post-tag-chip \${p.tag==='free'?'tag-free':'tag-verify'}">\${p.tag==='free'?'자유':'인증'}</span>
+        <span class="post-card-title">\${p.title.replace(/</g,'&lt;')}</span>
       </div>
-      <div class="post-card-meta">
-        <span>${p.nickname}</span><span>${timeAgo(p.created_at)}</span>
-        <button class="post-like-btn" onclick="likePost('${p.id}',this)" style="${myLikedPostIds.has(p.id)?'color:var(--lotto-red);font-weight:900;':''}">❤️ ${p.likes}</button>
+      <div class="post-card-stats">
+        <span>\${p.nickname}</span>
+        <span>\${timeAgo(p.created_at)}</span>
+        <span style="\${liked?'color:var(--lotto-red);':''}">\${heartSvg} \${p.likes||0}</span>
+        <span>\${chatSvg} \${p.comment_count||0}</span>
       </div>
-    </div>`).join('');
+    </div>\`;
+  }).join('');
 }
 
 async function likePost(postId, btn) {
@@ -2040,6 +2064,7 @@ async function writePost() {
     tag: curCommTab,
     title: text,
     likes: 0,
+    comment_count: 0,
   });
   if (error) { toast('❌ 등록 실패: ' + error.message); return; }
   inp.value = '';
@@ -2066,6 +2091,116 @@ async function loadCommunityPosts() {
     console.warn('loadCommunityPosts:', e.message);
     renderCommunityList();
   }
+}
+
+// ── 게시글 상세 보기 ──────────────────────────────────────────
+let currentPostId = null;
+
+async function openPostDetail(postId) {
+  currentPostId = postId;
+  const all = [...(commPosts.free || []), ...(commPosts.verify || [])];
+  const post = all.find(p => String(p.id) === String(postId));
+  if (!post) return;
+  const liked = myLikedPostIds.has(postId);
+  const heartSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="${liked?'var(--lotto-red)':'none'}" stroke="${liked?'var(--lotto-red)':'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+  const backSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
+
+  $('community-content').innerHTML = `
+    <div class="post-detail-back" onclick="closePostDetail()">${backSvg} 목록으로</div>
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:12px;">
+      <div style="margin-bottom:6px;">
+        <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}">${post.tag==='free'?'자유':'인증'}</span>
+      </div>
+      <div class="post-detail-title">${post.title.replace(/</g,'&lt;')}</div>
+      <div class="post-detail-meta">
+        <span>${post.nickname}</span>
+        <span>${timeAgo(post.created_at)}</span>
+        <button class="post-like-btn ${liked?'liked':''}" id="detail-like-btn" onclick="likePostDetail('${postId}')">
+          ${heartSvg} <span id="detail-like-count">${post.likes||0}</span>
+        </button>
+      </div>
+    </div>
+    <div class="comment-section">
+      <div class="comment-section-title">댓글 <span id="comment-count-label">로딩 중...</span></div>
+      <div id="comment-list"></div>
+      ${isLoggedIn ? `
+        <div class="comment-write-bar">
+          <input type="text" id="comment-input" class="comment-input" placeholder="댓글을 입력하세요..." maxlength="200" onkeyup="if(event.key==='Enter')submitComment('${postId}')">
+          <button class="comment-submit-btn" onclick="submitComment('${postId}')">등록</button>
+        </div>` : `<div style="padding:10px;background:#f8fafc;border-radius:6px;font-size:12px;color:var(--text-muted);text-align:center;">로그인 후 댓글을 작성할 수 있습니다</div>`}
+    </div>`;
+  await loadComments(postId);
+}
+
+function closePostDetail() {
+  currentPostId = null;
+  renderCommunityList();
+}
+
+async function loadComments(postId) {
+  try {
+    const { data } = await sb.from('comments')
+      .select('*')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+    const list = data || [];
+    $('comment-count-label').textContent = `(${list.length})`;
+    if (!list.length) {
+      $('comment-list').innerHTML = '<div style="padding:16px 0;text-align:center;font-size:12px;color:var(--text-muted);">첫 댓글을 남겨보세요</div>';
+      return;
+    }
+    $('comment-list').innerHTML = list.map(c => `
+      <div class="comment-item">
+        <div class="comment-nick">${c.nickname}</div>
+        <div class="comment-body">${c.body.replace(/</g,'&lt;')}</div>
+        <div class="comment-time">${timeAgo(c.created_at)}</div>
+      </div>`).join('');
+  } catch(e) {
+    $('comment-list').innerHTML = '<div style="font-size:12px;color:var(--b-red);padding:8px 0;">댓글 로드 실패</div>';
+  }
+}
+
+async function submitComment(postId) {
+  if (!isLoggedIn || !currentUser) { toast('⚠️ 로그인이 필요합니다'); return; }
+  const inp = $('comment-input');
+  const body = inp?.value?.trim();
+  if (!body) return;
+  const nick = $('user-name').textContent;
+  const btn = document.querySelector('.comment-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '등록 중...'; }
+  try {
+    await sb.from('comments').insert({ post_id: postId, user_id: currentUser.id, nickname: nick, body });
+    // 게시글 comment_count 증가
+    const cur = [...(commPosts.free||[]),...(commPosts.verify||[])].find(p=>String(p.id)===String(postId));
+    if (cur) await sb.from('posts').update({ comment_count: (cur.comment_count||0)+1 }).eq('id', postId);
+    if (inp) inp.value = '';
+    await loadComments(postId);
+    await loadCommunityPosts();
+  } catch(e) {
+    toast('❌ 댓글 등록 실패: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '등록'; }
+  }
+}
+
+async function likePostDetail(postId) {
+  if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
+  const already = myLikedPostIds.has(postId);
+  const all = [...(commPosts.free||[]),...(commPosts.verify||[])];
+  const post = all.find(p=>String(p.id)===String(postId));
+  if (!post) return;
+  if (already) {
+    await sb.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+    await sb.from('posts').update({ likes: Math.max(0,(post.likes||1)-1) }).eq('id', postId);
+    myLikedPostIds.delete(postId);
+  } else {
+    await sb.from('post_likes').insert({ post_id: postId, user_id: currentUser.id });
+    await sb.from('posts').update({ likes: (post.likes||0)+1 }).eq('id', postId);
+    myLikedPostIds.add(postId);
+  }
+  await loadCommunityPosts();
+  // 상세보기 새로고침
+  if (currentPostId === postId) openPostDetail(postId);
 }
 
 async function renderCommunity() {
