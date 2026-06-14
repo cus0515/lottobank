@@ -922,26 +922,39 @@ async function chgRes() {
     .then(j => {
       const s1 = j.stores1 || [];
       const s2 = j.stores2 || [];
-      function buildStoreSummary(stores, color, emoji, title) {
-        if (!stores.length) return `<div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">데이터 없음</div>`;
+      function buildStoreBlock(stores, color, emoji, title) {
+        if (!stores.length) return `<div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">데이터 없음</div>`;
         const autoC = stores.filter(s => s.auto === '자동').length;
         const manC = stores.filter(s => s.auto === '수동').length;
         const regionMap = {};
         stores.forEach(s => { const r = s.region || '기타'; regionMap[r] = (regionMap[r] || 0) + 1; });
         const chips = Object.entries(regionMap).sort((a,b) => b[1]-a[1])
-          .map(([r,c]) => `<span style="display:inline-block;background:${color}22;color:${color};border:1px solid ${color}44;border-radius:12px;padding:2px 8px;font-size:10px;margin:2px 2px 0 0;">${r} ${c}</span>`).join('');
-        return `<div style="margin-bottom:8px;">
+          .map(([r,c]) => `<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
+        const rows = stores.map(s => `<tr style="border-bottom:1px solid #f1f5f9;">
+              <td style="padding:4px 6px;font-size:11px;font-weight:600;">${s.name}</td>
+              <td style="padding:4px 6px;font-size:10px;color:#475569;">${s.addr}</td>
+              <td style="padding:4px 6px;font-size:11px;text-align:center;color:#64748b;">${s.auto}</td>
+            </tr>`).join('');
+        return `<div style="margin-bottom:10px;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
             <span style="font-size:12px;font-weight:700;color:${color};">${emoji} ${title} (${stores.length}곳)</span>
-            <span style="font-size:11px;color:#64748b;">자동 <b>${autoC}</b> / 수동 <b>${manC}</b></span>
+            <span style="font-size:11px;color:#64748b;">자동 <b style="color:${color};">${autoC}</b> / 수동 <b>${manC}</b></span>
           </div>
-          <div style="line-height:1.8;">${chips}</div>
+          <div style="margin-bottom:6px;line-height:2;">${chips}</div>
+          <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead><tr style="background:#f8fafc;">
+              <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">판매점</th>
+              <th style="padding:4px 6px;text-align:left;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">주소</th>
+              <th style="padding:4px 6px;text-align:center;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">구분</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
         </div>`;
       }
       const storeHtml = `
-        <div style="margin-top:6px;padding:6px 0;border-top:1px solid #e2e8f0;">
-          ${buildStoreSummary(s1, '#dc2626', '🏆', '1등 당첨 판매소')}
-          ${buildStoreSummary(s2, '#2563eb', '🥈', '2등 당첨 판매소')}
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e2e8f0;">
+          ${buildStoreBlock(s1, '#dc2626', '🏆', '1등 당첨 판매소')}
+          ${buildStoreBlock(s2, '#2563eb', '🥈', '2등 당첨 판매소')}
         </div>`;
       const sec = document.getElementById('store-section');
       if (sec) sec.innerHTML = storeHtml;
