@@ -190,7 +190,25 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 .profile-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
 .profile-row:last-child { border-bottom: none; }
 .profile-row-val { font-weight: 700; color: var(--text-dark); }
+
+/* ── 로그인 모달 ── */
+.auth-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:none; align-items:center; justify-content:center; }
+.auth-overlay.open { display:flex; }
+.auth-box { background:#fff; border-radius:14px; padding:36px 32px 28px; width:400px; max-width:92vw; box-shadow:0 20px 60px rgba(0,0,0,0.25); position:relative; }
+.auth-box h2 { color:var(--lotto-red); font-size:22px; font-weight:900; margin-bottom:6px; }
+.auth-box p.auth-sub { font-size:13px; color:var(--text-muted); margin-bottom:22px; }
+.auth-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted); line-height:1; }
+.auth-field { margin-bottom:14px; }
+.auth-field label { display:block; font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:5px; }
+.auth-field input { width:100%; padding:11px 14px; border:1.5px solid #e2e8f0; border-radius:7px; font-size:14px; font-family:inherit; outline:none; transition:border-color .15s; }
+.auth-field input:focus { border-color:var(--lotto-red); }
+.auth-submit { width:100%; padding:13px; background:var(--lotto-red); color:#fff; font-size:15px; font-weight:700; border:none; border-radius:7px; cursor:pointer; margin-top:6px; font-family:inherit; }
+.auth-submit:disabled { opacity:0.55; cursor:not-allowed; }
+.auth-divider { text-align:center; font-size:13px; color:var(--text-muted); margin:14px 0 4px; }
+.auth-switch { background:none; border:none; color:var(--lotto-purple); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+.auth-err { color:#dc2626; font-size:12px; font-weight:700; min-height:18px; margin-top:10px; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -212,7 +230,7 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
     </div>
     <div class="auth-zone">
       <span id="api-indicator" class="api-status loading">API 로딩중...</span>
-      <button id="btn-auth" class="btn-login" onclick="toggleAuth()">로그인</button>
+      <button id="btn-auth" class="btn-login" onclick="showAuthModal()">로그인</button>
       <div id="user-profile" class="user-profile">
         <span id="my-badge-space"></span>
         <span id="user-name" style="color:var(--text-dark);">금손유저_익명</span>
@@ -220,6 +238,33 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
     </div>
   </div>
 </header>
+
+<!-- 로그인 / 회원가입 모달 -->
+<div id="auth-modal" class="auth-overlay" onclick="if(event.target===this)closeAuthModal()">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuthModal()">✕</button>
+    <h2 id="auth-title">로그인</h2>
+    <p class="auth-sub" id="auth-sub">이메일과 비밀번호로 로그인하세요</p>
+    <div class="auth-field">
+      <label>이메일</label>
+      <input type="email" id="auth-email" placeholder="example@email.com" onkeyup="if(event.key==='Enter')doAuth()">
+    </div>
+    <div class="auth-field" id="auth-nick-row" style="display:none">
+      <label>닉네임</label>
+      <input type="text" id="auth-nick" placeholder="사용할 닉네임 (2~12자)" maxlength="12" onkeyup="if(event.key==='Enter')doAuth()">
+    </div>
+    <div class="auth-field">
+      <label>비밀번호</label>
+      <input type="password" id="auth-pass" placeholder="8자리 이상" onkeyup="if(event.key==='Enter')doAuth()">
+    </div>
+    <button class="auth-submit" id="auth-submit" onclick="doAuth()">로그인</button>
+    <p class="auth-err" id="auth-err"></p>
+    <div class="auth-divider">계정이 없으신가요?</div>
+    <div style="text-align:center">
+      <button class="auth-switch" id="auth-switch" onclick="toggleAuthMode()">회원가입</button>
+    </div>
+  </div>
+</div>
 
 <main>
   <!-- 좌측: 실시간 분석 스코어보드 -->
@@ -361,6 +406,13 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 <div id="toast"></div>
 
 <script>
+// =====================================================
+// Supabase 초기화
+// =====================================================
+const SUPABASE_URL = 'https://wosbpljbdyofavsbrkyn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_WhehbHhTwxo-9uEyWbEEtA_52ACEDbj';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 // =====================================================
 // 유틸리티
 // =====================================================
@@ -803,30 +855,117 @@ function updateBadgeUI() {
 }
 
 // =====================================================
-// 로그인 / 로그아웃
+// 인증 (Supabase Auth)
 // =====================================================
-function toggleAuth() {
-  isLoggedIn = !isLoggedIn;
+let authMode = 'login';
+
+function showAuthModal() {
   if (isLoggedIn) {
-    $('btn-auth').textContent = '로그아웃';
-    $('user-profile').style.display = 'flex';
-    $('chat-input').disabled = false;
-    $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
-    updateBadgeUI();
-    toast('🔓 로그인 완료');
-  } else {
-    $('btn-auth').textContent = '로그인';
-    $('user-profile').style.display = 'none';
-    $('chat-input').disabled = true;
-    $('chat-input').placeholder = '로그인 후 대화에 참여해보세요.';
-    toast('🔒 로그아웃 처리됨');
+    sb.auth.signOut();
+    return;
   }
+  $('auth-modal').classList.add('open');
+  setTimeout(() => $('auth-email').focus(), 100);
+}
+
+function closeAuthModal() {
+  $('auth-modal').classList.remove('open');
+  $('auth-err').textContent = '';
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  const isSignup = authMode === 'signup';
+  $('auth-title').textContent = isSignup ? '회원가입' : '로그인';
+  $('auth-sub').textContent = isSignup ? '이메일로 간편하게 가입하세요' : '이메일과 비밀번호로 로그인하세요';
+  $('auth-submit').textContent = isSignup ? '가입하기' : '로그인';
+  $('auth-switch').textContent = isSignup ? '로그인으로 돌아가기' : '회원가입';
+  $('auth-nick-row').style.display = isSignup ? 'block' : 'none';
+  document.querySelector('.auth-divider').textContent = isSignup ? '이미 계정이 있으신가요?' : '계정이 없으신가요?';
+  $('auth-err').textContent = '';
+}
+
+async function doAuth() {
+  const email = $('auth-email').value.trim();
+  const pass = $('auth-pass').value;
+  const nick = $('auth-nick').value.trim();
+  $('auth-err').textContent = '';
+
+  if (!email || !pass) { $('auth-err').textContent = '이메일과 비밀번호를 입력해주세요'; return; }
+  if (authMode === 'signup' && !nick) { $('auth-err').textContent = '닉네임을 입력해주세요 (2~12자)'; return; }
+  if (authMode === 'signup' && (nick.length < 2 || nick.length > 12)) { $('auth-err').textContent = '닉네임은 2~12자로 입력해주세요'; return; }
+
+  const btn = $('auth-submit');
+  btn.disabled = true;
+  btn.textContent = '처리 중...';
+
+  try {
+    if (authMode === 'login') {
+      const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if (error) throw error;
+      closeAuthModal();
+      toast('🔓 로그인 완료');
+    } else {
+      const { error } = await sb.auth.signUp({
+        email, password: pass,
+        options: { data: { nickname: nick } }
+      });
+      if (error) throw error;
+      closeAuthModal();
+      toast('✅ 가입 완료! 이메일 인증 후 로그인해주세요');
+    }
+  } catch (e) {
+    const msg = e.message || '';
+    if (msg.includes('Invalid login')) $('auth-err').textContent = '이메일 또는 비밀번호가 올바르지 않습니다';
+    else if (msg.includes('already registered')) $('auth-err').textContent = '이미 가입된 이메일입니다';
+    else if (msg.includes('Password should')) $('auth-err').textContent = '비밀번호는 8자리 이상이어야 합니다';
+    else $('auth-err').textContent = msg || '오류가 발생했습니다. 다시 시도해주세요';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === 'login' ? '로그인' : '가입하기';
+  }
+}
+
+function applyLoginUI(user) {
+  isLoggedIn = true;
+  const nick = user.user_metadata?.nickname || user.email.split('@')[0];
+  $('user-name').textContent = nick;
+  $('btn-auth').textContent = '로그아웃';
+  $('user-profile').style.display = 'flex';
+  $('chat-input').disabled = false;
+  $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
+  updateBadgeUI();
   const active = document.querySelector('.menu-btn.on');
   if (active) {
     const id = active.id.replace('m-', '');
     if (id === 'community') renderCommunity();
     if (id === 'profile') renderProfile();
   }
+}
+
+function applyLogoutUI() {
+  isLoggedIn = false;
+  $('btn-auth').textContent = '로그인';
+  $('user-profile').style.display = 'none';
+  $('chat-input').disabled = true;
+  $('chat-input').placeholder = '로그인 후 대화에 참여해보세요.';
+  toast('🔒 로그아웃되었습니다');
+  const active = document.querySelector('.menu-btn.on');
+  if (active) {
+    const id = active.id.replace('m-', '');
+    if (id === 'community') renderCommunity();
+    if (id === 'profile') renderProfile();
+  }
+}
+
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) applyLoginUI(session.user);
+
+  sb.auth.onAuthStateChange((event, session) => {
+    if (session) applyLoginUI(session.user);
+    else if (event === 'SIGNED_OUT') applyLogoutUI();
+  });
 }
 
 // =====================================================
@@ -897,6 +1036,7 @@ function renderFortune() {
 // 초기화
 // =====================================================
 async function init() {
+  initAuth();
   loadStorage();
   updateGlobalStats();
   buildOMRGrid();
@@ -1185,7 +1325,7 @@ function renderProfile() {
       <div class="profile-row" style="color:var(--text-muted);"><span>알림 설정</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
       <div class="profile-row" style="color:var(--text-muted);"><span>데이터 내보내기</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
     </div>
-    ${!isLoggedIn ? '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [가상 로그인] 버튼을 눌러 서비스를 이용해보세요</div>' : ''}
+    ${!isLoggedIn ? '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [로그인] 버튼으로 로그인하면 전체 기능을 이용할 수 있습니다</div>' : ''}
   `;
 }
 
