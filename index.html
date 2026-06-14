@@ -73,6 +73,8 @@ main.chat-hidden .chat-panel { display: none; }
 .panel { background: var(--paper-white); border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; height: 100%; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 .panel-header { padding: 15px 20px; border-bottom: 2px solid var(--lotto-red); font-size: 15px; font-weight: 900; color: var(--lotto-red); display: flex; justify-content: space-between; align-items: center; background: #fff; }
 .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
+@keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.page-fade { animation: pageFadeIn 0.2s ease; }
 
 .lotto-slip { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; position: relative; }
 .slip-header { border-bottom: 1px dashed var(--lotto-red); padding-bottom: 8px; margin-bottom: 12px; text-align: center; }
@@ -285,7 +287,7 @@ main.chat-hidden .chat-panel { display: none; }
 <header>
   <div class="nav-container">
     <div class="logo-area">
-      <div class="logo-title">LottoBank <span>| 로또 전적 & 당첨 인증</span></div>
+      <div class="logo-title" onclick="go('home')" style="cursor:pointer;">LottoBank <span>| 로또 전적 &amp; 당첨 인증</span></div>
     </div>
     <div class="menu-tabs">
       <button id="m-home" class="menu-btn on" onclick="go('home')">홈</button>
@@ -294,7 +296,6 @@ main.chat-hidden .chat-panel { display: none; }
       <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
     </div>
     <div class="auth-zone">
-      <span id="api-indicator" class="api-status loading">API 로딩중...</span>
       <button id="chat-reopen-btn" onclick="toggleChat()" title="채팅 열기"
         style="display:none;align-items:center;gap:4px;padding:4px 10px;font-size:12px;font-weight:700;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;">
         💬 채팅
@@ -745,8 +746,8 @@ function renderLatestOnLeft(data) {
     $('h-rec-date').textContent = '잠시 후 자동 재시도합니다';
     $('h-balls').innerHTML = '<span style="color:var(--b-red);font-size:11px;">⚠️ 데이터 로딩 실패</span>';
     $('h-prize-table').innerHTML = '<tr><td colspan="5" style="color:#ef4444;padding:12px 0;">연결 실패 — 자동 재시도 중</td></tr>';
-    $('api-indicator').textContent = 'API 오류';
-    $('api-indicator').className = 'api-status err';
+    $('api-indicator')?.textContent = 'API 오류';
+    $('api-indicator')?.className = 'api-status err';
     return;
   }
   $('h-rec-title').textContent = `제 ${data.round}회 공식 당첨번호`;
@@ -755,8 +756,8 @@ function renderLatestOnLeft(data) {
     '<span style="font-weight:900;color:var(--text-muted);font-size:16px;margin:0 3px;">+</span>' + bH(data.bonus);
   $('h-amt').textContent = fmtMShort(data.prize_1st);
   $('h-round-badge').textContent = ` ${data.round}회`;
-  $('api-indicator').textContent = `실시간 ${data.round}회`;
-  $('api-indicator').className = 'api-status ok';
+  $('api-indicator')?.textContent = `실시간 ${data.round}회`;
+  $('api-indicator')?.className = 'api-status ok';
 
   // 당첨 등급 테이블
   const prize2 = data.prize_2nd || Math.round((data.totalSales * 0.125) / Math.max(data.win_count_2nd||1,1));
@@ -937,7 +938,7 @@ async function chgRes() {
         const chips = Object.entries(regionMap).sort((a,b) => b[1]-a[1])
           .map(([r,c]) => `<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
         const rows = stores.map(s => `<tr style="border-bottom:1px solid #f1f5f9;">
-              <td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
+              <td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;" title="${s.name}">${s.name} 🗺</a></td>
               <td style="padding:4px 6px;font-size:10px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td>
               <td style="padding:4px 6px;font-size:11px;text-align:center;color:#64748b;white-space:nowrap;">${s.auto}</td>
             </tr>`).join('');
@@ -1470,8 +1471,13 @@ async function upsertUserStats(gameCount, gameResults, totalPrize = 0, winData =
 function go(id) {
   document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
   document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('on'));
-  $('pg-' + id).style.display = 'block';
-  $('m-' + id).classList.add('on');
+  const pg = $('pg-' + id);
+  pg.style.display = 'block';
+  pg.classList.remove('page-fade');
+  void pg.offsetWidth;
+  pg.classList.add('page-fade');
+  const mBtn = $('m-' + id);
+  if (mBtn) mBtn.classList.add('on');
   ['home','ticket','stats','badge'].forEach(k => {
     const btn = $('mob-btn-' + k);
     if (btn) btn.classList.toggle('on', k === id);
@@ -1532,8 +1538,8 @@ async function init() {
   subscribeChat();
 
   latestRound = getLatestRound();
-  $('api-indicator').textContent = 'API 연결 중...';
-  $('api-indicator').className = 'api-status loading';
+  $('api-indicator')?.textContent = 'API 연결 중...';
+  $('api-indicator')?.className = 'api-status loading';
 
   // 최신 회차 자동 탐색 (최대 3회차 뒤로)
   for (let r = latestRound; r >= latestRound - 2; r--) {
@@ -1557,6 +1563,7 @@ async function init() {
     renderHomeLive();
     updateGlobalStats();
     rList();
+    go('result');
 
 
 
