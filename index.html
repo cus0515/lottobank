@@ -1261,8 +1261,12 @@ function toggleOMR(n) {
   $('manual-slots').innerHTML = manualSelected.sort((a,b)=>a-b).map(n=>bH(n)).join('');
 }
 function chgMode() {
-  $('manual-panel').style.display = ($('add-mode').value === 'manual') ? 'block' : 'none';
-  manualSelected = []; buildOMRGrid(); $('manual-slots').innerHTML = '';
+  const modeEl = $('add-mode');
+  const manualEl = $('manual-panel');
+  const slotsEl = $('manual-slots');
+  if (manualEl) manualEl.style.display = (modeEl?.value === 'manual') ? 'block' : 'none';
+  manualSelected = []; buildOMRGrid();
+  if (slotsEl) slotsEl.innerHTML = '';
 }
 
 function saveT() {
