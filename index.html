@@ -35,9 +35,9 @@ header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); positio
 .auth-zone { display: flex; align-items: center; gap: 10px; }
 .btn-login { padding: 6px 14px; font-size: 13px; font-weight: 700; background: var(--text-dark); color: #fff; border: none; border-radius: 4px; cursor: pointer; }
 .user-profile { display: none; align-items: center; position: relative; }
-.user-btn { display:flex; align-items:center; gap:8px; background:none; border:none; cursor:pointer; font-size:13px; font-weight:700; color:var(--text-dark); padding:4px 8px; border-radius:6px; }
+.user-btn { display:flex; align-items:center; gap:10px; background:none; border:none; cursor:pointer; font-size:13px; font-weight:700; color:var(--text-dark); padding:4px 10px; border-radius:6px; }
 .user-btn:hover { background:#f1f5f9; }
-.user-avatar { width:28px; height:28px; border-radius:50%; background:var(--lotto-red); color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; flex-shrink:0; }
+.user-avatar { width:32px; height:32px; border-radius:50%; background:var(--lotto-red); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:900; flex-shrink:0; }
 .user-btn-arrow { font-size:10px; color:#94a3b8; }
 .user-dropdown { display:none; position:absolute; top:calc(100% + 6px); right:0; background:#fff; border:1px solid #e2e8f0; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.12); min-width:180px; z-index:9999; overflow:hidden; }
 .user-dropdown.open { display:block; }
@@ -57,7 +57,7 @@ main.chat-hidden .chat-panel { display: none; }
 .chat-toggle-btn { background:none; border:none; cursor:pointer; font-size:14px; color:#94a3b8; padding:2px 6px; border-radius:4px; line-height:1; }
 .chat-toggle-btn:hover { background:#f1f5f9; color:var(--lotto-red); }
 .prize-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
-.prize-table th { background:#f8fafc; color:#64748b; font-weight:700; padding:6px 8px; text-align:center; border-bottom:2px solid #e2e8f0; }
+.prize-table th { background:#f8fafc; color:#64748b; font-weight:700; padding:6px 8px; text-align:center; border-bottom:2px solid #e2e8f0; white-space:nowrap; }
 .prize-table td { padding:6px 8px; text-align:center; border-bottom:1px solid #f1f5f9; }
 .prize-table tr:hover td { background:#fafafa; }
 .prize-rank-badge { display:inline-block; width:22px; height:22px; border-radius:50%; font-size:10px; font-weight:900; line-height:22px; }
@@ -112,7 +112,7 @@ main.chat-hidden .chat-panel { display: none; }
 .result-metric span { display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; }
 .result-metric strong { display: block; margin-top: 4px; color: var(--text-dark); font-size: 14px; }
 .prize-table { margin-top: 12px; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; background: #fff; }
-.prize-row { display: grid; grid-template-columns: 48px 1fr 1fr 70px; gap: 8px; align-items: center; padding: 9px 10px; border-top: 1px solid #e2e8f0; font-size: 12px; }
+.prize-row { display: grid; grid-template-columns: 40px minmax(80px,1fr) 1fr 70px; gap: 6px; align-items: center; padding: 8px 10px; border-top: 1px solid #e2e8f0; font-size: 11px; white-space: nowrap; }
 .prize-row:first-child { border-top: none; background: #f8fafc; color: var(--text-muted); font-weight: 900; }
 .prize-row b { color: var(--lotto-red); }
 
@@ -335,12 +335,31 @@ main.chat-hidden .chat-panel { display: none; }
       <!-- 로그인 후 유저 드롭다운 -->
       <div id="user-profile" class="user-profile" onclick="toggleUserDropdown()">
         <div id="user-avatar" class="user-avatar">?</div>
-        <span id="user-name" style="font-size:13px;font-weight:700;color:var(--text-dark);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-        <span style="font-size:10px;color:#94a3b8;">▼</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;max-width:90px;">
+          <span id="user-name" style="font-size:13px;font-weight:700;color:var(--text-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px;line-height:1.2;"></span>
+          <span id="header-badge-chip" style="font-size:10px;color:#dc2626;font-weight:700;white-space:nowrap;display:none;"></span>
+        </div>
+        <span style="font-size:10px;color:#94a3b8;flex-shrink:0;">▼</span>
         <div id="user-dropdown" class="user-dropdown">
-          <div style="padding:10px 14px;border-bottom:1px solid #f1f5f9;">
-            <div id="dd-nick" style="font-size:13px;font-weight:700;color:var(--text-dark);"></div>
-            <div id="dd-badge" style="font-size:11px;color:#dc2626;margin-top:2px;"></div>
+          <div style="padding:12px 14px;border-bottom:1px solid #f1f5f9;background:#fafafa;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <div id="dd-nick" style="font-size:14px;font-weight:900;color:var(--text-dark);"></div>
+              <div id="dd-badge" style="font-size:10px;color:#dc2626;font-weight:700;"></div>
+            </div>
+            <div id="dd-stats-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;">
+              <div style="text-align:center;padding:5px 0;background:#fff;border:1px solid #e2e8f0;border-radius:5px;">
+                <div style="font-size:10px;color:#94a3b8;font-weight:600;">구매</div>
+                <div id="dd-stat-buy" style="font-size:12px;font-weight:900;color:var(--text-dark);">-</div>
+              </div>
+              <div style="text-align:center;padding:5px 0;background:#fff;border:1px solid #e2e8f0;border-radius:5px;">
+                <div style="font-size:10px;color:#94a3b8;font-weight:600;">당첨</div>
+                <div id="dd-stat-win" style="font-size:12px;font-weight:900;color:var(--b-green);">-</div>
+              </div>
+              <div style="text-align:center;padding:5px 0;background:#fff;border:1px solid #e2e8f0;border-radius:5px;">
+                <div style="font-size:10px;color:#94a3b8;font-weight:600;">ROI</div>
+                <div id="dd-stat-roi" style="font-size:12px;font-weight:900;color:var(--text-dark);">-</div>
+              </div>
+            </div>
           </div>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('ticket')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('fortune')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 번호 분석</button>
@@ -976,6 +995,18 @@ async function chgRes() {
     $('res-balls').innerHTML = '<span style="color:var(--b-red);font-size:12px;">데이터 없음</span>';
     return;
   }
+  // 좌측 패널 연동 — 선택 회차가 최신이 아니면 표시
+  const isLatest = (round === latestRound);
+  if (!isLatest) {
+    $('h-rec-title').textContent = `제 ${d.round}회 당첨번호 (조회 중)`;
+    $('h-rec-date').textContent = `추첨일: ${d.date}`;
+    $('h-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
+      '<span style="font-weight:900;color:var(--text-muted);font-size:16px;margin:0 3px;">+</span>' + bH(d.bonus);
+    $('h-round-badge').textContent = ` ${d.round}회`;
+    $('h-amt').textContent = fmtMFull(d.prize_1st);
+  } else {
+    renderLatestOnLeft(d);
+  }
   const a = analyzeNumbers(d.nums);
   $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
     '<span style="font-weight:900;color:var(--text-muted);font-size:16px;margin:0 3px;">+</span>' + bH(d.bonus);
@@ -1324,6 +1355,12 @@ function updateHeaderUser(nick, badgeText) {
   $('dd-nick').textContent = nick;
   $('user-avatar').textContent = nick.charAt(0).toUpperCase() || '?';
   $('dd-badge').textContent = badgeText || '';
+  // 헤더 뱃지 칩
+  const chip = $('header-badge-chip');
+  if (chip) {
+    if (badgeText) { chip.textContent = badgeText; chip.style.display = ''; }
+    else { chip.style.display = 'none'; }
+  }
 }
 function toggleUserDropdown() {
   $('user-dropdown')?.classList.toggle('open');
@@ -1578,9 +1615,29 @@ async function loadUserDataFromDB() {
       const nick2 = currentUser?.user_metadata?.nickname || currentUser?.email?.split('@')[0] || '?';
       updateHeaderUser(nick2, myVerifiedTitle || '');
       updateBadgeUI();
+      updateDropdownStats();
     }
   } catch (e) {
     console.warn('loadUserDataFromDB:', e.message);
+  }
+}
+
+function updateDropdownStats() {
+  if (!dbStats) return;
+  const buy  = dbStats.total_tickets || 0;
+  const wins = dbStats.total_wins    || 0;
+  const inv  = dbStats.total_spent   || 0;
+  const prz  = dbStats.total_prize   || 0;
+  const roi  = inv > 0 ? ((prz - inv) / inv * 100) : null;
+  const eb = $('dd-stat-buy'); if (eb) eb.textContent = fmtCnt(buy) + '게임';
+  const ew = $('dd-stat-win'); if (ew) ew.textContent = fmtCnt(wins) + '회';
+  const er = $('dd-stat-roi');
+  if (er) {
+    if (roi === null) { er.textContent = '-'; er.style.color = ''; }
+    else {
+      er.textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+      er.style.color = roi >= 0 ? 'var(--b-green)' : 'var(--b-red)';
+    }
   }
 }
 
@@ -2379,14 +2436,33 @@ async function changeNickname() {
   if (!isLoggedIn || !currentUser) return;
   const newNick = $('nick-input').value.trim();
   if (newNick.length < 2 || newNick.length > 12) { toast('⚠️ 닉네임은 2~12자'); return; }
+  if (!/^[가-힣a-zA-Z0-9]+$/.test(newNick)) { toast('⚠️ 한글/영문/숫자만 사용 가능'); return; }
   const btn = $('nick-save-btn');
   btn.disabled = true; btn.textContent = '저장 중...';
-  const { error } = await sb.from('profiles').update({ nickname: newNick }).eq('id', currentUser.id);
-  btn.disabled = false; btn.textContent = '저장';
-  if (error) { toast('❌ 저장 실패: ' + error.message); return; }
-  $('user-name').textContent = newNick;
-  toast('✅ 닉네임이 변경되었습니다');
-  renderProfile();
+  try {
+    if (isAdminTestMode) {
+      // 검증 모드: 로컬만 업데이트
+      currentUser.user_metadata.nickname = newNick;
+      updateHeaderUser(newNick, myVerifiedTitle || '');
+      toast('✅ [검증] 닉네임 변경됨 (mock)');
+      renderProfile();
+      return;
+    }
+    // 1) profiles 테이블
+    const { error: pe } = await sb.from('profiles').update({ nickname: newNick }).eq('id', currentUser.id);
+    if (pe) throw pe;
+    // 2) Supabase Auth 메타데이터
+    await sb.auth.updateUser({ data: { nickname: newNick } });
+    // 3) 헤더 & 드롭다운 즉시 반영
+    currentUser.user_metadata = { ...(currentUser.user_metadata || {}), nickname: newNick };
+    updateHeaderUser(newNick, myVerifiedTitle || '');
+    toast('✅ 닉네임이 변경되었습니다');
+    renderProfile();
+  } catch(e) {
+    toast('❌ 저장 실패: ' + (e.message || ''));
+  } finally {
+    btn.disabled = false; btn.textContent = '저장';
+  }
 }
 
 // ══════════════════════════════════════════════
