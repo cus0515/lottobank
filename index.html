@@ -331,6 +331,7 @@ main.chat-hidden .chat-panel { display: none; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 <body>
 
@@ -470,6 +471,25 @@ main.chat-hidden .chat-panel { display: none; }
 
       <!-- 비로그인: 플랫폼 통계 + 가입 유도 -->
       <div id="left-guest">
+        <!-- TOP PLAYER 카드 -->
+        <div id="top-player-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+          <div style="background:#fff;border:1px solid #fecaca;border-radius:8px;padding:10px;cursor:pointer;" onclick="go('rank')">
+            <div style="font-size:10px;color:#dc2626;font-weight:800;margin-bottom:4px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="#dc2626" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              ROI 1위
+            </div>
+            <div id="top-roi-nick" style="font-size:12px;font-weight:900;color:#1e293b;margin-bottom:2px;">-</div>
+            <div id="top-roi-val" style="font-size:13px;font-weight:900;color:#dc2626;">-%</div>
+          </div>
+          <div style="background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:10px;cursor:pointer;" onclick="go('rank')">
+            <div style="font-size:10px;color:#16a34a;font-weight:800;margin-bottom:4px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg>
+              인증 1위
+            </div>
+            <div id="top-cert-nick" style="font-size:12px;font-weight:900;color:#1e293b;margin-bottom:2px;">-</div>
+            <div id="top-cert-val" style="font-size:13px;font-weight:900;color:#16a34a;">-게임</div>
+          </div>
+        </div>
         <div class="left-dashboard-card">
           <div style="font-size:11px;font-weight:800;color:#dc2626;margin-bottom:10px;letter-spacing:0.3px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>플랫폼 전체 통계</div>
           <div class="left-stat-row">
@@ -608,7 +628,22 @@ main.chat-hidden .chat-panel { display: none; }
           <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> 실물 로또 QR 당첨 인증</div>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">동행복권 앱 → 구매내역 → QR코드 → URL 복사 후 붙여넣기</p>
           <input type="text" id="qr-url-input" class="input-custom" placeholder="동행복권 QR URL 붙여넣기...">
-          <button class="btn-action" onclick="verifyRealQR()" style="background:var(--lotto-red);margin-top:8px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 당첨 인증하기</button>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn-action" onclick="verifyRealQR()" style="background:var(--lotto-red);flex:1;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 당첨 인증하기</button>
+            <button class="btn-action" id="cam-btn" onclick="toggleCameraQR()" style="background:#3b82f6;min-width:44px;padding:0 12px;" title="카메라로 QR 스캔"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
+          </div>
+          <!-- 카메라 QR 스캔 UI -->
+          <div id="cam-area" style="display:none;margin-top:10px;border:2px solid #3b82f6;border-radius:8px;overflow:hidden;background:#000;position:relative;">
+            <video id="cam-video" autoplay playsinline muted style="width:100%;max-height:220px;object-fit:cover;display:block;"></video>
+            <canvas id="cam-canvas" style="display:none;"></canvas>
+            <div id="cam-status" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;font-weight:700;padding:5px 10px;text-align:center;">📷 QR 코드를 화면 중앙에 맞춰주세요</div>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:140px;height:140px;border:2px solid rgba(255,255,255,0.5);border-radius:8px;pointer-events:none;">
+              <div style="position:absolute;top:-2px;left:-2px;width:20px;height:20px;border-top:3px solid #3b82f6;border-left:3px solid #3b82f6;border-radius:2px 0 0 0;"></div>
+              <div style="position:absolute;top:-2px;right:-2px;width:20px;height:20px;border-top:3px solid #3b82f6;border-right:3px solid #3b82f6;border-radius:0 2px 0 0;"></div>
+              <div style="position:absolute;bottom:-2px;left:-2px;width:20px;height:20px;border-bottom:3px solid #3b82f6;border-left:3px solid #3b82f6;border-radius:0 0 0 2px;"></div>
+              <div style="position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-bottom:3px solid #3b82f6;border-right:3px solid #3b82f6;border-radius:0 0 2px 0;"></div>
+            </div>
+          </div>
           <div id="qr-result-display" style="margin-top:10px;"></div>
         </div>
       </div>
@@ -1321,16 +1356,32 @@ async function verifyRealQR() {
   }
   usedQrKeys.push(parsed.key);
   saveStorage();
-  // 1~3등 인증 시 채팅 브로드캐스트
+  // 1~3등 인증 시 채팅 브로드캐스트 (랭킹 포지션 포함)
   if (bestRank <= 3 && isLoggedIn && currentUser && !isAdminTestMode) {
     const bNick = currentUser.user_metadata?.nickname || currentUser.email.split('@')[0];
-    sb.from('chat_messages').insert({
-      user_id: currentUser.id,
-      nickname: 'LottoBank',
-      verified_title: null,
-      message: `🎉 [${bNick}]님이 제 ${parsed.round}회차 ${bestLabel} 인증에 성공하셨습니다!`,
-      is_system: true
-    }).catch(() => {});
+    // 랭킹 포지션 비동기 조회 후 브로드캐스트
+    (async () => {
+      let roiMsg = '';
+      try {
+        const myStats = dbStats;
+        if (myStats && myStats.total_spent > 0) {
+          const myRoi = ((myStats.total_prize / myStats.total_spent) * 100).toFixed(1);
+          const { count } = await sb.from('user_stats')
+            .select('*', { count: 'exact', head: true })
+            .gt('total_prize', myStats.total_prize || 0);
+          const pos = (count || 0) + 1;
+          roiMsg = ` 현재 당첨금 랭킹 ${pos}위`;
+        }
+      } catch(_) {}
+      const rankEmoji = { 1:'🥇', 2:'🥈', 3:'🥉' };
+      sb.from('chat_messages').insert({
+        user_id: currentUser.id,
+        nickname: 'LottoBank',
+        verified_title: null,
+        message: `${rankEmoji[bestRank]||'🎉'} [${bNick}]님이 제 ${parsed.round}회차 ${bestLabel} 인증 성공!${roiMsg}`,
+        is_system: true
+      }).catch(() => {});
+    })();
   }
   saveTicketToDB(parsed, winData, gameResults); // DB 저장 (비동기, 결과 대기 안함)
 
@@ -1574,6 +1625,7 @@ function applyLogoutUI() {
   // 좌측 패널 게스트 상태 복귀
   const lg = $('left-guest'); if (lg) lg.style.display = 'block';
   const lu = $('left-user');  if (lu) lu.style.display = 'none';
+  loadTopPlayers();
   if (roiChartInstance) { roiChartInstance.destroy(); roiChartInstance = null; }
   loadGuestStats();
   toast('<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> 로그아웃되었습니다');
@@ -1890,6 +1942,8 @@ async function loadGuestStats() {
       }
     } catch(_) {}
   } catch(e) { console.warn('loadGuestStats:', e.message); }
+  // Top Player 카드 로드
+  loadTopPlayers();
 }
 
 function calcPrizeAmount(rank, winData) {
@@ -1929,15 +1983,41 @@ async function saveTicketToDB(parsed, winData, gameResults) {
     // 활동 피드 삽입
     insertActivity('qr_register', { round: parsed.round, games: parsed.games.length });
     if (bestResult.rank <= 5) {
-      insertActivity('win', { round: parsed.round, rank: bestResult.rank, prize: totalPrize });
+      // 랭킹 포지션 포함
+      let winRankPos = null;
+      try {
+        const { count: wc } = await sb.from('user_stats')
+          .select('*', { count: 'exact', head: true })
+          .gt('total_prize', (dbStats?.total_prize || 0));
+        winRankPos = (wc || 0) + 1;
+      } catch(_) {}
+      insertActivity('win', { round: parsed.round, rank: bestResult.rank, prize: totalPrize, rank_pos: winRankPos });
     }
-    // 새 뱃지 획득 체크
+    // 새 뱃지 획득 체크 + DB 저장 + 랭킹 포지션 포함 피드
     const prevEarned = (window._prevBadgeIds || []);
     const nowEarned  = BADGE_DEFS.filter(b => b.cond()).map(b => b.id);
-    nowEarned.filter(id => !prevEarned.includes(id)).forEach(id => {
-      const bd = BADGE_DEFS.find(b => b.id === id);
-      if (bd) insertActivity('badge', { badge_id: id, badge_name: bd.name, icon: bd.icon });
-    });
+    const newBadges  = nowEarned.filter(id => !prevEarned.includes(id));
+    if (newBadges.length > 0) {
+      // user_badges 테이블에 저장
+      try {
+        await sb.from('user_badges').upsert(
+          newBadges.map(id => ({ user_id: currentUser.id, badge_id: id, earned_at: new Date().toISOString() })),
+          { onConflict: 'user_id,badge_id', ignoreDuplicates: true }
+        );
+      } catch(_) {}
+      // 랭킹 포지션 조회
+      let rankPos = null;
+      try {
+        const { count } = await sb.from('user_stats')
+          .select('*', { count: 'exact', head: true })
+          .gt('total_tickets', dbStats?.total_tickets || 0);
+        rankPos = (count || 0) + 1;
+      } catch(_) {}
+      newBadges.forEach(id => {
+        const bd = BADGE_DEFS.find(b => b.id === id);
+        if (bd) insertActivity('badge', { badge_id: id, badge_name: bd.name, icon: bd.icon, rank_pos: rankPos });
+      });
+    }
     window._prevBadgeIds = nowEarned;
   } catch (e) {
     console.warn('saveTicketToDB:', e.message);
@@ -2215,6 +2295,115 @@ function svgIcon(name, size=16, color='currentColor') {
 // =====================================================
 // 실시간 활동 피드
 // =====================================================
+// =====================================================
+// 카메라 QR 스캔
+// =====================================================
+let _camStream = null;
+let _camLoopId = null;
+
+async function toggleCameraQR() {
+  const area = document.getElementById('cam-area');
+  if (_camStream) { stopCameraQR(); return; }
+  if (!navigator.mediaDevices?.getUserMedia) {
+    alert('이 브라우저에서는 카메라 기능을 지원하지 않습니다.');
+    return;
+  }
+  try {
+    document.getElementById('cam-status').textContent = '📷 카메라 연결 중...';
+    area.style.display = 'block';
+    document.getElementById('cam-btn').style.background = '#ef4444';
+    _camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    const video = document.getElementById('cam-video');
+    video.srcObject = _camStream;
+    await video.play();
+    _camLoopId = requestAnimationFrame(scanCameraLoop);
+  } catch(e) {
+    area.style.display = 'none';
+    document.getElementById('cam-btn').style.background = '#3b82f6';
+    alert('카메라 접근 권한이 필요합니다. 브라우저 주소창의 자물쇠 아이콘을 눌러 카메라 권한을 허용해주세요.');
+  }
+}
+
+function stopCameraQR() {
+  if (_camLoopId) { cancelAnimationFrame(_camLoopId); _camLoopId = null; }
+  if (_camStream) { _camStream.getTracks().forEach(t => t.stop()); _camStream = null; }
+  const area = document.getElementById('cam-area');
+  if (area) area.style.display = 'none';
+  const btn = document.getElementById('cam-btn');
+  if (btn) btn.style.background = '#3b82f6';
+}
+
+function scanCameraLoop() {
+  if (!_camStream) return;
+  const video = document.getElementById('cam-video');
+  const canvas = document.getElementById('cam-canvas');
+  if (!video || !canvas || video.readyState < 2) {
+    _camLoopId = requestAnimationFrame(scanCameraLoop);
+    return;
+  }
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const code = (typeof jsQR !== 'undefined') ? jsQR(imgData.data, imgData.width, imgData.height) : null;
+  if (code && code.data) {
+    const url = code.data;
+    const parsed = parseQRUrl(url);
+    if (parsed) {
+      document.getElementById('cam-status').textContent = '✅ QR 인식 완료!';
+      document.getElementById('cam-btn').style.background = '#10b981';
+      stopCameraQR();
+      document.getElementById('qr-url-input').value = url;
+      setTimeout(() => verifyRealQR(), 300);
+      return;
+    }
+  }
+  document.getElementById('cam-status').textContent = '📷 QR 코드를 화면 중앙에 맞춰주세요';
+  _camLoopId = requestAnimationFrame(scanCameraLoop);
+}
+
+// =====================================================
+// Top Player 카드 로드
+// =====================================================
+async function loadTopPlayers() {
+  if (!sb) return;
+  try {
+    const { data } = await sb.from('user_stats')
+      .select('user_id, total_tickets, total_spent, total_prize, profiles(nickname)')
+      .gt('total_tickets', 0)
+      .limit(100);
+    if (!data || !data.length) return;
+
+    // ROI 1위
+    const withRoi = data
+      .filter(s => s.total_spent > 0)
+      .map(s => ({ ...s, roi: (s.total_prize / s.total_spent) * 100, nick: s.profiles?.nickname || '익명' }))
+      .sort((a, b) => b.roi - a.roi);
+    if (withRoi.length) {
+      const top = withRoi[0];
+      const el1 = document.getElementById('top-roi-nick');
+      const el2 = document.getElementById('top-roi-val');
+      if (el1) el1.textContent = top.nick;
+      if (el2) { el2.textContent = (top.roi >= 0 ? '+' : '') + top.roi.toFixed(1) + '%'; el2.style.color = top.roi >= 0 ? '#dc2626' : '#3b82f6'; }
+    }
+
+    // 인증 횟수 1위
+    const withCert = [...data]
+      .map(s => ({ ...s, nick: s.profiles?.nickname || '익명' }))
+      .sort((a, b) => b.total_tickets - a.total_tickets);
+    if (withCert.length) {
+      const top = withCert[0];
+      const el3 = document.getElementById('top-cert-nick');
+      const el4 = document.getElementById('top-cert-val');
+      if (el3) el3.textContent = top.nick;
+      if (el4) el4.textContent = (top.total_tickets || 0).toLocaleString() + '게임';
+    }
+  } catch(e) { console.warn('loadTopPlayers:', e.message); }
+}
+
 async function insertActivity(type, data = {}) {
   if (!isLoggedIn || !currentUser || !sb) return;
   if (isAdminTestMode) {
@@ -2249,11 +2438,24 @@ function feedItemHtml(a) {
     badge:       svgIcon('medal',  15, '#10b981'),
     rank_enter:  svgIcon('ranking',15, '#3b82f6'),
   };
+  const rankColors = { 1:'#dc2626', 2:'#a855f7', 3:'#10b981', 4:'#3b82f6', 5:'#64748b' };
+  const rankEmoji  = { 1:'🥇', 2:'🥈', 3:'🥉', 4:'🎯', 5:'✅' };
   const labels = {
-    qr_register: d => `${d.games||1}게임 QR 등록 완료 (${d.round}회)`,
-    win:         d => `${d.rank}등 당첨! ${fmtMFull(d.prize||0)} 인증`,
-    badge:       d => `뱃지 획득 — ${d.badge_name}`,
-    rank_enter:  d => `${d.category} 랭킹 진입`,
+    qr_register: d => `${d.games||1}게임 QR 등록 (${d.round}회)`,
+    win: d => {
+      const rc = rankColors[d.rank]||'#64748b';
+      const re = rankEmoji[d.rank]||'';
+      const rankStr = `<span style="color:${rc};font-weight:900;">${re} ${d.rank}등 당첨!</span>`;
+      const prizeStr = d.prize ? ` ${fmtMFull(d.prize)}` : '';
+      const rankPos = d.rank_pos ? ` · <span style="color:#3b82f6;">랭킹 ${d.rank_pos}위 진입</span>` : '';
+      return `${rankStr}${prizeStr}${rankPos}`;
+    },
+    badge: d => {
+      const icon2 = d.icon ? `${d.icon} ` : '🏅 ';
+      const rankPos = d.rank_pos ? ` <span style="color:#dc2626;font-weight:700;">→ 랭킹 ${d.rank_pos}위</span>` : '';
+      return `<span style="color:#10b981;font-weight:900;">${icon2}${d.badge_name}</span> 뱃지 획득${rankPos}`;
+    },
+    rank_enter:  d => `<span style="color:#3b82f6;font-weight:700;">${d.category} ${d.pos||''}위</span> 랭킹 진입`,
   };
   const icon  = icons[a.type] || svgIcon('star',15,'#94a3b8');
   const label = labels[a.type] ? labels[a.type](a.data || {}) : a.type;
@@ -2261,8 +2463,8 @@ function feedItemHtml(a) {
   return `<div class="feed-item">
     <div class="feed-avatar" style="background:#f8fafc;">${icon}</div>
     <div class="feed-body">
-      <div class="feed-nick">${a.nick}</div>
-      <div class="feed-label">${label}</div>
+      <div class="feed-nick">${a.nick || '익명'}</div>
+      <div class="feed-label" style="line-height:1.5;">${label}</div>
     </div>
     <div class="feed-time">${time}</div>
   </div>`;
