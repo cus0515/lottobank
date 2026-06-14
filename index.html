@@ -290,8 +290,8 @@ main.chat-hidden .chat-panel { display: none; }
       <div class="logo-title" onclick="go('home')" style="cursor:pointer;">LottoBank <span>| 로또 전적 &amp; 당첨 인증</span></div>
     </div>
     <div class="menu-tabs">
-      <button id="m-home" class="menu-btn on" onclick="go('home')">홈</button>
-      <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
+      <button id="m-home" class="menu-btn" onclick="go('home')">홈</button>
+      <button id="m-result" class="menu-btn on" onclick="go('result')">회차 조회</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
     </div>
@@ -424,18 +424,16 @@ main.chat-hidden .chat-panel { display: none; }
 
   <!-- 가운데: 탭별 메인 콘텐츠 -->
   <section class="panel">
-    <div id="mid-title" class="panel-header">📋 내 번호 보관함</div>
+    <div id="mid-title" class="panel-header">🔍 회차별 당첨 번호 조회</div>
     <div class="panel-body" style="background:#f8fafc;">
 
       <!-- 1. 종합 데스크 -->
-      <div id="pg-home" class="page-content">
+      <div id="pg-home" class="page-content" style="display:none;">
         <div id="home-live"></div>
-        <div id="ticket-feedback"></div>
-        <div id="tl"></div>
       </div>
 
       <!-- 2. 회차별 조회 -->
-      <div id="pg-result" class="page-content" style="display:none;">
+      <div id="pg-result" class="page-content">
         <select id="res-sel" onchange="chgRes()" class="select-custom">
           <option>회차 목록 로딩 중...</option>
         </select>
@@ -501,6 +499,12 @@ main.chat-hidden .chat-panel { display: none; }
       <!-- 9. 프로필 -->
       <div id="pg-profile" class="page-content" style="display:none;">
         <div id="profile-content"></div>
+        <!-- 내 번호 보관함 (로그인 후) -->
+        <div id="my-numbers-section" style="margin-top:14px;display:none;">
+          <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:8px;">📋 내 번호 보관함</div>
+          <div id="ticket-feedback"></div>
+          <div id="tl"></div>
+        </div>
       </div>
 
     </div>
@@ -1227,6 +1231,7 @@ function applyLoginUI(user) {
   $('btn-auth').style.display = 'none';
   $('user-profile').style.display = 'flex';
   const mobSec = $('mob-auth-section'); if (mobSec) mobSec.style.display = '';
+  const mn = $('my-numbers-section'); if(mn) mn.style.display = '';
   $('chat-input').disabled = false;
   $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
   updateBadgeUI();
@@ -1246,6 +1251,7 @@ function applyLogoutUI() {
   $('btn-auth').style.display = '';
   $('user-profile').style.display = 'none';
   const mobSec2 = $('mob-auth-section'); if (mobSec2) mobSec2.style.display = 'none';
+  const mn2 = $('my-numbers-section'); if(mn2) mn2.style.display = 'none';
   $('chat-input').disabled = true;
   $('chat-input').placeholder = '로그인 후 대화에 참여해보세요.';
   toast('🔒 로그아웃되었습니다');
@@ -1492,7 +1498,7 @@ function go(id) {
     profile:   '👤 내 프로필',
   };
   $('mid-title').textContent = titles[id] || '';
-  if (id === 'home')      { renderHomeLive(); rList(); }
+  if (id === 'home')      { renderHomeLive(); }
   if (id === 'result')    { initRoundSelector(); }
   if (id === 'ticket')    { chgMode(); }
   if (id === 'fortune')   { renderFortune(); }
@@ -1500,7 +1506,7 @@ function go(id) {
   if (id === 'badge')     { renderBadge(); }
   if (id === 'rank')      { renderRank(); }
   if (id === 'community') { renderCommunity(); }
-  if (id === 'profile')   { renderProfile(); }
+  if (id === 'profile')   { renderProfile(); rList(); const ms = $('my-numbers-section'); if(ms && isLoggedIn) ms.style.display=''; }
 }
 
 // =====================================================
@@ -1526,6 +1532,7 @@ function renderFortune() {
 // 초기화
 // =====================================================
 async function init() {
+  go('result');
   initAuth();
   loadStorage();
   updateGlobalStats();
