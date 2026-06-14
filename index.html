@@ -1133,10 +1133,20 @@ async function loadUserDataFromDB() {
   }
 }
 
+function calcPrizeAmount(rank, winData) {
+  if (rank === 1) return winData.prize_1st || 0;
+  if (rank === 2) return 60000000;
+  if (rank === 3) return 1500000;
+  if (rank === 4) return 50000;
+  if (rank === 5) return 5000;
+  return 0;
+}
+
 async function saveTicketToDB(parsed, winData, gameResults) {
   if (!isLoggedIn || !currentUser) return;
   try {
     const bestResult = gameResults.reduce((b, r) => r.rank < b.rank ? r : b, gameResults[0]);
+    const totalPrize = gameResults.reduce((sum, r) => sum + calcPrizeAmount(r.rank, winData), 0);
     await sb.from('tickets').upsert({
       user_id: currentUser.id,
       qr_url: parsed.key,
@@ -1145,17 +1155,17 @@ async function saveTicketToDB(parsed, winData, gameResults) {
       purchase_date: winData.drwNoDate || null,
       result: 'checked',
       prize_rank: bestResult.rank <= 5 ? bestResult.rank : null,
-      prize_amount: 0,
+      prize_amount: totalPrize,
     }, { onConflict: 'qr_url' });
 
-    await upsertUserStats(parsed.games.length, gameResults);
+    await upsertUserStats(parsed.games.length, gameResults, totalPrize, winData);
     await loadUserDataFromDB();
   } catch (e) {
     console.warn('saveTicketToDB:', e.message);
   }
 }
 
-async function upsertUserStats(gameCount, gameResults) {
+async function upsertUserStats(gameCount, gameResults, totalPrize = 0, winData = null) {
   if (!isLoggedIn || !currentUser) return;
   const uid = currentUser.id;
   const c = dbStats || {};
@@ -1168,7 +1178,7 @@ async function upsertUserStats(gameCount, gameResults) {
     total_tickets: (c.total_tickets || 0) + gameCount,
     total_spent:   (c.total_spent   || 0) + gameCount * 1000,
     total_wins:    (c.total_wins    || 0) + winCount,
-    total_prize:   c.total_prize    || 0,
+    total_prize:   (c.total_prize   || 0) + totalPrize,
     best_rank:     bestRank < prevBest ? bestRank : (prevBest < 99 ? prevBest : null),
     rank_1_count:  (c.rank_1_count  || 0) + gameResults.filter(r => r.rank === 1).length,
     rank_2_count:  (c.rank_2_count  || 0) + gameResults.filter(r => r.rank === 2).length,
@@ -1309,10 +1319,6 @@ function renderStats() {
       }
     });
     isMock = (totalBuy === 0);
-    if (isMock) {
-      totalBuy = 32; totalInvest = 32000; totalPrize = 35000; winCount = 5; bestRank = 5;
-      rankCounts = {1:0, 2:0, 3:0, 4:0, 5:5};
-    }
   }
 
   const roi = totalInvest > 0 ? ((totalPrize - totalInvest) / totalInvest * 100) : 0;
@@ -1349,7 +1355,7 @@ function renderStats() {
         <tr><td>5등</td><td>3개 일치</td><td style="font-weight:700;">${rankCounts[5]}회</td><td style="font-size:11px;color:var(--text-muted);">5천원</td></tr>
       </tbody>
     </table>
-    ${isMock ? '<div style="margin-top:10px;font-size:11px;color:var(--text-muted);text-align:center;">* QR 등록 후 실제 데이터로 업데이트됩니다</div>' : ''}
+    ${isMock ? '<div style="margin-top:14px;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:6px;text-align:center;font-size:12px;color:var(--text-muted);">QR 인증 탭에서 실제 복권 QR을 등록하면 전적이 자동으로 기록됩니다</div>' : ''}
   `;
 }
 
@@ -1358,13 +1364,13 @@ function renderStats() {
 // =====================================================
 const BADGE_DEFS = [
   { id: 'first_reg',  icon: '🎟️', name: '첫 등록',    desc: '처음으로 QR을 등록했습니다',       cond: () => usedQrKeys.length >= 1 },
-  { id: 'first_win',  icon: '🎉', name: '첫 당첨',    desc: '처음으로 당첨을 경험했습니다',       cond: () => false, mockEarned: true },
+  { id: 'first_win',  icon: '🎉', name: '첫 당첨',    desc: '처음으로 당첨을 경험했습니다',       cond: () => (dbStats?.total_wins || 0) >= 1 },
   { id: 'reg_10',     icon: '📋', name: '인증 10회',  desc: 'QR을 10회 등록했습니다',           cond: () => usedQrKeys.length >= 10,  progress: () => [usedQrKeys.length, 10] },
   { id: 'reg_50',     icon: '📦', name: '인증 50회',  desc: 'QR을 50회 등록했습니다',           cond: () => usedQrKeys.length >= 50,  progress: () => [usedQrKeys.length, 50] },
   { id: 'game_100',   icon: '🎯', name: '100게임',    desc: '100게임 이상 구매했습니다',          cond: () => MY.length >= 100,          progress: () => [MY.length, 100] },
   { id: 'game_500',   icon: '⭐', name: '500게임',    desc: '500게임 이상 구매했습니다',          cond: () => MY.length >= 500,          progress: () => [MY.length, 500] },
   { id: 'game_1000',  icon: '🔥', name: '1000게임',   desc: '1000게임 달성! 진정한 로또인',      cond: () => MY.length >= 1000,         progress: () => [MY.length, 1000] },
-  { id: 'rank5',      icon: '🔹', name: '5등 헌터',   desc: '5등 당첨 5회 이상',                cond: () => false, mockEarned: true },
+  { id: 'rank5',      icon: '🔹', name: '5등 헌터',   desc: '5등 당첨 5회 이상',                cond: () => (dbStats?.rank_5_count || 0) >= 5, progress: () => [dbStats?.rank_5_count||0, 5] },
   { id: 'rank4',      icon: '🏅', name: '4등 헌터',   desc: '4등 당첨 3회 이상',                cond: () => false },
   { id: 'rank3',      icon: '🥉', name: '3등 수집가', desc: '3등 당첨 경험',                    cond: () => false },
   { id: 'rank2',      icon: '🥈', name: '2등 인증자', desc: 'QR로 2등 인증 완료',               cond: () => myVerifiedTitle && myVerifiedTitle.includes('2등') },
@@ -1372,7 +1378,7 @@ const BADGE_DEFS = [
 ];
 
 function renderBadge() {
-  const earned = BADGE_DEFS.filter(b => b.cond() || b.mockEarned);
+  const earned = BADGE_DEFS.filter(b => b.cond());
   let html = `
     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
       <div>
@@ -1383,7 +1389,7 @@ function renderBadge() {
     </div>
     <div class="badge-page-grid">`;
   BADGE_DEFS.forEach(b => {
-    const isEarned = b.cond() || b.mockEarned;
+    const isEarned = b.cond();
     const prog = b.progress ? b.progress() : null;
     html += `<div class="badge-card-item ${isEarned ? 'earned' : 'locked'}">
       <span class="badge-icon-big">${b.icon}</span>
@@ -1408,61 +1414,80 @@ const RANK_CATS = [
   { id: 'rank5',       label: '5등 최다',  unit: '회' },
   { id: 'rank3',       label: '3등 이상',  unit: '회' },
 ];
-const RANK_MOCK = {
-  buy_count:   [{n:'로또천재',v:1280},{n:'주간구매왕',v:986},{n:'금손유저_익명',v:312,me:true},{n:'행운부자',v:201},{n:'도전자A',v:145}],
-  qr_count:    [{n:'인증왕',v:312},{n:'로또천재',v:244},{n:'행운부자',v:130},{n:'금손유저_익명',v:32,me:true},{n:'도전자A',v:18}],
-  roi:         [{n:'행운부자',v:'+312.5'},{n:'인증왕',v:'+45.2'},{n:'도전자A',v:'+12.0'},{n:'금손유저_익명',v:'-9.4',me:true},{n:'로또천재',v:'-78.2'}],
-  total_prize: [{n:'행운부자',v:'3.2억'},{n:'인증왕',v:'5000만'},{n:'로또천재',v:'450만'},{n:'금손유저_익명',v:'3.5만',me:true},{n:'도전자A',v:'5천'}],
-  rank5:       [{n:'로또천재',v:48},{n:'주간구매왕',v:31},{n:'금손유저_익명',v:5,me:true},{n:'인증왕',v:4},{n:'행운부자',v:2}],
-  rank3:       [{n:'행운부자',v:3},{n:'인증왕',v:1},{n:'로또천재',v:1},{n:'금손유저_익명',v:0,me:true},{n:'도전자A',v:0}],
-};
 let curRankCat = 'buy_count';
 
-function renderRank(catId) {
+async function renderRank(catId) {
   catId = catId || curRankCat;
   curRankCat = catId;
   const cat = RANK_CATS.find(c => c.id === catId);
-  const data = RANK_MOCK[catId] || [];
-  const medals = ['🥇','🥈','🥉','',''];
   $('rank-tab-row').innerHTML = RANK_CATS.map(c =>
     `<button class="rank-tab-pill ${c.id===catId?'on':''}" onclick="renderRank('${c.id}')">${c.label}</button>`
   ).join('');
-  let html = `<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;">[ ${cat.label} 랭킹 ] · Mock 데이터</div>
-    <table class="rank-board-table">
-      <thead><tr><th style="width:36px;">순위</th><th>닉네임</th><th style="text-align:right;">${cat.label}</th></tr></thead>
-      <tbody>`;
-  data.forEach((row, i) => {
-    html += `<tr ${row.me?'class="my-row"':''}>
-      <td class="rank-no-cell">${medals[i]||(i+1)}</td>
-      <td class="rank-name-cell">${row.me?'👉 ':''}${row.n}${row.me?' <span style="font-size:10px;color:var(--lotto-red);">(나)</span>':''}</td>
-      <td style="text-align:right;" class="rank-val-cell">${row.v}${cat.unit}</td>
-    </tr>`;
-  });
-  html += `</tbody></table><div style="margin-top:10px;font-size:11px;color:var(--text-muted);text-align:center;">* 실제 회원 데이터 연동 후 실시간 업데이트됩니다</div>`;
-  $('rank-content').innerHTML = html;
+  $('rank-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px;">로딩 중...</div>';
+
+  try {
+    // user_stats + profiles JOIN
+    const { data: stats } = await sb.from('user_stats')
+      .select('user_id, total_tickets, total_spent, total_wins, total_prize, best_rank, rank_5_count, rank_3_count, rank_1_count')
+      .order('total_tickets', { ascending: false })
+      .limit(20);
+
+    if (!stats || !stats.length) {
+      $('rank-content').innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+        <div style="font-size:36px;margin-bottom:12px;">🏆</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">${cat.label} 랭킹</div>
+        <div style="font-size:12px;">아직 집계된 데이터가 없습니다.<br>QR 인증 후 자동으로 랭킹에 반영됩니다.</div>
+      </div>`;
+      return;
+    }
+
+    // 닉네임 조회
+    const uids = stats.map(s => s.user_id);
+    const { data: profiles } = await sb.from('profiles').select('id, nickname').in('id', uids);
+    const nickMap = Object.fromEntries((profiles||[]).map(p => [p.id, p.nickname]));
+
+    // 카테고리별 정렬
+    const COL_MAP = {
+      buy_count:   { field: s => s.total_tickets || 0, unit: '회', label: '구매 횟수' },
+      qr_count:    { field: s => s.total_wins || 0,    unit: '회', label: '당첨 횟수' },
+      roi:         { field: s => s.total_spent > 0 ? Math.round((s.total_prize - s.total_spent) / s.total_spent * 100) : -100, unit: '%', label: 'ROI' },
+      total_prize: { field: s => s.total_prize || 0,   unit: '',   label: '총 당첨금', fmt: v => fmtMShort(v) },
+      rank5:       { field: s => s.rank_5_count || 0,  unit: '회', label: '5등 횟수' },
+      rank3:       { field: s => (s.rank_1_count||0)+(s.rank_3_count||0), unit: '회', label: '3등 이상' },
+    };
+    const col = COL_MAP[catId] || COL_MAP.buy_count;
+    const sorted = [...stats].sort((a, b) => col.field(b) - col.field(a));
+    const medals = ['🥇','🥈','🥉'];
+    const myUid = currentUser?.id;
+
+    let html = `<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;">[ ${cat.label} 랭킹 ] · 실시간</div>
+      <table class="rank-board-table">
+        <thead><tr><th style="width:36px;">순위</th><th>닉네임</th><th style="text-align:right;">${col.label}</th></tr></thead>
+        <tbody>`;
+    sorted.forEach((row, i) => {
+      const isMe = row.user_id === myUid;
+      const val = col.field(row);
+      const display = col.fmt ? col.fmt(val) : (val + col.unit);
+      const nick = nickMap[row.user_id] || '익명';
+      html += `<tr ${isMe ? 'class="my-row"' : ''}>
+        <td class="rank-no-cell">${medals[i] || (i+1)}</td>
+        <td class="rank-name-cell">${isMe ? '👉 ' : ''}${nick}${isMe ? ' <span style="font-size:10px;color:var(--lotto-red);">(나)</span>' : ''}</td>
+        <td style="text-align:right;" class="rank-val-cell">${display}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    $('rank-content').innerHTML = html;
+  } catch(e) {
+    $('rank-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--b-red);font-size:12px;">랭킹 로드 실패: ' + e.message + '</div>';
+  }
 }
 
 // =====================================================
 // 커뮤니티 페이지
 // =====================================================
 let curCommTab = 'free';
-const MOCK_POSTS = {
-  free: [
-    {tag:'free', title:'이번 주 번호 예측 공유합니다!', author:'로또분석가', time:'10분 전', likes:24, comments:8},
-    {tag:'free', title:'연속번호 3개 이상 나온 회차 통계 정리', author:'통계매니아', time:'1시간 전', likes:41, comments:15},
-    {tag:'free', title:'10년째 사고 안됩니다... 포기해야할까요', author:'희망이없나', time:'3시간 전', likes:88, comments:32},
-    {tag:'free', title:'핫번호 vs 콜드번호 어느 전략이 맞나요?', author:'고민중', time:'5시간 전', likes:19, comments:7},
-    {tag:'free', title:'이번달 구매금액 공유 (나 좀 심각한 것 같아)', author:'반성중', time:'1일 전', likes:136, comments:47},
-  ],
-  verify: [
-    {tag:'verify', title:'[1225회 5등] QR 인증 완료 🔹 번호: 3 11 22 31 38 42', author:'금손유저_익명', time:'2시간 전', likes:5, comments:2},
-    {tag:'verify', title:'[1224회 4등] 4개 맞혔습니다! 5만원 쏜다', author:'행운부자', time:'1일 전', likes:28, comments:9},
-    {tag:'verify', title:'[1220회 3등] 드디어 3등!! QR 인증 완료', author:'인증왕', time:'3일 전', likes:182, comments:64},
-    {tag:'verify', title:'[1218회 5등] 3개 맞음... 5천원이라도 감사', author:'소소한기쁨', time:'4일 전', likes:12, comments:3},
-    {tag:'verify', title:'[1215회 5등] 이달 첫 당첨! QR 인증', author:'새싹로또', time:'1주 전', likes:8, comments:1},
-  ],
-};
-let commPosts = { free: [...MOCK_POSTS.free], verify: [...MOCK_POSTS.verify] };
+let commPosts = { free: [], verify: [] };
+let myLikedPostIds = new Set();
 
 function commTab(tab) {
   curCommTab = tab;
@@ -1470,46 +1495,122 @@ function commTab(tab) {
   $('ct-verify').classList.toggle('on', tab==='verify');
   renderCommunityList();
 }
+
+function timeAgo(iso) {
+  const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (diff < 60) return '방금 전';
+  if (diff < 3600) return Math.floor(diff/60) + '분 전';
+  if (diff < 86400) return Math.floor(diff/3600) + '시간 전';
+  return Math.floor(diff/86400) + '일 전';
+}
+
 function renderCommunityList() {
   const posts = commPosts[curCommTab] || [];
-  if (!posts.length) { $('community-content').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px;">게시글이 없습니다.</div>'; return; }
-  $('community-content').innerHTML = posts.map((p,i) => `
+  if (!posts.length) {
+    $('community-content').innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+      <div style="font-size:32px;margin-bottom:10px;">💬</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">아직 게시글이 없습니다</div>
+      <div style="font-size:12px;">첫 번째 글을 작성해보세요!</div>
+    </div>`;
+    return;
+  }
+  $('community-content').innerHTML = posts.map(p => `
     <div class="post-card">
       <div class="post-card-top">
         <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='free'?'자유':'인증'}</span>
-        <span class="post-card-title">${p.title}</span>
+        <span class="post-card-title">${p.title.replace(/</g,'&lt;')}</span>
       </div>
       <div class="post-card-meta">
-        <span>${p.author}</span><span>${p.time}</span><span>💬 ${p.comments}</span>
-        <button class="post-like-btn" onclick="likePost('${curCommTab}',${i})">❤️ ${p.likes}</button>
+        <span>${p.nickname}</span><span>${timeAgo(p.created_at)}</span>
+        <button class="post-like-btn" onclick="likePost('${p.id}',this)" style="${myLikedPostIds.has(p.id)?'color:var(--lotto-red);font-weight:900;':''}">❤️ ${p.likes}</button>
       </div>
     </div>`).join('');
 }
-function likePost(tab, idx) { commPosts[tab][idx].likes++; renderCommunityList(); }
-function writePost() {
+
+async function likePost(postId, btn) {
+  if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
+  const already = myLikedPostIds.has(postId);
+  if (already) {
+    await sb.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+    await sb.from('posts').update({ likes: Math.max(0, (commPosts[curCommTab].find(p=>p.id===postId)?.likes||1)-1) }).eq('id', postId);
+    myLikedPostIds.delete(postId);
+  } else {
+    await sb.from('post_likes').insert({ post_id: postId, user_id: currentUser.id });
+    await sb.from('posts').update({ likes: (commPosts[curCommTab].find(p=>p.id===postId)?.likes||0)+1 }).eq('id', postId);
+    myLikedPostIds.add(postId);
+  }
+  await loadCommunityPosts();
+}
+
+async function writePost() {
   if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
   const inp = $('post-input');
   const text = inp.value.trim();
   if (!text) { toast('⚠️ 내용을 입력해주세요'); return; }
-  commPosts[curCommTab].unshift({ tag:curCommTab, title:text, author:$('user-name').textContent, time:'방금 전', likes:0, comments:0 });
+  const nick = $('user-name').textContent;
+  const { error } = await sb.from('posts').insert({
+    user_id: currentUser.id,
+    nickname: nick,
+    tag: curCommTab,
+    title: text,
+    likes: 0,
+  });
+  if (error) { toast('❌ 등록 실패: ' + error.message); return; }
   inp.value = '';
-  renderCommunityList();
   toast('✅ 게시글이 등록되었습니다');
+  await loadCommunityPosts();
 }
-function renderCommunity() {
+
+async function loadCommunityPosts() {
+  try {
+    const { data } = await sb.from('posts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (data) {
+      commPosts.free   = data.filter(p => p.tag === 'free');
+      commPosts.verify = data.filter(p => p.tag === 'verify');
+    }
+    if (isLoggedIn && currentUser) {
+      const { data: likes } = await sb.from('post_likes').select('post_id').eq('user_id', currentUser.id);
+      myLikedPostIds = new Set((likes||[]).map(l => l.post_id));
+    }
+    renderCommunityList();
+  } catch(e) {
+    console.warn('loadCommunityPosts:', e.message);
+    renderCommunityList();
+  }
+}
+
+async function renderCommunity() {
   $('post-input').disabled = !isLoggedIn;
   $('post-input').placeholder = isLoggedIn ? '게시글 제목을 입력하세요...' : '로그인 후 글 작성 가능합니다';
-  renderCommunityList();
+  await loadCommunityPosts();
 }
 
 // =====================================================
 // 프로필 페이지
 // =====================================================
+async function changeNickname() {
+  if (!isLoggedIn || !currentUser) return;
+  const newNick = $('nick-input').value.trim();
+  if (newNick.length < 2 || newNick.length > 12) { toast('⚠️ 닉네임은 2~12자'); return; }
+  const btn = $('nick-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  const { error } = await sb.from('profiles').update({ nickname: newNick }).eq('id', currentUser.id);
+  btn.disabled = false; btn.textContent = '저장';
+  if (error) { toast('❌ 저장 실패: ' + error.message); return; }
+  $('user-name').textContent = newNick;
+  toast('✅ 닉네임이 변경되었습니다');
+  renderProfile();
+}
+
 function renderProfile() {
   const nick = $('user-name').textContent;
-  const totalBuy = MY.length || 32;
-  const qrCount = usedQrKeys.length || 5;
-  const earnedCount = BADGE_DEFS.filter(b => b.cond() || b.mockEarned).length;
+  const totalBuy = (isLoggedIn && dbStats) ? (dbStats.total_tickets || 0) : MY.length;
+  const qrCount = usedQrKeys.length;
+  const earnedCount = BADGE_DEFS.filter(b => b.cond()).length;
+  const email = currentUser?.email || '-';
   $('profile-content').innerHTML = `
     <div class="profile-hero">
       <div class="profile-avatar-circle">${nick.charAt(0)||'?'}</div>
@@ -1523,23 +1624,27 @@ function renderProfile() {
     </div>
     <div class="profile-block">
       <div class="profile-block-title">계정 정보</div>
-      <div class="profile-row"><span>닉네임</span><span class="profile-row-val">${nick}</span></div>
+      <div class="profile-row"><span>이메일</span><span class="profile-row-val" style="font-size:12px;">${email}</span></div>
       <div class="profile-row"><span>인증 등급</span><span class="profile-row-val">${myVerifiedTitle||'일반 회원'}</span></div>
       <div class="profile-row"><span>가입 방식</span><span class="profile-row-val">이메일 로그인</span></div>
     </div>
     <div class="profile-block">
       <div class="profile-block-title">나의 활동 요약</div>
-      <div class="profile-row"><span>추천번호 저장</span><span class="profile-row-val">${MY.length}게임</span></div>
       <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
       <div class="profile-row"><span>획득 뱃지</span><span class="profile-row-val">${earnedCount} / ${BADGE_DEFS.length}개</span></div>
     </div>
+    ${isLoggedIn ? `
     <div class="profile-block">
-      <div class="profile-block-title">설정 (2단계 개발 예정)</div>
-      <div class="profile-row" style="color:var(--text-muted);"><span>닉네임 변경</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
-      <div class="profile-row" style="color:var(--text-muted);"><span>알림 설정</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
-      <div class="profile-row" style="color:var(--text-muted);"><span>데이터 내보내기</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
-    </div>
-    ${!isLoggedIn ? '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [로그인] 버튼으로 로그인하면 전체 기능을 이용할 수 있습니다</div>' : ''}
+      <div class="profile-block-title">닉네임 변경</div>
+      <div style="display:flex;gap:8px;align-items:center;padding:8px 0;">
+        <input type="text" id="nick-input" value="${nick}" maxlength="12"
+          style="flex:1;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;outline:none;"
+          onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'">
+        <button id="nick-save-btn" onclick="changeNickname()"
+          style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">저장</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);">2~12자, 한글/영문/숫자 사용 가능</div>
+    </div>` : '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [로그인] 버튼으로 로그인하면 전체 기능을 이용할 수 있습니다</div>'}
   `;
 }
 
@@ -1547,3 +1652,4 @@ window.onload = init;
 </script>
 </body>
 </html>
+                                                                                                                                               

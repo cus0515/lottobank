@@ -95,3 +95,44 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+
+-- ── posts (커뮤니티 게시글) ─────────────────────────────
+create table if not exists public.posts (
+  id         uuid default gen_random_uuid() primary key,
+  user_id    uuid references auth.users(id) on delete cascade,
+  nickname   text not null,
+  tag        text not null default 'free',   -- free | verify
+  title      text not null,
+  likes      integer default 0,
+  created_at timestamptz default now()
+);
+
+alter table public.posts enable row level security;
+
+create policy "게시글 전체 조회" on public.posts
+  for select using (true);
+
+create policy "본인 게시글 작성" on public.posts
+  for insert with check (auth.uid() = user_id);
+
+create policy "본인 게시글 삭제" on public.posts
+  for delete using (auth.uid() = user_id);
+
+-- 좋아요 (중복 방지용 별도 테이블)
+create table if not exists public.post_likes (
+  post_id  uuid references public.posts(id) on delete cascade,
+  user_id  uuid references auth.users(id) on delete cascade,
+  primary key (post_id, user_id)
+);
+
+alter table public.post_likes enable row level security;
+
+create policy "좋아요 전체 조회" on public.post_likes
+  for select using (true);
+
+create policy "좋아요 등록" on public.post_likes
+  for insert with check (auth.uid() = user_id);
+
+create policy "좋아요 취소" on public.post_likes
+  for delete using (auth.uid() = user_id);
