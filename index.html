@@ -1265,7 +1265,8 @@ async function doAuth() {
 
   try {
     if (authMode === 'login') {
-      const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+      console.log('signIn result:', { data: data?.user?.email, error: error?.message, status: error?.status });
       if (error) throw error;
       closeAuthModal();
       toast('🔓 로그인 완료');
@@ -1294,8 +1295,17 @@ async function doAuth() {
       $('auth-err').textContent = '잠시 후 다시 시도해주세요';
     else if (msg.includes('network') || msg.includes('fetch'))
       $('auth-err').textContent = '네트워크 오류가 발생했습니다. 연결을 확인해주세요';
-    else
-      $('auth-err').textContent = '오류가 발생했습니다. 다시 시도해주세요';
+    else if (msg.includes('email link') || msg.includes('magic link') || msg.includes('otp'))
+      $('auth-err').textContent = '이메일 링크 인증 방식입니다. 받은편지함을 확인해주세요';
+    else if (msg.includes('signup') || msg.includes('sign up') || msg.includes('not found') || msg.includes('user not'))
+      $('auth-err').textContent = '계정이 존재하지 않습니다. 회원가입을 먼저 해주세요';
+    else if (e.status === 400 || e.status === 401 || e.status === 422)
+      $('auth-err').textContent = '이메일 또는 비밀번호가 올바르지 않습니다';
+    else {
+      // 디버그: 실제 에러 출력
+      console.error('Auth error:', e);
+      $('auth-err').textContent = `오류: ${e.message || e.status || '알 수 없는 오류'}`;
+    }
   } finally {
     btn.disabled = false;
     btn.textContent = authMode === 'login' ? '로그인' : '가입하기';
