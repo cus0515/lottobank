@@ -219,6 +219,9 @@ main.chat-hidden .chat-panel { display: none; }
 .comment-input:focus { border-color:var(--lotto-red); }
 .comment-submit-btn { padding:8px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit; }
 .post-card-stats   { font-size:11px;color:var(--text-muted);display:flex;gap:10px;margin-top:4px;align-items:center; }
+/* ===== 관리자 패널 ===== */
+.admin-section-title { font-size:13px;font-weight:900;color:var(--lotto-red);margin:16px 0 8px;border-bottom:2px solid var(--lotto-red);padding-bottom:6px; }
+
 /* ===== 커뮤니티 페이지 ===== */
 .comm-tab-row { display: flex; gap: 6px; margin-bottom: 12px; }
 .comm-tab-btn { padding: 5px 14px; font-size: 12px; font-weight: 700; border: 1px solid #e2e8f0; border-radius: 4px; background: #fff; cursor: pointer; color: var(--text-muted); }
@@ -321,6 +324,7 @@ main.chat-hidden .chat-panel { display: none; }
       <button id="m-result" class="menu-btn on" onclick="go('result')">회차 조회</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
+      <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;color:#dc2626;">관리자</button>
     </div>
     <div class="auth-zone">
       <button id="chat-reopen-btn" onclick="toggleChat()" title="채팅 열기"
@@ -528,6 +532,31 @@ main.chat-hidden .chat-panel { display: none; }
       </div>
 
       <!-- 9. 프로필 -->
+      <!-- 관리자 페이지 -->
+      <div id="pg-admin" class="page-content" style="display:none;">
+        <div id="admin-gate">
+          <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div style="font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:8px;">관리자 전용 영역</div>
+            <div style="font-size:12px;">관리자 계정으로 로그인해야 접근 가능합니다</div>
+          </div>
+        </div>
+        <div id="admin-content" style="display:none;">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+            <div class="kpi-box hl" id="adm-total-users"><div class="kpi-label">총 회원수</div><div class="kpi-value blue" id="adm-kpi-users">-</div></div>
+            <div class="kpi-box" id="adm-total-tickets"><div class="kpi-label">총 티켓</div><div class="kpi-value" id="adm-kpi-tickets">-</div></div>
+            <div class="kpi-box" id="adm-total-posts"><div class="kpi-label">총 게시글</div><div class="kpi-value" id="adm-kpi-posts">-</div></div>
+            <div class="kpi-box" id="adm-total-prize"><div class="kpi-label">총 당첨금</div><div class="kpi-value red" id="adm-kpi-prize">-</div></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+            <button class="rank-tab-pill on" onclick="adminTab('users',this)">회원 목록</button>
+            <button class="rank-tab-pill" onclick="adminTab('tickets',this)">티켓 목록</button>
+            <button class="rank-tab-pill" onclick="adminTab('posts',this)">게시글 목록</button>
+            <button class="rank-tab-pill" onclick="adminTab('stats',this)">전적 현황</button>
+          </div>
+          <div id="admin-table-wrap"></div>
+        </div>
+      </div>
       <div id="pg-profile" class="page-content" style="display:none;">
         <div id="profile-content"></div>
         <!-- 내 번호 보관함 (로그인 후) -->
@@ -577,12 +606,19 @@ function toast(m) {
   const t = $('toast'); t.textContent = m; t.classList.add('on');
   setTimeout(() => t.classList.remove('on'), 2500);
 }
-function fmtM(v) { return new Intl.NumberFormat('ko-KR').format(v) + '원'; }
+function fmtM(v) { return new Intl.NumberFormat('ko-KR').format(Math.round(v||0)) + '원'; }
 function fmtMShort(v) {
-  if (!v) return '-';
-  if (v >= 1e8) return (v / 1e8).toFixed(1) + '억원';
-  if (v >= 1e4) return (v / 1e4).toFixed(0) + '만원';
-  return fmtM(v);
+  if (!v || v === 0) return '-';
+  if (v >= 1e8) return (v / 1e8).toFixed(1).replace(/\.0$/, '') + '억원';
+  if (v >= 1e4) return Math.round(v / 1e4) + '만원';
+  return new Intl.NumberFormat('ko-KR').format(Math.round(v)) + '원';
+}
+function fmtMFull(v) {
+  // 항상 전체 원단위 (예: 2,500,000,000원)
+  return new Intl.NumberFormat('ko-KR').format(Math.round(v||0)) + '원';
+}
+function fmtCnt(v) {
+  return new Intl.NumberFormat('ko-KR').format(Math.round(v||0));
 }
 function getBCls(n) {
   if (n <= 10) return 'y'; if (n <= 20) return 'bl';
@@ -774,7 +810,7 @@ function prizeTableHtml(data) {
   return `
     <div class="prize-table">
       <div class="prize-row"><span>항목</span><span>내용</span><span>금액</span><span>인원</span></div>
-      <div class="prize-row"><b>1등</b><span>6개 일치</span><span>${fmtMShort(data.prize_1st)}</span><span>${data.win_count_1st}명</span></div>
+      <div class="prize-row"><b>1등</b><span>6개 일치</span><span>${fmtMFull(data.prize_1st)}</span><span>${data.win_count_1st}명</span></div>
     </div>`;
 }
 
@@ -788,10 +824,10 @@ function renderLatestOnLeft(data) {
     return;
   }
   $('h-rec-title').textContent = `제 ${data.round}회 공식 당첨번호`;
-  $('h-rec-date').textContent = `추첨일: ${data.date}  ·  총 판매액 ${fmtMShort(data.totalSales)}`;
+  $('h-rec-date').textContent = `추첨일: ${data.date}  ·  총 판매액 ${fmtMFull(data.totalSales)}`;
   $('h-balls').innerHTML = data.nums.map(n => bH(n)).join('') +
     '<span style="font-weight:900;color:var(--text-muted);font-size:16px;margin:0 3px;">+</span>' + bH(data.bonus);
-  $('h-amt').textContent = fmtMShort(data.prize_1st);
+  $('h-amt').textContent = fmtMFull(data.prize_1st);
   $('h-round-badge').textContent = ` ${data.round}회`;
   // api-indicator removed
 
@@ -800,19 +836,25 @@ function renderLatestOnLeft(data) {
   const prizes = [
     { rank:1, cond:'6개 일치', cls:'pr1', amt: data.prize_1st, cnt: data.win_count_1st, auto: data.auto_1st, manual: data.manual_1st },
     { rank:2, cond:'5개+보너스', cls:'pr2', amt: prize2, cnt: data.win_count_2nd||'?', auto: data.auto_2nd, manual: data.manual_2nd },
-    { rank:3, cond:'5개 일치', cls:'pr3', amt: data.prize_3rd||1500000, cnt: data.win_count_3rd||'?', auto:null, manual:null },
-    { rank:4, cond:'4개 일치', cls:'pr4', amt: data.prize_4th||50000, cnt: data.win_count_4th||'?', auto:null, manual:null },
-    { rank:5, cond:'3개 일치', cls:'pr5', amt: data.prize_5th||5000, cnt: data.win_count_5th||'?', auto:null, manual:null },
+    { rank:3, cond:'5개 일치', cls:'pr3', amt: data.prize_3rd||0, cnt: data.win_count_3rd||0, auto:null, manual:null },
+    { rank:4, cond:'4개 일치', cls:'pr4', amt: data.prize_4th||50000, cnt: data.win_count_4th||0, auto:null, manual:null },
+    { rank:5, cond:'3개 일치', cls:'pr5', amt: data.prize_5th||5000, cnt: data.win_count_5th||0, auto:null, manual:null },
   ];
   $('h-prize-table').innerHTML = prizes.map(p => {
-    const autoStr = (p.auto != null && p.manual != null)
-      ? `<span class="winner-type">자동 ${p.auto}<br>수동 ${p.manual}</span>`
-      : `<span class="winner-type" style="color:#cbd5e1;">—</span>`;
+    let autoStr;
+    if (p.auto != null && p.manual != null && (p.auto + p.manual) > 0) {
+      autoStr = `<span class="winner-type">자동 ${fmtCnt(p.auto)}<br>수동 ${fmtCnt(p.manual)}</span>`;
+    } else if (p.rank >= 3) {
+      autoStr = `<span class="winner-type" style="color:#94a3b8;font-size:10px;">미집계</span>`;
+    } else {
+      autoStr = `<span class="winner-type" style="color:#cbd5e1;">—</span>`;
+    }
+    const cntStr = (p.cnt && p.cnt !== '?') ? fmtCnt(p.cnt) + '명' : '?명';
     return `<tr>
       <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
       <td style="font-size:11px;color:#475569;">${p.cond}</td>
-      <td style="font-weight:700;">${p.cnt}명</td>
-      <td style="font-weight:700;color:var(--lotto-red);">${fmtMShort(p.amt)}</td>
+      <td style="font-weight:700;">${cntStr}</td>
+      <td style="font-weight:700;color:var(--lotto-red);">${p.rank===1||p.rank===2?fmtMFull(p.amt):fmtMShort(p.amt)}</td>
       <td${p.rank<=2?` id="h-auto-${p.rank}"`:''}>${autoStr}</td>
     </tr>`;
   }).join('');
@@ -839,7 +881,7 @@ function renderHomeLive() {
   $('home-live').innerHTML = `
     <div class="live-summary">
       <div class="live-card"><span>최신 회차</span><strong>${d.round}회</strong><span>${d.date}</span></div>
-      <div class="live-card"><span>1등 당첨금</span><strong style="font-size:14px;">${fmtMShort(d.prize_1st)}</strong><span>${d.win_count_1st}명 당첨</span></div>
+      <div class="live-card"><span>1등 당첨금</span><strong style="font-size:14px;">${fmtMFull(d.prize_1st)}</strong><span>${d.win_count_1st}명 당첨</span></div>
       <div class="live-card"><span>홀짝 비율</span><strong>${a.odd}:${a.even}</strong><span>최신 회차</span></div>
     </div>
     <div class="section-mini-title"><span>최근 10회차 반복 출현 번호 (실제 데이터)</span><em>핫 넘버</em></div>
@@ -861,14 +903,14 @@ function updateGlobalStats() {
     const target = apiCache[tk.drw];
     if (!target) return;
     const r = checkWinRank(tk.nums, target.nums, target.bonus);
-    if (r.rank === 1) priz += target.prize_1st;
-    else if (r.rank === 2) priz += 50000000;
-    else if (r.rank === 3) priz += 1500000;
-    else if (r.rank === 4) priz += 50000;
-    else if (r.rank === 5) priz += 5000;
+    if (r.rank === 1) priz += target.prize_1st || 0;
+    else if (r.rank === 2) priz += target.prize_2nd || 60000000;
+    else if (r.rank === 3) priz += target.prize_3rd || 1500000;
+    else if (r.rank === 4) priz += target.prize_4th || 50000;
+    else if (r.rank === 5) priz += target.prize_5th || 5000;
   });
-  $('h-cost').textContent = fmtM(inv);
-  $('h-earned').textContent = fmtM(priz);
+  $('h-cost').textContent = fmtMFull(inv);
+  $('h-earned').textContent = fmtMFull(priz);
   $('h-total').textContent = MY.length + '게임';
 }
 
@@ -946,7 +988,7 @@ async function chgRes() {
       <span style="color:#64748b;">추첨일</span><span style="font-weight:700;">${d.date}</span>
     </div>
     <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0;font-size:12px;">
-      <span style="color:#64748b;">총 판매액</span><span style="font-weight:700;">${fmtMShort(d.totalSales)}</span>
+      <span style="color:#64748b;">총 판매액</span><span style="font-weight:700;">${fmtMFull(d.totalSales)}</span>
     </div>
     <table class="prize-table" style="margin-top:6px;">
       <thead><tr><th>등수</th><th>당첨 조건</th><th>당첨자</th><th>1인당 금액</th><th>수동/자동</th></tr></thead>
@@ -1280,6 +1322,8 @@ document.addEventListener('click', e => {
   if (!$('user-profile')?.contains(e.target)) closeUserDropdown();
 });
 
+const ADMIN_EMAIL = 'jobdevil23@gmail.com';
+
 function applyLoginUI(user) {
   isLoggedIn = true;
   const mp = document.getElementById('h-my-purchase');
@@ -1293,6 +1337,8 @@ function applyLoginUI(user) {
   const mn = $('my-numbers-section'); if(mn) mn.style.display = '';
   $('chat-input').disabled = false;
   $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
+  const adminBtn = $('m-admin');
+  if (adminBtn) adminBtn.style.display = user.email === ADMIN_EMAIL ? '' : 'none';
   updateBadgeUI();
   loadUserDataFromDB();
   const active = document.querySelector('.menu-btn.on');
@@ -1311,6 +1357,7 @@ function applyLogoutUI() {
   dbStats = null;
   $('btn-auth').style.display = '';
   $('user-profile').style.display = 'none';
+  const adminBtnL = $('m-admin'); if (adminBtnL) adminBtnL.style.display = 'none';
   const mobSec2 = $('mob-auth-section'); if (mobSec2) mobSec2.style.display = 'none';
   const mn2 = $('my-numbers-section'); if(mn2) mn2.style.display = 'none';
   $('chat-input').disabled = true;
@@ -1448,8 +1495,8 @@ async function loadUserDataFromDB() {
     const { data: stats } = await sb.from('user_stats').select('*').eq('user_id', uid).single();
     if (stats) {
       dbStats = stats;
-      $('h-cost').textContent   = fmtM(stats.total_spent  || 0);
-      $('h-earned').textContent = fmtM(stats.total_prize  || 0);
+      $('h-cost').textContent   = fmtMFull(stats.total_spent  || 0);
+      $('h-earned').textContent = fmtMFull(stats.total_prize  || 0);
       $('h-total').textContent  = (stats.total_tickets || 0) + '게임';
     }
 
@@ -1570,6 +1617,7 @@ function go(id) {
     badge:     '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg> 획득 뱃지',
     rank:      '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg> 전체 랭킹',
     community: '커뮤니티',
+    admin:     '🔐 관리자 패널',
     profile:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필',
   };
   $('mid-title').innerHTML = titles[id] || '';
@@ -1581,6 +1629,7 @@ function go(id) {
   if (id === 'badge')     { renderBadge(); }
   if (id === 'rank')      { renderRank(); }
   if (id === 'community') { renderCommunity(); }
+  if (id === 'admin')     { renderAdmin(); }
   if (id === 'profile')   { renderProfile(); rList(); const ms = $('my-numbers-section'); if(ms && isLoggedIn) ms.style.display=''; }
 }
 
@@ -1698,11 +1747,11 @@ function renderStats() {
         winCount++;
         if (bestRank === 0 || r.rank < bestRank) bestRank = r.rank;
         rankCounts[r.rank] = (rankCounts[r.rank] || 0) + 1;
-        if (r.rank === 1) totalPrize += target.prize_1st;
-        else if (r.rank === 2) totalPrize += 50000000;
-        else if (r.rank === 3) totalPrize += 1500000;
-        else if (r.rank === 4) totalPrize += 50000;
-        else if (r.rank === 5) totalPrize += 5000;
+        if (r.rank === 1) totalPrize += target.prize_1st || 0;
+        else if (r.rank === 2) totalPrize += target.prize_2nd || 60000000;
+        else if (r.rank === 3) totalPrize += target.prize_3rd || 1500000;
+        else if (r.rank === 4) totalPrize += target.prize_4th || 50000;
+        else if (r.rank === 5) totalPrize += target.prize_5th || 5000;
       }
     });
     isMock = (totalBuy === 0);
@@ -1715,9 +1764,9 @@ function renderStats() {
 
   $('stats-content').innerHTML = `
     <div class="kpi-grid">
-      <div class="kpi-box"><div class="kpi-label">총 구매 횟수</div><div class="kpi-value">${totalBuy}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">총 ${fmtM(totalInvest)} 투자</div></div>
+      <div class="kpi-box"><div class="kpi-label">총 구매 횟수</div><div class="kpi-value">${totalBuy}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">총 ${fmtMFull(totalInvest)} 투자</div></div>
       <div class="kpi-box"><div class="kpi-label">총 당첨 횟수</div><div class="kpi-value blue">${winCount}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">당첨률 ${totalBuy > 0 ? (winCount/totalBuy*100).toFixed(1) : 0}%</div></div>
-      <div class="kpi-box hl"><div class="kpi-label">총 당첨금</div><div class="kpi-value red">${fmtMShort(totalPrize)}</div><div class="kpi-sub">투자 대비 ${roi.toFixed(1)}%</div></div>
+      <div class="kpi-box hl"><div class="kpi-label">총 당첨금</div><div class="kpi-value red">${fmtMFull(totalPrize)}</div><div class="kpi-sub">투자 대비 ${roi.toFixed(1)}%</div></div>
       <div class="kpi-box"><div class="kpi-label">최고 등수</div><div class="kpi-value">${bestLabel}</div><div class="kpi-sub">역대 최고 당첨 등수</div></div>
       <div class="kpi-box hl"><div class="kpi-label">ROI</div><div class="kpi-value ${roiPos?'green':'red'}">${roiPos?'+':''}${roi.toFixed(1)}<span style="font-size:12px;font-weight:500;">%</span></div><div class="kpi-sub">투자 대비 수익률</div></div>
     </div>
@@ -1729,7 +1778,7 @@ function renderStats() {
       </div>
       <div class="roi-bar-wrap"><div class="roi-bar${roiPos ? '' : ' neg'}" style="width:${roiPct}%;"></div></div>
       <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:6px;">
-        <span>투자 ${fmtMShort(totalInvest)}</span><span>회수 ${fmtMShort(totalPrize)}</span>
+        <span>투자 ${fmtMFull(totalInvest)}</span><span>회수 ${fmtMFull(totalPrize)}</span>
       </div>
     </div>
     <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">등수별 당첨 이력</div>
@@ -1738,9 +1787,9 @@ function renderStats() {
       <tbody>
         <tr><td><b style="color:var(--lotto-red);">1등</b></td><td>6개 일치</td><td style="font-weight:700;">${rankCounts[1]}회</td><td style="font-size:11px;color:var(--text-muted);">평균 20~30억</td></tr>
         <tr><td><b style="color:#a855f7;">2등</b></td><td>5개+보너스</td><td style="font-weight:700;">${rankCounts[2]}회</td><td style="font-size:11px;color:var(--text-muted);">약 5천만원</td></tr>
-        <tr><td><b style="color:var(--b-green);">3등</b></td><td>5개 일치</td><td style="font-weight:700;">${rankCounts[3]}회</td><td style="font-size:11px;color:var(--text-muted);">약 150만원</td></tr>
-        <tr><td>4등</td><td>4개 일치</td><td style="font-weight:700;">${rankCounts[4]}회</td><td style="font-size:11px;color:var(--text-muted);">5만원</td></tr>
-        <tr><td>5등</td><td>3개 일치</td><td style="font-weight:700;">${rankCounts[5]}회</td><td style="font-size:11px;color:var(--text-muted);">5천원</td></tr>
+        <tr><td><b style="color:var(--b-green);">3등</b></td><td>5개 일치</td><td style="font-weight:700;">${rankCounts[3]}회</td><td style="font-size:11px;color:var(--text-muted);">약 150만원 (변동)</td></tr>
+        <tr><td>4등</td><td>4개 일치</td><td style="font-weight:700;">${rankCounts[4]}회</td><td style="font-size:11px;color:var(--text-muted);">고정 50,000원</td></tr>
+        <tr><td>5등</td><td>3개 일치</td><td style="font-weight:700;">${rankCounts[5]}회</td><td style="font-size:11px;color:var(--text-muted);">고정 5,000원</td></tr>
       </tbody>
     </table>
     ${isMock ? '<div style="margin-top:14px;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:6px;text-align:center;font-size:12px;color:var(--text-muted);">QR 인증 탭에서 실제 복권 QR을 등록하면 전적이 자동으로 기록됩니다</div>' : ''}
@@ -1803,7 +1852,7 @@ function feedItemHtml(a) {
   };
   const labels = {
     qr_register: d => `${d.games||1}게임 QR 등록 완료 (${d.round}회)`,
-    win:         d => `${d.rank}등 당첨! ${fmtMShort(d.prize||0)} 인증`,
+    win:         d => `${d.rank}등 당첨! ${fmtMFull(d.prize||0)} 인증`,
     badge:       d => `뱃지 획득 — ${d.badge_name}`,
     rank_enter:  d => `${d.category} 랭킹 진입`,
   };
@@ -1955,7 +2004,7 @@ async function renderRank(catId) {
       buy_count:   { field: s => s.total_tickets || 0, unit: '회', label: '구매 횟수' },
       qr_count:    { field: s => s.total_wins || 0,    unit: '회', label: '당첨 횟수' },
       roi:         { field: s => s.total_spent > 0 ? Math.round((s.total_prize - s.total_spent) / s.total_spent * 100) : -100, unit: '%', label: 'ROI', fmt: v => (v >= 0 ? '+' : '') + v + '%' },
-      total_prize: { field: s => s.total_prize || 0,   unit: '',   label: '총 당첨금', fmt: v => fmtMShort(v) },
+      total_prize: { field: s => s.total_prize || 0,   unit: '',   label: '총 당첨금', fmt: v => fmtMFull(v) },
       rank5:       { field: s => s.rank_5_count || 0,  unit: '회', label: '5등 횟수' },
       rank3:       { field: s => (s.rank_1_count||0)+(s.rank_3_count||0), unit: '회', label: '3등 이상' },
     };
@@ -2018,22 +2067,22 @@ function renderCommunityList() {
     </div>`;
     return;
   }
-  const heartSvg = \`<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>\`;
-  const chatSvg = \`<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>\`;
+  const heartSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+  const chatSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
   $('community-content').innerHTML = posts.map(p => {
     const liked = myLikedPostIds.has(p.id);
-    return \`<div class="post-card" onclick="openPostDetail('\${p.id}')">
+    return `<div class="post-card" onclick="openPostDetail('${p.id}')">
       <div class="post-card-top">
-        <span class="post-tag-chip \${p.tag==='free'?'tag-free':'tag-verify'}">\${p.tag==='free'?'자유':'인증'}</span>
-        <span class="post-card-title">\${p.title.replace(/</g,'&lt;')}</span>
+        <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='free'?'자유':'인증'}</span>
+        <span class="post-card-title">${p.title.replace(/</g,'&lt;')}</span>
       </div>
       <div class="post-card-stats">
-        <span>\${p.nickname}</span>
-        <span>\${timeAgo(p.created_at)}</span>
-        <span style="\${liked?'color:var(--lotto-red);':''}">\${heartSvg} \${p.likes||0}</span>
-        <span>\${chatSvg} \${p.comment_count||0}</span>
+        <span>${p.nickname}</span>
+        <span>${timeAgo(p.created_at)}</span>
+        <span style="${liked?'color:var(--lotto-red);':''}">${heartSvg} ${p.likes||0}</span>
+        <span>${chatSvg} ${p.comment_count||0}</span>
       </div>
-    </div>\`;
+    </div>`;
   }).join('');
 }
 
@@ -2226,6 +2275,113 @@ async function changeNickname() {
   renderProfile();
 }
 
+// ══════════════════════════════════════════════
+// 관리자 패널
+// ══════════════════════════════════════════════
+const ADMIN_TABS = { users:'users', tickets:'tickets', posts:'posts', stats:'stats' };
+let currentAdminTab = 'users';
+
+async function renderAdmin() {
+  const isAdmin = isLoggedIn && currentUser?.email === ADMIN_EMAIL;
+  $('admin-gate').style.display = isAdmin ? 'none' : '';
+  $('admin-content').style.display = isAdmin ? '' : 'none';
+  if (!isAdmin) return;
+  await loadAdminStats();
+  await adminTab('users');
+}
+
+async function loadAdminStats() {
+  try {
+    const [uRes, tRes, pRes, sRes] = await Promise.all([
+      sb.from('users').select('id', { count: 'exact', head: true }),
+      sb.from('tickets').select('id', { count: 'exact', head: true }),
+      sb.from('posts').select('id', { count: 'exact', head: true }),
+      sb.from('user_stats').select('total_prize'),
+    ]);
+    $('adm-kpi-users').textContent = fmtCnt(uRes.count || 0) + '명';
+    $('adm-kpi-tickets').textContent = fmtCnt(tRes.count || 0) + '개';
+    $('adm-kpi-posts').textContent = fmtCnt(pRes.count || 0) + '개';
+    const totalPrize = (sRes.data || []).reduce((a, r) => a + (r.total_prize || 0), 0);
+    $('adm-kpi-prize').textContent = fmtMShort(totalPrize);
+  } catch (e) {
+    console.warn('admin stats error', e);
+  }
+}
+
+async function adminTab(tab, btn) {
+  currentAdminTab = tab;
+  document.querySelectorAll('#admin-content .rank-tab-pill').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  const wrap = $('admin-table-wrap');
+  wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px;">로딩 중...</div>';
+  try {
+    if (tab === 'users') {
+      const { data } = await sb.from('users').select('id,email,nickname,created_at').order('created_at', { ascending: false }).limit(50);
+      if (!data || !data.length) { wrap.innerHTML = adminEmpty('회원이 없습니다'); return; }
+      wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
+        <th>#</th><th>닉네임</th><th>이메일</th><th>가입일</th>
+      </tr></thead><tbody>${data.map((u,i) => `<tr>
+        <td>${i+1}</td>
+        <td style="font-weight:700;">${u.nickname||'-'}</td>
+        <td style="font-size:11px;color:var(--text-muted);">${u.email||'-'}</td>
+        <td style="font-size:11px;color:var(--text-muted);">${u.created_at?u.created_at.slice(0,10):'-'}</td>
+      </tr>`).join('')}</tbody></table>`;
+    } else if (tab === 'tickets') {
+      const { data } = await sb.from('tickets').select('id,drw_no,created_at,users(nickname),game_count,prize_amount').order('created_at', { ascending: false }).limit(100);
+      if (!data || !data.length) { wrap.innerHTML = adminEmpty('등록된 티켓이 없습니다'); return; }
+      wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
+        <th>#</th><th>회원</th><th>회차</th><th>게임수</th><th>당첨금</th><th>등록일</th>
+      </tr></thead><tbody>${data.map((t,i) => `<tr>
+        <td>${i+1}</td>
+        <td style="font-weight:700;">${t.users?.nickname||'-'}</td>
+        <td>${t.drw_no||'-'}회</td>
+        <td>${fmtCnt(t.game_count||0)}게임</td>
+        <td style="color:var(--lotto-red);font-weight:700;">${fmtMShort(t.prize_amount||0)}</td>
+        <td style="font-size:11px;color:var(--text-muted);">${t.created_at?t.created_at.slice(0,10):'-'}</td>
+      </tr>`).join('')}</tbody></table>`;
+    } else if (tab === 'posts') {
+      const { data } = await sb.from('posts').select('id,title,nickname,tag,likes,comment_count,created_at').order('created_at', { ascending: false }).limit(50);
+      if (!data || !data.length) { wrap.innerHTML = adminEmpty('게시글이 없습니다'); return; }
+      wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
+        <th>#</th><th>제목</th><th>작성자</th><th>구분</th><th>좋아요</th><th>댓글</th><th>작성일</th>
+      </tr></thead><tbody>${data.map((p,i) => `<tr>
+        <td>${i+1}</td>
+        <td style="font-weight:700;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(p.title||'').replace(/</g,'&lt;')}</td>
+        <td>${p.nickname||'-'}</td>
+        <td><span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='free'?'자유':'인증'}</span></td>
+        <td>${p.likes||0}</td>
+        <td>${p.comment_count||0}</td>
+        <td style="font-size:11px;color:var(--text-muted);">${p.created_at?p.created_at.slice(0,10):'-'}</td>
+      </tr>`).join('')}</tbody></table>`;
+    } else if (tab === 'stats') {
+      const { data } = await sb.from('user_stats').select('users(nickname),total_tickets,total_spent,total_prize,total_wins,best_rank,rank_1_count').order('total_prize', { ascending: false }).limit(30);
+      if (!data || !data.length) { wrap.innerHTML = adminEmpty('전적 데이터가 없습니다'); return; }
+      wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
+        <th>#</th><th>회원</th><th>구매게임</th><th>구매금액</th><th>당첨금</th><th>ROI</th><th>최고등수</th><th>1등횟수</th>
+      </tr></thead><tbody>${data.map((s,i) => {
+        const roi = s.total_spent > 0 ? ((s.total_prize - s.total_spent) / s.total_spent * 100).toFixed(1) : '-';
+        const roiColor = roi !== '-' && parseFloat(roi) >= 0 ? '#10b981' : '#ef4444';
+        return `<tr>
+          <td>${i+1}</td>
+          <td style="font-weight:700;">${s.users?.nickname||'-'}</td>
+          <td>${fmtCnt(s.total_tickets||0)}게임</td>
+          <td>${fmtMShort(s.total_spent||0)}</td>
+          <td style="color:var(--lotto-red);font-weight:700;">${fmtMShort(s.total_prize||0)}</td>
+          <td style="color:${roiColor};font-weight:700;">${roi !== '-' ? (parseFloat(roi) >= 0 ? '+' : '') + roi + '%' : '-'}</td>
+          <td>${s.best_rank ? s.best_rank + '등' : '-'}</td>
+          <td>${fmtCnt(s.rank_1_count||0)}회</td>
+        </tr>`;
+      }).join('')}</tbody></table>`;
+    }
+  } catch (e) {
+    wrap.innerHTML = `<div style="color:var(--b-red);font-size:12px;padding:12px;">오류: ${e.message}</div>`;
+  }
+}
+
+function adminEmpty(msg) {
+  return `<div style="text-align:center;padding:40px 20px;font-size:13px;color:var(--text-muted);">${msg}</div>`;
+}
+
 function renderProfile() {
   const nick = $('user-name').textContent;
   const totalBuy = (isLoggedIn && dbStats) ? (dbStats.total_tickets || 0) : MY.length;
@@ -2242,7 +2398,7 @@ function renderProfile() {
       <div class="profile-stat-cell"><div class="profile-stat-val">${totalBuy}</div><div class="profile-stat-lbl">총 구매</div></div>
       <div class="profile-stat-cell"><div class="profile-stat-val">${qrCount}</div><div class="profile-stat-lbl">QR 인증</div></div>
       <div class="profile-stat-cell"><div class="profile-stat-val">${earnedCount}</div><div class="profile-stat-lbl">보유 뱃지</div></div>
-      <div class="profile-stat-cell"><div class="profile-stat-val" style="font-size:15px;">${fmtMShort(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</div><div class="profile-stat-lbl">총 당첨금</div></div>
+      <div class="profile-stat-cell"><div class="profile-stat-val" style="font-size:13px;font-weight:900;">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</div><div class="profile-stat-lbl">총 당첨금</div></div>
     </div>
     <div class="profile-block">
       <div class="profile-block-title">계정 정보</div>
@@ -2252,8 +2408,8 @@ function renderProfile() {
     </div>
     <div class="profile-block">
       <div class="profile-block-title">나의 활동 요약</div>
-      <div class="profile-row"><span>총 구매 금액</span><span class="profile-row-val">${fmtM(isLoggedIn&&dbStats?dbStats.total_spent||0:totalBuy*1000)}</span></div>
-      <div class="profile-row"><span>총 당첨 금액</span><span class="profile-row-val" style="color:var(--lotto-red);font-weight:700;">${fmtM(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</span></div>
+      <div class="profile-row"><span>총 구매 금액</span><span class="profile-row-val">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_spent||0:totalBuy*1000)}</span></div>
+      <div class="profile-row"><span>총 당첨 금액</span><span class="profile-row-val" style="color:var(--lotto-red);font-weight:700;">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</span></div>
       <div class="profile-row"><span>ROI</span><span class="profile-row-val" style="color:${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0&&(prz-inv)/inv*100>=0?'#10b981':'#ef4444';})()};font-weight:700;">${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0?(((prz-inv)/inv*100).toFixed(1)+'%'):'-';})()}</span></div>
       <div class="profile-row"><span>최고 등수</span><span class="profile-row-val">${isLoggedIn&&dbStats&&dbStats.best_rank?dbStats.best_rank+'등':'-'}</span></div>
       <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
