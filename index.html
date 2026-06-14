@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LottoBank | QR 기반 로또 인증 & 전적 관리</title>
+<title>LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Courier+New&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -197,18 +197,18 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 <header>
   <div class="nav-container">
     <div class="logo-area">
-      <div class="logo-title">LottoBank <span>| QR 인증 플랫폼</span></div>
+      <div class="logo-title">LottoBank <span>| 로또 전적 & 당첨 인증</span></div>
     </div>
     <div class="menu-tabs">
-      <button id="m-home" class="menu-btn on" onclick="go('home')">종합 데스크</button>
-      <button id="m-result" class="menu-btn" onclick="go('result')">회차별 조회</button>
-      <button id="m-ticket" class="menu-btn" onclick="go('ticket')">번호 추천 &amp; QR인증</button>
-      <button id="m-fortune" class="menu-btn" onclick="go('fortune')">투자 가이드</button>
-      <button id="m-stats" class="menu-btn" onclick="go('stats')">전적</button>
+      <button id="m-home" class="menu-btn on" onclick="go('home')">홈</button>
+      <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
+      <button id="m-ticket" class="menu-btn" onclick="go('ticket')">QR 인증</button>
+      <button id="m-fortune" class="menu-btn" onclick="go('fortune')">번호 분석</button>
+      <button id="m-stats" class="menu-btn" onclick="go('stats')">나의 전적</button>
       <button id="m-badge" class="menu-btn" onclick="go('badge')">뱃지</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
-      <button id="m-profile" class="menu-btn" onclick="go('profile')">프로필</button>
+      <button id="m-profile" class="menu-btn" onclick="go('profile')">내 프로필</button>
     </div>
     <div class="auth-zone">
       <span id="api-indicator" class="api-status loading">API 로딩중...</span>
@@ -224,7 +224,7 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 <main>
   <!-- 좌측: 실시간 분석 스코어보드 -->
   <section class="panel">
-    <div class="panel-header">📊 실시간 분석 데스크</div>
+    <div class="panel-header">📊 최신 당첨 현황</div>
     <div class="panel-body" style="display:flex; flex-direction:column; gap:15px;">
       <div class="lotto-slip">
         <div class="slip-header">
@@ -238,19 +238,19 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
         </div>
       </div>
 
-      <div style="font-size:13px; font-weight:700; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">내 구매 현황</div>
+      <div style="font-size:13px; font-weight:700; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">내 통계</div>
       <div class="stats-grid">
-        <div class="stats-box"><div class="stats-label">총 구매 금액</div><div id="h-cost" class="stats-value" style="color:var(--b-red);">0원</div></div>
-        <div class="stats-box"><div class="stats-label">총 당첨 금액</div><div id="h-earned" class="stats-value" style="color:var(--b-green);">0원</div></div>
-        <div class="stats-box"><div class="stats-label">저장 추천번호</div><div id="h-total" class="stats-value">0게임</div></div>
-        <div class="stats-box"><div class="stats-label">인증된 타이틀</div><div id="h-best-badge" class="stats-value" style="font-size:12px;">없음</div></div>
+        <div class="stats-box"><div class="stats-label">누적 구매 금액</div><div id="h-cost" class="stats-value" style="color:var(--b-red);">0원</div></div>
+        <div class="stats-box"><div class="stats-label">누적 당첨 금액</div><div id="h-earned" class="stats-value" style="color:var(--b-green);">0원</div></div>
+        <div class="stats-box"><div class="stats-label">저장된 번호</div><div id="h-total" class="stats-value">0게임</div></div>
+        <div class="stats-box"><div class="stats-label">획득 뱃지</div><div id="h-best-badge" class="stats-value" style="font-size:12px;">없음</div></div>
       </div>
     </div>
   </section>
 
   <!-- 가운데: 탭별 메인 콘텐츠 -->
   <section class="panel">
-    <div id="mid-title" class="panel-header">🧾 저장된 추천번호 보관함</div>
+    <div id="mid-title" class="panel-header">📋 내 번호 보관함</div>
     <div class="panel-body" style="background:#f8fafc;">
 
       <!-- 1. 종합 데스크 -->
@@ -273,10 +273,10 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 
       <!-- 3. 번호 추천 & QR 인증 -->
       <div id="pg-ticket" class="page-content" style="display:none;">
-        <div style="font-size:12px; font-weight:700; margin-bottom:5px; color:var(--lotto-purple);">[옵션 1] 분석 기반 번호 추천</div>
+        <div style="font-size:12px; font-weight:700; margin-bottom:5px; color:var(--lotto-purple);">번호 선택 방식</div>
         <select id="add-mode" onchange="chgMode()" class="select-custom">
-          <option value="auto">📈 최근 패턴 기반 추천번호 (실제 데이터)</option>
-          <option value="manual">✍️ 직접 번호 입력 후 비교</option>
+          <option value="auto">📈 최근 패턴 분석 기반 자동 추천</option>
+          <option value="manual">✍️ 직접 번호 입력</option>
         </select>
         <div id="manual-panel" style="display:none; margin-bottom:12px;">
           <div class="omr-grid" id="omr-buttons"></div>
@@ -284,8 +284,8 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
         </div>
         <button class="btn-action" onclick="saveT()" style="margin-bottom:20px;">💾 추천번호 보관함에 저장</button>
 
-        <div style="font-size:12px; font-weight:700; margin-bottom:5px; color:var(--lotto-red); border-top:1px solid #cbd5e1; padding-top:15px;">[옵션 2] 실제 로또 영수증 QR 고유 타이틀 인증</div>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">동행복권 모바일 QR 주소를 입력하면 실제 당첨번호와 대조하여 정확한 등수 뱃지를 부여합니다. (중복 방지)</p>
+        <div style="font-size:12px; font-weight:700; margin-bottom:5px; color:var(--lotto-red); border-top:1px solid #cbd5e1; padding-top:15px;">실물 로또 QR 당첨 인증</div>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">동행복권 앱의 구매 QR 주소를 입력하면 실제 당첨번호와 대조해 등수를 자동 확인하고 인증 뱃지를 부여합니다.</p>
         <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">예시: <code style="background:#f1f5f9;padding:2px 4px;border-radius:2px;">https://m.dhlottery.co.kr/qr.do?method=winQr&v=1122q030621303444</code></p>
         <input type="text" id="qr-url-input" class="input-custom" placeholder="동행복권 QR URL 붙여넣기...">
         <button class="btn-action" onclick="verifyRealQR()" style="background:#1e293b;">🔍 실제 당첨 영수증 인증하기</button>
@@ -295,11 +295,11 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
       <!-- 4. 투자 가이드 -->
       <div id="pg-fortune" class="page-content" style="display:none;">
         <div class="lotto-slip" style="background:#fff; line-height:1.7; font-size:13px;">
-          <h4 style="color:var(--lotto-red); font-weight:900; margin-bottom:10px;">💡 번호 분석 가이드</h4>
+          <h4 style="color:var(--lotto-red); font-weight:900; margin-bottom:10px;">📊 당첨 번호 출현 패턴 분석</h4>
           <div id="fortune-content">
-            <p>• 실제 동행복권 API 데이터 기반으로 최신 패턴을 분석합니다.</p>
-            <p style="margin-top:5px;">• <strong>커뮤니티 팁:</strong> QR 인증 뱃지가 있는 유저의 회차+등수 정보는 실제 당첨번호와 대조 완료된 검증 정보입니다.</p>
-            <p style="margin-top:5px;">• <strong>참고:</strong> 로또는 확률 게임입니다. 번호 분석은 참고 자료로만 활용하세요.</p>
+            <p>• 동행복권 공식 API 데이터를 기반으로 최근 회차 번호 패턴을 분석합니다.</p>
+            <p style="margin-top:5px;">• <strong>인증 데이터 기반:</strong> QR 인증 완료 회원의 당첨 이력은 실제 구매 데이터로만 기록됩니다.</p>
+            <p style="margin-top:5px;">• <strong>안내:</strong> 번호 분석은 통계적 참고 자료입니다. 당첨을 보장하지 않습니다.</p>
           </div>
           <div id="fortune-stats" style="margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:12px;"></div>
         </div>
@@ -344,12 +344,11 @@ main { max-width: 1500px; margin: 20px auto; padding: 0 20px; display: grid; gri
 
   <!-- 우측: 라이브 커뮤니티 -->
   <section class="panel">
-    <div class="panel-header">💬 실시간 커뮤니티</div>
+    <div class="panel-header">💬 커뮤니티 피드</div>
     <div style="display:flex; flex-direction:column; height:calc(100% - 49px);">
       <div class="chat-messages" id="chat-box">
-        <div class="chat-row"><span class="badge b-guest">일반</span><span class="chat-user">시스템:</span><br><span class="chat-text">동행복권 API 연동 버전입니다. QR 인증 시 실제 당첨번호와 대조합니다.</span></div>
-        <div class="chat-row"><span class="badge b-guest">일반</span><span class="chat-user">로또는기세다:</span><br><span class="chat-text">QR 인증 어떻게 하나요?</span></div>
-        <div class="chat-row"><span class="badge b-guest">일반</span><span class="chat-user">시스템:</span><br><span class="chat-text">동행복권 앱에서 구매이력 → QR코드 → URL 복사 후 [번호추천&QR인증] 탭에 붙여넣으세요.</span></div>
+        <div class="chat-row"><span class="badge b-guest">공지</span><span class="chat-user">LottoBank:</span><br><span class="chat-text">실제 구매 QR 코드로 당첨 여부를 인증하고 전적을 기록하세요.</span></div>
+        <div class="chat-row"><span class="badge b-guest">일반</span><span class="chat-user">번호수집가:</span><br><span class="chat-text">QR 인증 탭에서 동행복권 앱 QR 주소 붙여넣으면 자동으로 등수 확인됩니다 👍</span></div>
       </div>
       <div class="chat-input-area">
         <input type="text" id="chat-input" class="chat-input" placeholder="로그인 후 실시간 대화에 참여해보세요." onkeyup="if(event.key==='Enter')sendChat()" disabled>
@@ -853,13 +852,13 @@ function go(id) {
   $('pg-' + id).style.display = 'block';
   $('m-' + id).classList.add('on');
   const titles = {
-    home:      '🧾 저장된 추천번호 보관함',
-    result:    '🔍 회차별 추첨 기록 상세 조회',
-    ticket:    '📈 번호 추천 & 실물 인증',
-    fortune:   '💡 오늘의 종합 투자 리포트',
-    stats:     '📊 나의 전적 현황',
-    badge:     '🏅 뱃지 컬렉션',
-    rank:      '🏆 랭킹보드',
+    home:      '📋 내 번호 보관함',
+    result:    '🔍 회차별 당첨 번호 조회',
+    ticket:    '🎯 QR 인증 & 번호 저장',
+    fortune:   '📊 번호 출현 패턴 분석',
+    stats:     '📈 나의 전적',
+    badge:     '🏅 획득 뱃지',
+    rank:      '🏆 전체 랭킹',
     community: '💬 커뮤니티',
     profile:   '👤 내 프로필',
   };
@@ -1178,4 +1177,19 @@ function renderProfile() {
       <div class="profile-block-title">나의 활동 요약</div>
       <div class="profile-row"><span>추천번호 저장</span><span class="profile-row-val">${MY.length}게임</span></div>
       <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
-      <div class="profile-row
+      <div class="profile-row"><span>획득 뱃지</span><span class="profile-row-val">${earnedCount} / ${BADGE_DEFS.length}개</span></div>
+    </div>
+    <div class="profile-block">
+      <div class="profile-block-title">설정 (2단계 개발 예정)</div>
+      <div class="profile-row" style="color:var(--text-muted);"><span>닉네임 변경</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
+      <div class="profile-row" style="color:var(--text-muted);"><span>알림 설정</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
+      <div class="profile-row" style="color:var(--text-muted);"><span>데이터 내보내기</span><span style="font-size:12px;">🔒 로그인 연동 후 제공</span></div>
+    </div>
+    ${!isLoggedIn ? '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [가상 로그인] 버튼을 눌러 서비스를 이용해보세요</div>' : ''}
+  `;
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
