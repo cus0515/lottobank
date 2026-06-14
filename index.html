@@ -122,6 +122,11 @@ main.chat-hidden .chat-panel { display: none; }
 .badge.b-real-3 { background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 0 5px rgba(16,185,129,0.4); }
 .badge.b-guest { background: #94a3b8; color: #fff; font-weight: 500; }
 .badge.b-system { background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; font-weight:900; animation: neonGold 2s ease-in-out infinite alternate; }
+.emoji-gap { margin-right: 6px; }
+.adm-edit-row { background: #fffbeb; }
+.adm-input { width:100%; padding:4px 6px; border:1px solid #fbbf24; border-radius:4px; font-size:11px; box-sizing:border-box; }
+.adm-save-btn { padding:3px 10px; background:#16a34a; color:#fff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.adm-cancel-btn { padding:3px 8px; background:#e2e8f0; color:#475569; border:none; border-radius:4px; font-size:11px; cursor:pointer; margin-left:4px; }
 @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
 @keyframes neonRed { 0% { box-shadow: 0 0 6px rgba(239,68,68,0.6), 0 0 12px rgba(239,68,68,0.2); } 100% { box-shadow: 0 0 14px rgba(239,68,68,0.9), 0 0 28px rgba(239,68,68,0.5); } }
 @keyframes neonPurple { 0% { box-shadow: 0 0 5px rgba(168,85,247,0.4); } 100% { box-shadow: 0 0 12px rgba(168,85,247,0.8), 0 0 22px rgba(168,85,247,0.4); } }
@@ -489,7 +494,7 @@ main.chat-hidden .chat-panel { display: none; }
           </div>
           <div style="padding:10px;background:#fff5f5;border:1px dashed #fca5a5;border-radius:7px;text-align:center;">
             <div style="font-size:11px;color:#64748b;line-height:1.6;margin-bottom:8px;">QR 인증으로 내 로또 전적을<br>데이터로 관리해보세요</div>
-            <button onclick="showAuthModal()" style="background:#dc2626;color:#fff;border:none;border-radius:5px;padding:7px 16px;font-size:12px;font-weight:900;cursor:pointer;">1분만에 시작하기 →</button>
+            <button onclick="showAuthModal()" style="background:#dc2626;color:#fff;border:none;border-radius:5px;padding:7px 16px;font-size:12px;font-weight:900;cursor:pointer;">1분만에 시작하기  →</button>
           </div>
         </div>
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;">
@@ -1644,7 +1649,7 @@ function appendChatRow(msg) {
   const esc = t => (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   if (msg.is_system || msg.nickname === 'LottoBank') {
     row.className = 'chat-system-row';
-    row.innerHTML = `<span class="badge b-system">시스템</span><span style="font-size:12px;color:#92400e;font-weight:700;">${esc(msg.message)}</span>`;
+    row.innerHTML = `<span class="badge b-system"> 시스템</span><span style="font-size:12px;color:#92400e;font-weight:700;">${esc(msg.message)}</span>`;
   } else {
     row.className = 'chat-row';
     row.innerHTML = `${getChatBadgeHtml(msg.verified_title)}<span class="chat-user">${esc(msg.nickname)}:</span><br><span class="chat-text">${esc(msg.message)}</span>`;
@@ -2768,25 +2773,31 @@ async function adminTab(tab, btn) {
       const { data } = await sb.from('users').select('id,email,nickname,created_at').order('created_at', { ascending: false }).limit(50);
       if (!data || !data.length) { wrap.innerHTML = adminEmpty('회원이 없습니다'); return; }
       wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
-        <th>#</th><th>닉네임</th><th>이메일</th><th>가입일</th>
-      </tr></thead><tbody>${data.map((u,i) => `<tr>
+        <th>#</th><th>닉네임</th><th>이메일</th><th>가입일</th><th style="width:60px;">수정</th>
+      </tr></thead><tbody>${data.map((u,i) => `<tr id="urow-${u.id}">
         <td>${i+1}</td>
-        <td style="font-weight:700;">${u.nickname||'-'}</td>
+        <td style="font-weight:700;" id="unick-${u.id}">${u.nickname||'-'}</td>
         <td style="font-size:11px;color:var(--text-muted);">${u.email||'-'}</td>
         <td style="font-size:11px;color:var(--text-muted);">${u.created_at?u.created_at.slice(0,10):'-'}</td>
+        <td><button data-uid="${u.id}" data-nick="${u.nickname||''}" data-email="${u.email||''}" onclick="adminEditUser(this.dataset.uid,this.dataset.nick,this.dataset.email)" style="padding:3px 8px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
       </tr>`).join('')}</tbody></table>`;
     } else if (tab === 'tickets') {
       const { data } = await sb.from('tickets').select('id,drw_no,created_at,users(nickname),game_count,prize_amount').order('created_at', { ascending: false }).limit(100);
       if (!data || !data.length) { wrap.innerHTML = adminEmpty('등록된 티켓이 없습니다'); return; }
-      wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
-        <th>#</th><th>회원</th><th>회차</th><th>게임수</th><th>당첨금</th><th>등록일</th>
-      </tr></thead><tbody>${data.map((t,i) => `<tr>
+      wrap.innerHTML = `<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">각 행의 수정 버튼으로 당첨금·게임수 직접 편집 가능합니다</div>
+      <table class="rank-board-table"><thead><tr>
+        <th>#</th><th>회원</th><th>회차</th><th>게임수</th><th>당첨금</th><th>등록일</th><th style="width:80px;">수정/삭제</th>
+      </tr></thead><tbody>${data.map((t,i) => `<tr id="trow-${t.id}">
         <td>${i+1}</td>
         <td style="font-weight:700;">${t.users?.nickname||'-'}</td>
-        <td>${t.drw_no||'-'}회</td>
-        <td>${fmtCnt(t.game_count||0)}게임</td>
-        <td style="color:var(--lotto-red);font-weight:700;">${fmtMShort(t.prize_amount||0)}</td>
+        <td id="tdrw-${t.id}">${t.drw_no||'-'}회</td>
+        <td id="tgame-${t.id}">${fmtCnt(t.game_count||0)}게임</td>
+        <td id="tprize-${t.id}" style="color:var(--lotto-red);font-weight:700;">${fmtMShort(t.prize_amount||0)}</td>
         <td style="font-size:11px;color:var(--text-muted);">${t.created_at?t.created_at.slice(0,10):'-'}</td>
+        <td style="display:flex;gap:4px;">
+          <button onclick="adminEditTicket('${t.id}',${t.drw_no||0},${t.game_count||0},${t.prize_amount||0})" style="padding:3px 6px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button>
+          <button onclick="adminDelete('tickets','${t.id}')" style="padding:3px 6px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;font-size:11px;cursor:pointer;">삭제</button>
+        </td>
       </tr>`).join('')}</tbody></table>`;
     } else if (tab === 'posts') {
       const { data } = await sb.from('posts').select('id,title,nickname,tag,likes,comment_count,created_at').order('created_at', { ascending: false }).limit(50);
@@ -2808,7 +2819,7 @@ async function adminTab(tab, btn) {
       // 임의 데이터 삽입 폼
       wrap.innerHTML = `
         <div style="font-size:12px;color:#92400e;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:10px 12px;margin-bottom:14px;">
-          ⚠️ 이 탭은 테스트 전용입니다. 실제 DB에 데이터가 삽입됩니다.
+          ⚠️  이 탭은 테스트 전용입니다. 실제 DB에 데이터가 삽입됩니다.
         </div>
 
         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:12px;">
@@ -2888,7 +2899,7 @@ async function adminTab(tab, btn) {
       const { data } = await sb.from('user_stats').select('users(nickname),total_tickets,total_spent,total_prize,total_wins,best_rank,rank_1_count').order('total_prize', { ascending: false }).limit(30);
       if (!data || !data.length) { wrap.innerHTML = adminEmpty('전적 데이터가 없습니다'); return; }
       wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
-        <th>#</th><th>회원</th><th>구매게임</th><th>구매금액</th><th>당첨금</th><th>ROI</th><th>최고등수</th><th>1등횟수</th>
+        <th>#</th><th>회원</th><th>구매게임</th><th>구매금액</th><th>당첨금</th><th>수익률</th><th>최고등수</th><th>1등횟수</th><th style="width:50px;">수정</th>
       </tr></thead><tbody>${data.map((s,i) => {
         const roi = s.total_spent > 0 ? ((s.total_prize - s.total_spent) / s.total_spent * 100).toFixed(1) : '-';
         const roiColor = roi !== '-' && parseFloat(roi) >= 0 ? '#10b981' : '#ef4444';
@@ -2901,6 +2912,7 @@ async function adminTab(tab, btn) {
           <td style="color:${roiColor};font-weight:700;">${roi !== '-' ? (parseFloat(roi) >= 0 ? '+' : '') + roi + '%' : '-'}</td>
           <td>${s.best_rank ? s.best_rank + '등' : '-'}</td>
           <td>${fmtCnt(s.rank_1_count||0)}회</td>
+          <td><button data-uid="${s.user_id}" data-nick="${s.users?.nickname||''}" data-tickets="${s.total_tickets||0}" data-spent="${s.total_spent||0}" data-prize="${s.total_prize||0}" data-wins="${s.total_wins||0}" data-best="${s.best_rank||0}" onclick="adminEditStat(this.dataset.uid,this.dataset.nick,+this.dataset.tickets,+this.dataset.spent,+this.dataset.prize,+this.dataset.wins,+this.dataset.best)" style="padding:3px 8px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
         </tr>`;
       }).join('')}</tbody></table>`;
     }
@@ -2924,6 +2936,113 @@ async function adminDelete(table, id) {
 
 function adminEmpty(msg) {
   return `<div style="text-align:center;padding:40px 20px;font-size:13px;color:var(--text-muted);">${msg}</div>`;
+}
+
+// 인라인 편집 함수들
+function adminEditUser(id, nick, email) {
+  const row = $(`urow-${id}`);
+  if (!row) return;
+  row.innerHTML = `
+    <td colspan="4">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:11px;font-weight:700;color:#64748b;">닉네임</span>
+        <input class="adm-input" id="edit-unick-${id}" value="${nick.replace(/"/g,'&quot;')}" style="width:120px;">
+        <button class="adm-save-btn" onclick="adminSaveUser('${id}')">저장</button>
+        <button class="adm-cancel-btn" onclick="adminTab('users')">취소</button>
+      </div>
+    </td><td></td>`;
+}
+
+async function adminSaveUser(id) {
+  const newNick = ($(`edit-unick-${id}`)?.value || '').trim();
+  if (!newNick) { toast('닉네임을 입력하세요'); return; }
+  try {
+    const { error } = await sb.from('profiles').update({ nickname: newNick }).eq('id', id);
+    if (error) throw error;
+    toast('✅ 닉네임 수정 완료');
+    adminTab('users');
+  } catch(e) { toast('❌ ' + e.message); }
+}
+
+function adminEditTicket(id, drwNo, games, prize) {
+  const row = $(`trow-${id}`);
+  if (!row) return;
+  row.className = 'adm-edit-row';
+  row.innerHTML = `
+    <td colspan="5">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0;">
+        <span style="font-size:11px;font-weight:700;color:#64748b;">회차</span>
+        <input class="adm-input" id="edit-tdrw-${id}" value="${drwNo}" style="width:60px;" type="number">
+        <span style="font-size:11px;font-weight:700;color:#64748b;">게임수</span>
+        <input class="adm-input" id="edit-tgame-${id}" value="${games}" style="width:55px;" type="number">
+        <span style="font-size:11px;font-weight:700;color:#64748b;">당첨금</span>
+        <input class="adm-input" id="edit-tprize-${id}" value="${prize}" style="width:90px;" type="number">
+        <button class="adm-save-btn" onclick="adminSaveTicket('${id}')">저장</button>
+        <button class="adm-cancel-btn" onclick="adminTab('tickets')">취소</button>
+      </div>
+    </td>
+    <td></td><td></td>`;
+}
+
+async function adminSaveTicket(id) {
+  const drwNo = parseInt($(`edit-tdrw-${id}`)?.value) || 0;
+  const games = parseInt($(`edit-tgame-${id}`)?.value) || 0;
+  const prize = parseInt($(`edit-tprize-${id}`)?.value) || 0;
+  try {
+    const { error } = await sb.from('tickets').update({ drw_no: drwNo, game_count: games, prize_amount: prize }).eq('id', id);
+    if (error) throw error;
+    toast('✅ 티켓 수정 완료');
+    adminTab('tickets');
+  } catch(e) { toast('❌ ' + e.message); }
+}
+
+function adminEditStat(uid, nick, tickets, spent, prize, wins, best) {
+  const wrap = $('admin-table-wrap');
+  // 모달 스타일 인라인 편집
+  const existing = document.getElementById('stat-edit-modal');
+  if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.id = 'stat-edit-modal';
+  div.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:20px;z-index:9999;min-width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.15);';
+  div.innerHTML = `
+    <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:12px;">전적 수정 — ${nick}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div><label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">구매 게임수</label>
+        <input id="sedit-tickets" type="number" value="${tickets}" class="adm-input"></div>
+      <div><label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">총 투자금</label>
+        <input id="sedit-spent" type="number" value="${spent}" class="adm-input"></div>
+      <div><label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">총 당첨금</label>
+        <input id="sedit-prize" type="number" value="${prize}" class="adm-input"></div>
+      <div><label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">총 당첨 횟수</label>
+        <input id="sedit-wins" type="number" value="${wins}" class="adm-input"></div>
+      <div><label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">최고 등수</label>
+        <input id="sedit-best" type="number" value="${best||''}" min="1" max="5" class="adm-input"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="adm-save-btn" onclick="adminSaveStat('${uid}')" style="flex:1;padding:8px;">저장</button>
+      <button class="adm-cancel-btn" onclick="document.getElementById('stat-edit-modal').remove()" style="padding:8px 14px;">취소</button>
+    </div>`;
+  document.body.appendChild(div);
+}
+
+async function adminSaveStat(uid) {
+  const patch = {
+    user_id: uid,
+    total_tickets: parseInt($('sedit-tickets')?.value) || 0,
+    total_spent:   parseInt($('sedit-spent')?.value)   || 0,
+    total_prize:   parseInt($('sedit-prize')?.value)   || 0,
+    total_wins:    parseInt($('sedit-wins')?.value)    || 0,
+  };
+  const best = parseInt($('sedit-best')?.value);
+  if (best >= 1 && best <= 5) patch.best_rank = best;
+  try {
+    const { error } = await sb.from('user_stats').upsert(patch, { onConflict: 'user_id' });
+    if (error) throw error;
+    document.getElementById('stat-edit-modal')?.remove();
+    toast('✅ 전적 수정 완료');
+    adminTab('stats');
+    await loadAdminStats();
+  } catch(e) { toast('❌ ' + e.message); }
 }
 
 async function adminInsertTicket() {
