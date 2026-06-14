@@ -1,13 +1,28 @@
 @echo off
 chcp 65001 > nul
+title LottoBank GitHub Push
 cd /d "%~dp0"
 
-echo Aborting any rebase in progress...
-git rebase --abort 2>nul
+echo ============================================
+echo  LottoBank GitHub Push
+echo ============================================
+echo.
 
-echo Force pushing to GitHub...
-git push --force origin main
+git add -A
+git status
+
+git diff --cached --quiet 2>nul
+if errorlevel 1 (
+    git commit -m "fix: lotto.js complete - build fix"
+    echo [OK] Commit done
+) else (
+    echo [OK] Nothing to commit
+)
+
+git push origin main
 
 echo.
 echo Done! https://github.com/cus0515/lottobank
+echo Cloudflare Pages rebuild: 1-2 min
+echo.
 pause
