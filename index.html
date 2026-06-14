@@ -942,12 +942,12 @@ async function chgRes() {
             </tr>`).join('');
         return `<div style="margin-bottom:8px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
           <div onclick="(function(el){var b=document.getElementById('sb-${uid}');var arr=el.querySelector('.sarr');if(b.style.display==='none'){b.style.display='';arr.textContent='▲';}else{b.style.display='none';arr.textContent='▼';}})(this)"
-               style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f8fafc;cursor:pointer;user-select:none;">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-              <span style="font-size:12px;font-weight:700;color:${color};">${emoji} ${title} (${stores.length}곳)</span>
-              <span style="font-size:11px;color:#64748b;">자동 <b style="color:${color};">${autoC}</b> / 수동 <b>${manC}</b></span>
+               style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f8fafc;cursor:pointer;user-select:none;gap:6px;">
+            <div style="min-width:0;flex:1;">
+              <div style="font-size:12px;font-weight:700;color:${color};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${emoji} ${title} (${stores.length}곳)</div>
+              <div style="font-size:11px;color:#64748b;margin-top:1px;white-space:nowrap;">자동 <b style="color:${color};">${autoC}</b> / 수동 <b>${manC}</b></div>
             </div>
-            <span class="sarr" style="font-size:10px;color:#94a3b8;">▲</span>
+            <span class="sarr" style="font-size:10px;color:#94a3b8;flex-shrink:0;">▲</span>
           </div>
           <div id="sb-${uid}">
             <div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div>
