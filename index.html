@@ -411,6 +411,13 @@ main.chat-hidden .chat-panel { display: none; }
     <div style="text-align:center">
       <button class="auth-switch" id="auth-switch" onclick="toggleAuthMode()">회원가입</button>
     </div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #e2e8f0;">
+      <div style="font-size:11px;color:#94a3b8;text-align:center;margin-bottom:8px;">관리자 전용</div>
+      <button onclick="adminTestLogin()" style="width:100%;padding:10px;background:#1e293b;color:#fff;font-size:13px;font-weight:700;border:none;border-radius:7px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        관리자 계정으로 검증 모드 시작
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1334,6 +1341,45 @@ document.addEventListener('click', e => {
 
 const ADMIN_EMAIL = 'jobdevil23@gmail.com';
 
+// ── 관리자 검증 모드 (Supabase 인증 우회, 기능 테스트용)
+let isAdminTestMode = false;
+
+function adminTestLogin() {
+  isAdminTestMode = true;
+  closeAuthModal();
+  // mock 관리자 유저 객체 생성
+  const mockUser = {
+    id: 'admin-test-00000000-0000-0000-0000-000000000000',
+    email: ADMIN_EMAIL,
+    user_metadata: { nickname: '관리자' },
+  };
+  // dbStats mock - 실제처럼 동작하도록
+  dbStats = {
+    total_tickets: 47,
+    total_spent: 47000,
+    total_prize: 15000,
+    total_wins: 3,
+    best_rank: 5,
+    rank_1_count: 0,
+    rank_2_count: 0,
+    rank_3_count: 0,
+    rank_4_count: 0,
+    rank_5_count: 3,
+  };
+  // mock QR 등록 이력
+  usedQrKeys = ['mock-qr-001', 'mock-qr-002', 'mock-qr-003'];
+  saveStorage();
+  applyLoginUI(mockUser);
+  // 헤더에 검증 모드 배지 표시
+  const badge = document.createElement('span');
+  badge.id = 'dev-mode-badge';
+  badge.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);background:#f59e0b;color:#000;font-size:11px;font-weight:900;padding:3px 12px;z-index:99999;border-radius:0 0 6px 6px;letter-spacing:0.3px;';
+  badge.textContent = '🔧 관리자 검증 모드';
+  document.body.appendChild(badge);
+  toast('🔧 관리자 검증 모드 시작. 모든 기능을 테스트할 수 있습니다');
+  go('admin');
+}
+
 function applyLoginUI(user) {
   isLoggedIn = true;
   const mp = document.getElementById('h-my-purchase');
@@ -1497,6 +1543,13 @@ let dbStats = null;
 
 async function loadUserDataFromDB() {
   if (!isLoggedIn || !currentUser) return;
+  if (isAdminTestMode) {
+    // 검증 모드: mock dbStats 이미 설정됨, UI만 업데이트
+    const nick = currentUser.user_metadata?.nickname || '관리자';
+    updateHeaderUser(nick, '🔐 관리자');
+    updateBadgeUI();
+    return;
+  }
   const uid = currentUser.id;
   try {
     const { data: profile } = await sb.from('profiles').select('nickname').eq('id', uid).single();
@@ -1543,6 +1596,12 @@ function calcPrizeAmount(rank, winData) {
 
 async function saveTicketToDB(parsed, winData, gameResults) {
   if (!isLoggedIn || !currentUser) return;
+  // 검증 모드에서는 Supabase 저장 스킵 (로컬만 처리)
+  if (isAdminTestMode) {
+    usedQrKeys.push(parsed.qrKey || parsed.url);
+    saveStorage();
+    return;
+  }
   try {
     const bestResult = gameResults.reduce((b, r) => r.rank < b.rank ? r : b, gameResults[0]);
     const totalPrize = gameResults.reduce((sum, r) => sum + calcPrizeAmount(r.rank, winData), 0);
@@ -1579,6 +1638,16 @@ async function saveTicketToDB(parsed, winData, gameResults) {
 
 async function upsertUserStats(gameCount, gameResults, totalPrize = 0, winData = null) {
   if (!isLoggedIn || !currentUser) return;
+  if (isAdminTestMode) {
+    // 검증 모드: dbStats 로컬 업데이트만
+    if (dbStats) {
+      dbStats.total_tickets = (dbStats.total_tickets || 0) + gameCount;
+      dbStats.total_spent   = (dbStats.total_spent   || 0) + gameCount * 1000;
+      dbStats.total_prize   = (dbStats.total_prize   || 0) + totalPrize;
+      if (totalPrize > 0) dbStats.total_wins = (dbStats.total_wins || 0) + 1;
+    }
+    return;
+  }
   const uid = currentUser.id;
   const c = dbStats || {};
   const winCount = gameResults.filter(r => r.rank <= 5).length;
@@ -1839,6 +1908,17 @@ function svgIcon(name, size=16, color='currentColor') {
 // =====================================================
 async function insertActivity(type, data = {}) {
   if (!isLoggedIn || !currentUser || !sb) return;
+  if (isAdminTestMode) {
+    // 검증 모드: 피드에 mock 아이템 추가
+    const mockAct = {
+      type, data, nick: '관리자',
+      created_at: new Date().toISOString(),
+      id: 'mock-' + Date.now(),
+    };
+    const fl = $('feed-list');
+    if (fl) fl.insertAdjacentHTML('afterbegin', feedItemHtml(mockAct));
+    return;
+  }
   try {
     const nick = currentUser.user_metadata?.nick || currentUser.email?.split('@')[0] || '익명';
     await sb.from('activity_feed').insert({ user_id: currentUser.id, nick, type, data });
@@ -2117,6 +2197,16 @@ async function writePost() {
   const text = inp.value.trim();
   if (!text) { toast('⚠️ 내용을 입력해주세요'); return; }
   const nick = $('user-name').textContent;
+  if (isAdminTestMode) {
+    // 검증 모드: 로컬 mock 게시글
+    const mockPost = { id: 'mock-post-' + Date.now(), user_id: currentUser.id, nickname: nick, tag: curCommTab, title: text, likes: 0, comment_count: 0, created_at: new Date().toISOString() };
+    if (!commPosts[curCommTab]) commPosts[curCommTab] = [];
+    commPosts[curCommTab].unshift(mockPost);
+    $('post-input').value = '';
+    renderCommunityList();
+    toast('✅ [검증] 게시글 등록됨 (mock)');
+    return;
+  }
   const { error } = await sb.from('posts').insert({
     user_id: currentUser.id,
     nickname: nick,
@@ -2228,6 +2318,20 @@ async function submitComment(postId) {
   const btn = document.querySelector('.comment-submit-btn');
   if (btn) { btn.disabled = true; btn.textContent = '등록 중...'; }
   try {
+    if (isAdminTestMode) {
+      if (inp) inp.value = '';
+      const mockCmt = { id: 'mock-cmt-' + Date.now(), post_id: postId, user_id: currentUser.id, nickname: nick, body, created_at: new Date().toISOString() };
+      const cl = $('comment-list');
+      if (cl) {
+        const existing = cl.innerHTML.includes('첫 댓글') ? '' : cl.innerHTML;
+        cl.innerHTML = existing + `<div class="comment-item"><div class="comment-nick">${mockCmt.nickname}</div><div class="comment-body">${mockCmt.body.replace(/</g,'&lt;')}</div><div class="comment-time">방금 전</div></div>`;
+        const lbl = $('comment-count-label');
+        if (lbl) { const n = parseInt(lbl.textContent.replace(/\D/g,''))||0; lbl.textContent = '(' + (n+1) + ')'; }
+      }
+      toast('✅ [검증] 댓글 등록됨 (mock)');
+      if (btn) { btn.disabled = false; btn.textContent = '등록'; }
+      return;
+    }
     await sb.from('comments').insert({ post_id: postId, user_id: currentUser.id, nickname: nick, body });
     // 게시글 comment_count 증가
     const cur = [...(commPosts.free||[]),...(commPosts.verify||[])].find(p=>String(p.id)===String(postId));
