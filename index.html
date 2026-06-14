@@ -514,7 +514,7 @@ main.chat-hidden .chat-panel { display: none; }
         <div id="profile-content"></div>
         <!-- 내 번호 보관함 (로그인 후) -->
         <div id="my-numbers-section" style="margin-top:14px;display:none;">
-          <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:8px;">📋 내 번호 보관함</div>
+          <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:8px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> 내 번호 보관함</div>
           <div id="ticket-feedback"></div>
           <div id="tl"></div>
         </div>
@@ -702,11 +702,11 @@ function makeRecommendedNums() {
 function checkWinRank(myNums, winNums, bonus) {
   const matched = myNums.filter(n => winNums.includes(n)).length;
   const hasBonus = myNums.includes(bonus);
-  if (matched === 6) return { rank: 1, label: '🎉 1등 당첨!', badge: '1등' };
-  if (matched === 5 && hasBonus) return { rank: 2, label: '🥈 2등 당첨!', badge: '2등' };
-  if (matched === 5) return { rank: 3, label: '🥉 3등 당첨!', badge: '3등' };
-  if (matched === 4) return { rank: 4, label: '🏅 4등 당첨', badge: null };
-  if (matched === 3) return { rank: 5, label: '🔹 5등 당첨', badge: null };
+  if (matched === 6) return { rank: 1, label: '1등 당첨!', badge: '1등' };
+  if (matched === 5 && hasBonus) return { rank: 2, label: '2등 당첨!', badge: '2등' };
+  if (matched === 5) return { rank: 3, label: '3등 당첨!', badge: '3등' };
+  if (matched === 4) return { rank: 4, label: '4등 당첨', badge: null };
+  if (matched === 3) return { rank: 5, label: '5등 당첨', badge: null };
   return { rank: 0, label: '낙첨', badge: null };
 }
 
@@ -883,7 +883,7 @@ function renderTicketFeedback(tk) {
   const match = tk.nums.filter(n => target.nums.includes(n));
   $('ticket-feedback').innerHTML = `<div class="ticket-feedback">
     방금 저장한 번호는 ${tk.drw}회 당첨번호와 ${match.length}개 일치합니다.
-    ${match.length === 6 ? '🎉 1등!' : match.length >= 3 ? `일치: ${match.join(', ')}번` : '아쉽네요!'}
+    ${match.length === 6 ? '1등 당첨!' : match.length >= 3 ? `일치: ${match.join(', ')}번` : '아쉽네요!'}
   </div>`;
 }
 
@@ -953,7 +953,7 @@ async function chgRes() {
       <div class="result-metric"><span>저/고</span><strong>${a.low}:${a.high}</strong></div>
       <div class="result-metric"><span>연속</span><strong>${a.seq ? a.seq + '쌍' : '없음'}</strong></div>
     </div>
-    <div id="store-section" style="margin-top:10px;"><div style="font-size:11px;color:#94a3b8;padding:4px 0;">📍 판매소 데이터 로딩 중...</div></div>
+    <div id="store-section" style="margin-top:10px;"><div style="font-size:11px;color:#94a3b8;padding:4px 0;"> 판매소 데이터 로딩 중...</div></div>
   `;
   // 1등/2등 판매소 비동기 로드
   fetch(`/api/lotto-region?round=${round}`, {cache: 'no-cache'})
@@ -1125,8 +1125,8 @@ async function verifyRealQR() {
   const summaryBorder = bestRank <= 2 ? '#86efac' : bestRank <= 5 ? '#93c5fd' : '#e2e8f0';
   const summaryColor = bestRank <= 2 ? '#166534' : bestRank <= 5 ? '#1e40af' : '#64748b';
   const summaryMsg   = bestRank <= 2
-    ? `🎉 ${bestLabel} 인증 완료! 뱃지가 활성화되었습니다`
-    : bestRank <= 5 ? `✅ ${bestLabel} 인증 완료`
+    ? `${bestLabel} 인증 완료! 뱃지가 활성화되었습니다`
+    : bestRank <= 5 ? `${bestLabel} 인증 완료`
     : '영수증 인증 완료 — 낙첨권입니다';
 
   $('qr-result-display').innerHTML = `
@@ -1457,11 +1457,12 @@ async function loadUserDataFromDB() {
 }
 
 function calcPrizeAmount(rank, winData) {
-  if (rank === 1) return winData.prize_1st || 0;
-  if (rank === 2) return 60000000;
-  if (rank === 3) return 1500000;
-  if (rank === 4) return 50000;
-  if (rank === 5) return 5000;
+  if (!winData) return 0;
+  if (rank === 1) return winData.prize_1st  || winData.firstWinamnt  || 0;
+  if (rank === 2) return winData.prize_2nd  || winData.rnk2WnAmt     || 60000000;
+  if (rank === 3) return winData.prize_3rd  || winData.rnk3WnAmt     || 1500000;
+  if (rank === 4) return winData.prize_4th  || winData.rnk4WnAmt     || 50000;
+  if (rank === 5) return winData.prize_5th  || winData.rnk5WnAmt     || 5000;
   return 0;
 }
 
@@ -1543,7 +1544,7 @@ function go(id) {
     if (btn) btn.classList.toggle('on', k === id);
   });
   const titles = {
-    home:      '📋 내 번호 보관함',
+    home:      '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> 내 번호 보관함',
     result:    '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 회차별 당첨 번호 조회',
     ticket:    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증 & 번호 저장',
     fortune:   '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> 번호 출현 패턴 분석',
@@ -1553,7 +1554,7 @@ function go(id) {
     community: '커뮤니티',
     profile:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필',
   };
-  $('mid-title').textContent = titles[id] || '';
+  $('mid-title').innerHTML = titles[id] || '';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(); }
   if (id === 'ticket')    { chgMode(); }
@@ -1700,6 +1701,7 @@ function renderStats() {
       <div class="kpi-box"><div class="kpi-label">총 당첨 횟수</div><div class="kpi-value blue">${winCount}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">당첨률 ${totalBuy > 0 ? (winCount/totalBuy*100).toFixed(1) : 0}%</div></div>
       <div class="kpi-box hl"><div class="kpi-label">총 당첨금</div><div class="kpi-value red">${fmtMShort(totalPrize)}</div><div class="kpi-sub">투자 대비 ${roi.toFixed(1)}%</div></div>
       <div class="kpi-box"><div class="kpi-label">최고 등수</div><div class="kpi-value">${bestLabel}</div><div class="kpi-sub">역대 최고 당첨 등수</div></div>
+      <div class="kpi-box hl"><div class="kpi-label">ROI</div><div class="kpi-value ${roiPos?'green':'red'}">${roiPos?'+':''}${roi.toFixed(1)}<span style="font-size:12px;font-weight:500;">%</span></div><div class="kpi-sub">투자 대비 수익률</div></div>
     </div>
     <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">ROI 분석</div>
     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:14px;">
@@ -1835,18 +1837,30 @@ function subscribeFeed() {
 // 뱃지 페이지
 // =====================================================
 const BADGE_DEFS = [
-  { id: 'first_reg',  icon: svgIcon('ticket',24,'#6366f1'), name: '첫 등록',    desc: '처음으로 QR을 등록했습니다',       cond: () => usedQrKeys.length >= 1 },
-  { id: 'first_win',  icon: '🎉', name: '첫 당첨',    desc: '처음으로 당첨을 경험했습니다',       cond: () => (dbStats?.total_wins || 0) >= 1 },
-  { id: 'reg_10',     icon: '📋', name: '인증 10회',  desc: 'QR을 10회 등록했습니다',           cond: () => usedQrKeys.length >= 10,  progress: () => [usedQrKeys.length, 10] },
-  { id: 'reg_50',     icon: '📦', name: '인증 50회',  desc: 'QR을 50회 등록했습니다',           cond: () => usedQrKeys.length >= 50,  progress: () => [usedQrKeys.length, 50] },
-  { id: 'game_100',   icon: svgIcon('qr',24,'#10b981'), name: '100게임',    desc: '100게임 이상 구매했습니다',          cond: () => MY.length >= 100,          progress: () => [MY.length, 100] },
-  { id: 'game_500',   icon: '⭐', name: '500게임',    desc: '500게임 이상 구매했습니다',          cond: () => MY.length >= 500,          progress: () => [MY.length, 500] },
-  { id: 'game_1000',  icon: '🔥', name: '1000게임',   desc: '1000게임 달성! 진정한 로또인',      cond: () => MY.length >= 1000,         progress: () => [MY.length, 1000] },
-  { id: 'rank5',      icon: '🔹', name: '5등 헌터',   desc: '5등 당첨 5회 이상',                cond: () => (dbStats?.rank_5_count || 0) >= 5, progress: () => [dbStats?.rank_5_count||0, 5] },
-  { id: 'rank4',      icon: svgIcon('medal',24,'#8b5cf6'), name: '4등 헌터',   desc: '4등 당첨 3회 이상',                cond: () => false },
-  { id: 'rank3',      icon: '🥉', name: '3등 수집가', desc: '3등 당첨 경험',                    cond: () => false },
-  { id: 'rank2',      icon: svgIcon('trophy',24,'#94a3b8'), name: '2등 인증자', desc: 'QR로 2등 인증 완료',               cond: () => myVerifiedTitle && myVerifiedTitle.includes('2등') },
-  { id: 'rank1',      icon: svgIcon('crown',24,'#f59e0b'), name: '1등 인증자', desc: 'QR로 1등 인증 완료 — 전설',        cond: () => myVerifiedTitle && myVerifiedTitle.includes('1등') },
+  { id: 'first_reg',  icon: svgIcon('ticket',24,'#6366f1'), name: '첫 등록',    desc: '처음으로 QR을 등록했습니다',
+    cond: () => usedQrKeys.length >= 1 },
+  { id: 'first_win',  icon: svgIcon('star',24,'#f59e0b'),   name: '첫 당첨',    desc: '처음으로 당첨을 경험했습니다',
+    cond: () => (dbStats?.total_wins || 0) >= 1 },
+  { id: 'reg_10',     icon: svgIcon('qr',24,'#3b82f6'),     name: '인증 10회',  desc: 'QR을 10회 등록했습니다',
+    cond: () => usedQrKeys.length >= 10,   progress: () => [usedQrKeys.length, 10] },
+  { id: 'reg_50',     icon: svgIcon('qr',24,'#6366f1'),     name: '인증 50회',  desc: 'QR을 50회 등록했습니다',
+    cond: () => usedQrKeys.length >= 50,   progress: () => [usedQrKeys.length, 50] },
+  { id: 'game_100',   icon: svgIcon('chart',24,'#10b981'),  name: '100게임',    desc: '100게임 이상 구매했습니다',
+    cond: () => (dbStats?.total_tickets||0) >= 100, progress: () => [dbStats?.total_tickets||0, 100] },
+  { id: 'game_500',   icon: svgIcon('trending',24,'#f59e0b'),name: '500게임',   desc: '500게임 이상 구매했습니다',
+    cond: () => (dbStats?.total_tickets||0) >= 500, progress: () => [dbStats?.total_tickets||0, 500] },
+  { id: 'game_1000',  icon: svgIcon('trophy',24,'#dc2626'), name: '1000게임',   desc: '1000게임 달성! 진정한 로또인',
+    cond: () => (dbStats?.total_tickets||0) >= 1000, progress: () => [dbStats?.total_tickets||0, 1000] },
+  { id: 'rank5',      icon: svgIcon('medal',24,'#94a3b8'),  name: '5등 헌터',   desc: '5등 당첨 5회 이상',
+    cond: () => (dbStats?.rank_5_count||0) >= 5, progress: () => [dbStats?.rank_5_count||0, 5] },
+  { id: 'rank4',      icon: svgIcon('medal',24,'#8b5cf6'),  name: '4등 헌터',   desc: '4등 당첨 3회 이상',
+    cond: () => (dbStats?.rank_4_count||0) >= 3, progress: () => [dbStats?.rank_4_count||0, 3] },
+  { id: 'rank3',      icon: svgIcon('medal',24,'#cd7f32'),  name: '3등 수집가', desc: '3등 당첨 경험',
+    cond: () => (dbStats?.rank_3_count||0) >= 1, progress: () => [dbStats?.rank_3_count||0, 1] },
+  { id: 'rank2',      icon: svgIcon('trophy',24,'#94a3b8'), name: '2등 인증자', desc: 'QR로 2등 인증 완료',
+    cond: () => (dbStats?.rank_2_count||0) >= 1 || (myVerifiedTitle||'').includes('2등') },
+  { id: 'rank1',      icon: svgIcon('crown',24,'#f59e0b'),  name: '1등 인증자', desc: 'QR로 1등 인증 완료 — 전설',
+    cond: () => (dbStats?.rank_1_count||0) >= 1 || (myVerifiedTitle||'').includes('1등') },
 ];
 
 function renderBadge() {
@@ -1857,7 +1871,7 @@ function renderBadge() {
         <div style="font-size:11px;color:var(--text-muted);font-weight:700;">획득한 뱃지</div>
         <div style="font-size:22px;font-weight:900;color:var(--lotto-red);">${earned.length}<span style="font-size:13px;color:var(--text-muted);font-weight:500;"> / ${BADGE_DEFS.length}</span></div>
       </div>
-      <div style="font-size:28px;">🎖️</div>
+      <div style="display:flex;align-items:center;justify-content:center;width:42px;height:42px;background:#fff8e1;border-radius:12px;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg></div>
     </div>
     <div class="badge-page-grid">`;
   BADGE_DEFS.forEach(b => {
@@ -1867,7 +1881,7 @@ function renderBadge() {
       <span class="badge-icon-big">${b.icon}</span>
       <div class="badge-name-text">${b.name}</div>
       <div class="badge-desc-text">${b.desc}</div>
-      ${isEarned ? '<div class="badge-earned-mark">✅ 획득</div>' : ''}
+      ${isEarned ? '<div class="badge-earned-mark"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="20 6 9 17 4 12"/></svg> 획득</div>' : ''}
       ${prog && !isEarned ? `<div class="badge-progress-bar"><div class="badge-progress-fill" style="width:${Math.min(prog[0]/prog[1]*100,100)}%"></div></div><div style="font-size:10px;color:var(--text-muted);margin-top:3px;">${prog[0]} / ${prog[1]}</div>` : ''}
     </div>`;
   });
@@ -1900,7 +1914,7 @@ async function renderRank(catId) {
   try {
     // user_stats + profiles JOIN
     const { data: stats } = await sb.from('user_stats')
-      .select('user_id, total_tickets, total_spent, total_wins, total_prize, best_rank, rank_5_count, rank_3_count, rank_1_count')
+      .select('user_id, total_tickets, total_spent, total_wins, total_prize, best_rank, rank_1_count, rank_2_count, rank_3_count, rank_4_count, rank_5_count')
       .order('total_tickets', { ascending: false })
       .limit(20);
 
@@ -1922,7 +1936,7 @@ async function renderRank(catId) {
     const COL_MAP = {
       buy_count:   { field: s => s.total_tickets || 0, unit: '회', label: '구매 횟수' },
       qr_count:    { field: s => s.total_wins || 0,    unit: '회', label: '당첨 횟수' },
-      roi:         { field: s => s.total_spent > 0 ? Math.round((s.total_prize - s.total_spent) / s.total_spent * 100) : -100, unit: '%', label: 'ROI' },
+      roi:         { field: s => s.total_spent > 0 ? Math.round((s.total_prize - s.total_spent) / s.total_spent * 100) : -100, unit: '%', label: 'ROI', fmt: v => (v >= 0 ? '+' : '') + v + '%' },
       total_prize: { field: s => s.total_prize || 0,   unit: '',   label: '총 당첨금', fmt: v => fmtMShort(v) },
       rank5:       { field: s => s.rank_5_count || 0,  unit: '회', label: '5등 횟수' },
       rank3:       { field: s => (s.rank_1_count||0)+(s.rank_3_count||0), unit: '회', label: '3등 이상' },
@@ -1943,7 +1957,7 @@ async function renderRank(catId) {
       const nick = nickMap[row.user_id] || '익명';
       html += `<tr ${isMe ? 'class="my-row"' : ''}>
         <td class="rank-no-cell">${medals[i] || (i+1)}</td>
-        <td class="rank-name-cell">${isMe ? '👉 ' : ''}${nick}${isMe ? ' <span style="font-size:10px;color:var(--lotto-red);">(나)</span>' : ''}</td>
+        <td class="rank-name-cell">${isMe ? '▶ ' : ''}${nick}${isMe ? ' <span style="font-size:10px;color:var(--lotto-red);">(나)</span>' : ''}</td>
         <td style="text-align:right;" class="rank-val-cell">${display}</td>
       </tr>`;
     });
@@ -2093,6 +2107,7 @@ function renderProfile() {
       <div class="profile-stat-cell"><div class="profile-stat-val">${totalBuy}</div><div class="profile-stat-lbl">총 구매</div></div>
       <div class="profile-stat-cell"><div class="profile-stat-val">${qrCount}</div><div class="profile-stat-lbl">QR 인증</div></div>
       <div class="profile-stat-cell"><div class="profile-stat-val">${earnedCount}</div><div class="profile-stat-lbl">보유 뱃지</div></div>
+      <div class="profile-stat-cell"><div class="profile-stat-val" style="font-size:15px;">${fmtMShort(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</div><div class="profile-stat-lbl">총 당첨금</div></div>
     </div>
     <div class="profile-block">
       <div class="profile-block-title">계정 정보</div>
@@ -2102,8 +2117,13 @@ function renderProfile() {
     </div>
     <div class="profile-block">
       <div class="profile-block-title">나의 활동 요약</div>
+      <div class="profile-row"><span>총 구매 금액</span><span class="profile-row-val">${fmtM(isLoggedIn&&dbStats?dbStats.total_spent||0:totalBuy*1000)}</span></div>
+      <div class="profile-row"><span>총 당첨 금액</span><span class="profile-row-val" style="color:var(--lotto-red);font-weight:700;">${fmtM(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</span></div>
+      <div class="profile-row"><span>ROI</span><span class="profile-row-val" style="color:${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0&&(prz-inv)/inv*100>=0?'#10b981':'#ef4444';})()};font-weight:700;">${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0?(((prz-inv)/inv*100).toFixed(1)+'%'):'-';})()}</span></div>
+      <div class="profile-row"><span>최고 등수</span><span class="profile-row-val">${isLoggedIn&&dbStats&&dbStats.best_rank?dbStats.best_rank+'등':'-'}</span></div>
       <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
       <div class="profile-row"><span>획득 뱃지</span><span class="profile-row-val">${earnedCount} / ${BADGE_DEFS.length}개</span></div>
+      <div class="profile-row"><span>당첨 횟수</span><span class="profile-row-val">${isLoggedIn&&dbStats?dbStats.total_wins||0:0}회</span></div>
     </div>
     ${isLoggedIn ? `
     <div class="profile-block">
@@ -2120,7 +2140,7 @@ function renderProfile() {
     <div style="margin-top:8px;">
       <button onclick="doLogout()"
         style="width:100%;padding:11px;background:#fff;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-weight:700;color:#ef4444;cursor:pointer;">
-        🚪 로그아웃
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> 로그아웃
       </button>
     </div>` : '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [로그인] 버튼으로 로그인하면 전체 기능을 이용할 수 있습니다</div>'}
   `;
