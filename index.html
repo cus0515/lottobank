@@ -295,6 +295,10 @@ main.chat-hidden .chat-panel { display: none; }
     </div>
     <div class="auth-zone">
       <span id="api-indicator" class="api-status loading">API 로딩중...</span>
+      <button id="chat-reopen-btn" onclick="toggleChat()" title="채팅 열기"
+        style="display:none;align-items:center;gap:4px;padding:4px 10px;font-size:12px;font-weight:700;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;">
+        💬 채팅
+      </button>
       <button id="btn-auth" class="btn-login" onclick="showAuthModal()">로그인</button>
       <!-- 로그인 후 유저 드롭다운 -->
       <div id="user-profile" class="user-profile" onclick="toggleUserDropdown()">
@@ -932,9 +936,9 @@ async function chgRes() {
         const chips = Object.entries(regionMap).sort((a,b) => b[1]-a[1])
           .map(([r,c]) => `<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
         const rows = stores.map(s => `<tr style="border-bottom:1px solid #f1f5f9;">
-              <td style="padding:5px 8px;font-size:11px;font-weight:600;white-space:nowrap;">${s.name}</td>
-              <td style="padding:5px 8px;font-size:10px;color:#475569;">${s.addr}</td>
-              <td style="padding:5px 8px;font-size:11px;text-align:center;color:#64748b;white-space:nowrap;">${s.auto}</td>
+              <td style="padding:5px 8px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.name}</td>
+              <td style="padding:5px 8px;font-size:10px;color:#475569;word-break:break-all;">${s.addr}</td>
+              <td style="padding:5px 8px;font-size:11px;text-align:center;color:#64748b;">${s.auto}</td>
             </tr>`).join('');
         return `<div style="margin-bottom:8px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
           <div onclick="(function(el){var b=document.getElementById('sb-${uid}');var arr=el.querySelector('.sarr');if(b.style.display==='none'){b.style.display='';arr.textContent='▲';}else{b.style.display='none';arr.textContent='▼';}})(this)"
@@ -947,11 +951,12 @@ async function chgRes() {
           </div>
           <div id="sb-${uid}">
             <div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div>
-            <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;">
+              <colgroup><col style="width:30%"><col style="width:54%"><col style="width:16%"></colgroup>
               <thead><tr style="background:#f8fafc;">
-                <th style="padding:5px 8px;text-align:left;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;white-space:nowrap;">판매점</th>
+                <th style="padding:5px 8px;text-align:left;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">판매점</th>
                 <th style="padding:5px 8px;text-align:left;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">주소</th>
-                <th style="padding:5px 8px;text-align:center;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;white-space:nowrap;">구분</th>
+                <th style="padding:5px 8px;text-align:center;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">구분</th>
               </tr></thead>
               <tbody>${rows}</tbody>
             </table>
@@ -1278,16 +1283,13 @@ function toggleChat() {
     main.classList.add('chat-hidden');
     btn.textContent = '💬';
     btn.title = '채팅 열기';
-    // 채팅 닫았을 때 우측 상단에 열기 버튼 표시
   }
+  const reopenBtn = $('chat-reopen-btn');
+  if (reopenBtn) reopenBtn.style.display = chatVisible ? 'none' : 'flex';
   try { localStorage.setItem('lottobank_chat_visible', chatVisible ? '1' : '0'); } catch {}
 }
-// 채팅 상태 복원
-try {
-  if (localStorage.getItem('lottobank_chat_visible') === '0') {
-    chatVisible = true; toggleChat();
-  }
-} catch {}
+// 채팅 상태 복원 (항상 열린 상태로 시작)
+// localStorage 무시하고 항상 표시
 
 // =====================================================
 // 채팅 (Supabase Realtime)
