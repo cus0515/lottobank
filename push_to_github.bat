@@ -8,6 +8,8 @@ echo  LottoBank GitHub Push
 echo ============================================
 echo.
 
+git fetch origin
+
 git add -A
 git status
 
@@ -19,7 +21,7 @@ if errorlevel 1 (
     echo [OK] Nothing to commit
 )
 
-git push --force-with-lease origin main
+git push origin main --force
 
 echo.
 echo Done! https://github.com/cus0515/lottobank
