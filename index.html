@@ -658,9 +658,17 @@ main.chat-hidden .chat-panel { display: none; }
           <button class="comm-tab-btn on" id="ct-free" onclick="commTab('free')">자유게시판</button>
           <button class="comm-tab-btn" id="ct-verify" onclick="commTab('verify')">인증게시판</button>
         </div>
-        <div class="post-write-bar">
-          <input type="text" id="post-input" class="post-write-input" placeholder="로그인 후 글 작성..." disabled>
-          <button class="post-write-btn" onclick="writePost()">글쓰기</button>
+        <div class="post-write-bar" id="post-write-bar-collapsed">
+          <input type="text" id="post-input" class="post-write-input" placeholder="로그인 후 글 작성..." disabled onclick="expandPostForm()">
+          <button class="post-write-btn" onclick="expandPostForm()">글쓰기</button>
+        </div>
+        <div id="post-write-expanded" style="display:none;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:10px;">
+          <input type="text" id="post-input-title" class="post-write-input" placeholder="제목을 입력하세요..." style="margin-bottom:8px;width:100%;box-sizing:border-box;" maxlength="100">
+          <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:#1e293b;" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
+            <button onclick="collapsePostForm()" style="padding:8px 14px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;">취소</button>
+            <button onclick="writePost()" style="padding:8px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">등록</button>
+          </div>
         </div>
         <div id="community-content"></div>
       </div>
@@ -1737,6 +1745,7 @@ async function loadUserDataFromDB() {
     const nick = currentUser.user_metadata?.nickname || '관리자';
     updateHeaderUser(nick, '🔐 관리자');
     updateBadgeUI();
+    updateDropdownStats();
     return;
   }
   const uid = currentUser.id;
@@ -1764,11 +1773,12 @@ async function loadUserDataFromDB() {
         const title = `${best.round_no}회 ${rankLabels[best.prize_rank]}`;
         if (!myVerifiedTitle || myVerifiedTitle !== title) { myVerifiedTitle = title; saveStorage(); }
       }
-      const nick2 = currentUser?.user_metadata?.nickname || currentUser?.email?.split('@')[0] || '?';
-      updateHeaderUser(nick2, myVerifiedTitle || '');
-      updateBadgeUI();
-      updateDropdownStats();
     }
+    // 티켓 유무와 무관하게 항상 헤더/좌측패널 업데이트
+    const nick2 = currentUser?.user_metadata?.nickname || currentUser?.email?.split('@')[0] || '?';
+    updateHeaderUser(nick2, myVerifiedTitle || '');
+    updateBadgeUI();
+    updateDropdownStats();
   } catch (e) {
     console.warn('loadUserDataFromDB:', e.message);
   }
@@ -1944,6 +1954,7 @@ async function saveTicketToDB(parsed, winData, gameResults) {
       qr_url: parsed.key,
       round_no: parsed.round,
       numbers: parsed.games[0],
+      game_count: parsed.games.length,
       purchase_date: winData.drwNoDate || null,
       result: 'checked',
       prize_rank: bestResult.rank <= 5 ? bestResult.rank : null,
@@ -2288,15 +2299,13 @@ async function init() {
   }
 
   renderLatestOnLeft(latestData);
-  if (!isLoggedIn) loadGuestStats();
+  // 비로그인 시 게스트 통계 로드 (initAuth 비동기이므로 짧게 지연)
+  setTimeout(() => { if (!isLoggedIn) loadGuestStats(); }, 500);
   if (latestData) {
     recentData[latestRound] = latestData;
     renderHomeLive();
     updateGlobalStats();
     rList();
-    go('result');
-
-
 
     for (let r = latestRound - 1; r >= Math.max(1, latestRound - 9); r--) {
       fetchLotto(r).then(d => {
@@ -2891,17 +2900,19 @@ async function likePost(postId, btn) {
 }
 
 async function writePost() {
-  if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
-  const inp = $('post-input');
-  const text = inp.value.trim();
-  if (!text) { toast('⚠️ 내용을 입력해주세요'); return; }
+  if (!isLoggedIn) { showAuthModal(); return; }
+  const titleInp = $('post-input-title');
+  const bodyInp  = $('post-input-body');
+  const text = (titleInp ? titleInp.value : $('post-input').value).trim();
+  const body = bodyInp ? bodyInp.value.trim() : '';
+  if (!text) { toast('⚠️ 제목을 입력해주세요'); return; }
   const nick = $('user-name').textContent;
   if (isAdminTestMode) {
     // 검증 모드: 로컬 mock 게시글
-    const mockPost = { id: 'mock-post-' + Date.now(), user_id: currentUser.id, nickname: nick, tag: curCommTab, title: text, likes: 0, comment_count: 0, created_at: new Date().toISOString() };
+    const mockPost = { id: 'mock-post-' + Date.now(), user_id: currentUser.id, nickname: nick, tag: curCommTab, title: text, body: body || null, likes: 0, comment_count: 0, created_at: new Date().toISOString() };
     if (!commPosts[curCommTab]) commPosts[curCommTab] = [];
     commPosts[curCommTab].unshift(mockPost);
-    $('post-input').value = '';
+    collapsePostForm();
     renderCommunityList();
     toast('✅ [검증] 게시글 등록됨 (mock)');
     return;
@@ -2911,11 +2922,12 @@ async function writePost() {
     nickname: nick,
     tag: curCommTab,
     title: text,
+    body: body || null,
     likes: 0,
     comment_count: 0,
   });
   if (error) { toast('❌ 등록 실패: ' + error.message); return; }
-  inp.value = '';
+  collapsePostForm();
   toast('✅ 게시글이 등록되었습니다');
   await loadCommunityPosts();
 }
@@ -2960,6 +2972,7 @@ async function openPostDetail(postId) {
         <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}">${post.tag==='free'?'자유':'인증'}</span>
       </div>
       <div class="post-detail-title">${post.title.replace(/</g,'&lt;')}</div>
+      ${post.body ? `<div style="font-size:13px;color:#374151;line-height:1.7;margin:12px 0;white-space:pre-wrap;">${post.body.replace(/</g,'&lt;')}</div>` : ''}
       <div class="post-detail-meta">
         <span>${post.nickname}</span>
         <span>${timeAgo(post.created_at)}</span>
@@ -3066,9 +3079,27 @@ async function likePostDetail(postId) {
 }
 
 async function renderCommunity() {
-  $('post-input').disabled = !isLoggedIn;
-  $('post-input').placeholder = isLoggedIn ? '게시글 제목을 입력하세요...' : '로그인 후 글 작성 가능합니다';
+  const pinput = $('post-input');
+  if (pinput) { pinput.disabled = !isLoggedIn; pinput.placeholder = isLoggedIn ? '클릭하여 글쓰기...' : '로그인 후 글 작성 가능합니다'; }
+  collapsePostForm();
   await loadCommunityPosts();
+}
+
+function expandPostForm() {
+  if (!isLoggedIn) { showAuthModal(); return; }
+  const bar = $('post-write-bar-collapsed');
+  const exp = $('post-write-expanded');
+  if (bar) bar.style.display = 'none';
+  if (exp) { exp.style.display = ''; const t = $('post-input-title'); if(t) t.focus(); }
+}
+
+function collapsePostForm() {
+  const bar = $('post-write-bar-collapsed');
+  const exp = $('post-write-expanded');
+  if (bar) bar.style.display = '';
+  if (exp) exp.style.display = 'none';
+  const t = $('post-input-title'); if(t) t.value = '';
+  const b = $('post-input-body'); if(b) b.value = '';
 }
 
 // =====================================================

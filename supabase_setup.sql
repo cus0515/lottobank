@@ -175,3 +175,50 @@ ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
 CREATE POLICY IF NOT EXISTS "댓글 공개" ON public.comments FOR SELECT USING (true);
 CREATE POLICY IF NOT EXISTS "댓글 작성" ON public.comments FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY IF NOT EXISTS "댓글 삭제 본인" ON public.comments FOR DELETE USING (auth.uid() = user_id);
+
+-- =====================================================
+-- activity_feed (실시간 활동 피드)
+-- =====================================================
+create table if not exists public.activity_feed (
+  id         uuid default gen_random_uuid() primary key,
+  user_id    uuid references auth.users(id) on delete cascade,
+  nick       text not null,
+  type       text not null,  -- 'qr_register' | 'win' | 'badge' | 'rank_enter'
+  data       jsonb default '{}',
+  created_at timestamptz default now()
+);
+
+alter table public.activity_feed enable row level security;
+
+create policy "활동 피드 공개 조회" on public.activity_feed
+  for select using (true);
+
+create policy "로그인 사용자 피드 등록" on public.activity_feed
+  for insert with check (auth.uid() = user_id);
+
+-- Realtime 활성화
+alter publication supabase_realtime add table public.activity_feed;
+
+-- =====================================================
+-- user_badges (사용자 보유 뱃지)
+-- =====================================================
+create table if not exists public.user_badges (
+  user_id    uuid references auth.users(id) on delete cascade,
+  badge_id   text not null,
+  earned_at  timestamptz default now(),
+  primary key (user_id, badge_id)
+);
+
+alter table public.user_badges enable row level security;
+
+create policy "뱃지 공개 조회" on public.user_badges
+  for select using (true);
+
+create policy "본인 뱃지 등록" on public.user_badges
+  for insert with check (auth.uid() = user_id);
+
+-- tickets 테이블 game_count 컬럼 추가 (없을 경우)
+alter table public.tickets add column if not exists game_count integer default 1;
+
+-- posts 테이블 body 컬럼 추가 (게시글 본문)
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS body TEXT;
