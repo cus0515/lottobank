@@ -286,12 +286,12 @@ main.chat-hidden .chat-panel { display: none; }
 .post-like-btn:hover { border-color: var(--lotto-red); color: var(--lotto-red); }
 
 /* ===== 프로필 페이지 ===== */
-.profile-hero { text-align: center; padding: 18px 0 14px; border-bottom: 1px solid #e2e8f0; margin-bottom: 14px; }
+.profile-hero { text-align: center; padding: 18px 0 14px; border-bottom: 1px solid var(--border-dashed); margin-bottom: 14px; }
 .profile-avatar-circle { width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, var(--lotto-red), var(--lotto-purple)); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; font-weight: 900; margin: 0 auto 10px; }
 .profile-nick { font-size: 17px; font-weight: 900; margin-bottom: 4px; }
 .profile-sub-text { font-size: 12px; color: var(--text-muted); }
-.profile-stats-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
-.profile-stat-cell { background: #fff; padding: 12px; text-align: center; }
+.profile-stats-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border-dashed); border: 1px solid var(--border-dashed); border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+.profile-stat-cell { background: var(--paper-white); padding: 12px; text-align: center; }
 .profile-stat-val { font-size: 18px; font-weight: 900; color: var(--text-dark); }
 .profile-stat-lbl { font-size: 10px; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
 .profile-block { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 10px; }
@@ -430,8 +430,10 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .badge-card-item.earned { background:#1a3020; border-color:#166534; }
 [data-theme="dark"] .badge-name-text { color:#f1f5f9; }
 [data-theme="dark"] .profile-hero { background:#1e293b; border-color:#334155; }
+[data-theme="dark"] #profile-content div[style*="background:#f8fafc"] { background:#263244 !important; border-color:#334155 !important; }
+[data-theme="dark"] #profile-content div[style*="background:#fff5f5"] { background:#1a1a2e !important; border-color:#7f1d1d !important; }
 [data-theme="dark"] .profile-stats-strip { background:#0f172a; border-color:#334155; }
-[data-theme="dark"] .profile-stat-cell { border-color:#334155; }
+[data-theme="dark"] .profile-stat-cell { border-color:#334155; background:#1e293b !important; }
 [data-theme="dark"] .profile-stat-val { color:#f1f5f9; }
 [data-theme="dark"] .profile-block { background:#1e293b; border-color:#334155; }
 [data-theme="dark"] .profile-block-title { color:#f1f5f9; border-color:#334155; }
@@ -1547,7 +1549,12 @@ async function renderQRHistory() {
   const wrap = document.getElementById('qr-history-section');
   if (!wrap) return;
   if (!isLoggedIn || !currentUser || !sb) {
-    wrap.innerHTML = '';
+    wrap.innerHTML = `<div style="text-align:center;padding:24px 16px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;margin-top:8px;">
+      <div style="font-size:32px;margin-bottom:10px;">📋</div>
+      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">구매 내역이 없습니다</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">로그인 후 QR을 등록하면<br>구매 내역이 여기에 표시됩니다.</div>
+      <button onclick="showAuthModal()" style="padding:8px 20px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;">로그인하기</button>
+    </div>`;
     return;
   }
   try {
@@ -4324,6 +4331,7 @@ function renderProfile() {
       <div class="profile-row"><span>이메일</span><span class="profile-row-val" style="font-size:12px;">${email}</span></div>
       <div class="profile-row"><span>인증 등급</span><span class="profile-row-val">${myVerifiedTitle||'일반 회원'}</span></div>
       <div class="profile-row"><span>가입 방식</span><span class="profile-row-val">이메일 로그인</span></div>
+      <div class="profile-row"><span>가입일</span><span class="profile-row-val" style="font-size:12px;">${currentUser?.created_at ? new Date(currentUser.created_at).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}) : '-'}</span></div>
     </div>
     <div class="profile-block">
       <div class="profile-block-title">나의 활동 요약</div>
