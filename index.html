@@ -206,7 +206,8 @@ main.chat-hidden .chat-panel { display: none; }
 .badge-progress-fill { height: 100%; background: var(--lotto-red); border-radius: 3px; }
 
 /* ===== 랭킹 페이지 ===== */
-.rank-tab-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.rank-tab-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
+.rank-tab-row::-webkit-scrollbar { display: none; }
 .rank-tab-pill { padding: 5px 12px; font-size: 12px; font-weight: 700; border: 1px solid #e2e8f0; border-radius: 20px; background: #fff; cursor: pointer; color: var(--text-muted); white-space: nowrap; }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); }
 .rank-board-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
@@ -385,6 +386,7 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .comm-tab-btn.on { background:var(--lotto-red); color:#fff; }
 [data-theme="dark"] .comm-sort-btn { background:#1e293b; color:#94a3b8; border-color:#475569; }
 [data-theme="dark"] .comm-sort-btn.on { background:#f1f5f9; color:#0f172a; border-color:#f1f5f9; }
+[data-theme="dark"] #comm-search-input { background:#1e293b !important; border-color:#475569 !important; color:#f1f5f9 !important; }
 [data-theme="dark"] .post-card { background:#263244; border-color:#334155; }
 [data-theme="dark"] .post-card:hover { background:#2d3e55; }
 [data-theme="dark"] .post-card-title { color:#f1f5f9; }
@@ -817,6 +819,10 @@ main.chat-hidden .chat-panel { display: none; }
             <button class="comm-sort-btn on" id="cs-newest" onclick="commSort('newest')">최신순</button>
             <button class="comm-sort-btn" id="cs-popular" onclick="commSort('popular')">인기순</button>
           </div>
+        </div>
+        <div style="position:relative;margin-bottom:8px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="comm-search-input" placeholder="게시글 검색..." oninput="commSearch(this.value)" style="width:100%;box-sizing:border-box;padding:7px 10px 7px 30px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;font-family:inherit;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'">
         </div>
         <div class="post-write-bar" id="post-write-bar-collapsed">
           <input type="text" id="post-input" class="post-write-input" placeholder="로그인 후 글 작성..." disabled onclick="expandPostForm()">
@@ -2329,6 +2335,65 @@ function go(id) {
 // =====================================================
 // 내 번호 통계 (번호분석 페이지 — 로그인 사용자)
 // =====================================================
+async function loadMyMatchSection() {
+  const wrap = document.getElementById('my-match-section');
+  if (!wrap || !latestData) return;
+  try {
+    const { data: tks } = await sb.from('tickets')
+      .select('round_no, numbers, game_count')
+      .eq('user_id', currentUser.id)
+      .order('round_no', { ascending: false })
+      .limit(5);
+    if (!tks || !tks.length) { wrap.innerHTML = ''; return; }
+    const d = latestData;
+    const winNums = new Set(d.nums);
+    const bonus = d.bonus;
+    let rows = '';
+    for (const tk of tks) {
+      if (!tk.numbers) continue;
+      let nums = tk.numbers;
+      if (typeof nums === 'string') { try { nums = JSON.parse(nums); } catch(_) { continue; } }
+      if (!Array.isArray(nums)) continue;
+      const gameNums = Array.isArray(nums[0]) ? nums : [nums];
+      const round = tk.round_no || '-';
+      const isSameRound = round === d.round;
+      gameNums.slice(0, 5).forEach((game, gi) => {
+        if (!Array.isArray(game)) return;
+        const sorted = [...game].sort((a,b)=>a-b);
+        const matchCount = sorted.filter(n => winNums.has(n)).length;
+        const hasBonus = sorted.includes(bonus);
+        let rankLabel = '';
+        if (matchCount === 6) rankLabel = '<span style="color:#dc2626;font-weight:900;">🥇 1등!</span>';
+        else if (matchCount === 5 && hasBonus) rankLabel = '<span style="color:#a855f7;font-weight:900;">🥈 2등!</span>';
+        else if (matchCount === 5) rankLabel = '<span style="color:#10b981;font-weight:900;">🥉 3등!</span>';
+        else if (matchCount === 4) rankLabel = '<span style="color:#3b82f6;font-weight:700;">🎯 4등</span>';
+        else if (matchCount === 3) rankLabel = '<span style="color:#64748b;font-weight:700;">✅ 5등</span>';
+        else rankLabel = '<span style="color:#94a3b8;">' + matchCount + '개 일치</span>';
+        const ballsHtml = sorted.map(n => bH(n, winNums.has(n))).join('');
+        rows += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+          <span style="font-size:10px;color:#94a3b8;min-width:50px;">${round}회 G${gi+1}</span>
+          <div class="ball-context" style="gap:3px;margin:0;flex:1;">${ballsHtml}</div>
+          <span style="font-size:11px;min-width:70px;text-align:right;">${rankLabel}</span>
+        </div>`;
+      });
+      if (rows.length > 0) break; // 최근 1개 티켓만 표시
+    }
+    if (!rows) { wrap.innerHTML = ''; return; }
+    const tk0 = tks[0];
+    const compareRound = tk0.round_no || d.round;
+    const compareData = recentData[compareRound] || d;
+    wrap.innerHTML = `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-top:12px;">
+      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        최근 QR 번호 매칭 분석 <span style="font-size:10px;font-weight:500;color:#94a3b8;">(최신 QR 기준)</span>
+      </div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:8px;">${d.round}회 당첨번호: <span style="font-weight:700;">${d.nums.join(', ')}</span> + 보너스 ${d.bonus}</div>
+      ${rows}
+      <div style="font-size:10px;color:#94a3b8;margin-top:8px;text-align:center;">※ 색이 있는 볼 = 당첨번호 일치 · 최근 등록 QR 게임 기준</div>
+    </div>`;
+  } catch(e) { wrap.innerHTML = ''; }
+}
+
 async function loadMyNumberStats() {
   const wrap = document.getElementById('my-num-stats');
   if (!wrap) return;
@@ -2622,8 +2687,10 @@ function renderFortune() {
     </div>
     <!-- 5. 내 번호 통계 (로그인 후 표시) -->
     <div id="my-num-stats"></div>
+    <!-- 6. 최근 당첨번호 vs 내 QR 매칭 (로그인 후 표시) -->
+    <div id="my-match-section"></div>
   `;
-  if (isLoggedIn && currentUser && sb) loadMyNumberStats();
+  if (isLoggedIn && currentUser && sb) { loadMyNumberStats(); loadMyMatchSection(); }
 }
 
 // =====================================================
@@ -2757,13 +2824,13 @@ function renderStats() {
     </div>
     <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">등수별 당첨 이력</div>
     <table class="rank-history-table">
-      <thead><tr><th>등수</th><th>조건</th><th>당첨 횟수</th><th>비고</th></tr></thead>
-      <tbody>
-        <tr><td><b style="color:var(--lotto-red);">1등</b></td><td>6개 일치</td><td style="font-weight:700;">${rankCounts[1]}회</td><td style="font-size:11px;color:var(--text-muted);">평균 20~30억</td></tr>
-        <tr><td><b style="color:#a855f7;">2등</b></td><td>5개+보너스</td><td style="font-weight:700;">${rankCounts[2]}회</td><td style="font-size:11px;color:var(--text-muted);">약 5천만원</td></tr>
-        <tr><td><b style="color:var(--b-green);">3등</b></td><td>5개 일치</td><td style="font-weight:700;">${rankCounts[3]}회</td><td style="font-size:11px;color:var(--text-muted);">약 150만원 (변동)</td></tr>
-        <tr><td>4등</td><td>4개 일치</td><td style="font-weight:700;">${rankCounts[4]}회</td><td style="font-size:11px;color:var(--text-muted);">고정 50,000원</td></tr>
-        <tr><td>5등</td><td>3개 일치</td><td style="font-weight:700;">${rankCounts[5]}회</td><td style="font-size:11px;color:var(--text-muted);">고정 5,000원</td></tr>
+      <thead><tr><th>등수</th><th>조건</th><th style="text-align:center;">당첨 횟수</th><th style="text-align:right;">누적 당첨금</th></tr></thead>
+      <tbody id="rank-breakdown-tbody">
+        <tr><td><b style="color:var(--lotto-red);">1등</b></td><td>6개 일치</td><td style="font-weight:700;text-align:center;">${rankCounts[1]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
+        <tr><td><b style="color:#a855f7;">2등</b></td><td>5개+보너스</td><td style="font-weight:700;text-align:center;">${rankCounts[2]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
+        <tr><td><b style="color:var(--b-green);">3등</b></td><td>5개 일치</td><td style="font-weight:700;text-align:center;">${rankCounts[3]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
+        <tr><td>4등</td><td>4개 일치</td><td style="font-weight:700;text-align:center;">${rankCounts[4]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
+        <tr><td>5등</td><td>3개 일치</td><td style="font-weight:700;text-align:center;">${rankCounts[5]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
       </tbody>
     </table>
     ${!isLoggedIn ? '<div style="margin-top:14px;padding:12px;background:#fff5f5;border:1px solid #fecaca;border-radius:6px;text-align:center;font-size:12px;"><b style=\"color:#dc2626;\">로그인</b><span style=\"color:#64748b;">하면 실제 QR 인증 데이터 기반 전적이 기록됩니다</span><br><button onclick=\"showAuthModal()\" style=\"margin-top:8px;background:#dc2626;color:#fff;border:none;border-radius:4px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;\">로그인하기</button></div>' : isMock ? '<div style="margin-top:14px;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:6px;text-align:center;font-size:12px;color:var(--text-muted);">QR 인증 탭에서 실제 복권 QR을 등록하면 전적이 자동으로 기록됩니다</div>' : ''}
@@ -2817,6 +2884,23 @@ async function loadTicketHistory() {
     } else if (bpEl) {
       bpEl.textContent = '없음';
       if (bpRankEl) bpRankEl.textContent = '당첨 이력 없음';
+    }
+
+    // 등수별 누적 당첨금 업데이트
+    const rankPrizeMap = {1:0,2:0,3:0,4:0,5:0};
+    tickets.forEach(t => { if(t.prize_rank&&t.prize_rank<=5) rankPrizeMap[t.prize_rank] += (t.prize_amount||0); });
+    const tbody = document.getElementById('rank-breakdown-tbody');
+    if (tbody) {
+      const rows = tbody.querySelectorAll('tr');
+      [1,2,3,4,5].forEach((rank, i) => {
+        const td = rows[i]?.querySelectorAll('td')[3];
+        if (td) {
+          const prize = rankPrizeMap[rank];
+          td.textContent = prize > 0 ? fmtMFull(prize) : (rankPrizeMap[rank]===0 && tickets.filter(t=>t.prize_rank===rank).length===0 ? '-' : fmtMFull(0));
+          td.style.color = prize > 0 ? 'var(--lotto-red)' : '#94a3b8';
+          td.style.fontWeight = prize > 0 ? '700' : '400';
+        }
+      });
     }
 
     // 월별 통계 계산
@@ -3328,6 +3412,7 @@ let curCommTab = 'free';
 let commPosts = { free: [], verify: [] };
 let myLikedPostIds = new Set();
 let curCommSort = 'newest';
+let commSearchQuery = '';
 
 function commTab(tab) {
   curCommTab = tab;
@@ -3343,6 +3428,11 @@ function commSort(sort) {
   renderCommunityList();
 }
 
+function commSearch(query) {
+  commSearchQuery = (query || '').trim().toLowerCase();
+  renderCommunityList();
+}
+
 function timeAgo(iso) {
   const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
   if (diff < 60) return '방금 전';
@@ -3353,14 +3443,22 @@ function timeAgo(iso) {
 
 function renderCommunityList() {
   let posts = [...(commPosts[curCommTab] || [])];
+  if (commSearchQuery) {
+    posts = posts.filter(p =>
+      (p.title || '').toLowerCase().includes(commSearchQuery) ||
+      (p.body || '').toLowerCase().includes(commSearchQuery) ||
+      (p.nickname || '').toLowerCase().includes(commSearchQuery)
+    );
+  }
   if (curCommSort === 'popular') {
     posts.sort((a,b) => (b.likes||0) - (a.likes||0));
   }
   if (!posts.length) {
+    const isSearch = !!commSearchQuery;
     $('community-content').innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
-      <div style="margin-bottom:10px;"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-      <div style="font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">아직 게시글이 없습니다</div>
-      <div style="font-size:12px;">첫 번째 글을 작성해보세요!</div>
+      <div style="margin-bottom:10px;"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">${isSearch ? '검색 결과가 없습니다' : '아직 게시글이 없습니다'}</div>
+      <div style="font-size:12px;">${isSearch ? '다른 키워드로 검색해보세요' : '첫 번째 글을 작성해보세요!'}</div>
     </div>`;
     return;
   }
