@@ -4,6 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리</title>
+<meta name="description" content="로또 QR 기반 구매 이력 인증 · 당첨 확인 · 전적 관리 플랫폼. 회차별 당첨번호 조회, 나의 전적 통계, 뱃지, 랭킹을 한 곳에서.">
+<meta name="keywords" content="로또,로또당첨,로또인증,로또전적,QR인증,당첨번호,로또통계,LottoBank">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lottobank.pages.dev">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lottobank.pages.dev">
+<meta property="og:title" content="LottoBank — 로또 전적 &amp; 당첨 인증">
+<meta property="og:description" content="QR로 로또를 등록하고 구매 이력, 당첨금, 뱃지, 랭킹을 한 곳에서 관리하세요.">
+<meta property="og:image" content="https://lottobank.pages.dev/og.png">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LottoBank — 로또 전적 &amp; 당첨 인증">
+<meta name="twitter:description" content="QR로 로또를 등록하고 구매 이력, 당첨금, 뱃지, 랭킹을 한 곳에서 관리하세요.">
+<meta name="twitter:image" content="https://lottobank.pages.dev/og.png">
+<meta name="theme-color" content="#d61c4e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LottoBank">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Courier+New&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -164,6 +181,13 @@ main.chat-hidden .chat-panel { display: none; }
 
 #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; z-index: 2000; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
 #toast.on { opacity: 1; }
+/* ── 스켈레톤 로딩 ── */
+.skel { background: linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%); background-size:200% 100%; animation:skelShimmer 1.4s infinite; border-radius:6px; }
+@keyframes skelShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.skel-row { height:14px; margin-bottom:8px; border-radius:4px; }
+.skel-row.w60 { width:60%; } .skel-row.w80 { width:80%; } .skel-row.w40 { width:40%; }
+.skel-card { background:var(--paper-white); border:1px solid var(--border-dashed); border-radius:10px; padding:16px; margin-bottom:10px; }
+[data-theme="dark"] .skel { background:linear-gradient(90deg,#1e293b 25%,#263244 50%,#1e293b 75%); background-size:200% 100%; }
 
 /* ===== 전적 페이지 ===== */
 .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
@@ -466,6 +490,9 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .comment-write-bar .comment-input { background:#0f172a !important; border-color:#475569 !important; color:#f1f5f9 !important; }
 [data-theme="dark"] #community-content div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #left-prize-card { background:#0f2a18 !important; border-color:#166534 !important; }
+[data-theme="dark"] #my-match-section div[style*="background:#fff"],[data-theme="dark"] #my-match-section div[style*="background: #fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #my-match-section div[style*="background:#f8fafc"],[data-theme="dark"] #my-match-section div[style*="background:#f1f5f9"] { background:#263244 !important; }
+[data-theme="dark"] #auth-success-banner { background:#0f2a18 !important; border-color:#166534 !important; color:#86efac !important; }
 [data-theme="dark"] #left-cost-card { background:#2a0f0f !important; border-color:#991b1b !important; }
 [data-theme="dark"] #left-feed-section { border-top-color:#334155 !important; }
 [data-theme="dark"] #left-feed-section > div[style*="color:#64748b"] { color:#94a3b8 !important; }
@@ -590,8 +617,15 @@ main.chat-hidden .chat-panel { display: none; }
       <label>비밀번호</label>
       <input type="password" id="auth-pass" placeholder="8자리 이상" onkeyup="if(event.key==='Enter')doAuth()">
     </div>
+    <div id="forgot-pwd-row" style="text-align:right;margin-top:-6px;margin-bottom:10px;">
+      <button onclick="forgotPassword()" style="background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;text-decoration:underline;font-family:inherit;padding:0;">비밀번호를 잊으셨나요?</button>
+    </div>
     <button class="auth-submit" id="auth-submit" onclick="doAuth()">로그인</button>
     <p class="auth-err" id="auth-err"></p>
+    <div id="auth-success-banner" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 14px;margin-top:10px;font-size:13px;color:#166534;line-height:1.5;">
+      📧 <strong>이메일을 확인해주세요.</strong><br>
+      <span id="auth-success-msg">인증 링크를 발송했습니다.</span>
+    </div>
     <div class="auth-divider">계정이 없으신가요?</div>
     <div style="text-align:center">
       <button class="auth-switch" id="auth-switch" onclick="toggleAuthMode()">회원가입</button>
@@ -1375,6 +1409,12 @@ async function chgRes() {
       <div class="result-metric"><span>저/고</span><strong>${a.low}:${a.high}</strong></div>
       <div class="result-metric"><span>연속</span><strong>${a.seq ? a.seq + '쌍' : '없음'}</strong></div>
     </div>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px dashed #e2e8f0;display:flex;gap:6px;justify-content:flex-end;">
+      <button onclick="shareURL('https://lottobank.pages.dev','LottoBank 링크')" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;font-size:11px;font-weight:700;color:#475569;cursor:pointer;font-family:inherit;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        공유
+      </button>
+    </div>
     <div id="store-section" style="margin-top:10px;"><div style="font-size:11px;color:#94a3b8;padding:4px 0;"> 판매소 데이터 로딩 중...</div></div>
   `;
   // 1등/2등 판매소 비동기 로드
@@ -1660,9 +1700,57 @@ function showAuthModal() {
   setTimeout(() => $('auth-email').focus(), 100);
 }
 
+// 비밀번호 재설정 이메일 발송
+async function forgotPassword() {
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email) { $('auth-err').textContent = '이메일을 먼저 입력해주세요.'; return; }
+  $('auth-err').textContent = '';
+  const row = $('forgot-pwd-row');
+  const btn = row ? row.querySelector('button') : null;
+  if (btn) { btn.disabled = true; btn.textContent = '전송 중...'; }
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://lottobank.pages.dev' });
+    if (error) throw error;
+    $('auth-success-msg').textContent = email + '로 비밀번호 재설정 링크를 발송했습니다.';
+    $('auth-success-banner').style.display = 'block';
+    if (btn) btn.textContent = '✅ 전송됨';
+  } catch(e) {
+    $('auth-err').textContent = '전송 실패: ' + (e.message || '다시 시도해주세요.');
+    if (btn) { btn.disabled = false; btn.textContent = '비밀번호를 잊으셨나요?'; }
+  }
+}
+
+// URL 클립보드 복사
+function shareURL(url, label) {
+  const target = url || location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(target).then(() => toast('🔗 ' + (label||'링크') + ' 복사됨'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = target; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    toast('🔗 ' + (label||'링크') + ' 복사됨');
+  }
+}
+
 function closeAuthModal() {
   $('auth-modal').classList.remove('open');
   $('auth-err').textContent = '';
+  // 성공 배너 및 폼 초기화
+  $('auth-success-banner').style.display = 'none';
+  $('auth-submit').style.display = '';
+  const divider = document.querySelector('.auth-divider');
+  if (divider) { divider.style.display = ''; divider.textContent = '계정이 없으신가요?'; }
+  $('auth-switch').style.display = '';
+  document.getElementById('auth-email').disabled = false;
+  document.getElementById('auth-pass').disabled = false;
+  authMode = 'login';
+  $('auth-title').textContent = '로그인';
+  $('auth-sub').textContent = '이메일과 비밀번호로 로그인하세요';
+  $('auth-submit').textContent = '로그인';
+  $('auth-switch').textContent = '회원가입';
+  $('auth-nick-row').style.display = 'none';
+  if ($('forgot-pwd-row')) $('forgot-pwd-row').style.display = 'block';
 }
 
 function toggleAuthMode() {
@@ -1673,6 +1761,8 @@ function toggleAuthMode() {
   $('auth-submit').textContent = isSignup ? '가입하기' : '로그인';
   $('auth-switch').textContent = isSignup ? '로그인으로 돌아가기' : '회원가입';
   $('auth-nick-row').style.display = isSignup ? 'block' : 'none';
+  if ($('forgot-pwd-row')) $('forgot-pwd-row').style.display = isSignup ? 'none' : 'block';
+  if ($('auth-success-banner')) $('auth-success-banner').style.display = 'none';
   document.querySelector('.auth-divider').textContent = isSignup ? '이미 계정이 있으신가요?' : '계정이 없으신가요?';
   $('auth-err').textContent = '';
 }
@@ -1704,8 +1794,18 @@ async function doAuth() {
         options: { data: { nickname: nick } }
       });
       if (error) throw error;
-      closeAuthModal();
-      toast('✅ 가입 완료! 이메일 인증 후 로그인해주세요');
+      // 가입 후 이메일 인증 안내 배너
+      $('auth-title').textContent = '가입 완료!';
+      $('auth-sub').textContent = '이메일을 확인해주세요';
+      $('auth-success-msg').textContent = email + '로 인증 링크를 보냈습니다. 확인 후 로그인하세요.';
+      $('auth-success-banner').style.display = 'block';
+      $('auth-submit').style.display = 'none';
+      $('auth-nick-row').style.display = 'none';
+      const _div = document.querySelector('.auth-divider'); if(_div) _div.style.display='none';
+      $('auth-switch').style.display = 'none';
+      if($('forgot-pwd-row')) $('forgot-pwd-row').style.display='none';
+      document.getElementById('auth-email').disabled = true;
+      document.getElementById('auth-pass').disabled = true;
     }
   } catch (e) {
     const msg = (e.message || '').toLowerCase();
@@ -2324,10 +2424,24 @@ function go(id) {
   if (id === 'result')    { initRoundSelector(); }
   if (id === 'ticket')    { chgMode(); renderQRHistory(); }
   if (id === 'fortune')   { ensureRecentData().then(() => renderFortune()); }
-  if (id === 'stats')     { renderStats(); }
-  if (id === 'badge')     { renderBadge(); }
-  if (id === 'rank')      { renderRank(); }
-  if (id === 'community') { renderCommunity(); }
+  if (id === 'stats') {
+    $('stats-content').innerHTML = '<div class="skel-card"><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div></div></div>';
+    renderStats();
+  }
+  if (id === 'badge') {
+    $('badge-content').innerHTML = '<div class="skel-card"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"><div class="skel" style="height:70px;border-radius:8px;"></div><div class="skel" style="height:70px;border-radius:8px;"></div><div class="skel" style="height:70px;border-radius:8px;"></div></div></div>';
+    renderBadge();
+  }
+  if (id === 'rank') {
+    $('rank-content').innerHTML = '<div class="skel-card"><div class="skel skel-row w80"></div><div class="skel skel-row w60"></div><div class="skel skel-row w80"></div><div class="skel skel-row w40"></div><div class="skel skel-row w80"></div></div>';
+    renderRank();
+  }
+  if (id === 'community') {
+    if (!commPosts.free || !commPosts.free.length) {
+      $('community-content').innerHTML = '<div class="skel-card"><div class="skel skel-row w80"></div><div class="skel skel-row w60"></div></div><div class="skel-card"><div class="skel skel-row w80"></div><div class="skel skel-row w40"></div></div>';
+    }
+    renderCommunity();
+  }
   if (id === 'admin')     { renderAdmin(); }
   if (id === 'profile')   { renderProfile(); rList(); const ms = $('my-numbers-section'); if(ms && isLoggedIn) ms.style.display=''; }
 }
@@ -3013,7 +3127,7 @@ async function toggleCameraQR() {
   const area = document.getElementById('cam-area');
   if (_camStream) { stopCameraQR(); return; }
   if (!navigator.mediaDevices?.getUserMedia) {
-    alert('이 브라우저에서는 카메라 기능을 지원하지 않습니다.');
+    toast('⚠️ 이 브라우저에서는 카메라 기능을 지원하지 않습니다.');
     return;
   }
   try {
@@ -3030,7 +3144,7 @@ async function toggleCameraQR() {
   } catch(e) {
     area.style.display = 'none';
     document.getElementById('cam-btn').style.background = '#3b82f6';
-    alert('카메라 접근 권한이 필요합니다. 브라우저 주소창의 자물쇠 아이콘을 눌러 카메라 권한을 허용해주세요.');
+    toast('📷 카메라 권한이 필요합니다. 주소창 자물쇠 아이콘에서 허용해주세요.');
   }
 }
 
@@ -3307,7 +3421,7 @@ async function renderRank(catId) {
   $('rank-tab-row').innerHTML = RANK_CATS.map(c =>
     `<button class="rank-tab-pill ${c.id===catId?'on':''}" onclick="renderRank('${c.id}')">${c.label}</button>`
   ).join('');
-  $('rank-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px;">로딩 중...</div>';
+  $('rank-content').innerHTML = '<div class="skel-card"><div class="skel skel-row w80"></div><div class="skel skel-row w60"></div><div class="skel skel-row w80"></div><div class="skel skel-row w40"></div><div class="skel skel-row w80"></div></div>';
 
   try {
     // user_stats + profiles JOIN
