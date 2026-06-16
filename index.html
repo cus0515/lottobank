@@ -507,6 +507,14 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .badge-content,[data-theme="dark"] #badge-content > div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #badge-content > div > div[style*="background:#f8fafc"] { background:#263244 !important; }
 [data-theme="dark"] .post-detail-wrap { background:#1e293b; border-color:#334155; }
+/* ── 푸터 ── */
+.site-footer { background:var(--paper-white); border-top:1px solid var(--border-dashed); padding:20px 24px; text-align:center; font-size:11px; color:var(--text-muted); margin-top:auto; }
+.site-footer a { color:var(--text-muted); text-decoration:none; }
+.site-footer a:hover { color:var(--lotto-red); }
+.site-footer-inner { max-width:1500px; margin:0 auto; }
+.footer-links { display:flex; gap:16px; justify-content:center; margin-bottom:8px; flex-wrap:wrap; }
+[data-theme="dark"] .site-footer { background:#0f172a; border-top-color:#1e293b; }
+[data-theme="dark"] #home-live div[style*="background:linear-gradient(135deg,#fff5f5"] { background:linear-gradient(135deg,#1a0f0f,#1a0f1a) !important; border-color:#7f1d1d !important; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -939,6 +947,19 @@ main.chat-hidden .chat-panel { display: none; }
   </section>
 </main>
 
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-links">
+      <a href="javascript:void(0)" onclick="go('community')">커뮤니티</a>
+      <a href="javascript:void(0)" onclick="go('rank')">랭킹</a>
+      <a href="javascript:void(0)" onclick="go('fortune')">번호분석</a>
+      <span style="color:var(--border-dashed);">|</span>
+      <a href="https://dhlottery.co.kr" target="_blank" rel="noopener">동행복권</a>
+    </div>
+    <div>© 2024–2025 LottoBank · QR 기반 로또 전적 인증 플랫폼 · 본 서비스는 동행복권 공식 서비스가 아닙니다.</div>
+  </div>
+</footer>
+
 <div id="toast"></div>
 
 <script>
@@ -1251,7 +1272,16 @@ function renderHomeLive() {
       <div class="insight-item"><span>데이터 출처</span><b>동행복권 공식 API</b></div>
     </div>
     <div class="section-mini-title" style="margin-top:2px;"><span>실시간 활동 피드</span><em>최신순</em></div>
-    <div id="feed-list" style="min-height:40px;"></div>`;
+    <div id="feed-list" style="min-height:40px;"></div>
+    ${!isLoggedIn ? `<div style="margin-top:14px;background:linear-gradient(135deg,#fff5f5,#fdf4ff);border:1.5px solid #fecaca;border-radius:10px;padding:16px;">
+      <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:10px;">🚀 LottoBank 시작하기</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="min-width:22px;height:22px;border-radius:50%;background:var(--lotto-red);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;">1</div><div><div style="font-size:12px;font-weight:700;color:var(--text-dark);">회원가입</div><div style="font-size:11px;color:var(--text-muted);">이메일로 30초 만에 가입</div></div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="min-width:22px;height:22px;border-radius:50%;background:#f59e0b;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;">2</div><div><div style="font-size:12px;font-weight:700;color:var(--text-dark);">QR 등록</div><div style="font-size:11px;color:var(--text-muted);">동행복권 앱 구매내역 → QR 복사 → 붙여넣기</div></div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="min-width:22px;height:22px;border-radius:50%;background:#10b981;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;">3</div><div><div style="font-size:12px;font-weight:700;color:var(--text-dark);">전적 관리</div><div style="font-size:11px;color:var(--text-muted);">ROI · 뱃지 · 랭킹 자동 계산</div></div></div>
+      </div>
+      <button onclick="showAuthModal()" style="width:100%;margin-top:12px;padding:10px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit;">무료 시작하기</button>
+    </div>` : ''}`;
   renderFeed();
 }
 
@@ -1563,10 +1593,17 @@ async function renderQRHistory() {
       .eq('user_id', currentUser.id)
       .order('created_at', { ascending: false })
       .limit(5);
-    if (!tks || !tks.length) { wrap.innerHTML = ''; return; }
+    if (!tks || !tks.length) {
+      wrap.innerHTML = `<div style="text-align:center;padding:24px 16px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;margin-top:8px;">
+        <div style="font-size:32px;margin-bottom:10px;">🔖</div>
+        <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">아직 등록된 QR이 없습니다</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">동행복권 앱에서 구매 내역 QR을 복사해<br>위 입력창에 붙여넣기 하세요.</div>
+      </div>`;
+      return;
+    }
     const rankLabel = r => r===1?'🥇 1등':r===2?'🥈 2등':r===3?'🥉 3등':r===4?'🎯 4등':r===5?'✅ 5등':'낙첨';
     const rankColor = r => r<=3?'var(--lotto-red)':r===4?'#3b82f6':r===5?'#64748b':'#94a3b8';
-    wrap.innerHTML = `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-top:4px;">
+    wrap.innerHTML = `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px;margin-top:4px;">
       <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">최근 인증 이력</div>
       <div style="display:flex;flex-direction:column;gap:6px;">
         ${tks.map(t => `<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;">
