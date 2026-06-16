@@ -21,6 +21,8 @@
 <meta name="theme-color" content="#d61c4e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="LottoBank">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Courier+New&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -338,6 +340,7 @@ main.chat-hidden .chat-panel { display: none; }
   .mid-panel-inner { padding: 12px; }
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .badge-grid { grid-template-columns: repeat(3, 1fr); }
+  #toast { bottom: 80px; }
 }
 
 /* ── 로그인 모달 ── */
@@ -444,6 +447,9 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .mob-menu-panel { background:#1e293b; }
 [data-theme="dark"] .mob-menu-item { color:#f1f5f9; border-color:#334155; }
 [data-theme="dark"] .mob-menu-overlay { background:rgba(0,0,0,0.7); }
+[data-theme="dark"] .mob-drawer { background:#1e293b !important; color:#f1f5f9; box-shadow:-4px 0 24px rgba(0,0,0,0.5); }
+[data-theme="dark"] .mob-drawer-head { border-bottom-color:#334155 !important; }
+[data-theme="dark"] .mob-drawer-close { color:#94a3b8 !important; }
 [data-theme="dark"] .hamburger span { background:#f1f5f9; }
 [data-theme="dark"] .rank-history-table th { background:#0f172a; color:#94a3b8; }
 [data-theme="dark"] .rank-history-table td { border-color:#334155; color:#f1f5f9; }
@@ -611,7 +617,7 @@ main.chat-hidden .chat-panel { display: none; }
     </div>
     <div class="auth-field" id="auth-nick-row" style="display:none">
       <label>닉네임</label>
-      <input type="text" id="auth-nick" placeholder="사용할 닉네임 (2~12자)" maxlength="12" onkeyup="if(event.key==='Enter')doAuth()">
+      <input type="text" id="auth-nick" placeholder="사용할 닉네임 (2~12자)" maxlength="12" oninput="checkNickAvail(this.value)" onkeyup="if(event.key==='Enter')doAuth()">
     </div>
     <div class="auth-field">
       <label>비밀번호</label>
@@ -1033,6 +1039,14 @@ const QR_USED_KEY = 'lottobank_qr_used';
 const BADGE_KEY = 'lottobank_badge';
 
 let MY = [];
+window.addEventListener('unhandledrejection', e => {
+  const msg = e.reason?.message || String(e.reason);
+  if (msg && !msg.includes('cancel') && !msg.includes('AbortError')) {
+    console.error('[LottoBank]', msg);
+  }
+  e.preventDefault();
+});
+
 let isLoggedIn = false;
 let currentUser = null;
 let myVerifiedTitle = null;
@@ -1701,6 +1715,26 @@ function showAuthModal() {
 }
 
 // 비밀번호 재설정 이메일 발송
+let _nickCheckTimer = null;
+async function checkNickAvail(val) {
+  const errEl = $('auth-err');
+  const trimmed = val.trim();
+  if (trimmed.length < 2) { errEl.textContent = ''; return; }
+  clearTimeout(_nickCheckTimer);
+  _nickCheckTimer = setTimeout(async () => {
+    try {
+      const { data } = await sb.from('profiles').select('id').eq('nickname', trimmed).maybeSingle();
+      if (data) {
+        errEl.textContent = '❌ 이미 사용 중인 닉네임입니다.';
+        errEl.style.color = '#dc2626';
+      } else if (trimmed.length >= 2) {
+        errEl.textContent = '✓ 사용 가능한 닉네임입니다.';
+        errEl.style.color = '#16a34a';
+      }
+    } catch(_) {}
+  }, 500);
+}
+
 async function forgotPassword() {
   const email = document.getElementById('auth-email').value.trim();
   if (!email) { $('auth-err').textContent = '이메일을 먼저 입력해주세요.'; return; }
@@ -1735,7 +1769,7 @@ function shareURL(url, label) {
 
 function closeAuthModal() {
   $('auth-modal').classList.remove('open');
-  $('auth-err').textContent = '';
+  $('auth-err').textContent = ''; $('auth-err').style.color = '';
   // 성공 배너 및 폼 초기화
   $('auth-success-banner').style.display = 'none';
   $('auth-submit').style.display = '';
@@ -1764,7 +1798,7 @@ function toggleAuthMode() {
   if ($('forgot-pwd-row')) $('forgot-pwd-row').style.display = isSignup ? 'none' : 'block';
   if ($('auth-success-banner')) $('auth-success-banner').style.display = 'none';
   document.querySelector('.auth-divider').textContent = isSignup ? '이미 계정이 있으신가요?' : '계정이 없으신가요?';
-  $('auth-err').textContent = '';
+  $('auth-err').textContent = ''; $('auth-err').style.color = '';
 }
 
 async function doAuth() {
