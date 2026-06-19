@@ -1118,6 +1118,11 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 
       <!-- 3. QR 인증 -->
       <div id="pg-ticket" class="page-content" style="display:none;">
+        <div style="background:linear-gradient(135deg,#1a0a2e,#2d1b4e);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 16px rgba(45,27,78,.4);">
+          <div style="font-size:10px;opacity:.4;font-weight:700;letter-spacing:1px;margin-bottom:3px;">QR VERIFY</div>
+          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">🔍 QR 당첨 인증</div>
+          <div style="font-size:11px;opacity:.5;">동행복권 앱 QR로 실제 구매 이력을 등록하세요</div>
+        </div>
         <div id="qr-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:18px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
           <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> 실물 로또 QR 당첨 인증</div>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">동행복권 앱 → 구매내역 → QR코드 → URL 복사 후 붙여넣기</p>
@@ -1186,22 +1191,42 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 
       <!-- 5. 전적 -->
       <div id="pg-stats" class="page-content" style="display:none;">
+        <div style="background:linear-gradient(135deg,#0f2a18,#14532d);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 16px rgba(20,83,45,.4);">
+          <div style="font-size:10px;opacity:.4;font-weight:700;letter-spacing:1px;margin-bottom:3px;">MY RECORD</div>
+          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">📊 나의 전적</div>
+          <div style="font-size:11px;opacity:.5;">QR 인증 기반 실제 투자 · 당첨 기록</div>
+        </div>
         <div id="stats-content"></div>
       </div>
 
       <!-- 6. 뱃지 -->
       <div id="pg-badge" class="page-content" style="display:none;">
+        <div style="background:linear-gradient(135deg,#451a03,#92400e);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 16px rgba(146,64,14,.4);">
+          <div style="font-size:10px;opacity:.4;font-weight:700;letter-spacing:1px;margin-bottom:3px;">ACHIEVEMENTS</div>
+          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">🏅 뱃지 컬렉션</div>
+          <div style="font-size:11px;opacity:.5;">QR 인증 활동으로 뱃지를 획득하세요</div>
+        </div>
         <div id="badge-content"></div>
       </div>
 
       <!-- 7. 랭킹 -->
       <div id="pg-rank" class="page-content" style="display:none;">
-        <div class="rank-tab-row" id="rank-tab-row"></div>
+        <div style="background:linear-gradient(135deg,#0f172a,#1e1b4b);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 16px rgba(30,27,75,.5);">
+          <div style="font-size:10px;opacity:.4;font-weight:700;letter-spacing:1px;margin-bottom:3px;">LEADERBOARD</div>
+          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">🏆 전국 로또 랭킹</div>
+          <div style="font-size:11px;opacity:.5;">QR 인증 데이터 기반 실시간 순위</div>
+        </div>
+        <div class="rank-tab-row" id="rank-tab-row" style="overflow-x:auto;padding-bottom:2px;flex-wrap:nowrap;white-space:nowrap;"></div>
         <div id="rank-content"></div>
       </div>
 
       <!-- 8. 커뮤니티 -->
       <div id="pg-community" class="page-content" style="display:none;">
+        <div style="background:linear-gradient(135deg,#0c1a2e,#1e3a5f);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 16px rgba(30,58,95,.4);">
+          <div style="font-size:10px;opacity:.4;font-weight:700;letter-spacing:1px;margin-bottom:3px;">COMMUNITY</div>
+          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">💬 커뮤니티</div>
+          <div style="font-size:11px;opacity:.5;">로또 경험을 나누고 당첨을 인증하세요</div>
+        </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div class="comm-tab-row" style="margin-bottom:0;">
             <button class="comm-tab-btn on" id="ct-free" onclick="commTab('free')">자유게시판</button>
@@ -3480,6 +3505,17 @@ function genRecommended() {
   }
 
   $('fortune-content').innerHTML = `
+    <!-- page banner -->
+    <div style="background:linear-gradient(135deg,#1a0a2e 0%,#4c1d95 100%);border-radius:14px;padding:16px 20px;margin-bottom:14px;color:#fff;box-shadow:0 6px 24px rgba(76,29,149,.35);border:1px solid rgba(139,92,246,.2);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(167,139,250,.18) 0%,transparent 70%);pointer-events:none;"></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:22px;">🎯</span>
+        <div>
+          <div style="font-size:15px;font-weight:900;letter-spacing:-.3px;">번호분석 &amp; 로또 DNA</div>
+          <div style="font-size:10px;opacity:.5;margin-top:2px;font-weight:600;">출현 패턴 · 냉온 번호 · 나만의 이번주 추천 번호</div>
+        </div>
+      </div>
+    </div>
     <!-- 0. 다음 추첨 카운트다운 -->
     <div id="draw-countdown-block" style="background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%);border-radius:12px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 14px rgba(220,38,38,.3);">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
