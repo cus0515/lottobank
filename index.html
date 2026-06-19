@@ -4402,6 +4402,12 @@ function renderStats() {
   // 여기서는 기본 placeholder 렌더 후 loadTicketHistory에서 업데이트
 
   $('stats-content').innerHTML = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+      <button onclick="shareMyStats(${totalBuy},${totalPrize.toFixed(0)},${roi.toFixed(1)},${winCount})" style="display:flex;align-items:center;gap:5px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        전적 공유
+      </button>
+    </div>
     <div class="kpi-grid">
       <div class="kpi-box"><div class="kpi-label">총 구매 게임수</div><div class="kpi-value">${totalBuy}<span style="font-size:13px;font-weight:500;">게임</span></div><div class="kpi-sub">총 ${fmtMFull(totalInvest)} 투자</div></div>
       <div class="kpi-box"><div class="kpi-label">총 당첨 횟수</div><div class="kpi-value blue">${winCount}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">당첨률 ${totalBuy > 0 ? (winCount/totalBuy*100).toFixed(1) : 0}%</div></div>
@@ -6373,6 +6379,18 @@ function computeLuckyScore() {
     const colorMap = n => n<=9?'#ef4444':n<=19?'#f97316':n<=29?'#eab308':n<=39?'#3b82f6':'#64748b';
     numsEl.innerHTML = '<span style="font-size:9px;opacity:.5;margin-right:4px;align-self:center;">오늘의 번호</span>' +
       lucky3.map(n=>`<div style="width:26px;height:26px;border-radius:50%;background:${colorMap(n)};display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;">${n}</div>`).join('');
+  }
+}
+
+
+function shareMyStats(buy, prize, roi, wins) {
+  const nick = (currentUser && currentUser.user_metadata && currentUser.user_metadata.nickname) || '로또뱅커';
+  const roiStr = roi >= 0 ? '+' + roi : roi.toString();
+  const text = `🏆 ${nick}님의 LottoBank 전적\n\n📊 총 ${buy}게임 구매\n🏅 총 ${wins}회 당첨\n💰 총 ${Number(prize).toLocaleString()}원 수령\n📈 ROI: ${roiStr}%\n\n👉 https://lottobank.pages.dev`;
+  if (navigator.share) {
+    navigator.share({ title: 'LottoBank 내 전적', text }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text).then(() => toast('📋 전적 복사됨!')).catch(()=>{});
   }
 }
 
