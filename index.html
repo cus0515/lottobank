@@ -5422,7 +5422,21 @@ function renderCommunityList() {
   }
   const heartSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
   const chatSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
-  $('community-content').innerHTML = posts.map((p,idx) => {
+  // 인기 태그 집계 (모든 게시글 기준)
+  const allTagPosts = [...(commPosts['free']||[]), ...(commPosts['verify']||[])];
+  const tagCount = {};
+  allTagPosts.forEach(p => {
+    const { tag } = parsePostTag(p.title || '');
+    if (tag) tagCount[tag] = (tagCount[tag] || 0) + 1;
+  });
+  const topTags = Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const tagsHtml = topTags.length ? `<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center;">
+    <span style="font-size:10px;color:var(--text-muted);font-weight:600;">인기태그</span>
+    ${topTags.map(([t,c])=>`<button onclick="$('comm-search-input').value='[${t}]';commSearch('[${t}]')" style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:12px;padding:2px 9px;font-size:10px;font-weight:700;cursor:pointer;color:#475569;font-family:inherit;">#${t} <span style="opacity:.5;">${c}</span></button>`).join('')}
+    ${commSearchQuery?`<button onclick="$('comm-search-input').value='';commSearch('')" style="background:#fff5f5;border:1px solid #fecaca;border-radius:12px;padding:2px 9px;font-size:10px;font-weight:700;cursor:pointer;color:#dc2626;font-family:inherit;">✕ 초기화</button>`:''}
+  </div>` : '';
+
+  $('community-content').innerHTML = tagsHtml + posts.map((p,idx) => {
     const liked = myLikedPostIds.has(p.id);
     const bodyPreview = p.body ? (p.body.replace(/</g,'&lt;').slice(0,80) + (p.body.length > 80 ? '…' : '')) : '';
     const isHot = (p.likes||0) >= 5;
