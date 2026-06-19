@@ -731,6 +731,19 @@ input:focus, textarea:focus { box-shadow:0 0 0 3px rgba(220,38,38,.1) !important
 /* 아바타 피커 다크모드 */
 [data-theme="dark"] #avatar-picker-panel { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #avatar-picker-panel button { border-color:#475569 !important; }
+/* ===== 카운트업 숫자 애니메이션 ===== */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stat-anim { animation: countUp .4s ease; }
+
+/* ===== auth modal 브랜드 로고 ===== */
+.auth-box h2 { font-size:20px; font-weight:900; color:var(--text-dark); margin:0 0 4px; }
+
+/* ===== 결과 페이지 회차 이동 입력 다크모드 ===== */
+[data-theme="dark"] #res-jump-input { background:#1e293b !important; color:#f1f5f9 !important; border-color:#334155 !important; }
+
 /* fortune page dark mode */
 [data-theme="dark"] #fortune-content > div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #fortune-content div[style*="background:#f8fafc"] { background:#263244 !important; }
@@ -900,8 +913,13 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 <div id="auth-modal" class="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-title" onclick="if(event.target===this)closeAuthModal()">
   <div class="auth-box">
     <button class="auth-close" onclick="closeAuthModal()">✕</button>
-    <h2 id="auth-title">로그인</h2>
-    <p class="auth-sub" id="auth-sub">이메일과 비밀번호로 로그인하세요</p>
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border-radius:12px;padding:8px 16px;font-size:15px;font-weight:900;letter-spacing:-.3px;box-shadow:0 4px 12px rgba(220,38,38,.3);">
+        🎱 LottoBank
+      </div>
+    </div>
+    <h2 id="auth-title" style="text-align:center;">로그인</h2>
+    <p class="auth-sub" id="auth-sub" style="text-align:center;">이메일과 비밀번호로 로그인하세요</p>
     <div class="auth-field">
       <label>이메일</label>
       <input type="email" id="auth-email" placeholder="example@email.com" autocomplete="email" onkeyup="if(event.key==='Enter')doAuth()">
@@ -937,7 +955,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
     <div style="text-align:center">
       <button class="auth-switch" id="auth-switch" onclick="toggleAuthMode()">회원가입</button>
     </div>
-    <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #e2e8f0;">
+    <div id="admin-test-btn-wrap" style="display:none;margin-top:16px;padding-top:14px;border-top:1px dashed #e2e8f0;">
       <div style="font-size:11px;color:#94a3b8;text-align:center;margin-bottom:8px;">관리자 전용</div>
       <button onclick="adminTestLogin()" style="width:100%;padding:10px;background:#1e293b;color:#fff;font-size:13px;font-weight:700;border:none;border-radius:7px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -1138,7 +1156,20 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
         </div>
         <div id="qr-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:18px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
           <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> 실물 로또 QR 당첨 인증</div>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">동행복권 앱 → 구매내역 → QR코드 → URL 복사 후 붙여넣기</p>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted);">
+              <span style="width:18px;height:18px;border-radius:50%;background:#dc2626;color:#fff;font-size:9px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>
+              동행복권 앱 → 하단 <strong style="color:var(--text-dark);">'구매내역'</strong> 탭
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted);">
+              <span style="width:18px;height:18px;border-radius:50%;background:#f59e0b;color:#fff;font-size:9px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
+              구매 내역 선택 → <strong style="color:var(--text-dark);">'QR코드'</strong> 탭
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted);">
+              <span style="width:18px;height:18px;border-radius:50%;background:#10b981;color:#fff;font-size:9px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">3</span>
+              QR 이미지 하단 <strong style="color:var(--text-dark);">URL 복사</strong> → 아래 입력란에 붙여넣기
+            </div>
+          </div>
           <div style="position:relative;">
             <input type="text" id="qr-url-input" class="input-custom" placeholder="로또 6/45 · 연금복권 720+ QR URL 붙여넣기" onkeyup="if(event.key==='Enter')verifyRealQR();qrInputPreview(this.value)" oninput="qrInputPreview(this.value)" style="padding-right:72px;">
             <div id="qr-input-hint" style="min-height:18px;margin-top:4px;font-size:11px;"></div>
@@ -2314,6 +2345,12 @@ function updateBadgeUI() {
 let authMode = 'login';
 
 function showAuthModal() {
+  // 관리자만 테스트 버튼 표시
+  const adminWrap = $('admin-test-btn-wrap');
+  if (adminWrap) {
+    const curEmail = currentUser?.email || '';
+    adminWrap.style.display = (curEmail === ADMIN_EMAIL || location.search.includes('admin=1')) ? 'block' : 'none';
+  }
   if (isLoggedIn) {
     sb.auth.signOut();
     return;
@@ -2946,7 +2983,14 @@ async function loadGuestStats() {
       rank1:   a.rank1   + (r.rank_1_count||0),
     }), { tickets:0, wins:0, spent:0, prize:0, rank1:0 });
     const roi = tot.spent > 0 ? ((tot.prize - tot.spent) / tot.spent * 100).toFixed(1) : null;
-    const el = (id, val) => { const e = $(id); if(e) e.textContent = val; };
+    const el = (id, val) => {
+      const e = $(id);
+      if (!e) return;
+      e.textContent = val;
+      e.classList.remove('stat-anim');
+      void e.offsetWidth; // reflow
+      e.classList.add('stat-anim');
+    };
     el('gs-tickets', tot.tickets > 0 ? fmtCnt(tot.tickets) + '게임' : '0게임');
     el('gs-wins',    tot.wins > 0    ? fmtCnt(tot.wins) + '회'    : '0회');
     el('gs-rank1',   tot.rank1 > 0   ? fmtCnt(tot.rank1) + '명'   : '0명');
