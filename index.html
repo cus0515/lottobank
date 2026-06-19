@@ -788,6 +788,91 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 
 
 [data-theme="dark"] .home-dna-card { background: linear-gradient(135deg, #1e293b, #1e1b4b) !important; }
+
+/* ===== Dark mode comprehensive additions ===== */
+[data-theme="dark"] #badge-content div[style*="background:#fff;"],
+[data-theme="dark"] #badge-content div[style*="background:#fff "],
+[data-theme="dark"] #profile-content div[style*="background:#fff"],
+[data-theme="dark"] #comm-section div[style*="background:#fff;"],
+[data-theme="dark"] #community-content div[style*="background:#fff;"] { background:#1e293b !important; border-color:#334155 !important; }
+
+[data-theme="dark"] #badge-content div[style*="background:#f8fafc"],
+[data-theme="dark"] #badge-content div[style*="background:#f1f5f9"],
+[data-theme="dark"] #profile-content div[style*="background:#f8fafc"],
+[data-theme="dark"] #profile-content div[style*="background:#f1f5f9"],
+[data-theme="dark"] #comm-section div[style*="background:#f8fafc"],
+[data-theme="dark"] #community-content div[style*="background:#f8fafc"] { background:#263244 !important; }
+
+/* ROI bar dark */
+[data-theme="dark"] .roi-bar-wrap { background:#334155 !important; }
+
+/* Rank table */
+[data-theme="dark"] #rank-content div[style*="background:#fff;"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #rank-content div[style*="background:#f8fafc"] { background:#263244 !important; }
+
+/* QR result display dark */
+[data-theme="dark"] #qr-result-display div[style*="background:var(--paper-white)"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #qr-result-display div[style*="background:#f8fafc"] { background:#263244 !important; }
+
+/* kpi-box dark */
+[data-theme="dark"] .kpi-box { background:#1e293b !important; border-color:#334155 !important; }
+
+/* Auth modal dark */
+[data-theme="dark"] #auth-modal .auth-box { background:#1e293b !important; }
+[data-theme="dark"] #auth-modal input { background:#0f172a !important; color:#e2e8f0 !important; border-color:#334155 !important; }
+[data-theme="dark"] #auth-modal .auth-tab { color:#94a3b8 !important; border-color:#334155 !important; }
+[data-theme="dark"] #auth-modal .auth-tab.on { color:#f1f5f9 !important; border-color:#dc2626 !important; }
+
+/* Post cards in community */
+[data-theme="dark"] .post-card { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] .post-card:hover { background:#263244 !important; }
+[data-theme="dark"] .post-tag-badge { background:#334155 !important; color:#94a3b8 !important; }
+
+/* Badge cards dark */
+[data-theme="dark"] .badge-card-item { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] .badge-card-item.earned { background:#2d1a1a !important; border-color:#7f1d1d !important; }
+
+/* Profile page inputs */
+[data-theme="dark"] #nick-input { background:#0f172a !important; color:#e2e8f0 !important; border-color:#334155 !important; }
+
+/* Chat window */
+[data-theme="dark"] #chat-messages { background:#0f172a !important; }
+[data-theme="dark"] .chat-msg-bubble { background:#1e293b !important; }
+[data-theme="dark"] #chat-input-bar { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #chat-input { background:#0f172a !important; color:#e2e8f0 !important; }
+
+/* Fortune page */
+[data-theme="dark"] #fortune-content div[style*="background:#fff "] { background:#1e293b !important; border-color:#334155 !important; }
+
+/* streak card */
+[data-theme="dark"] #streak-card { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #streak-grid > div { background:#0f172a !important; }
+
+/* activity feed */
+[data-theme="dark"] #feed-list > div { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #left-activity-feed > div { background:#1e293b !important; }
+
+/* Res (당첨결과) page dark */
+[data-theme="dark"] #res-wrap > div { color:var(--text-dark); }
+[data-theme="dark"] #res-wrap div[style*="background:#fff;"],
+[data-theme="dark"] #res-wrap div[style*="background:#fff "] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #res-wrap div[style*="background:#f8fafc"],
+[data-theme="dark"] #res-wrap div[style*="background:#f1f5f9"] { background:#263244 !important; }
+
+/* select boxes */
+[data-theme="dark"] select { background:#1e293b !important; color:#e2e8f0 !important; border-color:#334155 !important; }
+/* Quick check inputs dark */
+[data-theme="dark"] #qc-1,[data-theme="dark"] #qc-2,[data-theme="dark"] #qc-3,
+[data-theme="dark"] #qc-4,[data-theme="dark"] #qc-5,[data-theme="dark"] #qc-6 {
+  background:#1e293b !important; color:#e2e8f0 !important; border-color:#334155 !important;
+}
+[data-theme="dark"] #quick-check-result div { color:var(--text-dark); }
+
+/* Scrollbar dark */
+[data-theme="dark"] ::-webkit-scrollbar-track { background:#1e293b; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background:#475569; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background:#64748b; }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -806,6 +891,19 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 </script>
 </head>
 <body>
+<!-- 스크롤 업 버튼 -->
+<button id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="맨 위로"
+  style="display:none;position:fixed;bottom:72px;right:16px;z-index:1000;width:40px;height:40px;border-radius:50%;background:var(--lotto-red);color:#fff;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(220,38,38,.4);font-size:18px;line-height:1;transition:opacity .2s,transform .2s;align-items:center;justify-content:center;">↑</button>
+<script>
+(function(){
+  const btn = document.getElementById('scroll-top-btn');
+  if (!btn) return;
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) { btn.style.display='flex'; }
+    else { btn.style.display='none'; }
+  }, { passive: true });
+})();
+</script>
 <a href="#main-content" style="position:absolute;left:-9999px;top:6px;background:var(--lotto-red);color:#fff;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:700;z-index:9999;text-decoration:none;" onfocus="this.style.left='6px'" onblur="this.style.left='-9999px'">본문으로 바로가기</a>
 
 <header>
@@ -1144,6 +1242,21 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
         <div class="lotto-slip" style="margin-top:10px;">
           <div id="res-balls" class="ball-context"></div>
           <div id="res-list" style="font-size:13px;"></div>
+        </div>
+        <!-- 번호 직접 확인 -->
+        <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;margin-top:10px;">
+          <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">🔢 번호 직접 확인</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">6개 번호 입력 후 현재 회차와 비교</div>
+          <div style="display:flex;gap:4px;margin-bottom:6px;" id="quick-check-inputs">
+            <input type="number" id="qc-1" min="1" max="45" placeholder="1" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-2').focus()">
+            <input type="number" id="qc-2" min="1" max="45" placeholder="2" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-3').focus()">
+            <input type="number" id="qc-3" min="1" max="45" placeholder="3" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-4').focus()">
+            <input type="number" id="qc-4" min="1" max="45" placeholder="4" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-5').focus()">
+            <input type="number" id="qc-5" min="1" max="45" placeholder="5" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-6').focus()">
+            <input type="number" id="qc-6" min="1" max="45" placeholder="6" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(event.key==='Enter')quickCheckNumbers()">
+          </div>
+          <button onclick="quickCheckNumbers()" style="width:100%;padding:8px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">확인하기</button>
+          <div id="quick-check-result" style="margin-top:8px;"></div>
         </div>
       </div>
 
@@ -1591,7 +1704,7 @@ function checkWinRank(myNums, winNums, bonus) {
   if (matched === 5) return { rank: 3, label: '3등 당첨!', badge: '3등' };
   if (matched === 4) return { rank: 4, label: '4등 당첨', badge: null };
   if (matched === 3) return { rank: 5, label: '5등 당첨', badge: null };
-  return { rank: 0, label: '낙첨', badge: null };
+  return { rank: 6, label: '낙첨', badge: null };
 }
 
 // QR URL 파싱 (동행복권 실제 포맷)
@@ -1893,6 +2006,45 @@ function resJumpTo() {
   inp.blur();
 }
 
+function quickCheckNumbers() {
+  const nums = [];
+  for (let i = 1; i <= 6; i++) {
+    const el = $('qc-' + i);
+    if (!el) continue;
+    const v = parseInt(el.value);
+    if (!v || v < 1 || v > 45) { toast('⚠️ 1~45 사이의 번호 6개를 모두 입력해주세요.'); return; }
+    if (nums.includes(v)) { toast('⚠️ 중복된 번호가 있습니다: ' + v); return; }
+    nums.push(v);
+  }
+  if (nums.length !== 6) { toast('⚠️ 번호 6개를 모두 입력해주세요.'); return; }
+  nums.sort((a,b) => a - b);
+
+  const round = parseInt($('res-sel')?.value);
+  const d = round ? apiCache[round] : latestData;
+  if (!d) { toast('⚠️ 당첨번호 데이터가 없습니다.'); return; }
+
+  const result = checkWinRank(nums, d.nums, d.bonus);
+  const matchedNums = nums.filter(n => d.nums.includes(n));
+  const hasBonus = nums.includes(d.bonus);
+  const ballsHtml = nums.map(n => bH(n, d.nums.includes(n) || (result.rank===2 && n===d.bonus))).join('');
+
+  const rColors = {1:'#dc2626',2:'#7c3aed',3:'#059669',4:'#2563eb',5:'#d97706',6:'#94a3b8'};
+  const rBgs   = {1:'#fee2e2',2:'#ede9fe',3:'#d1fae5',4:'#dbeafe',5:'#fef3c7',6:'#f8fafc'};
+  const rIcons  = {1:'🥇',2:'🥈',3:'🥉',4:'🎯',5:'✅',6:'😢'};
+  const rk = result.rank || 6;
+  const prizeAmt = rk <= 5 ? calcPrizeAmount(rk, d) : 0;
+
+  $('quick-check-result').innerHTML = `
+    <div style="background:${rBgs[rk]};border:1.5px solid ${rColors[rk]}44;border-radius:10px;padding:12px;text-align:center;animation:pageFadeIn .2s ease;">
+      <div style="font-size:24px;margin-bottom:4px;">${rIcons[rk]}</div>
+      <div style="font-size:15px;font-weight:900;color:${rColors[rk]};margin-bottom:4px;">${result.label || '낙첨'}</div>
+      ${prizeAmt>0?`<div style="font-size:13px;font-weight:700;color:${rColors[rk]};margin-bottom:6px;">${fmtMFull(prizeAmt)}</div>`:''}
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">일치 ${matchedNums.length}개${hasBonus&&rk!==2?' + 보너스':''} · ${round||d.round}회차 기준</div>
+      <div class="ball-context" style="justify-content:center;margin:0;">${ballsHtml}</div>
+    </div>`;
+  if (result.rank <= 3) setTimeout(miniConfetti, 200);
+}
+
 function resNavStep(delta) {
   const sel = $('res-sel');
   if (!sel) return;
@@ -2177,19 +2329,37 @@ async function renderQRHistory() {
       </div>`;
       return;
     }
-    window._ltbTickets = tickets;
+    window._ltbTickets = tks;
     const rankLabel = r => r===1?'🥇 1등':r===2?'🥈 2등':r===3?'🥉 3등':r===4?'🎯 4등':r===5?'✅ 5등':'낙첨';
     const rankColor = r => r<=3?'var(--lotto-red)':r===4?'#3b82f6':r===5?'#64748b':'#94a3b8';
-    wrap.innerHTML = `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px;margin-top:4px;">
-      <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">최근 인증 이력</div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        ${tks.map(t => `<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;">
-          <span style="color:var(--text-muted);">${t.round_no||'-'}회 ·${t.game_count||1}게임</span>
-          <span style="font-weight:700;color:${rankColor(t.prize_rank)};">${rankLabel(t.prize_rank)}${t.prize_rank&&t.prize_rank<=5&&t.prize_amount?' · '+fmtMFull(t.prize_amount):''}</span>
-        </div>`).join('')}
+    const rankBg = r => r===1?'linear-gradient(135deg,#fff7ed,#fef3c7)':r===2?'#f5f3ff':r===3?'#f0fdf4':r===4?'#eff6ff':r===5?'#f8fafc':'#f8fafc';
+    const rankBorder = r => r===1?'#fde68a':r===2?'#ddd6fe':r===3?'#86efac':r===4?'#bfdbfe':r===5?'#e2e8f0':'#e2e8f0';
+    const totalWins = tks.filter(t=>t.prize_rank&&t.prize_rank<=5).length;
+    const totalGames = tks.reduce((s,t)=>s+(t.game_count||1),0);
+    wrap.innerHTML = `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-top:6px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:12px;font-weight:900;color:var(--text-dark);">📋 최근 인증 이력 (${tks.length}건)</div>
+        <button onclick="go('stats')" style="font-size:10px;color:var(--lotto-red);background:none;border:none;cursor:pointer;font-weight:700;font-family:inherit;">전체 보기 →</button>
       </div>
-      <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;text-align:right;">
-        <button onclick="go('stats')" style="font-size:11px;color:var(--lotto-red);background:none;border:none;cursor:pointer;font-weight:700;">전체 이력 보기 →</button>
+      <div style="display:flex;gap:12px;margin-bottom:10px;padding:8px;background:var(--bg-light);border-radius:8px;">
+        <div style="flex:1;text-align:center;"><div style="font-size:18px;font-weight:900;color:var(--text-dark);">${tks.length}</div><div style="font-size:10px;color:var(--text-muted);">인증 티켓</div></div>
+        <div style="width:1px;background:var(--border-dashed);"></div>
+        <div style="flex:1;text-align:center;"><div style="font-size:18px;font-weight:900;color:var(--text-dark);">${totalGames}</div><div style="font-size:10px;color:var(--text-muted);">총 게임수</div></div>
+        <div style="width:1px;background:var(--border-dashed);"></div>
+        <div style="flex:1;text-align:center;"><div style="font-size:18px;font-weight:900;color:var(--lotto-red);">${totalWins}</div><div style="font-size:10px;color:var(--text-muted);">당첨 횟수</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        ${tks.map(t => {
+          const rk = t.prize_rank||0;
+          const won = rk>=1&&rk<=5;
+          return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:${rankBg(rk)};border:1px solid ${rankBorder(rk)};border-radius:8px;">
+            <div>
+              <span style="font-size:12px;font-weight:700;color:var(--text-dark);">${t.round_no||'-'}회</span>
+              <span style="font-size:10px;color:var(--text-muted);margin-left:5px;">${t.game_count||1}게임</span>
+            </div>
+            <span style="font-size:11px;font-weight:900;color:${rankColor(rk)};">${rankLabel(rk)}${won&&t.prize_amount?' · '+fmtMFull(t.prize_amount):''}</span>
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
   } catch(e) { wrap.innerHTML = ''; }
@@ -2271,14 +2441,16 @@ async function verifyRealQR() {
     const result = checkWinRank(nums, winData.nums, winData.bonus);
     if (result.rank < bestRank) { bestRank = result.rank; bestLabel = result.label; }
     const myBallsHtml = nums.map(n => bH(n, winData.nums.includes(n))).join('');
+    const rColors = { 1:'#dc2626', 2:'#7c3aed', 3:'#059669', 4:'#2563eb', 5:'#d97706' };
+    const rBgs   = { 1:'#fee2e2', 2:'#ede9fe', 3:'#d1fae5', 4:'#dbeafe', 5:'#fef3c7' };
     const rankLabel = result.rank <= 5
-      ? `<span style="color:var(--lotto-red);font-weight:900;">${result.label}</span>`
-      : `<span style="color:var(--text-muted);">낙첨</span>`;
+      ? `<span style="background:${rBgs[result.rank]};color:${rColors[result.rank]};font-weight:900;font-size:10px;padding:2px 6px;border-radius:10px;">${result.label}</span>`
+      : `<span style="color:var(--text-muted);font-size:10px;">낙첨</span>`;
     gamesHtml += `
-      <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f1f5f9;">
-        <span style="font-size:11px;color:var(--text-muted);font-weight:700;white-space:nowrap;min-width:32px;">${String.fromCharCode(64+idx+1)}게임</span>
-        <div class="ball-context" style="margin:0;gap:3px;">${myBallsHtml}</div>
-        <span style="font-size:12px;font-weight:700;margin-left:auto;">${rankLabel}</span>
+      <div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border-dashed);">
+        <span style="font-size:10px;color:var(--text-muted);font-weight:700;white-space:nowrap;min-width:28px;">${String.fromCharCode(64+idx+1)}</span>
+        <div class="ball-context" style="margin:0;gap:2px;">${myBallsHtml}</div>
+        <span style="margin-left:auto;">${rankLabel}</span>
       </div>`;
   });
 
@@ -2327,21 +2499,46 @@ async function verifyRealQR() {
     : bestRank <= 5 ? `${bestLabel} 인증 완료`
     : '영수증 인증 완료 — 낙첨권입니다';
 
+  // 당첨 등수별 스타일 설정
+  const rankConfig = {
+    1: { bg:'linear-gradient(135deg,#ff6b35,#f7c948)', icon:'🥇', label:'1등 당첨!', sub:'억대 행운의 주인공', color:'#7c2d00', border:'rgba(255,255,255,.3)' },
+    2: { bg:'linear-gradient(135deg,#6366f1,#8b5cf6)', icon:'🥈', label:'2등 당첨!', sub:'보너스 번호 적중!', color:'#fff', border:'rgba(255,255,255,.25)' },
+    3: { bg:'linear-gradient(135deg,#10b981,#059669)', icon:'🥉', label:'3등 당첨!', sub:'5개 번호 일치!', color:'#fff', border:'rgba(255,255,255,.25)' },
+    4: { bg:'linear-gradient(135deg,#3b82f6,#2563eb)', icon:'🎉', label:'4등 당첨', sub:'4개 번호 일치', color:'#fff', border:'rgba(255,255,255,.25)' },
+    5: { bg:'linear-gradient(135deg,#f59e0b,#d97706)', icon:'🎊', label:'5등 당첨', sub:'3개 번호 일치 · 5,000원', color:'#fff', border:'rgba(255,255,255,.25)' },
+    6: { bg:'var(--paper-white)', icon:'📋', label:'낙첨', sub:'다음 기회에!', color:'var(--text-muted)', border:'var(--border-dashed)' }
+  };
+  const rc = rankConfig[bestRank] || rankConfig[6];
+  const prizeAmt = bestRank <= 5 ? calcPrizeAmount(bestRank, winData) : 0;
+  const prizeHtml = prizeAmt > 0
+    ? `<div style="font-size:${bestRank<=2?'22':'16'}px;font-weight:900;margin:8px 0 4px;letter-spacing:-.5px;">${fmtMFull(prizeAmt)}</div>`
+    : '';
+
   $('qr-result-display').innerHTML = `
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;font-size:12px;animation:pageFadeIn .25s ease;">
-      <div style="font-weight:900;margin-bottom:6px;font-size:13px;color:var(--text-dark);">${parsed.round}회 공식 당첨번호</div>
-      <div class="ball-context" style="justify-content:flex-start;margin:0 0 12px;">${winBallsHtml}</div>
-      <div style="font-weight:700;margin-bottom:4px;">내 번호 (${parsed.games.length}게임)</div>
-      ${gamesHtml}
-      <div style="background:${summaryBg};border:1px solid ${summaryBorder};border-radius:4px;padding:10px;margin-top:10px;font-size:12px;font-weight:700;color:${summaryColor};">
-        ${summaryMsg}
+    <div style="border-radius:14px;overflow:hidden;animation:pageFadeIn .3s ease;border:1px solid var(--border-dashed);">
+      <!-- 결과 헤더 -->
+      <div style="background:${rc.bg};padding:18px 16px 14px;text-align:center;position:relative;">
+        <div style="font-size:28px;margin-bottom:4px;">${rc.icon}</div>
+        <div style="font-size:${bestRank<=2?'20':'16'}px;font-weight:900;color:${rc.color};margin-bottom:2px;text-shadow:${bestRank<=3?'0 1px 3px rgba(0,0,0,.2)':'none'};">${rc.label}</div>
+        ${prizeHtml}
+        <div style="font-size:11px;color:${rc.color};opacity:.75;">${rc.sub}</div>
+        <div style="font-size:10px;margin-top:8px;opacity:.6;color:${rc.color};">${parsed.round}회차 · ${parsed.games.length}게임 인증 완료</div>
+      </div>
+      <!-- 당첨번호 -->
+      <div style="background:var(--paper-white);padding:12px 14px;border-top:1px solid ${rc.border};">
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:.5px;">공식 당첨번호</div>
+        <div class="ball-context" style="justify-content:flex-start;margin:0 0 10px;">${winBallsHtml}</div>
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:4px;letter-spacing:.5px;">내 번호</div>
+        ${gamesHtml}
       </div>
     </div>`;
 
   $('qr-url-input').value = '';
   renderQRHistory();
   // 당첨시 confetti
-  if (isWin) setTimeout(miniConfetti, 200);
+  if (bestRank === 1) { setTimeout(miniConfetti, 200); setTimeout(miniConfetti, 700); setTimeout(miniConfetti, 1200); }
+  else if (bestRank === 2) { setTimeout(miniConfetti, 200); setTimeout(miniConfetti, 800); }
+  else if (isWin) setTimeout(miniConfetti, 200);
 }
 
 // =====================================================
