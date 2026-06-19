@@ -1333,7 +1333,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
         <div id="profile-content"></div>
         <!-- 내 번호 보관함 (로그인 후) -->
         <div id="my-numbers-section" style="margin-top:14px;display:none;">
-          <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:8px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> 내 번호 보관함</div>
+          <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;"><span><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> 내 번호 보관함</span><span id="tl-count" style="font-size:11px;font-weight:600;color:#94a3b8;"></span></div>
           <div id="ticket-feedback"></div>
           <div id="tl"></div>
         </div>
@@ -1835,17 +1835,30 @@ function updateGlobalStats() {
 
 function rList() {
   renderHomeLive();
+  // 보관함 헤더 카운트 업데이트
+  const cntEl = $('tl-count');
+  if (cntEl) cntEl.textContent = MY.length + '개';
   const w = $('tl');
   if (MY.length === 0) {
-    w.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--text-muted);font-size:12px;">보관된 추천번호가 없습니다.<br>번호 추천 탭에서 저장해 보세요!</div>';
+    w.innerHTML = `<div style="text-align:center;padding:30px 16px;color:var(--text-muted);">
+      <div style="font-size:36px;margin-bottom:10px;">🎱</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">보관함이 비어 있습니다</div>
+      <div style="font-size:11px;line-height:1.6;margin-bottom:14px;">번호분석 탭에서 추천번호를 저장하거나<br>QR 인증으로 구매 이력을 등록하세요.</div>
+      <button onclick="go('fortune')" style="padding:8px 18px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">번호분석 바로가기 →</button>
+    </div>`;
     return;
   }
   let html = '';
   MY.forEach(tk => {
     const target = apiCache[tk.drw];
     let rankText = target ? checkWinRank(tk.nums, target.nums, target.bonus).label : '⏳ 결과대기';
-    html += `<div class="lotto-receipt">
-      <div style="font-weight:700;margin-bottom:4px;font-size:11px;color:var(--text-muted);">제 ${tk.drw}회차 (${tk.type==='recommend'?'추천':'수동'})</div>
+    const idx = MY.indexOf(tk);
+    const typeLabel = tk.type === 'qr' ? '🔍 QR' : tk.type === 'recommend' ? '🎯 추천' : '✏️ 수동';
+    html += `<div class="lotto-receipt" style="position:relative;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div style="font-weight:700;font-size:11px;color:var(--text-muted);">제 ${tk.drw}회차 <span style="font-size:9px;opacity:.7;">${typeLabel}</span></div>
+        <button onclick="MY.splice(${idx},1);saveStorage();rList();" title="삭제" style="background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:13px;padding:0 2px;line-height:1;">✕</button>
+      </div>
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div>${tk.nums.map(n => bH(n, target && target.nums.includes(n))).join(' ')}</div>
         <span style="font-weight:900;font-size:12px;color:var(--lotto-red);min-width:75px;text-align:right;">${rankText}</span>
@@ -3185,7 +3198,7 @@ function go(id) {
   pg.classList.add('page-fade');
   const mBtn = $('m-' + id);
   if (mBtn) mBtn.classList.add('on');
-  ['result','ticket','stats','badge','fortune'].forEach(k => {
+  ['result','ticket','stats','badge','fortune','rank','community'].forEach(k => {
     const btn = $('mob-btn-' + k);
     if (btn) btn.classList.toggle('on', k === id);
   });
@@ -3197,7 +3210,7 @@ function go(id) {
     stats:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적',
     badge:     '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg> 획득 뱃지',
     rank:      '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg> 전체 랭킹',
-    community: '커뮤니티',
+    community: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 커뮤니티',
     admin:     '🔐 관리자 패널',
     profile:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필',
   };
