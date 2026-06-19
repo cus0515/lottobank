@@ -1632,30 +1632,41 @@ function renderHomeLive() {
   const hot = getHotNums();
   $('home-live').innerHTML = `
     <!-- 최신 당첨번호 배너 -->
-    <div style="background:linear-gradient(135deg,#1a2235 0%,#0d1527 100%);border-radius:14px;padding:16px 18px;margin-bottom:14px;color:#fff;box-shadow:0 4px 20px rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <div style="background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);border-radius:16px;padding:18px 20px;margin-bottom:14px;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,.35);border:1px solid rgba(139,92,246,.2);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(251,191,36,.12) 0%,transparent 70%);pointer-events:none;"></div>
+      <div style="position:absolute;bottom:-20px;left:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(139,92,246,.1) 0%,transparent 70%);pointer-events:none;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
         <div>
-          <span style="font-size:10px;opacity:.5;font-weight:700;letter-spacing:.5px;">최신 당첨번호</span>
-          <div style="font-size:13px;font-weight:900;margin-top:1px;">${d.round}회 · ${d.date}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <span style="display:inline-block;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:#fbbf24;border-radius:20px;padding:1px 8px;font-size:9px;font-weight:800;letter-spacing:.5px;">LATEST</span>
+            <span style="font-size:10px;opacity:.4;font-weight:600;">${d.date}</span>
+          </div>
+          <div style="font-size:18px;font-weight:900;letter-spacing:-.3px;">제 <span style="color:#fbbf24;">${d.round}</span>회</div>
         </div>
         <div style="text-align:right;">
-          <div style="font-size:10px;opacity:.5;font-weight:700;">1등 당첨금</div>
-          <div style="font-size:14px;font-weight:900;color:#fbbf24;">${fmtMFull(d.prize_1st)}</div>
+          <div style="font-size:9px;opacity:.4;font-weight:700;letter-spacing:.5px;margin-bottom:2px;">1등 당첨금</div>
+          <div style="font-size:20px;font-weight:900;color:#fbbf24;letter-spacing:-.5px;">${fmtMFull(d.prize_1st)}</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:10px;">
         ${d.nums.map(n=>bH(n)).join('')}
-        <span style="color:#94a3b8;font-size:14px;font-weight:900;">+</span>
-        <div style="position:relative;">${bH(d.bonus)}<span style="position:absolute;top:-6px;right:-4px;background:#f59e0b;color:#000;font-size:8px;font-weight:900;border-radius:4px;padding:1px 3px;">보너스</span></div>
+        <span style="color:rgba(255,255,255,.3);font-size:18px;font-weight:300;margin:0 2px;">+</span>
+        <div style="position:relative;">${bH(d.bonus)}<span style="position:absolute;top:-8px;right:-6px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-size:7px;font-weight:900;border-radius:4px;padding:1px 4px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3);">보너스</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);">
+        <div style="text-align:center;"><div style="font-size:9px;opacity:.4;margin-bottom:2px;">홀/짝</div><div style="font-size:13px;font-weight:800;">${a.odd}:${a.even}</div></div>
+        <div style="text-align:center;"><div style="font-size:9px;opacity:.4;margin-bottom:2px;">저/고</div><div style="font-size:13px;font-weight:800;">${a.low}:${a.high}</div></div>
+        <div style="text-align:center;"><div style="font-size:9px;opacity:.4;margin-bottom:2px;">연속</div><div style="font-size:13px;font-weight:800;">${a.seq?a.seq+'쌍':'없음'}</div></div>
       </div>
     </div>
-    <div class="live-summary" style="margin-bottom:14px;">
-      <div class="live-card" style="transition:transform .15s;cursor:default;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''"><span>홀짝 비율</span><strong>${a.odd}:${a.even}</strong><span>홀수 ${a.odd} · 짝수 ${a.even}</span></div>
-      <div class="live-card" style="transition:transform .15s;cursor:default;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''"><span>저고 분포</span><strong>${a.low}:${a.high}</strong><span>1~22 : 23~45</span></div>
-      <div class="live-card" style="transition:transform .15s;cursor:default;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''"><span>연속 번호</span><strong>${a.seq ? a.seq+'쌍' : '없음'}</strong><span>이번 회차 패턴</span></div>
+
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:11px;font-weight:800;color:var(--text-dark);">🔥 최근 10회차 핫 넘버</div>
+        <button onclick="go('fortune')" style="font-size:10px;color:var(--lotto-red);background:none;border:none;cursor:pointer;font-weight:700;font-family:inherit;padding:0;">번호분석 →</button>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">${hot.map(n => bH(n)).join('')}</div>
     </div>
-    <div class="section-mini-title"><span>최근 10회차 반복 출현 번호 (실제 데이터)</span><em>핫 넘버</em></div>
-    <div class="hot-number-strip">${hot.map(n => bH(n)).join('')}</div>
     ${isLoggedIn && MY.length > 0 ? (() => {
       const thisRound = d.round;
       const myThisRound = MY.filter(m => String(m.drw) === String(thisRound));
@@ -1703,14 +1714,26 @@ function renderHomeLive() {
       </div>`;
     })() : ''}
 
-    ${!isLoggedIn ? `<div style="margin-top:14px;background:linear-gradient(135deg,#fff5f5,#fdf4ff);border:1.5px solid #fecaca;border-radius:10px;padding:16px;">
-      <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:10px;">🚀 LottoBank 시작하기</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="min-width:22px;height:22px;border-radius:50%;background:var(--lotto-red);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;">1</div><div><div style="font-size:12px;font-weight:700;color:var(--text-dark);">회원가입</div><div style="font-size:11px;color:var(--text-muted);">이메일로 30초 만에 가입</div></div></div>
-        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="min-width:22px;height:22px;border-radius:50%;background:#f59e0b;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;">2</div><div><div style="font-size:12px;font-weight:700;color:var(--text-dark);">QR 등록</div><div style="font-size:11px;color:var(--text-muted);">동행복권 앱 구매내역 → QR 복사 → 붙여넣기</div></div></div>
-        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="min-width:22px;height:22px;border-radius:50%;background:#10b981;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;">3</div><div><div style="font-size:12px;font-weight:700;color:var(--text-dark);">전적 관리</div><div style="font-size:11px;color:var(--text-muted);">ROI · 뱃지 · 랭킹 자동 계산</div></div></div>
+    ${!isLoggedIn ? `<div style="margin-top:14px;background:linear-gradient(135deg,#0f172a,#1e1035);border-radius:16px;padding:20px;color:#fff;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(220,38,38,.2) 0%,transparent 70%);pointer-events:none;"></div>
+      <div style="font-size:11px;font-weight:700;opacity:.4;letter-spacing:1px;margin-bottom:6px;">START NOW</div>
+      <div style="font-size:17px;font-weight:900;margin-bottom:4px;">로또 기록을 <span style="color:#fbbf24;">스마트</span>하게</div>
+      <div style="font-size:11px;opacity:.5;margin-bottom:16px;">QR 하나로 구매 이력 · 당첨 인증 · 전적 자동 관리</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#dc2626;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;">1</div>
+          <div><div style="font-size:12px;font-weight:700;">무료 회원가입</div><div style="font-size:10px;opacity:.5;margin-top:1px;">이메일로 30초</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;">2</div>
+          <div><div style="font-size:12px;font-weight:700;">QR 등록</div><div style="font-size:10px;opacity:.5;margin-top:1px;">동행복권 앱 → 구매내역 → QR 복사</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;">3</div>
+          <div><div style="font-size:12px;font-weight:700;">전적 자동 계산</div><div style="font-size:10px;opacity:.5;margin-top:1px;">ROI · 뱃지 · 전국 랭킹</div></div>
+        </div>
       </div>
-      <button onclick="showAuthModal()" style="width:100%;margin-top:12px;padding:10px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit;">무료 시작하기</button>
+      <button onclick="showAuthModal()" style="width:100%;padding:12px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(220,38,38,.4);letter-spacing:.3px;">🚀 무료로 시작하기</button>
     </div>` : ''}`;
   renderFeed();
 }
@@ -6354,144 +6377,4 @@ function renderProfile() {
       </button>
     </div>
     <div style="margin-top:8px;">
-      <button id="logout-btn" onclick="doLogout()"
-        style="width:100%;padding:11px;background:#fff;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-weight:700;color:#ef4444;cursor:pointer;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> 로그아웃
-      </button>
-    </div>` : '<div style="text-align:center;padding:12px;background:linear-gradient(135deg,#fff7ed,#fef3c7);border:1px solid #fed7aa;border-radius:10px;font-size:12px;font-weight:700;color:#92400e;padding:14px;display:flex;align-items:center;gap:8px;"><span style="font-size:18px;">🔐</span><span>로그인하면 QR 인증, 전적 관리, 로또 DNA 분석 등 전체 기능을 이용할 수 있습니다.</span></div>'}
-  `;
-}
-
-// 다크모드 토글
-function toggleDarkMode() {
-  const isDark = document.body.getAttribute('data-theme') === 'dark';
-  const next = isDark ? 'light' : 'dark';
-  document.body.setAttribute('data-theme', next);
-  const btn = $('dark-toggle-btn');
-  if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
-  try { localStorage.setItem('lottobank-theme', next); } catch(_) {}
-}
-// 저장된 테마 복원
-(function initTheme() {
-  try {
-    const saved = localStorage.getItem('lottobank-theme') || 'light';
-    if (saved === 'dark') {
-      document.body.setAttribute('data-theme', 'dark');
-      const btn = document.getElementById('dark-toggle-btn');
-      if (btn) btn.textContent = '☀️';
-    }
-  } catch(_) {}
-})();
-
-// Service Worker 등록 (PWA 오프라인 지원)
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
-
-function requestDrawNotification() {
-  if (!('Notification' in window)) { toast('⚠️ 이 브라우저는 알림을 지원하지 않습니다'); return; }
-  if (Notification.permission === 'granted') {
-    toast('✅ 이미 알림이 설정되어 있습니다');
-    // Schedule next Saturday 8pm check
-    const next = getNextDrawTime();
-    if (next) scheduleDrawNotif(next);
-    return;
-  }
-  Notification.requestPermission().then(perm => {
-    if (perm === 'granted') { toast('✅ 추첨 알림이 설정되었습니다!'); }
-    else { toast('알림 권한이 거부되었습니다'); }
-  });
-}
-function getNextDrawTime() {
-  const now = new Date();
-  const day = now.getDay();
-  const diff = (6 - day + 7) % 7 || 7;
-  const sat = new Date(now);
-  sat.setDate(now.getDate() + diff);
-  sat.setHours(20, 35, 0, 0);
-  if (sat <= now) sat.setDate(sat.getDate() + 7);
-  return sat;
-}
-function scheduleDrawNotif(drawTime) {
-  const ms = drawTime - Date.now() - 30 * 60 * 1000; // 30분 전
-  if (ms > 0 && ms < 7 * 24 * 3600 * 1000) {
-    setTimeout(() => {
-      if (Notification.permission === 'granted') {
-        new Notification('🎰 LottoBank 추첨 알림', {
-          body: '30분 후 로또 추첨이 시작됩니다!',
-          icon: '/favicon.ico'
-        });
-      }
-    }, ms);
-  }
-}
-
-function computeLuckyScore() {
-  const el = document.getElementById('lucky-score-display');
-  const bar = document.getElementById('lucky-bar-fill');
-  const msg = document.getElementById('lucky-score-msg');
-  if (!el) return;
-  const today = new Date();
-  const dateSeed = today.getFullYear() * 10000 + (today.getMonth()+1) * 100 + today.getDate();
-  let h = dateSeed ^ 0x5a5a5a5a;
-  h = ((h >> 16) ^ h) * 0x45d9f3b; h = ((h >> 16) ^ h) * 0x45d9f3b; h = (h >> 16) ^ h;
-  const score = Math.abs(h % 41) + 60;
-  const msgs = ['⚡ 신중하게','🌤 평범한 날','✨ 살짝 기운이 올라요','🍀 행운이 따르는 날','🎯 대박의 기운!'];
-  const mIdx = score < 70 ? 0 : score < 78 ? 1 : score < 86 ? 2 : score < 94 ? 3 : 4;
-  el.textContent = score;
-  if (msg) msg.textContent = msgs[mIdx];
-  setTimeout(() => { if (bar) bar.style.width = score + '%'; }, 500);
-  // 오늘의 행운 번호 3개
-  const numsEl = document.getElementById('lucky-nums-today');
-  if (numsEl) {
-    let s2 = dateSeed ^ 0x7b7b7b7b;
-    const lucky3 = [];
-    for (let t=0; t<200 && lucky3.length<3; t++) {
-      s2 = (s2 * 1664525 + 1013904223) & 0x7fffffff;
-      const v = (s2 % 45) + 1;
-      if (!lucky3.includes(v)) lucky3.push(v);
-    }
-    const colorMap = n => n<=9?'#ef4444':n<=19?'#f97316':n<=29?'#eab308':n<=39?'#3b82f6':'#64748b';
-    numsEl.innerHTML = '<span style="font-size:9px;opacity:.5;margin-right:4px;align-self:center;">오늘의 번호</span>' +
-      lucky3.map(n=>`<div style="width:26px;height:26px;border-radius:50%;background:${colorMap(n)};display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;">${n}</div>`).join('');
-  }
-}
-
-
-function shareMyStats(buy, prize, roi, wins) {
-  const nick = (currentUser && currentUser.user_metadata && currentUser.user_metadata.nickname) || '로또뱅커';
-  const roiStr = roi >= 0 ? '+' + roi : roi.toString();
-  const text = `🏆 ${nick}님의 LottoBank 전적\n\n📊 총 ${buy}게임 구매\n🏅 총 ${wins}회 당첨\n💰 총 ${Number(prize).toLocaleString()}원 수령\n📈 ROI: ${roiStr}%\n\n👉 https://lottobank.pages.dev`;
-  if (navigator.share) {
-    navigator.share({ title: 'LottoBank 내 전적', text }).catch(()=>{});
-  } else {
-    navigator.clipboard.writeText(text).then(() => toast('📋 전적 복사됨!')).catch(()=>{});
-  }
-}
-
-
-// 키보드 단축키 (Alt+숫자)
-document.addEventListener('keydown', function(e) {
-  if (e.altKey && !e.ctrlKey && !e.metaKey) {
-    const map = {'1':'result','2':'ticket','3':'stats','4':'badge','5':'rank','6':'fortune','7':'community'};
-    if (map[e.key]) { e.preventDefault(); go(map[e.key]); }
-  }
-});
-
-window.onload = function() { 
-  init(); 
-  setTimeout(computeLuckyScore, 1000);
-  // 스크롤 탑 버튼 show/hide
-  const mc = document.getElementById('main-content');
-  if (mc) {
-    mc.addEventListener('scroll', function() {
-      const btn = document.getElementById('scroll-top-btn');
-      if (btn) btn.style.display = mc.scrollTop > 300 ? 'flex' : 'none';
-    });
-  }
-};
-</script>
-</body>
-</html>
+  
