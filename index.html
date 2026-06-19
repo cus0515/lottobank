@@ -773,6 +773,8 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 [data-theme="dark"] #post-input-body { background:#0f172a !important; color:#e2e8f0 !important; border-color:#334155 !important; }
 [data-theme="dark"] #post-write-expanded { background:#1e293b !important; border-color:#334155 !important; }
 
+
+[data-theme="dark"] .home-dna-card { background: linear-gradient(135deg, #1e293b, #1e1b4b) !important; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -1654,6 +1656,18 @@ function renderHomeLive() {
     </div>
     <div class="section-mini-title"><span>최근 10회차 반복 출현 번호 (실제 데이터)</span><em>핫 넘버</em></div>
     <div class="hot-number-strip">${hot.map(n => bH(n)).join('')}</div>
+    ${isLoggedIn && MY.length > 0 ? (() => {
+      const thisRound = d.round;
+      const myThisRound = MY.filter(m => String(m.drw) === String(thisRound));
+      if (!myThisRound.length) return '';
+      return `<div style="background:linear-gradient(135deg,#fff7ed,#fef3c7);border:1.5px solid #fde68a;border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:#92400e;margin-bottom:6px;">📋 ${thisRound}회차 내 등록 게임 (${myThisRound.length}게임)</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          ${myThisRound.slice(0,3).map(m=>`<div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap;">${m.nums.map(n=>bH(n)).join('')}</div>`).join('')}
+          ${myThisRound.length>3?`<div style="font-size:10px;color:#92400e;opacity:.7;">+${myThisRound.length-3}게임 더</div>`:''}
+        </div>
+      </div>`;
+    })() : ''}
     <div class="insight-list">
       <div class="insight-item"><span>저번호/고번호 분포</span><b>${a.low}개 / ${a.high}개</b></div>
       <div class="insight-item"><span>연속 번호</span><b>${a.seq ? a.seq + '쌍 발견' : '없음'}</b></div>
@@ -1661,6 +1675,34 @@ function renderHomeLive() {
     </div>
     <div class="section-mini-title" style="margin-top:2px;"><span>실시간 활동 피드</span><em>최신순</em></div>
     <div id="feed-list" style="min-height:40px;"></div>
+    ${isLoggedIn ? (() => {
+      const nick = (currentUser && currentUser.user_metadata && currentUser.user_metadata.nickname) || 'user';
+      let seed = 0;
+      for (const c of nick) seed = (seed * 31 + c.charCodeAt(0)) & 0x7fffffff;
+      const today = new Date();
+      const mon = new Date(today);
+      mon.setDate(today.getDate() - today.getDay() + 1);
+      mon.setHours(0,0,0,0);
+      const wSeed = (mon.getTime() / 1000) | 0;
+      let s = (seed ^ wSeed) >>> 0;
+      const nums = [];
+      for (let t = 0; t < 200 && nums.length < 6; t++) {
+        s = (s * 1664525 + 1013904223) >>> 0;
+        const v = (s % 45) + 1;
+        if (!nums.includes(v)) nums.push(v);
+      }
+      nums.sort((a, b) => a - b);
+      const cm = n => n<=9?'#ef4444':n<=19?'#f97316':n<=29?'#eab308':n<=39?'#3b82f6':'#64748b';
+      const balls = nums.map(n => `<div style="width:30px;height:30px;border-radius:50%;background:${cm(n)};display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;">${n}</div>`).join('');
+      return `<div style="margin-top:14px;background:linear-gradient(135deg,#0f172a,#1e1b4b);border-radius:10px;padding:14px;color:#fff;cursor:pointer;" onclick="go('fortune')">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:11px;font-weight:700;opacity:.6;letter-spacing:.5px;">🧬 이번 주 내 DNA 번호</span>
+          <span style="font-size:10px;opacity:.4;">번호분석 →</span>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">${balls}</div>
+      </div>`;
+    })() : ''}
+
     ${!isLoggedIn ? `<div style="margin-top:14px;background:linear-gradient(135deg,#fff5f5,#fdf4ff);border:1.5px solid #fecaca;border-radius:10px;padding:16px;">
       <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:10px;">🚀 LottoBank 시작하기</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
@@ -6393,6 +6435,15 @@ function shareMyStats(buy, prize, roi, wins) {
     navigator.clipboard.writeText(text).then(() => toast('📋 전적 복사됨!')).catch(()=>{});
   }
 }
+
+
+// 키보드 단축키 (Alt+숫자)
+document.addEventListener('keydown', function(e) {
+  if (e.altKey && !e.ctrlKey && !e.metaKey) {
+    const map = {'1':'result','2':'ticket','3':'stats','4':'badge','5':'rank','6':'fortune','7':'community'};
+    if (map[e.key]) { e.preventDefault(); go(map[e.key]); }
+  }
+});
 
 window.onload = function() { 
   init(); 
