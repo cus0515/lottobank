@@ -478,6 +478,8 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] #post-write-expanded { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #pg-ticket details { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #pg-ticket details div[style*="background:#fef3c7"] { background:#1a1200 !important; color:#fbbf24 !important; }
+/* Quick nav buttons dark mode */
+[data-theme="dark"] .left-panel button[onclick*="go("] { background:#263244 !important; border-color:#334155 !important; color:#e2e8f0 !important; }
 [data-theme="dark"] #ticket-history-section tr[style*="background:#fafafa"] { background:#263244 !important; }
 [data-theme="dark"] #ticket-history-section tr[style*="background:#fff5f5"] { background:#2d1515 !important; }
 [data-theme="dark"] #ticket-history-section thead tr { background:#0f172a !important; }
@@ -632,6 +634,20 @@ input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px
 /* 페이지 전환 애니메이션 */
 .page-content { animation: pageFadeIn .25s ease; }
 @keyframes pageFadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+#scroll-top-btn:hover { filter:brightness(1.15); transform:translateY(-2px); }
+[data-theme="dark"] #scroll-top-btn { box-shadow:0 2px 12px rgba(220,38,38,.5); }
+@keyframes ballWin {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+  50% { transform: scale(1.08); box-shadow: 0 0 0 4px rgba(220,38,38,0.25); }
+}
+.ball-matched { animation: ballWin 1.2s ease-in-out 2; }
+
+@keyframes slideInRight {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.slide-in-right { animation: slideInRight .3s ease-out forwards; }
+
 @keyframes confettiFall { 0% { transform:translateY(0) rotate(0deg); opacity:1; } 100% { transform:translateY(120px) rotate(540deg); opacity:0; } }
 @keyframes badgePopIn { 0% { transform:scale(.5); opacity:0; } 70% { transform:scale(1.15); } 100% { transform:scale(1); opacity:1; } }
 
@@ -874,6 +890,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
   <button class="mob-nav-btn" id="mob-btn-ticket" onclick="go('ticket')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg></span>QR인증</button>
   <button class="mob-nav-btn" id="mob-btn-stats" onclick="go('stats')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>전적</button>
   <button class="mob-nav-btn" id="mob-btn-badge" onclick="go('badge')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg></span>뱃지</button>
+  <button class="mob-nav-btn" id="mob-btn-fortune" onclick="go('fortune')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>번호분석</button>
   <button class="mob-nav-btn" id="mob-btn-more" onclick="openMobMenu()"><span class="mob-nav-icon">☰</span>더보기</button>
 </nav>
 
@@ -1037,6 +1054,13 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
         </div>
       </div>
 
+      <!-- 빠른 바로가기 -->
+      <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+        <button onclick="go('ticket')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">🔍 QR 인증</button>
+        <button onclick="go('fortune')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">🎯 번호분석</button>
+        <button onclick="go('stats')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">📊 내 전적</button>
+        <button onclick="go('rank')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">🏆 랭킹</button>
+      </div>
       <!-- 실시간 활동 피드 (항상 표시) -->
       <div id="left-feed-section" style="margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;">
         <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">
@@ -1293,6 +1317,8 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
   </div>
 </div>
 
+<!-- 맨 위로 버튼 -->
+<button id="scroll-top-btn" onclick="document.getElementById('main-content').scrollTop=0" title="맨 위로" style="position:fixed;bottom:72px;right:16px;width:38px;height:38px;border-radius:50%;background:var(--lotto-red);color:#fff;border:none;cursor:pointer;font-size:16px;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(220,38,38,.4);z-index:800;">↑</button>
 <div id="toast"></div>
 
 <script>
@@ -2214,6 +2240,18 @@ function shareURL(url, label) {
   }
 }
 
+function shareDNANums(nums) {
+  const numStr = nums.join(', ');
+  const text = `🧬 나의 LottoBank 로또 이번 주 추천번호
+[${numStr}]
+
+나만의 번호로 도전해보세요! → https://lottobank.pages.dev`;
+  if (navigator.share) {
+    navigator.share({ title: 'LottoBank 추천번호', text }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text).then(() => toast('📋 공유 텍스트가 복사되었습니다!')).catch(()=>{});
+  }
+}
 function copyNumSet(nums) {
   const text = '[LottoBank] 번호: ' + nums.join(', ') + ' — lottobank.pages.dev';
   if (navigator.clipboard) {
@@ -2942,6 +2980,9 @@ async function upsertUserStats(gameCount, gameResults, totalPrize = 0, winData =
 // 탭 전환
 // =====================================================
 function go(id) {
+  // 페이지 이동 시 상단으로 스크롤
+  const mc = document.getElementById('main-content');
+  if (mc) mc.scrollTop = 0;
   // 페이지 전환 fade
   document.querySelectorAll('.page-content').forEach(p => {
     p.style.display = 'none';
@@ -2956,7 +2997,7 @@ function go(id) {
   pg.classList.add('page-fade');
   const mBtn = $('m-' + id);
   if (mBtn) mBtn.classList.add('on');
-  ['result','ticket','stats','badge'].forEach(k => {
+  ['result','ticket','stats','badge','fortune'].forEach(k => {
     const btn = $('mob-btn-' + k);
     if (btn) btn.classList.toggle('on', k === id);
   });
@@ -3428,6 +3469,7 @@ function genRecommended() {
       <div style="display:flex;gap:6px;">
         <button class="dna-refresh-btn" onclick="saveFortuneSet('${JSON.stringify(dnaNums)}')">💾 저장</button>
         <button class="dna-refresh-btn" onclick="copyNumSet(${JSON.stringify(dnaNums)})">📋 복사</button>
+        <button class="dna-refresh-btn" onclick="shareDNANums(${JSON.stringify(dnaNums)})">📤 공유</button>
         ${!isLoggedIn ? '<button class="dna-refresh-btn" onclick="showAuthModal()" style="background:rgba(220,38,38,.3);border-color:rgba(220,38,38,.5);">🔑 로그인하면 내 번호 생성</button>' : ''}
       </div>
     </div>
@@ -3594,7 +3636,7 @@ function genRecommended() {
         })()}
       </div>
     </div>
-    <!-- 5. 확률 시뮬레이터 --><!-- 5. 확률 시뮬레이터 -->
+    <!-- 5. 확률 시뮬레이터 -->
     <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:14px;margin-bottom:12px;">
       <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
         🎯 당첨 확률 시뮬레이터
@@ -3694,10 +3736,35 @@ function genRecommended() {
         <button onclick="if(confirm('보관함을 비울까요?')){MY=MY.filter(m=>m.type!=='recommend');saveStorage();renderFortune();}" style="font-size:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;padding:3px 8px;cursor:pointer;color:#94a3b8;font-weight:700;">전체삭제</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;">
-        ${recent.map((m,i)=>`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">
-          <span style="font-size:9px;color:#94a3b8;min-width:38px;font-weight:600;">${m.date||''}</span>
-          <div class="ball-context" style="margin:0;gap:3px;flex:1;">${m.nums.map(n=>bH(n)).join('')}</div>
-        </div>`).join('')}
+        ${(()=>{
+          const ld = latestData;
+          return recent.map((m,i)=>{
+            let matchCnt=0, matchLabel='';
+            if(ld && m.nums) {
+              const hits = m.nums.filter(n=>ld.nums.includes(n));
+              const bonus = m.nums.includes(ld.bonus);
+              matchCnt = hits.length;
+              if(matchCnt===6) matchLabel='🥇 1등!';
+              else if(matchCnt===5&&bonus) matchLabel='🥈 2등!';
+              else if(matchCnt===5) matchLabel='🥉 3등';
+              else if(matchCnt===4) matchLabel='🎯 4등';
+              else if(matchCnt===3) matchLabel='✅ 5등';
+              else matchLabel=matchCnt+'개 일치';
+            }
+            const borderColor = matchCnt>=3?'#fecaca':'#e2e8f0';
+            const bg = matchCnt>=3?'#fff5f5':'#f8fafc';
+            return '<div style="background:'+bg+';border:1px solid '+borderColor+';border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">'
+              +'<span style="font-size:9px;color:#94a3b8;min-width:38px;font-weight:600;">'+(m.date||'')+'</span>'
+              +'<div class="ball-context" style="margin:0;gap:3px;flex:1;">'
+              + (ld&&m.nums ? m.nums.map(n=>{
+                const isHit = ld.nums.includes(n)||n===ld.bonus;
+                return bH(n, isHit);
+              }).join('') : m.nums.map(n=>bH(n)).join(''))
+              +'</div>'
+              +(ld?'<span style="font-size:9px;font-weight:700;white-space:nowrap;color:'+(matchCnt>=3?'#dc2626':'#94a3b8')+';">'+matchLabel+'</span>':'')
+              +'</div>';
+          }).join('');
+        })()}
       </div>
     </div>`;
   })();
@@ -6309,7 +6376,18 @@ function computeLuckyScore() {
   }
 }
 
-window.onload = function() { init(); setTimeout(computeLuckyScore, 1000); };
+window.onload = function() { 
+  init(); 
+  setTimeout(computeLuckyScore, 1000);
+  // 스크롤 탑 버튼 show/hide
+  const mc = document.getElementById('main-content');
+  if (mc) {
+    mc.addEventListener('scroll', function() {
+      const btn = document.getElementById('scroll-top-btn');
+      if (btn) btn.style.display = mc.scrollTop > 300 ? 'flex' : 'none';
+    });
+  }
+};
 </script>
 </body>
 </html>
