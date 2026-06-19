@@ -1099,6 +1099,11 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 
       <!-- 2. 회차별 조회 -->
       <div id="pg-result" class="page-content">
+        <div style="background:linear-gradient(135deg,#1a0000,#7f1d1d);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 16px rgba(127,29,29,.4);">
+          <div style="font-size:10px;opacity:.4;font-weight:700;letter-spacing:1px;margin-bottom:3px;">DRAW RESULTS</div>
+          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">🎱 당첨 결과 조회</div>
+          <div style="font-size:11px;opacity:.5;">역대 회차 당첨번호 · 1등 당첨금 · 내 번호 비교</div>
+        </div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:0;">
           <button id="res-older-btn" onclick="resNavPage(-1)" title="이전 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#475569;font-size:12px;font-weight:700;cursor:pointer;">◀◀</button>
           <select id="res-sel" onchange="chgRes()" class="select-custom" style="flex:1;margin:0;">
@@ -1107,8 +1112,16 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
           <button id="res-newer-btn" onclick="resNavPage(1)" title="다음 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#475569;font-size:12px;font-weight:700;cursor:pointer;">▶▶</button>
         </div>
         <div style="display:flex;gap:6px;margin-top:6px;">
-          <button id="res-prev-btn" onclick="resNavStep(-1)" title="이전 회차" style="flex:1;padding:6px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#475569;font-size:11px;font-weight:700;cursor:pointer;">◀ 이전 회차</button>
-          <button id="res-next-btn" onclick="resNavStep(1)" title="다음 회차" style="flex:1;padding:6px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#475569;font-size:11px;font-weight:700;cursor:pointer;">다음 회차 ▶</button>
+          <button id="res-prev-btn" onclick="resNavStep(-1)" title="이전 회차" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">◀ 이전 회차</button>
+          <button id="res-next-btn" onclick="resNavStep(1)" title="다음 회차" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:6px;align-items:center;">
+          <input type="number" id="res-jump-input" placeholder="회차 직접 입력" min="1" max="9999"
+            style="flex:1;padding:7px 10px;border:1px solid var(--border-dashed);border-radius:8px;font-size:12px;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;"
+            onkeyup="if(event.key==='Enter')resJumpTo()"
+            onfocus="this.style.borderColor='var(--lotto-red)'"
+            onblur="this.style.borderColor=''">
+          <button onclick="resJumpTo()" style="padding:7px 14px;border:1px solid var(--lotto-red);border-radius:8px;background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">이동</button>
         </div>
         <div class="lotto-slip" style="margin-top:10px;">
           <div id="res-balls" class="ball-context"></div>
@@ -1325,7 +1338,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
       <span style="color:var(--border-dashed);">|</span>
       <a href="https://dhlottery.co.kr" target="_blank" rel="noopener">동행복권</a>
     </div>
-    <div>© 2024–2025 LottoBank · QR 기반 로또 전적 인증 플랫폼 · 본 서비스는 동행복권 공식 서비스가 아닙니다.</div>
+    <div>© 2024–2026 LottoBank · QR 기반 로또 전적 인증 플랫폼 · 본 서비스는 동행복권 공식 서비스가 아닙니다.</div>
           <div style="margin-top:6px;font-size:10px;opacity:0.5;">
             <a href="javascript:void(0)" onclick="openTermsModal()" style="color:inherit;text-decoration:underline;">이용약관</a>
             &nbsp;·&nbsp;
@@ -1345,7 +1358,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 </div>
 
 <!-- 맨 위로 버튼 -->
-<button id="scroll-top-btn" onclick="document.getElementById('main-content').scrollTop=0" title="맨 위로" style="position:fixed;bottom:72px;right:16px;width:38px;height:38px;border-radius:50%;background:var(--lotto-red);color:#fff;border:none;cursor:pointer;font-size:16px;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(220,38,38,.4);z-index:800;">↑</button>
+<button id="scroll-top-btn" onclick="document.getElementById('main-content').scrollTop=0" title="맨 위로" style="position:fixed;bottom:72px;right:16px;width:38px;height:38px;border-radius:50%;background:var(--lotto-red);color:#fff;border:none;cursor:pointer;font-size:16px;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(220,38,38,.4);z-index:800;">▲</button>
 <div id="toast"></div>
 
 <script>
@@ -1816,6 +1829,17 @@ function renderTicketFeedback(tk) {
 // =====================================================
 // 회차별 조회
 // =====================================================
+function resJumpTo() {
+  const inp = $('res-jump-input');
+  if (!inp) return;
+  const val = parseInt(inp.value);
+  if (!val || val < 1) { toast('올바른 회차 번호를 입력하세요.'); return; }
+  const target = Math.min(val, latestRound || 9999);
+  initRoundSelector(target);
+  inp.value = '';
+  inp.blur();
+}
+
 function resNavStep(delta) {
   const sel = $('res-sel');
   if (!sel) return;
@@ -6413,4 +6437,14 @@ function renderProfile() {
       </button>
     </div>
     <div style="margin-top:8px;">
-  
+      </div>
+    ` : `
+    <div class="profile-block" style="text-align:center;padding:20px;">
+      <div style="font-size:32px;margin-bottom:8px;">🔒</div>
+      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">로그인이 필요합니다</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">프로필을 보려면 먼저 로그인하세요.</div>
+      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
+    </div>
+    `}
+  `;
+}
