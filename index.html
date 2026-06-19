@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>(function(){const t=localStorage.getItem('ltb-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 <title>LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리</title>
 <meta name="description" content="로또 QR 기반 구매 이력 인증 · 당첨 확인 · 전적 관리 플랫폼. 회차별 당첨번호 조회, 나의 전적 통계, 뱃지, 랭킹을 한 곳에서.">
 <meta name="keywords" content="로또,로또당첨,로또인증,로또전적,QR인증,당첨번호,로또통계,LottoBank">
@@ -93,7 +94,8 @@ main.chat-hidden .chat-panel { display: none; }
 .panel { background: var(--paper-white); border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; height: 100%; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 .panel-header { padding: 15px 20px; border-bottom: 2px solid var(--lotto-red); font-size: 15px; font-weight: 900; color: var(--lotto-red); display: flex; justify-content: space-between; align-items: center; background: #fff; }
 .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
-@keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } }
 .page-fade { animation: pageFadeIn 0.2s ease; }
 
 .lotto-slip { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; position: relative; }
@@ -1397,18 +1399,18 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
         </div>
         <div style="position:relative;margin-bottom:8px;">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" id="comm-search-input" placeholder="게시글 검색..." oninput="commSearch(this.value)" style="width:100%;box-sizing:border-box;padding:7px 10px 7px 30px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;font-family:inherit;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'">
+          <input type="text" id="comm-search-input" placeholder="게시글 검색..." oninput="commSearch(this.value)" style="width:100%;box-sizing:border-box;padding:7px 10px 7px 30px;border:1px solid var(--border-dashed);border-radius:6px;font-size:12px;outline:none;font-family:inherit;background:var(--paper-white);color:var(--text-dark);" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'">
         </div>
         <div class="post-write-bar" id="post-write-bar-collapsed">
           <input type="text" id="post-input" class="post-write-input" placeholder="로그인 후 글 작성..." disabled onclick="expandPostForm()">
           <button class="post-write-btn" onclick="expandPostForm()">글쓰기</button>
         </div>
-        <div id="post-write-expanded" style="display:none;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:10px;">
+        <div id="post-write-expanded" style="display:none;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px;margin-bottom:10px;">
           <input type="text" id="post-input-title" class="post-write-input" placeholder="제목을 입력하세요..." style="margin-bottom:8px;width:100%;box-sizing:border-box;" maxlength="100">
-          <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:#1e293b;" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'" oninput="const c=$('post-body-count');if(c)c.textContent=this.value.length+'/2000'"></textarea>
+          <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid var(--border-dashed);border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:var(--text-dark);background:var(--paper-white);" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'" oninput="const c=$('post-body-count');if(c)c.textContent=this.value.length+'/2000'"></textarea>
           <div style="text-align:right;font-size:11px;color:var(--text-muted);margin-top:2px;"><span id="post-body-count">0/2000</span></div>
           <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
-            <button onclick="collapsePostForm()" style="padding:8px 14px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;">취소</button>
+            <button onclick="collapsePostForm()" style="padding:8px 14px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">취소</button>
             <button onclick="writePost()" style="padding:8px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">등록</button>
           </div>
         </div>
@@ -1954,17 +1956,21 @@ function rList() {
   const w = $('tl');
   if (MY.length === 0) {
     w.innerHTML = `<div style="text-align:center;padding:30px 16px;color:var(--text-muted);">
-      <div style="font-size:36px;margin-bottom:10px;">🎱</div>
-      <div style="font-size:13px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">보관함이 비어 있습니다</div>
-      <div style="font-size:11px;line-height:1.6;margin-bottom:14px;">번호분석 탭에서 추천번호를 저장하거나<br>QR 인증으로 구매 이력을 등록하세요.</div>
-      <button onclick="go('fortune')" style="padding:8px 18px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">번호분석 바로가기 →</button>
+      <div style="font-size:40px;margin-bottom:12px;">🎱</div>
+      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">보관함이 비어 있습니다</div>
+      <div style="font-size:11px;line-height:1.7;margin-bottom:16px;">번호분석 탭에서 추천번호를 저장하거나<br>QR 인증으로 구매 이력을 등록하세요.</div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="go('fortune')" style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🎯 번호분석</button>
+        <button onclick="go('ticket')" style="padding:9px 16px;background:var(--paper-white);color:var(--text-dark);border:1px solid var(--border-dashed);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 QR 인증</button>
+      </div>
     </div>`;
     return;
   }
   let html = '';
   MY.forEach(tk => {
     const target = apiCache[tk.drw];
-    let rankText = target ? checkWinRank(tk.nums, target.nums, target.bonus).label : '⏳ 결과대기';
+    const _wr = target ? checkWinRank(tk.nums, target.nums, target.bonus) : null;
+    let rankText = _wr ? (_wr.rank >= 1 && _wr.rank <= 5 ? _wr.label : '낙첨') : '⏳ 결과대기';
     const idx = MY.indexOf(tk);
     const typeLabel = tk.type === 'qr' ? '🔍 QR' : tk.type === 'recommend' ? '🎯 추천' : '✏️ 수동';
     html += `<div class="lotto-receipt" style="position:relative;">
@@ -2214,28 +2220,28 @@ async function chgRes() {
         stores.forEach(s => { const r = s.region || '기타'; regionMap[r] = (regionMap[r] || 0) + 1; });
         const chips = Object.entries(regionMap).sort((a,b) => b[1]-a[1])
           .map(([r,c]) => `<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
-        const rows = stores.map(s => `<tr style="border-bottom:1px solid #f1f5f9;">
+        const rows = stores.map(s => `<tr style="border-bottom:1px solid var(--border-dashed);">
               <td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;" title="${s.name}">${s.name} <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a></td>
-              <td style="padding:4px 6px;font-size:10px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td>
-              <td style="padding:4px 6px;font-size:11px;text-align:center;color:#64748b;white-space:nowrap;">${s.auto}</td>
+              <td style="padding:4px 6px;font-size:10px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td>
+              <td style="padding:4px 6px;font-size:11px;text-align:center;color:var(--text-muted);white-space:nowrap;">${s.auto}</td>
             </tr>`).join('');
-        return `<div style="margin-bottom:8px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
+        return `<div style="margin-bottom:8px;border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;">
           <div onclick="(function(el){var b=document.getElementById('sb-${uid}');var arr=el.querySelector('.sarr');if(b.style.display==='none'){b.style.display='';arr.textContent='▲';}else{b.style.display='none';arr.textContent='▼';}})(this)"
-               style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f8fafc;cursor:pointer;user-select:none;gap:6px;">
+               style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-light);cursor:pointer;user-select:none;gap:6px;">
             <div style="min-width:0;flex:1;">
               <div style="font-size:12px;font-weight:700;color:${color};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${emoji} ${title} (${stores.length}곳)</div>
-              <div style="font-size:11px;color:#64748b;margin-top:1px;white-space:nowrap;">자동 <b style="color:${color};">${autoC}</b> / 수동 <b>${manC}</b></div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;">자동 <b style="color:${color};">${autoC}</b> / 수동 <b>${manC}</b></div>
             </div>
-            <span class="sarr" style="font-size:10px;color:#94a3b8;flex-shrink:0;">▲</span>
+            <span class="sarr" style="font-size:10px;color:var(--text-muted);flex-shrink:0;">▲</span>
           </div>
           <div id="sb-${uid}">
             <div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div>
             <table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;">
               <colgroup><col style="width:32%"><col style="width:46%"><col style="width:22%"></colgroup>
-              <thead><tr style="background:#f8fafc;">
-                <th style="padding:4px 6px;text-align:left;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">판매점</th>
-                <th style="padding:4px 6px;text-align:left;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">주소</th>
-                <th style="padding:4px 6px;text-align:center;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b;">구분</th>
+              <thead><tr style="background:var(--bg-light);">
+                <th style="padding:4px 6px;text-align:left;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">판매점</th>
+                <th style="padding:4px 6px;text-align:left;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">주소</th>
+                <th style="padding:4px 6px;text-align:center;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">구분</th>
               </tr></thead>
               <tbody>${rows}</tbody>
             </table>
@@ -2243,7 +2249,7 @@ async function chgRes() {
         </div>`;
       }
       const storeHtml = `
-        <div style="margin-top:10px;padding-top:8px;border-top:2px solid #e2e8f0;">
+        <div style="margin-top:10px;padding-top:8px;border-top:2px solid var(--border-dashed);">
           ${buildStoreBlock(s1, '#dc2626', '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M2 19h20"/><path d="m2 9 5 5 5-8 5 8 5-5"/></svg>', '1등 당첨 판매소', 'r1')}
           ${buildStoreBlock(s2, '#2563eb', '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg>', '2등 당첨 판매소', 'r2')}
         </div>`;
@@ -2399,7 +2405,7 @@ async function verifyRealQR() {
             total_prize: 0,
             ticket_type: 'pension'
           });
-          await sb.from('activity_feed').insert({ user_id: currentUser.id, action_type: 'qr_register', data: { round: parsed.round, type: 'pension' } });
+          insertActivity('qr_register', { round: parsed.round, games: 1, type: 'pension' });
           // 뱃지 체크
           await checkAndAwardBadges();
         } catch(e) { console.warn('pension save error', e); }
@@ -2421,7 +2427,11 @@ async function verifyRealQR() {
     return;
   }
 
-  $('qr-result-display').innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px;">🔍 당첨번호 조회 중...</div>';
+  $('qr-result-display').innerHTML = `<div style="text-align:center;padding:20px 12px;color:var(--text-muted);">
+    <div style="font-size:24px;margin-bottom:8px;animation:spin 1s linear infinite;display:inline-block;">⏳</div>
+    <div style="font-size:12px;font-weight:600;">당첨번호 조회 중...</div>
+    <div style="font-size:10px;margin-top:4px;opacity:.6;">${parsed.round}회차 데이터를 불러오고 있습니다</div>
+  </div>`;
 
   const winData = await fetchLotto(parsed.round);
   if (!winData) {
@@ -2619,15 +2629,18 @@ async function forgotPassword() {
 }
 
 // URL 클립보드 복사
-function shareURL(url, label) {
-  const target = url || location.href;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(target).then(() => toast('🔗 ' + (label||'링크') + ' 복사됨'));
+function shareURL(url, title) {
+  if (navigator.share) {
+    navigator.share({ title: title || 'LottoBank', text: 'QR 로또 인증 & 전적 관리 플랫폼', url: url || 'https://lottobank.pages.dev' }).catch(()=>{});
   } else {
-    const ta = document.createElement('textarea');
-    ta.value = target; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    toast('🔗 ' + (label||'링크') + ' 복사됨');
+    const u = url || 'https://lottobank.pages.dev';
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(u).then(()=>toast('🔗 링크가 클립보드에 복사되었습니다')).catch(()=>{
+        const ta = document.createElement('textarea'); ta.value = u;
+        document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('🔗 링크 복사됨'); } catch(_){}
+        document.body.removeChild(ta);
+      });
+    } else { toast('🔗 ' + u); }
   }
 }
 
@@ -3492,14 +3505,14 @@ async function loadMyMatchSection() {
     const tk0 = tks[0];
     const compareRound = tk0.round_no || d.round;
     const compareData = recentData[compareRound] || d;
-    wrap.innerHTML = `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-top:12px;">
+    wrap.innerHTML = `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-top:12px;">
       <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        최근 QR 번호 매칭 분석 <span style="font-size:10px;font-weight:500;color:#94a3b8;">(최신 QR 기준)</span>
+        최근 QR 번호 매칭 분석 <span style="font-size:10px;font-weight:500;color:var(--text-muted);">(최신 QR 기준)</span>
       </div>
-      <div style="font-size:11px;color:#64748b;margin-bottom:8px;">${d.round}회 당첨번호: <span style="font-weight:700;">${d.nums.join(', ')}</span> + 보너스 ${d.bonus}</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">${d.round}회 당첨번호: <span style="font-weight:700;">${d.nums.join(', ')}</span> + 보너스 ${d.bonus}</div>
       ${rows}
-      <div style="font-size:10px;color:#94a3b8;margin-top:8px;text-align:center;">※ 색이 있는 볼 = 당첨번호 일치 · 최근 등록 QR 게임 기준</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:8px;text-align:center;">※ 색이 있는 볼 = 당첨번호 일치 · 최근 등록 QR 게임 기준</div>
     </div>`;
   } catch(e) { wrap.innerHTML = ''; }
 }
@@ -3527,12 +3540,12 @@ async function loadMyNumberStats() {
     const top10 = indexed.filter(x=>x.c>0).slice(0,10);
     if (top10.length === 0) { wrap.innerHTML = ''; return; }
     const maxCnt = top10[0].c || 1;
-    wrap.innerHTML = `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;">
+    wrap.innerHTML = `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;">
       <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        내 번호 통계 <span style="font-size:10px;font-weight:500;color:#94a3b8;">(내 등록 QR ${tks.length}장 기준)</span>
+        내 번호 통계 <span style="font-size:10px;font-weight:500;color:var(--text-muted);">(내 등록 QR ${tks.length}장 기준)</span>
       </div>
-      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;">가장 많이 구매한 번호 TOP 10</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;">가장 많이 구매한 번호 TOP 10</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
         ${top10.map(item=>`<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">${bH(item.n)}<span style="font-size:9px;color:#64748b;font-weight:700;">${item.c}회</span></div>`).join('')}
       </div>
@@ -3821,7 +3834,10 @@ function genRecommended() {
       </div>
       </div>
       <div style="text-align:right;margin-top:8px;">
+        <div style="display:flex;gap:6px;align-items:center;">
+        <div style="font-size:10px;opacity:.65;">다음 회차 예상 <b id="next-round-label">-</b>회</div>
         <button onclick="requestDrawNotification()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:4px 12px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;">🔔 추첨 알림</button>
+      </div>
       </div>
     </div>
 
@@ -3909,13 +3925,13 @@ function genRecommended() {
           전략별 추천 5세트
           <span style="font-size:9px;font-weight:500;color:#94a3b8;margin-left:4px;">매 재생성마다 변경</span>
         </div>
-        <button onclick="renderFortune()" style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:4px 10px;cursor:pointer;color:#64748b;font-weight:700;transition:all .15s;">🔄 재생성</button>
+        <button onclick="renderFortune()" style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:4px 10px;cursor:pointer;color:#64748b;font-weight:700;transition:all .15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">🔄 재생성</button>
       </div>
       ${sets.map((nums, i) => `
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;transition:background .15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
-          <div style="flex-shrink:0;min-width:80px;">
-            <div style="font-size:8px;font-weight:700;color:#94a3b8;margin-bottom:2px;">${['🔥 핫번호','⚖️ 밸런스','🧊 콜드번호','🎯 패턴분석','🎲 랜덤믹스'][i]}</div>
-            <span style="font-size:10px;font-weight:800;color:#64748b;">${setLabels[i]}세트</span>
+          <div style="flex-shrink:0;min-width:72px;">
+            <div style="font-size:9px;font-weight:800;color:var(--text-dark);margin-bottom:1px;">${['🔥','⚖️','🧊','🎯','🎲'][i]} ${['핫번호','밸런스','콜드번호','패턴','랜덤'][i]}</div>
+            <span style="font-size:9px;color:#94a3b8;">${setLabels[i]}세트</span>
           </div>
           <div class="ball-context" style="margin:0;gap:4px;flex:1;">${nums.map(n=>bH(n)).join('')}</div>
           <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
@@ -4188,6 +4204,8 @@ function genRecommended() {
     cdH.textContent = String(h).padStart(2,'0');
     cdM.textContent = String(m).padStart(2,'0');
     cdS.textContent = String(s).padStart(2,'0');
+    const nrl = $('next-round-label');
+    if (nrl && latestRound) nrl.textContent = latestRound + 1;
     // 헤더 카운트다운 칩 업데이트
     const chip = $('header-countdown-chip');
     const chipTxt = $('header-cd-text');
@@ -4552,7 +4570,7 @@ async function renderLottoDNA(freq, rounds) {
   } catch{}
   const all = [...myNums, ...dbNums];
   if (all.length < 6) {
-    el.innerHTML = `<div style="background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px;text-align:center;">
+    el.innerHTML = `<div style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:12px;padding:16px;margin-bottom:12px;text-align:center;">
       <div style="font-size:26px;margin-bottom:6px;">🧬</div>
       <div style="font-size:13px;font-weight:800;color:var(--text-dark);margin-bottom:4px;">나만의 로또 DNA</div>
       <div style="font-size:11px;color:var(--text-muted);">QR을 3회 이상 등록하면 개인 패턴 분석이 제공됩니다.</div>
@@ -4613,8 +4631,98 @@ async function renderLottoDNA(freq, rounds) {
 }
 
 // =====================================================
+// 유틸리티 함수 (누락 방지)
+// =====================================================
+
+// 다크모드 토글
+function toggleDarkMode() {
+  const root = document.documentElement;
+  const isDark = root.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  document.body.setAttribute('data-theme', next); // CSS selector compatibility
+  localStorage.setItem('ltb-theme', next);
+  const btn = $('dark-toggle-btn');
+  if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
+}
+// 페이지 로드 시 다크모드 버튼 아이콘 초기화
+(function() {
+  const saved = localStorage.getItem('ltb-theme');
+  if (saved === 'dark') document.body.setAttribute('data-theme', 'dark');
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('dark-toggle-btn');
+    if (btn && saved === 'dark') btn.textContent = '☀️';
+  });
+})();
+
+// 전적 공유
+function shareMyStats(buy, prize, roi, wins) {
+  const text = `🎱 LottoBank 전적 공유\n구매: ${buy}게임 · 당첨: ${wins}회 · 총 당첨금: ${fmtMFull(prize)} · ROI: ${roi}%\nhttps://lottobank.pages.dev`;
+  if (navigator.share) {
+    navigator.share({ title: 'LottoBank 전적', text }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => toast('📋 전적이 클립보드에 복사되었습니다')).catch(() => {
+      toast('📤 공유: ' + text.split('\n')[0]);
+    });
+  }
+}
+
+// 추첨 알림 등록 (Web Notifications)
+function requestDrawNotification() {
+  if (!('Notification' in window)) { toast('⚠️ 이 브라우저는 알림을 지원하지 않습니다'); return; }
+  if (Notification.permission === 'granted') {
+    toast('✅ 이미 알림이 설정되어 있습니다. 토요일 오후 8:35에 알려드립니다!');
+    scheduleDrawNotification();
+    return;
+  }
+  Notification.requestPermission().then(perm => {
+    if (perm === 'granted') {
+      toast('🔔 추첨 알림이 설정되었습니다! 토요일 오후 8:35에 알려드립니다.');
+      scheduleDrawNotification();
+    } else {
+      toast('❌ 알림 권한이 거부되었습니다. 브라우저 설정에서 허용해주세요.');
+    }
+  });
+}
+function scheduleDrawNotification() {
+  // 다음 토요일 오후 8:35까지의 ms 계산
+  const now = new Date();
+  const day = now.getDay();
+  const diffToSat = (6 - day + 7) % 7 || 7;
+  const sat = new Date(now);
+  sat.setDate(now.getDate() + diffToSat);
+  sat.setHours(20, 35, 0, 0);
+  if (sat <= now) sat.setDate(sat.getDate() + 7);
+  const ms = sat - now;
+  if (ms > 0 && ms < 7 * 86400000) {
+    setTimeout(() => {
+      if (Notification.permission === 'granted') {
+        new Notification('🎱 LottoBank — 로또 추첨 시작!', {
+          body: `제 ${(latestRound||0)+1}회 로또 6/45 추첨이 시작됩니다. LottoBank에서 당첨번호를 확인하세요!`,
+          icon: '/favicon.ico',
+        });
+      }
+    }, ms);
+  }
+}
+
+// =====================================================
 // 초기화
 // =====================================================
+// 키보드 단축키 (Alt+1~8, Esc)
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if (e.altKey) {
+    const keyMap = {'1':'result','2':'ticket','3':'fortune','4':'stats','5':'badge','6':'rank','7':'community','8':'profile'};
+    const nameMap = {'result':'당첨결과','ticket':'QR인증','fortune':'번호분석','stats':'전적','badge':'뱃지','rank':'랭킹','community':'커뮤니티','profile':'프로필'};
+    if (keyMap[e.key]) { e.preventDefault(); go(keyMap[e.key]); toast('📌 ' + nameMap[keyMap[e.key]]); }
+  }
+  if (e.key === 'Escape') {
+    const am = $('auth-modal');
+    if (am && am.classList.contains('open')) am.classList.remove('open');
+  }
+});
+
 async function init() {
   go('result');
   initAuth();
@@ -4787,7 +4895,7 @@ function renderStats() {
       const target = apiCache[tk.drw];
       if (!target) return;
       const r = checkWinRank(tk.nums, target.nums, target.bonus);
-      if (r.rank > 0) {
+      if (r.rank >= 1 && r.rank <= 5) {
         winCount++;
         if (bestRank === 0 || r.rank < bestRank) bestRank = r.rank;
         rankCounts[r.rank] = (rankCounts[r.rank] || 0) + 1;
@@ -5305,6 +5413,10 @@ function relativeTime(isoStr) {
 }
 
 function feedItemHtml(a) {
+  // DB 컬럼명 정규화 (action_type/nickname 또는 type/nick 둘 다 지원)
+  const aType = a.type || a.action_type || '';
+  const aNick = a.nick || a.nickname || '익명';
+  const aData = a.data || {};
   const icons = {
     qr_register: svgIcon('ticket', 15, '#6366f1'),
     win:         svgIcon('trophy', 15, '#f59e0b'),
@@ -5330,13 +5442,13 @@ function feedItemHtml(a) {
     },
     rank_enter:  d => `<span style="color:#3b82f6;font-weight:700;">${d.category} ${d.pos||''}위</span> 랭킹 진입`,
   };
-  const icon  = icons[a.type] || svgIcon('star',15,'#94a3b8');
-  const label = labels[a.type] ? labels[a.type](a.data || {}) : a.type;
+  const icon  = icons[aType] || svgIcon('star',15,'#94a3b8');
+  const label = labels[aType] ? labels[aType](aData) : (aType || '활동');
   const time  = relativeTime(a.created_at);
   return `<div class="feed-item">
     <div class="feed-avatar" style="background:#f8fafc;">${icon}</div>
     <div class="feed-body">
-      <div class="feed-nick">${a.nick || '익명'}</div>
+      <div class="feed-nick">${aNick}</div>
       <div class="feed-label" style="line-height:1.5;">${label}</div>
     </div>
     <div class="feed-time">${time}</div>
@@ -5421,7 +5533,7 @@ const BADGE_DEFS = [
 
 async function renderBadge() {
   if (!isLoggedIn) {
-    $('badge-content').innerHTML = `<div style="text-align:center;padding:40px 20px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;">
+    $('badge-content').innerHTML = `<div style="text-align:center;padding:40px 20px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;">
       <div style="font-size:36px;margin-bottom:12px;">🏅</div>
       <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">뱃지 시스템</div>
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">QR 인증 활동을 통해 다양한 뱃지를 획득하세요.<br>로그인 후 뱃지 달성 현황을 확인할 수 있습니다.</div>
@@ -5454,7 +5566,7 @@ async function renderBadge() {
   ];
 
   let html = `
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:14px;">
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:14px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <div>
           <div style="font-size:11px;color:var(--text-muted);font-weight:700;">획득한 뱃지</div>
@@ -5528,11 +5640,13 @@ async function renderRank(catId) {
   $('rank-content').innerHTML = '<div class="skel-card"><div class="skel skel-row w80"></div><div class="skel skel-row w60"></div><div class="skel skel-row w80"></div><div class="skel skel-row w40"></div><div class="skel skel-row w80"></div></div>';
 
   // 기간 필터 UI 추가
+  const _pOn = 'background:var(--lotto-red);color:#fff;border-color:var(--lotto-red);';
+  const _pOff = 'background:var(--paper-white);color:var(--text-muted);border-color:var(--border-dashed);';
   const periodBtns = `<div style="display:flex;gap:6px;margin-bottom:10px;align-items:center;">
-    <span style="font-size:11px;color:#94a3b8;font-weight:600;">기간</span>
-    <button class="rank-period-btn ${!window._rankPeriod||window._rankPeriod==='all'?'on':''}" onclick="setRankPeriod('all')" style="padding:4px 12px;border:1px solid #e2e8f0;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:${!window._rankPeriod||window._rankPeriod==='all'?'#334155':'#fff'};color:${!window._rankPeriod||window._rankPeriod==='all'?'#fff':'#64748b'};">전체기간</button>
-    <button class="rank-period-btn ${window._rankPeriod==='month'?'on':''}" onclick="setRankPeriod('month')" style="padding:4px 12px;border:1px solid #e2e8f0;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:${window._rankPeriod==='month'?'#334155':'#fff'};color:${window._rankPeriod==='month'?'#fff':'#64748b'};">이번달</button>
-    <button class="rank-period-btn ${window._rankPeriod==='week'?'on':''}" onclick="setRankPeriod('week')" style="padding:4px 12px;border:1px solid #e2e8f0;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:${window._rankPeriod==='week'?'#334155':'#fff'};color:${window._rankPeriod==='week'?'#fff':'#64748b'};">이번주</button>
+    <span style="font-size:11px;color:var(--text-muted);font-weight:600;">기간</span>
+    <button class="rank-period-btn" onclick="setRankPeriod('all')" style="padding:4px 12px;border:1px solid;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;${!window._rankPeriod||window._rankPeriod==='all'?_pOn:_pOff}">전체기간</button>
+    <button class="rank-period-btn" onclick="setRankPeriod('month')" style="padding:4px 12px;border:1px solid;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;${window._rankPeriod==='month'?_pOn:_pOff}">이번달</button>
+    <button class="rank-period-btn" onclick="setRankPeriod('week')" style="padding:4px 12px;border:1px solid;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;${window._rankPeriod==='week'?_pOn:_pOff}">이번주</button>
   </div>`;
 
   try {
@@ -5799,7 +5913,7 @@ function renderCommunityList() {
   const topTags = Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const tagsHtml = topTags.length ? `<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center;">
     <span style="font-size:10px;color:var(--text-muted);font-weight:600;">인기태그</span>
-    ${topTags.map(([t,c])=>`<button onclick="$('comm-search-input').value='[${t}]';commSearch('[${t}]')" style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:12px;padding:2px 9px;font-size:10px;font-weight:700;cursor:pointer;color:#475569;font-family:inherit;">#${t} <span style="opacity:.5;">${c}</span></button>`).join('')}
+    ${topTags.map(([t,c])=>`<button onclick="$('comm-search-input').value='[${t}]';commSearch('[${t}]')" style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:12px;padding:2px 9px;font-size:10px;font-weight:700;cursor:pointer;color:var(--text-muted);font-family:inherit;">#${t} <span style="opacity:.5;">${c}</span></button>`).join('')}
     ${commSearchQuery?`<button onclick="$('comm-search-input').value='';commSearch('')" style="background:#fff5f5;border:1px solid #fecaca;border-radius:12px;padding:2px 9px;font-size:10px;font-weight:700;cursor:pointer;color:#dc2626;font-family:inherit;">✕ 초기화</button>`:''}
   </div>` : '';
 
@@ -5914,12 +6028,12 @@ async function openPostDetail(postId) {
       <div class="post-detail-back" onclick="closePostDetail()" style="margin:0;">${backSvg} 목록으로</div>
       ${isLoggedIn && currentUser && post.user_id === currentUser.id ? `<button onclick="deletePost('${postId}')" style="background:none;border:1px solid #fca5a5;color:#ef4444;font-size:11px;cursor:pointer;padding:4px 10px;border-radius:4px;font-weight:700;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">삭제</button>` : ''}
     </div>
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:12px;">
+    <div class="post-detail-wrap" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:16px;margin-bottom:12px;">
       <div style="margin-bottom:6px;">
         <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}">${post.tag==='free'?'자유':'인증'}</span>
       </div>
       <div class="post-detail-title">${(()=>{const {tag,cleanTitle}=parsePostTag(post.title||'');return (tag?tagChip(tag):'')+cleanTitle.replace(/</g,'&lt;');})()}</div>
-      ${post.body ? `<div style="font-size:13px;color:#374151;line-height:1.7;margin:12px 0;white-space:pre-wrap;">${post.body.replace(/</g,'&lt;')}</div>` : ''}
+      ${post.body ? `<div style="font-size:13px;color:var(--text-dark);line-height:1.7;margin:12px 0;white-space:pre-wrap;opacity:.85;">${post.body.replace(/</g,'&lt;')}</div>` : ''}
       <div class="post-detail-meta">
         <span>${post.nickname}</span>
         <span>${timeAgo(post.created_at)}</span>
@@ -5935,7 +6049,7 @@ async function openPostDetail(postId) {
         <div class="comment-write-bar">
           <input type="text" id="comment-input" class="comment-input" placeholder="댓글을 입력하세요..." maxlength="200" onkeyup="if(event.key==='Enter')submitComment('${postId}')">
           <button class="comment-submit-btn" onclick="submitComment('${postId}')">등록</button>
-        </div>` : `<div style="padding:10px;background:#f8fafc;border-radius:6px;font-size:12px;color:var(--text-muted);text-align:center;">로그인 후 댓글을 작성할 수 있습니다</div>`}
+        </div>` : `<div style="padding:10px;background:var(--bg-light);border-radius:6px;font-size:12px;color:var(--text-muted);text-align:center;">로그인 후 댓글을 작성할 수 있습니다</div>`}
     </div>`;
   await loadComments(postId);
 }
@@ -6671,8 +6785,8 @@ function renderProfile() {
       <div class="profile-block-title">닉네임 변경</div>
       <div style="display:flex;gap:8px;align-items:center;padding:8px 0;">
         <input type="text" id="nick-input" value="${nick}" maxlength="12"
-          style="flex:1;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;outline:none;"
-          onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'">
+          style="flex:1;padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);"
+          onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'">
         <button id="nick-save-btn" onclick="changeNickname()"
           style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">저장</button>
       </div>
