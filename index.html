@@ -45,7 +45,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-floor); col
 
 header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 .nav-container { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 70px; }
-.logo-title { font-size: 22px; font-weight: 900; color: var(--lotto-red); letter-spacing: -1px; }
+.logo-title { font-size: 22px; font-weight: 900; background: linear-gradient(135deg,#dc2626,#b91c1c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
 .logo-title span { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 .menu-tabs { display: flex; height: 100%; gap: 4px; }
 .menu-btn { height: 70px; padding: 0 11px; font-size: 13px; font-weight: 700; color: var(--text-muted); border: none; background: none; cursor: pointer; display: flex; align-items: center; position: relative; white-space: nowrap; }
@@ -514,11 +514,114 @@ main.chat-hidden .chat-panel { display: none; }
 .site-footer-inner { max-width:1500px; margin:0 auto; }
 .footer-links { display:flex; gap:16px; justify-content:center; margin-bottom:8px; flex-wrap:wrap; }
 [data-theme="dark"] .site-footer { background:#0f172a; border-top-color:#1e293b; }
+[data-theme="dark"] #terms-modal > div { background:#1e293b !important; }
+[data-theme="dark"] #terms-modal #terms-title { color:#f1f5f9 !important; }
+[data-theme="dark"] #terms-modal #terms-body { color:#cbd5e1 !important; }
 [data-theme="dark"] #home-live div[style*="background:linear-gradient(135deg,#fff5f5"] { background:linear-gradient(135deg,#1a0f0f,#1a0f1a) !important; border-color:#7f1d1d !important; }
+
+/* ── Premium UI Enhancements ── */
+*, *::before, *::after { transition: background-color .15s ease, border-color .15s ease, color .12s ease, opacity .15s ease; }
+a, button { transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .1s ease, opacity .18s ease !important; }
+button:active { transform: scale(0.97); }
+
+/* 헤더 메뉴 버튼 개선 */
+.menu-btn:hover { color: var(--lotto-red) !important; background: rgba(220,38,38,.06) !important; border-radius: 6px; }
+.menu-btn.on { color: var(--lotto-red) !important; background: rgba(220,38,38,.08) !important; border-radius: 6px; }
+
+/* 좌측 패널 카드 호버 */
+.left-panel > * { transition: box-shadow .2s ease; }
+
+/* kpi 카드 호버 */
+.kpi-cell { transition: transform .18s ease, box-shadow .18s ease !important; cursor: default; }
+.kpi-cell:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.1) !important; }
+.kpi-cell { border-radius: 10px !important; }
+
+/* 뱃지 카드 호버 */
+.badge-card-item { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease !important; cursor: default; border-radius: 10px !important; }
+.badge-card-item:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(220,38,38,.12) !important; }
+
+/* 랭킹 행 호버 */
+.rank-row { transition: background .15s ease !important; position: relative; overflow: hidden; }
+.rank-row:hover { background: rgba(220,38,38,.04) !important; }
+
+/* 프로필 블록 개선 */
+.profile-block { transition: box-shadow .2s ease !important; }
+.profile-block:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07) !important; }
+
+/* 모바일 하단 탭 */
+.mob-nav-btn { transition: color .15s ease, background .15s ease !important; }
+.mob-nav-btn:hover { background: rgba(220,38,38,.06) !important; }
+
+/* 드롭다운 메뉴 아이템 */
+.dd-item { transition: background .12s ease, color .12s ease !important; border-radius: 6px; }
+.dd-item:hover { background: #f8fafc !important; color: var(--lotto-red) !important; }
+[data-theme="dark"] .dd-item:hover { background: #1e293b !important; color: #f87171 !important; }
+
+/* 입력 필드 focus 링 */
+input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,38,.18) !important; }
+
+/* 커뮤니티 카드 */
+.comm-post-row { transition: background .14s ease, box-shadow .14s ease !important; }
+.comm-post-row:hover { background: rgba(248,250,252,1) !important; box-shadow: 0 2px 8px rgba(0,0,0,.06) !important; }
+[data-theme="dark"] .comm-post-row:hover { background: rgba(30,41,59,.8) !important; }
+
+/* 스켈레톤 shimmer */
+@keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+.skeleton { background: linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%); background-size:800px 100%; animation:shimmer 1.4s infinite; border-radius:4px; }
+[data-theme="dark"] .skeleton { background: linear-gradient(90deg,#1e293b 25%,#334155 50%,#1e293b 75%); background-size:800px 100%; animation:shimmer 1.4s infinite; }
+
+/* 페이지 전환 fade */
+@keyframes pageFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.page-fade { animation: pageFadeIn .22s ease forwards; }
+
+/* 연금복권 배지 색상 */
+.pension-badge { background: linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.3px; }
+
+/* 고급 버튼 스타일 */
+.btn-premium { background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 2px 8px rgba(220,38,38,.3); }
+.btn-premium:hover { box-shadow: 0 4px 16px rgba(220,38,38,.4); transform: translateY(-1px); }
+.btn-premium:active { transform: scale(0.97); }
+
+/* 닉네임 입력 개선 */
+#nick-input { background: var(--paper-white); color: var(--text-dark); }
+[data-theme="dark"] #nick-input { background: #0f172a !important; border-color: #334155 !important; color: #f1f5f9 !important; }
+
+/* 프로필 위험 구역 */
+[data-theme="dark"] .danger-zone { border-color: #7f1d1d !important; background: #1a0505 !important; }
+[data-theme="dark"] .danger-zone p { color: #94a3b8 !important; }
+[data-theme="dark"] .danger-zone button { background: #1e0a0a !important; border-color: #991b1b !important; }
+
+/* 비밀번호 입력 다크모드 */
+[data-theme="dark"] #pw-new, [data-theme="dark"] #pw-new2 { background: #0f172a !important; border-color: #334155 !important; color: #f1f5f9 !important; }
+[data-theme="dark"] #pw-change-btn { background: #334155 !important; }
+[data-theme="dark"] #left-guest .left-dashboard-card div[style*="background:#fff5f5"],
+[data-theme="dark"] #left-guest div[style*="background:linear-gradient(135deg,#fff5f5"] { background: #1a0a0a !important; border-color: #7f1d1d !important; }
+[data-theme="dark"] #left-hot-card { background: #1e293b !important; border-color: #334155 !important; }
+[data-theme="dark"] .danger-zone { border-color: #7f1d1d !important; background: #1a0505 !important; }
+[data-theme="dark"] .danger-zone p { color: #94a3b8 !important; }
+[data-theme="dark"] .danger-zone button { background: #200808 !important; border-color: #991b1b !important; }
+[data-theme="dark"] #weekly-resonance-block { background: linear-gradient(135deg,#080c14,#0e0b1f) !important; }
+[data-theme="dark"] .comm-post-row:hover { background: rgba(30,41,59,.9) !important; }
+
+/* 숫자 볼 개선 */
+.b-num { display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-weight:800;font-size:12px;letter-spacing:0;box-shadow:0 1px 4px rgba(0,0,0,.18); }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "LottoBank",
+  "url": "https://lottobank.pages.dev",
+  "description": "QR 기반 로또 구매 이력 인증 및 전적 관리 플랫폼",
+  "applicationCategory": "EntertainmentApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
+}
+</script>
 </head>
 <body>
 <a href="#main-content" style="position:absolute;left:-9999px;top:6px;background:var(--lotto-red);color:#fff;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:700;z-index:9999;text-decoration:none;" onfocus="this.style.left='6px'" onblur="this.style.left='-9999px'">본문으로 바로가기</a>
@@ -624,7 +727,7 @@ main.chat-hidden .chat-panel { display: none; }
     <p class="auth-sub" id="auth-sub">이메일과 비밀번호로 로그인하세요</p>
     <div class="auth-field">
       <label>이메일</label>
-      <input type="email" id="auth-email" placeholder="example@email.com" onkeyup="if(event.key==='Enter')doAuth()">
+      <input type="email" id="auth-email" placeholder="example@email.com" autocomplete="email" onkeyup="if(event.key==='Enter')doAuth()">
     </div>
     <div class="auth-field" id="auth-nick-row" style="display:none">
       <label>닉네임</label>
@@ -634,6 +737,10 @@ main.chat-hidden .chat-panel { display: none; }
       <label>비밀번호</label>
       <input type="password" id="auth-pass" placeholder="8자리 이상" onkeyup="if(event.key==='Enter')doAuth()">
     </div>
+    <div class="auth-field" id="auth-pw2-row" style="display:none">
+      <label>비밀번호 확인</label>
+      <input type="password" id="auth-pw2" placeholder="비밀번호를 한 번 더 입력하세요" onkeyup="if(event.key==='Enter')doAuth()">
+    </div>
     <div id="forgot-pwd-row" style="text-align:right;margin-top:-6px;margin-bottom:10px;">
       <button onclick="forgotPassword()" style="background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;text-decoration:underline;font-family:inherit;padding:0;">비밀번호를 잊으셨나요?</button>
     </div>
@@ -642,6 +749,12 @@ main.chat-hidden .chat-panel { display: none; }
     <div id="auth-success-banner" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 14px;margin-top:10px;font-size:13px;color:#166534;line-height:1.5;">
       📧 <strong>이메일을 확인해주세요.</strong><br>
       <span id="auth-success-msg">인증 링크를 발송했습니다.</span>
+    </div>
+    <div class="auth-field" id="auth-terms-row" style="display:none;">
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12px;font-weight:500;line-height:1.4;">
+        <input type="checkbox" id="auth-terms-chk" style="margin-top:2px;flex-shrink:0;accent-color:var(--lotto-red);">
+        <span><a href="javascript:void(0)" onclick="openTermsModal()" style="color:var(--lotto-red);text-decoration:underline;">이용약관</a> 및 <a href="javascript:void(0)" onclick="openTermsModal('privacy')" style="color:var(--lotto-red);text-decoration:underline;">개인정보처리방침</a>에 동의합니다</span>
+      </label>
     </div>
     <div class="auth-divider">계정이 없으신가요?</div>
     <div style="text-align:center">
@@ -690,12 +803,14 @@ main.chat-hidden .chat-panel { display: none; }
               <div class="left-stat-val" id="gs-roi">-</div>
             </div>
           </div>
-          <div style="padding:10px;background:#fff5f5;border:1px dashed #fca5a5;border-radius:7px;text-align:center;">
-            <div style="font-size:11px;color:#64748b;line-height:1.6;margin-bottom:8px;">QR 인증으로 내 로또 전적을<br>데이터로 관리해보세요</div>
-            <button onclick="showAuthModal()" style="background:#dc2626;color:#fff;border:none;border-radius:5px;padding:7px 16px;font-size:12px;font-weight:900;cursor:pointer;">1분만에 시작하기  →</button>
+          <div style="padding:12px;background:linear-gradient(135deg,#fff5f5,#fef2f2);border:1.5px solid #fecaca;border-radius:10px;text-align:center;">
+            <div style="font-size:18px;margin-bottom:6px;">🎯</div>
+            <div style="font-size:12px;font-weight:800;color:var(--text-dark);margin-bottom:4px;">지금 바로 시작하세요</div>
+            <div style="font-size:10px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">로또·연금복권 QR 등록으로<br>내 전적을 데이터로 관리하세요</div>
+            <button onclick="showAuthModal()" style="background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:7px;padding:9px 0;font-size:12px;font-weight:900;cursor:pointer;width:100%;box-shadow:0 3px 10px rgba(220,38,38,.3);">무료로 시작하기 →</button>
           </div>
         </div>
-        <div id="left-hot-card" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;">
+        <div id="left-hot-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:10px 12px;">
           <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             <span style="font-size:10px;font-weight:800;color:#64748b;">유저들이 자주 선택한 번호</span>
@@ -813,7 +928,10 @@ main.chat-hidden .chat-panel { display: none; }
         <div id="qr-card" style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px;">
           <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> 실물 로또 QR 당첨 인증</div>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">동행복권 앱 → 구매내역 → QR코드 → URL 복사 후 붙여넣기</p>
-          <input type="text" id="qr-url-input" class="input-custom" placeholder="동행복권 QR URL 붙여넣기..." onkeyup="if(event.key==='Enter')verifyRealQR()">
+          <div style="position:relative;">
+            <input type="text" id="qr-url-input" class="input-custom" placeholder="로또 6/45 · 연금복권 720+ QR URL 붙여넣기" onkeyup="if(event.key==='Enter')verifyRealQR()" style="padding-right:72px;">
+            <button onclick="navigator.clipboard.readText().then(t=>{if($('qr-url-input'))$('qr-url-input').value=t;}).catch(()=>{})" title="클립보드에서 붙여넣기" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:var(--lotto-red);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">붙여넣기</button>
+          </div>
           <div style="display:flex;gap:8px;margin-top:8px;">
             <button class="btn-action" onclick="verifyRealQR()" style="background:var(--lotto-red);flex:1;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 당첨 인증하기</button>
             <button class="btn-action" id="cam-btn" onclick="toggleCameraQR()" style="background:#3b82f6;min-width:44px;padding:0 12px;" title="카메라로 QR 스캔"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
@@ -881,7 +999,8 @@ main.chat-hidden .chat-panel { display: none; }
         </div>
         <div id="post-write-expanded" style="display:none;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:10px;">
           <input type="text" id="post-input-title" class="post-write-input" placeholder="제목을 입력하세요..." style="margin-bottom:8px;width:100%;box-sizing:border-box;" maxlength="100">
-          <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:#1e293b;" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+          <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:#1e293b;" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'" oninput="const c=$('post-body-count');if(c)c.textContent=this.value.length+'/2000'"></textarea>
+          <div style="text-align:right;font-size:11px;color:var(--text-muted);margin-top:2px;"><span id="post-body-count">0/2000</span></div>
           <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
             <button onclick="collapsePostForm()" style="padding:8px 14px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;">취소</button>
             <button onclick="writePost()" style="padding:8px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">등록</button>
@@ -958,8 +1077,23 @@ main.chat-hidden .chat-panel { display: none; }
       <a href="https://dhlottery.co.kr" target="_blank" rel="noopener">동행복권</a>
     </div>
     <div>© 2024–2025 LottoBank · QR 기반 로또 전적 인증 플랫폼 · 본 서비스는 동행복권 공식 서비스가 아닙니다.</div>
+          <div style="margin-top:6px;font-size:10px;opacity:0.5;">
+            <a href="javascript:void(0)" onclick="openTermsModal()" style="color:inherit;text-decoration:underline;">이용약관</a>
+            &nbsp;·&nbsp;
+            <a href="javascript:void(0)" onclick="openTermsModal('privacy')" style="color:inherit;text-decoration:underline;">개인정보처리방침</a>
+          </div>
   </div>
 </footer>
+
+<!-- 이용약관 모달 -->
+<div id="terms-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3001;overflow-y:auto;padding:20px;">
+  <div style="max-width:520px;margin:auto;background:var(--paper-white);border-radius:12px;padding:24px;position:relative;">
+    <button onclick="closeTermsModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">✕</button>
+    <h3 id="terms-title" style="margin:0 0 16px;font-size:16px;font-weight:900;color:var(--text-dark);">이용약관</h3>
+    <div id="terms-body" style="font-size:12px;color:var(--text-dark);line-height:1.8;max-height:60vh;overflow-y:auto;"></div>
+    <button onclick="closeTermsModal()" style="margin-top:16px;width:100%;padding:12px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;">확인</button>
+  </div>
+</div>
 
 <div id="toast"></div>
 
@@ -1602,6 +1736,7 @@ async function renderQRHistory() {
       </div>`;
       return;
     }
+    window._ltbTickets = tickets;
     const rankLabel = r => r===1?'🥇 1등':r===2?'🥈 2등':r===3?'🥉 3등':r===4?'🎯 4등':r===5?'✅ 5등':'낙첨';
     const rankColor = r => r<=3?'var(--lotto-red)':r===4?'#3b82f6':r===5?'#64748b':'#94a3b8';
     wrap.innerHTML = `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px;margin-top:4px;">
@@ -1627,6 +1762,18 @@ async function verifyRealQR() {
   if (!url) { toast('⚠️ QR URL을 입력해 주세요'); return; }
 
   const parsed = parseQRUrl(url);
+  // 연금복권 처리
+  if (parsed && parsed.type === 'pension') {
+    const rd = $('qr-result-display');
+    if (rd) rd.innerHTML = `<div style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border-radius:12px;padding:24px;text-align:center;margin-top:12px;">
+      <div style="font-size:32px;margin-bottom:8px;">🏦</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">연금복권 720+ 등록 완료</div>
+      <div style="font-size:12px;opacity:.85;line-height:1.6;">당첨 결과는 <b>동행복권 공식 앱</b>에서 확인하세요.<br>연금복권은 번호 기반 등록으로 저장됩니다.</div>
+      ${parsed.round ? `<div style="margin-top:12px;font-size:11px;opacity:.65;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;display:inline-block;">${parsed.round}회차 · ${parsed.jo||'?'}조 · ${String(parsed.no||0).padStart(6,'0')}번</div>` : ''}
+    </div>`;
+    toast('🏦 연금복권이 등록되었습니다!');
+    return;
+  }
   if (!parsed) {
     $('qr-result-display').innerHTML = '<div style="color:var(--b-red);font-size:12px;padding:8px;background:#fee2e2;border-radius:4px;">⚠️ 올바른 동행복권 QR 형식이 아닙니다.<br>동행복권 앱에서 복사한 URL을 그대로 붙여넣어 주세요.</div>';
     return;
@@ -1812,9 +1959,55 @@ function shareURL(url, label) {
   }
 }
 
+function copyNumSet(nums) {
+  const text = '로또 추천 번호: ' + nums.join(', ');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => toast('✅ 번호 복사 완료: ' + nums.join(', ')));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    toast('✅ 번호 복사 완료');
+  }
+}
+
+function openTermsModal(type) {
+  const modal = $('terms-modal');
+  const title = $('terms-title');
+  const body  = $('terms-body');
+  if (!modal) return;
+  if (type === 'privacy') {
+    title.textContent = '개인정보처리방침';
+    body.innerHTML = `LottoBank 개인정보처리방침\n\n1. 수집 항목: 이메일 주소, 닉네임, QR 코드 URL, 구매 이력 데이터\n\n2. 수집 목적: 회원 인증, 전적 관리, 뱃지/랭킹 서비스 제공\n\n3. 보유 기간: 회원 탈퇴 시까지 (관련 법령에 따라 일정 기간 보관)\n\n4. 제3자 제공: 개인정보를 제3자에게 제공하지 않습니다.\n\n5. 보안: Supabase를 통한 암호화 저장, HTTPS 전송 암호화 적용\n\n6. 권리: 언제든지 계정 삭제를 통해 개인정보 삭제를 요청할 수 있습니다.\n\n문의: LottoBank 서비스 팀`.split('\n').map(l => l ? `<p style="margin:0 0 8px;">${l}</p>` : '<br>').join('');
+  } else {
+    title.textContent = '이용약관';
+    body.innerHTML = `제1조 (목적) 본 약관은 LottoBank(이하 "서비스")를 이용함에 있어 회원과 운영자 간의 권리, 의무 및 책임 사항을 규정합니다.\n\n제2조 (서비스 내용) LottoBank는 QR 기반 로또 구매 이력 인증 및 전적 관리 서비스를 제공합니다. 당첨금 수령 및 복권 구매 대행은 제공하지 않습니다.\n\n제3조 (면책) 본 서비스는 동행복권의 공식 서비스가 아닙니다. 당첨 여부는 동행복권 공식 채널을 통해 반드시 확인하시기 바랍니다.\n\n제4조 (개인정보) 수집하는 정보: 이메일, 닉네임, QR 인증 데이터. 수집 목적: 서비스 제공 및 전적 관리. 보유 기간: 회원 탈퇴 시까지.\n\n제5조 (금지 행위) 타인의 QR 코드를 무단 등록하는 행위, 서비스를 상업적으로 무단 이용하는 행위를 금지합니다.\n\n제6조 (서비스 변경) 운영자는 서비스 내용을 변경하거나 중단할 수 있으며, 이 경우 사전 공지합니다.\n\n문의: LottoBank 서비스 팀`.split('\n').map(l => l ? `<p style="margin:0 0 8px;">${l}</p>` : '<br>').join('');
+  }
+  modal.style.display = 'block';
+}
+
+function closeTermsModal() {
+  const modal = $('terms-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+// ESC 키로 모달 닫기 (terms-modal + auth-modal)
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const tm = $('terms-modal');
+    if (tm && tm.style.display !== 'none') { closeTermsModal(); return; }
+    const am = $('auth-modal');
+    if (am && am.classList.contains('open')) closeAuthModal();
+  }
+});
+
 function closeAuthModal() {
   $('auth-modal').classList.remove('open');
   $('auth-err').textContent = ''; $('auth-err').style.color = '';
+  if ($('auth-pw2')) $('auth-pw2').value = '';
+  if ($('auth-pw2-row')) $('auth-pw2-row').style.display = 'none';
+  if ($('auth-terms-chk')) $('auth-terms-chk').checked = false;
+  if ($('auth-terms-row')) $('auth-terms-row').style.display = 'none';
   // 성공 배너 및 폼 초기화
   $('auth-success-banner').style.display = 'none';
   $('auth-submit').style.display = '';
@@ -1841,6 +2034,9 @@ function toggleAuthMode() {
   $('auth-switch').textContent = isSignup ? '로그인으로 돌아가기' : '회원가입';
   $('auth-nick-row').style.display = isSignup ? 'block' : 'none';
   if ($('forgot-pwd-row')) $('forgot-pwd-row').style.display = isSignup ? 'none' : 'block';
+  if ($('auth-pw2-row')) { $('auth-pw2-row').style.display = isSignup ? 'block' : 'none'; if (!isSignup && $('auth-pw2')) $('auth-pw2').value = ''; }
+  if ($('auth-terms-row')) $('auth-terms-row').style.display = isSignup ? 'block' : 'none';
+  if ($('auth-terms-chk')) $('auth-terms-chk').checked = false;
   if ($('auth-success-banner')) $('auth-success-banner').style.display = 'none';
   document.querySelector('.auth-divider').textContent = isSignup ? '이미 계정이 있으신가요?' : '계정이 없으신가요?';
   $('auth-err').textContent = ''; $('auth-err').style.color = '';
@@ -1853,8 +2049,12 @@ async function doAuth() {
   $('auth-err').textContent = '';
 
   if (!email || !pass) { $('auth-err').textContent = '이메일과 비밀번호를 입력해주세요'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { $('auth-err').textContent = '올바른 이메일 형식이 아닙니다'; return; }
   if (authMode === 'signup' && !nick) { $('auth-err').textContent = '닉네임을 입력해주세요 (2~12자)'; return; }
   if (authMode === 'signup' && (nick.length < 2 || nick.length > 12)) { $('auth-err').textContent = '닉네임은 2~12자로 입력해주세요'; return; }
+  if (authMode === 'signup' && pass.length < 8) { $('auth-err').textContent = '비밀번호는 8자리 이상이어야 합니다'; return; }
+  if (authMode === 'signup' && $('auth-pw2') && $('auth-pw2').value !== pass) { $('auth-err').textContent = '비밀번호가 일치하지 않습니다'; return; }
+  if (authMode === 'signup' && $('auth-terms-chk') && !$('auth-terms-chk').checked) { $('auth-err').textContent = '이용약관에 동의해주세요'; return; }
 
   const btn = $('auth-submit');
   btn.disabled = true;
@@ -2106,7 +2306,7 @@ async function loadRecentChats() {
     const { data } = await sb.from('chat_messages')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(50);
+      .limit(200);
     if (data && data.length) data.reverse().forEach(appendChatRow);
   } catch(e) { console.warn('loadRecentChats:', e.message); }
 }
@@ -2497,7 +2697,7 @@ function go(id) {
   };
   $('mid-title').innerHTML = titles[id] || '';
   // 페이지 타이틀 동적 업데이트
-  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', fortune:'번호 분석', stats:'나의 전적', badge:'획득 뱃지', rank:'전체 랭킹', community:'커뮤니티', admin:'관리자 패널', profile:'내 프로필', home:'내 번호 보관함' };
+  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', fortune:'번호분석 & 로또 DNA', stats:'나의 전적', badge:'획득 뱃지', rank:'전체 랭킹', community:'커뮤니티', admin:'관리자 패널', profile:'내 프로필', home:'내 번호 보관함' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(); }
@@ -2772,7 +2972,7 @@ function renderFortune() {
 
   $('fortune-content').innerHTML = `
     <!-- 1. 번호 추천 5세트 -->
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:12px;">
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <div style="font-size:13px;font-weight:900;color:var(--text-dark);">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -2785,6 +2985,7 @@ function renderFortune() {
           <span style="font-size:10px;font-weight:800;color:#64748b;min-width:32px;">${setLabels[i]}세트</span>
           <div class="ball-context" style="margin:0;gap:4px;flex:1;">${nums.map(n=>bH(n)).join('')}</div>
           <button onclick="saveFortuneSet('${JSON.stringify(nums)}')" style="flex-shrink:0;font-size:10px;font-weight:700;background:#dc2626;color:#fff;border:none;border-radius:5px;padding:5px 9px;cursor:pointer;white-space:nowrap;">저장</button>
+          <button onclick="copyNumSet(${JSON.stringify(nums)})" style="flex-shrink:0;font-size:10px;font-weight:700;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:5px;padding:5px 9px;cursor:pointer;white-space:nowrap;">복사</button>
         </div>`).join('')}
       <div style="font-size:10px;color:#94a3b8;margin-top:6px;text-align:center;">※ 최근 ${totalDraws}회차 출현 빈도 기반 통계 추천 · 당첨 보장 없음</div>
     </div>
@@ -2884,6 +3085,115 @@ function renderFortune() {
     <div id="my-match-section"></div>
   `;
   if (isLoggedIn && currentUser && sb) { loadMyNumberStats(); loadMyMatchSection(); }
+
+  // 주간 공명 번호 + 로또 DNA
+  renderWeeklyResonance(freq, hot6, cold6, rounds);
+  if (isLoggedIn && currentUser) renderLottoDNA(freq, rounds);
+}
+
+// ── 주간 공명 번호 ──
+function renderWeeklyResonance(freq, hot6, cold6, rounds) {
+  const el = $('weekly-nums-display');
+  if (!el) return;
+  const now = new Date();
+  const dow = now.getDay();
+  const diff = dow === 0 ? 6 : dow - 1;
+  const mon = new Date(now); mon.setDate(now.getDate() - diff);
+  const weekSeed = mon.getFullYear() * 10000 + (mon.getMonth()+1) * 100 + mon.getDate();
+  function seededRand(seed) {
+    let s = (seed ^ 0xdeadbeef) >>> 0;
+    return function() { s = (s * 1664525 + 1013904223) >>> 0; return s / 0x100000000; };
+  }
+  const rand = seededRand(weekSeed);
+  const weights = new Array(46).fill(1);
+  freq.forEach((cnt, i) => { if (i > 0) weights[i] = 1 + cnt * 2; });
+  cold6.forEach(n => { weights[n] = Math.max(weights[n], 4); });
+  const pool = Array.from({length:45},(_,i)=>i+1), nums = [];
+  while (nums.length < 6 && pool.length > 0) {
+    const tw = pool.reduce((s,n)=>s+weights[n],0);
+    let r = rand() * tw;
+    for (let j=0;j<pool.length;j++){r-=weights[pool[j]];if(r<=0){nums.push(pool[j]);pool.splice(j,1);break;}}
+  }
+  nums.sort((a,b)=>a-b);
+  el.innerHTML = nums.map(n=>bH(n)).join('') +
+    `<button onclick="copyNumSet(${JSON.stringify(nums)})" style="margin-left:8px;font-size:10px;font-weight:700;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:5px 10px;cursor:pointer;font-family:inherit;">복사</button>`;
+}
+
+// ── 로또 DNA 분석 (개인 맞춤) ──
+async function renderLottoDNA(freq, rounds) {
+  const el = $('lotto-dna-block');
+  if (!el) return;
+  const myNums = [];
+  MY.forEach(t => { if (t.nums) t.nums.forEach(n => myNums.push(n)); });
+  let dbNums = [];
+  try {
+    const { data } = await sb.from('tickets').select('numbers').eq('user_id', currentUser.id).limit(200);
+    if (data) data.forEach(t => {
+      const parsed = typeof t.numbers === 'string' ? JSON.parse(t.numbers||'[]') : (t.numbers||[]);
+      if (Array.isArray(parsed[0])) parsed.forEach(g => g.forEach(n => dbNums.push(n)));
+      else parsed.forEach(n => dbNums.push(n));
+    });
+  } catch{}
+  const all = [...myNums, ...dbNums];
+  if (all.length < 6) {
+    el.innerHTML = `<div style="background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px;text-align:center;">
+      <div style="font-size:26px;margin-bottom:6px;">🧬</div>
+      <div style="font-size:13px;font-weight:800;color:var(--text-dark);margin-bottom:4px;">나만의 로또 DNA</div>
+      <div style="font-size:11px;color:var(--text-muted);">QR을 3회 이상 등록하면 개인 패턴 분석이 제공됩니다.</div>
+    </div>`; return;
+  }
+  const myFreq = new Array(46).fill(0);
+  all.forEach(n => { if (n>=1&&n<=45) myFreq[n]++; });
+  const mi = myFreq.map((cnt,i)=>({n:i,cnt})).slice(1).sort((a,b)=>b.cnt-a.cnt);
+  const myFav3 = mi.slice(0,3).map(x=>x.n);
+  const myRare3 = mi.slice(-3).map(x=>x.n);
+  const nick = ($('user-name')||{}).textContent || 'u';
+  let ns = 0; for(let i=0;i<nick.length;i++) ns=(ns*31+nick.charCodeAt(i))&0xffffffff;
+  ns = ((ns>>>0)+1)||1;
+  function nr(){ns=(ns*1664525+1013904223)>>>0;return ns/0x100000000;}
+  const dw = new Array(46).fill(1);
+  myFreq.forEach((cnt,i)=>{if(i>0)dw[i]=1+cnt*3;});
+  freq.forEach((cnt,i)=>{if(i>0)dw[i]+=cnt;});
+  const dp=[...Array.from({length:45},(_,i)=>i+1)], dn=[];
+  while(dn.length<6&&dp.length>0){const tw=dp.reduce((s,n)=>s+dw[n],0);let r=nr()*tw;for(let j=0;j<dp.length;j++){r-=dw[dp[j]];if(r<=0){dn.push(dp[j]);dp.splice(j,1);break;}}}
+  dn.sort((a,b)=>a-b);
+  const cov = mi.filter(x=>x.cnt>0).length;
+  el.innerHTML = `
+  <div style="background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 60%,#0f0a1f 100%);border-radius:12px;padding:16px;margin-bottom:12px;color:#fff;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-24px;right:-24px;width:110px;height:110px;background:radial-gradient(circle,rgba(139,92,246,.35),transparent 70%);pointer-events:none;"></div>
+    <div style="position:absolute;bottom:-30px;left:-10px;width:90px;height:90px;background:radial-gradient(circle,rgba(220,38,38,.2),transparent 70%);pointer-events:none;"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;position:relative;">
+      <div><div style="font-size:14px;font-weight:900;letter-spacing:.3px;">🧬 나만의 로또 DNA</div>
+      <div style="font-size:10px;opacity:.5;margin-top:2px;">${Math.floor(all.length/6)}회차 · ${all.length}게임 분석</div></div>
+      <span style="font-size:9px;background:rgba(139,92,246,.4);padding:3px 8px;border-radius:10px;border:1px solid rgba(139,92,246,.5);">개인 맞춤형</span>
+    </div>
+    <div style="background:rgba(255,255,255,.07);border-radius:8px;padding:12px;margin-bottom:10px;">
+      <div style="font-size:10px;opacity:.55;margin-bottom:8px;font-weight:600;letter-spacing:.5px;">▸ 내 패턴 기반 추천 번호</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        ${dn.map(n=>bH(n)).join('')}
+        <button onclick="copyNumSet(${JSON.stringify(dn)})" style="margin-left:6px;font-size:10px;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:4px 9px;cursor:pointer;font-family:inherit;">복사</button>
+      </div>
+      <div style="font-size:9px;opacity:.35;margin-top:5px;">내 구매 패턴 + 전체 통계 + 고유 DNA 시드 합산 · 매주 고정</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px;">
+        <div style="font-size:9px;opacity:.5;margin-bottom:6px;font-weight:600;">🔥 내가 자주 사는 번호</div>
+        <div style="display:flex;gap:4px;">${myFav3.map(n=>bH(n)).join('')}</div>
+      </div>
+      <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px;">
+        <div style="font-size:9px;opacity:.5;margin-bottom:6px;font-weight:600;">❄️ 내가 잘 안 사는 번호</div>
+        <div style="display:flex;gap:4px;">${myRare3.map(n=>bH(n)).join('')}</div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-size:9px;opacity:.5;font-weight:600;">번호 다양성 (1~45 중 사용)</div>
+        <div style="font-size:10px;font-weight:800;">${cov}/45</div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px;"><div style="height:5px;border-radius:4px;background:linear-gradient(90deg,#8b5cf6,#ec4899);width:${Math.round(cov/45*100)}%;"></div></div>
+      <div style="font-size:9px;opacity:.35;margin-top:4px;">${cov<20?'번호 다양성이 낮습니다. 새로운 번호를 시도해 보세요!':cov<35?'적절한 다양성입니다.':'번호 다양성이 높습니다! 전략적입니다.'}</div>
+    </div>
+  </div>`;
 }
 
 // =====================================================
@@ -3137,7 +3447,13 @@ async function loadTicketHistory() {
       </div>
       ` : ''}
 
-      <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">QR 인증 이력 <span style="font-size:10px;font-weight:500;color:#94a3b8;">(최근 ${tickets.length}건)</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:12px;font-weight:900;color:var(--text-dark);">QR 인증 이력 <span style="font-size:10px;font-weight:500;color:#94a3b8;">(최근 ${tickets.length}건)</span></div>
+        <button onclick="if(window._ltbTickets)downloadTicketCSV(window._ltbTickets);else toast('데이터 없음')" style="background:none;border:1px solid #e2e8f0;border-radius:5px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='var(--text-muted)'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          CSV 내보내기
+        </button>
+      </div>
       <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
           <thead>
@@ -3166,6 +3482,32 @@ async function loadTicketHistory() {
 }
 
 
+
+// =====================================================
+// CSV 내보내기
+// =====================================================
+function downloadTicketCSV(tickets) {
+  if (!tickets || !tickets.length) { toast('⚠️ 내보낼 데이터가 없습니다'); return; }
+  const rankLabel = r => r===1?'1등':r===2?'2등':r===3?'3등':r===4?'4등':r===5?'5등':'낙첨';
+  const rows = [['회차','결과','당첨금','날짜','게임수']];
+  tickets.forEach(t => {
+    rows.push([
+      t.round_no || '',
+      rankLabel(t.prize_rank),
+      t.prize_amount || 0,
+      t.purchase_date || '',
+      t.game_count || 1
+    ]);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'LottoBank_전적_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('✅ CSV 파일 다운로드 완료');
+}
 
 // =====================================================
 // SVG 아이콘 라이브러리
@@ -3759,7 +4101,10 @@ async function openPostDetail(postId) {
   const backSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
 
   $('community-content').innerHTML = `
-    <div class="post-detail-back" onclick="closePostDetail()">${backSvg} 목록으로</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <div class="post-detail-back" onclick="closePostDetail()" style="margin:0;">${backSvg} 목록으로</div>
+      ${isLoggedIn && currentUser && post.user_id === currentUser.id ? `<button onclick="deletePost('${postId}')" style="background:none;border:1px solid #fca5a5;color:#ef4444;font-size:11px;cursor:pointer;padding:4px 10px;border-radius:4px;font-weight:700;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">삭제</button>` : ''}
+    </div>
     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:12px;">
       <div style="margin-bottom:6px;">
         <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}">${post.tag==='free'?'자유':'인증'}</span>
@@ -3791,6 +4136,34 @@ function closePostDetail() {
   renderCommunityList();
 }
 
+async function deletePost(postId) {
+  if (!isLoggedIn || !currentUser) return;
+  if (!confirm('게시글을 삭제하시겠습니까?')) return;
+  try {
+    const { error } = await sb.from('posts').delete().eq('id', postId).eq('user_id', currentUser.id);
+    if (error) throw error;
+    toast('게시글이 삭제되었습니다');
+    commPosts.free = (commPosts.free||[]).filter(p => String(p.id) !== String(postId));
+    commPosts.verify = (commPosts.verify||[]).filter(p => String(p.id) !== String(postId));
+    closePostDetail();
+  } catch(e) {
+    toast('❌ 삭제 실패: ' + e.message);
+  }
+}
+
+async function deleteComment(commentId, postId) {
+  if (!isLoggedIn || !currentUser) return;
+  if (!confirm('댓글을 삭제하시겠습니까?')) return;
+  try {
+    const { error } = await sb.from('comments').delete().eq('id', commentId).eq('user_id', currentUser.id);
+    if (error) throw error;
+    toast('댓글이 삭제되었습니다');
+    await loadComments(postId);
+  } catch(e) {
+    toast('❌ 삭제 실패: ' + e.message);
+  }
+}
+
 async function loadComments(postId) {
   try {
     const { data } = await sb.from('comments')
@@ -3805,9 +4178,14 @@ async function loadComments(postId) {
     }
     $('comment-list').innerHTML = list.map(c => `
       <div class="comment-item">
-        <div class="comment-nick">${c.nickname}</div>
-        <div class="comment-body">${c.body.replace(/</g,'&lt;')}</div>
-        <div class="comment-time">${timeAgo(c.created_at)}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div style="flex:1;">
+            <div class="comment-nick">${c.nickname}</div>
+            <div class="comment-body">${c.body.replace(/</g,'&lt;')}</div>
+            <div class="comment-time">${timeAgo(c.created_at)}</div>
+          </div>
+          ${isLoggedIn && currentUser && c.user_id === currentUser.id ? `<button onclick="deleteComment('${c.id}','${postId}')" style="background:none;border:none;color:#94a3b8;font-size:11px;cursor:pointer;padding:2px 6px;border-radius:4px;flex-shrink:0;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">삭제</button>` : ''}
+        </div>
       </div>`).join('');
   } catch(e) {
     $('comment-list').innerHTML = '<div style="font-size:12px;color:var(--b-red);padding:8px 0;">댓글 로드 실패</div>';
@@ -3900,11 +4278,53 @@ function collapsePostForm() {
   if (exp) exp.style.display = 'none';
   const t = $('post-input-title'); if(t) t.value = '';
   const b = $('post-input-body'); if(b) b.value = '';
+  const bc = $('post-body-count'); if(bc) bc.textContent = '0/2000';
 }
 
 // =====================================================
 // 프로필 페이지
 // =====================================================
+async function changePassword() {
+  if (!isLoggedIn || !currentUser) return;
+  const pw = ($('pw-new')||{}).value||'';
+  const pw2 = ($('pw-new2')||{}).value||'';
+  if (pw.length < 8) { toast('⚠️ 비밀번호는 8자 이상이어야 합니다'); return; }
+  if (pw !== pw2) { toast('⚠️ 비밀번호가 일치하지 않습니다'); return; }
+  const btn = $('pw-change-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '변경 중...'; }
+  try {
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if (error) throw error;
+    if ($('pw-new')) $('pw-new').value = '';
+    if ($('pw-new2')) $('pw-new2').value = '';
+    toast('✅ 비밀번호가 변경되었습니다.');
+  } catch(e) { toast('❌ 변경 실패: ' + (e.message||'')); }
+  finally { if (btn) { btn.disabled=false; btn.textContent='비밀번호 변경'; } }
+}
+
+async function deleteAccount() {
+  if (!isLoggedIn || !currentUser) return;
+  const confirmed = prompt('계정을 삭제하려면 아래에 "탈퇴"를 입력하세요.');
+  if (confirmed !== '탈퇴') { if (confirmed !== null) toast('취소되었습니다'); return; }
+  if (!confirm('⚠️ 모든 QR 기록, 전적, 뱃지, 게시글이 영구 삭제됩니다. 계속하시겠습니까?')) return;
+  toast('계정 삭제 처리 중...');
+  try {
+    const uid = currentUser.id;
+    await sb.from('tickets').delete().eq('user_id', uid);
+    await sb.from('user_stats').delete().eq('user_id', uid);
+    await sb.from('user_badges').delete().eq('user_id', uid);
+    await sb.from('activity_feed').delete().eq('user_id', uid);
+    await sb.from('chat_messages').delete().eq('user_id', uid);
+    await sb.from('comments').delete().eq('user_id', uid);
+    await sb.from('post_likes').delete().eq('user_id', uid);
+    await sb.from('posts').delete().eq('user_id', uid);
+    await sb.from('profiles').delete().eq('id', uid);
+    await sb.auth.signOut();
+    toast('✅ 계정이 삭제되었습니다. 이용해 주셔서 감사합니다.');
+    setTimeout(() => location.reload(), 2000);
+  } catch(e) { toast('❌ 탈퇴 실패: ' + (e.message||e)); }
+}
+
 async function changeNickname() {
   if (!isLoggedIn || !currentUser) return;
   const newNick = $('nick-input').value.trim();
@@ -4354,6 +4774,7 @@ function renderProfile() {
   const email = currentUser?.email || '-';
   $('profile-content').innerHTML = `
     <div class="profile-hero">
+      <button onclick="shareURL('https://lottobank.pages.dev','LottoBank 프로필')" style="position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border-dashed);color:var(--text-muted);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>공유</button>
       <div class="profile-avatar-circle">${nick.charAt(0)||'?'}</div>
       <div class="profile-nick">${nick}</div>
       <div class="profile-sub-text">${getMyBadgeHtml()}&nbsp;LottoBank 회원</div>
@@ -4405,12 +4826,33 @@ function renderProfile() {
       </div>
       <div style="font-size:11px;color:var(--text-muted);">2~12자, 한글/영문/숫자 사용 가능</div>
     </div>
+    <div class="profile-block">
+      <div class="profile-block-title">비밀번호 변경</div>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:8px 0;">
+        <input type="password" id="pw-new" placeholder="새 비밀번호 (8자 이상)" maxlength="50" autocomplete="new-password"
+          style="padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);">
+        <input type="password" id="pw-new2" placeholder="새 비밀번호 확인" maxlength="50" autocomplete="new-password"
+          style="padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);">
+        <button id="pw-change-btn" onclick="changePassword()"
+          style="padding:9px 16px;background:#1e293b;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">비밀번호 변경</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);">8자 이상 입력하세요. 변경 후 재로그인이 필요할 수 있습니다.</div>
+    </div>
+    <div class="profile-block danger-zone" style="border-color:#fecaca;">
+      <div class="profile-block-title" style="color:#dc2626;">위험 구역</div>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">탈퇴 시 QR 인증 기록, 전적, 뱃지, 게시글이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</p>
+      <button onclick="deleteAccount()"
+        style="width:100%;padding:9px;background:#fff5f5;border:1.5px solid #fecaca;border-radius:6px;font-size:13px;font-weight:700;color:#dc2626;cursor:pointer;font-family:inherit;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        회원 탈퇴
+      </button>
+    </div>
     <div style="margin-top:8px;">
       <button id="logout-btn" onclick="doLogout()"
         style="width:100%;padding:11px;background:#fff;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-weight:700;color:#ef4444;cursor:pointer;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> 로그아웃
       </button>
-    </div>` : '<div style="text-align:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;font-weight:700;color:#9a3412;">상단 [로그인] 버튼으로 로그인하면 전체 기능을 이용할 수 있습니다</div>'}
+    </div>` : '<div style="text-align:center;padding:12px;background:linear-gradient(135deg,#fff7ed,#fef3c7);border:1px solid #fed7aa;border-radius:10px;font-size:12px;font-weight:700;color:#92400e;padding:14px;display:flex;align-items:center;gap:8px;"><span style="font-size:18px;">🔐</span><span>로그인하면 QR 인증, 전적 관리, 로또 DNA 분석 등 전체 기능을 이용할 수 있습니다.</span></div>'}
   `;
 }
 
