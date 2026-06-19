@@ -409,6 +409,10 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .rank-tab-pill.on { background:var(--lotto-red); color:#fff; }
 .comm-sort-btn { padding:4px 10px; font-size:11px; font-weight:700; border:1px solid #e2e8f0; border-radius:4px; background:#fff; cursor:pointer; color:var(--text-muted); }
 .comm-sort-btn.on { background:#334155; color:#fff; border-color:#334155; }
+.post-tag-btn { padding:3px 9px; border:1px solid #e2e8f0; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer; background:#f8fafc; color:#64748b; font-family:inherit; transition:all .15s; }
+.post-tag-btn.on { background:#dc2626; color:#fff; border-color:#dc2626; }
+[data-theme="dark"] .post-tag-btn { background:#1e293b; color:#94a3b8; border-color:#334155; }
+[data-theme="dark"] .post-tag-btn.on { background:#dc2626; color:#fff; border-color:#dc2626; }
 [data-theme="dark"] .comm-tab-btn { background:#334155; color:#94a3b8; border-color:#475569; }
 [data-theme="dark"] .comm-tab-btn.on { background:var(--lotto-red); color:#fff; }
 [data-theme="dark"] .comm-sort-btn { background:#1e293b; color:#94a3b8; border-color:#475569; }
@@ -608,6 +612,8 @@ input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px
 [data-theme="dark"] .danger-zone button { background: #200808 !important; border-color: #991b1b !important; }
 [data-theme="dark"] #weekly-resonance-block { background: linear-gradient(135deg,#080c14,#0e0b1f) !important; }
 [data-theme="dark"] #fortune-content div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #streak-card { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #streak-card div[style*="background:#f8fafc"] { background:#263244 !important; border-color:#334155 !important; }
 [data-theme="dark"] #near-miss-block .ball-context span[style*="background:#f8fafc"] { background:#263244 !important; }
 [data-theme="dark"] .comm-post-row:hover { background: rgba(30,41,59,.9) !important; }
 
@@ -3017,6 +3023,36 @@ function renderFortune() {
   const setLabels = ['A','B','C','D','E'];
   const sets = setLabels.map(() => genRecommended());
 
+  // 미출현 간격 계산 (각 번호의 마지막 출현 이후 회차 수)
+  const lastAppear = new Array(46).fill(0); // 0 = 아직 한 번도 안나온 번호
+  const gapRounds = [...recentRounds]; // 최신→과거 순
+  for (let idx = 0; idx < gapRounds.length; idx++) {
+    const rd = recentData[gapRounds[idx]];
+    if (!rd) continue;
+    const allNums = [...rd.nums, rd.bonus];
+    allNums.forEach(n => { if (lastAppear[n] === 0) lastAppear[n] = idx + 1; });
+  }
+  // 미출현 간격 TOP 10 (오래 안나온 번호 순)
+  const gapList = Array.from({length:45},(_,i)=>({n:i+1, gap:lastAppear[i+1]||recentRounds.length}))
+    .sort((a,b)=>b.gap-a.gap).slice(0,10);
+
+  // 다음 추첨 카운트다운 계산
+  function getNextDraw() {
+    const now = new Date();
+    const day = now.getDay(); // 0=일,6=토
+    const diffToSat = (6 - day + 7) % 7 || 7;
+    const sat = new Date(now);
+    sat.setDate(now.getDate() + diffToSat);
+    sat.setHours(20, 35, 0, 0);
+    if (sat <= now) sat.setDate(sat.getDate() + 7);
+    const diff = sat - now;
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return { d, h, m, s, total: diff };
+  }
+
   // 출현 빈도 히트맵 HTML
   const maxFreq = Math.max(...freq.slice(1));
   const heatmapRows = [];
@@ -3036,6 +3072,46 @@ function renderFortune() {
   }
 
   $('fortune-content').innerHTML = `
+    <!-- 0. 다음 추첨 카운트다운 -->
+    <div id="draw-countdown-block" style="background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%);border-radius:12px;padding:14px 16px;margin-bottom:12px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 14px rgba(220,38,38,.3);">
+      <div>
+        <div style="font-size:10px;opacity:.7;font-weight:700;letter-spacing:.5px;margin-bottom:4px;">다음 추첨까지</div>
+        <div style="font-size:11px;font-weight:500;opacity:.65;">(토요일 오후 8:35)</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div style="text-align:center;"><div id="cd-d" style="font-size:22px;font-weight:900;line-height:1;">-</div><div style="font-size:9px;opacity:.6;margin-top:1px;">일</div></div>
+        <div style="font-size:20px;font-weight:900;opacity:.5;margin-bottom:4px;">:</div>
+        <div style="text-align:center;"><div id="cd-h" style="font-size:22px;font-weight:900;line-height:1;">-</div><div style="font-size:9px;opacity:.6;margin-top:1px;">시</div></div>
+        <div style="font-size:20px;font-weight:900;opacity:.5;margin-bottom:4px;">:</div>
+        <div style="text-align:center;"><div id="cd-m" style="font-size:22px;font-weight:900;line-height:1;">-</div><div style="font-size:9px;opacity:.6;margin-top:1px;">분</div></div>
+        <div style="font-size:20px;font-weight:900;opacity:.5;margin-bottom:4px;">:</div>
+        <div style="text-align:center;"><div id="cd-s" style="font-size:22px;font-weight:900;line-height:1;">-</div><div style="font-size:9px;opacity:.6;margin-top:1px;">초</div></div>
+      </div>
+    </div>
+
+    <!-- 번호 미출현 간격 분석 -->
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:16px;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        미출현 간격 분석 <span style="font-size:10px;font-weight:500;color:#94a3b8;">오래 안 나온 번호 TOP10</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        ${gapList.map((item,i)=>{
+          const pct = Math.round(item.gap/totalDraws*100);
+          const urgency = item.gap>=20?'#dc2626':item.gap>=10?'#f59e0b':'#64748b';
+          return `<div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;color:#94a3b8;min-width:16px;">${i+1}.</span>
+            ${bH(item.n)}
+            <div style="flex:1;background:#f1f5f9;border-radius:3px;height:8px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:${urgency};border-radius:3px;transition:width .5s;"></div>
+            </div>
+            <span style="font-size:10px;font-weight:700;min-width:54px;color:${urgency};">${item.gap}회 미출현</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="font-size:10px;color:#94a3b8;margin-top:8px;text-align:center;">※ 미출현 기간이 길다고 당첨 확률이 올라가진 않지만 참고 지표입니다</div>
+    </div>
+
     <!-- 1. 번호 추천 5세트 -->
     <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -3156,6 +3232,20 @@ function renderFortune() {
   // 주간 공명 번호 + 로또 DNA
   renderWeeklyResonance(freq, hot6, cold6, rounds);
   if (isLoggedIn && currentUser) renderLottoDNA(freq, rounds);
+
+  // 카운트다운 타이머 시작
+  if (window._cdTimer) clearInterval(window._cdTimer);
+  function updateCD() {
+    const { d, h, m, s, total } = getNextDraw();
+    const cdD = $('cd-d'), cdH = $('cd-h'), cdM = $('cd-m'), cdS = $('cd-s');
+    if (!cdD) { clearInterval(window._cdTimer); return; }
+    cdD.textContent = String(d).padStart(2,'0');
+    cdH.textContent = String(h).padStart(2,'0');
+    cdM.textContent = String(m).padStart(2,'0');
+    cdS.textContent = String(s).padStart(2,'0');
+  }
+  updateCD();
+  window._cdTimer = setInterval(updateCD, 1000);
 }
 
 // ── 뱃지 체크 (외부 호출용) ──
@@ -3508,6 +3598,10 @@ function renderStats() {
   const roiPct = Math.min(Math.abs(roi), 100);
   const bestLabel = bestRank > 0 ? bestRank + '등' : '-';
 
+  // 스트릭 계산 (DB 데이터 기준)
+  // 연속 낙첨 / 연속 당첨 카운트는 loadTicketHistory 후 계산
+  // 여기서는 기본 placeholder 렌더 후 loadTicketHistory에서 업데이트
+
   $('stats-content').innerHTML = `
     <div class="kpi-grid">
       <div class="kpi-box"><div class="kpi-label">총 구매 게임수</div><div class="kpi-value">${totalBuy}<span style="font-size:13px;font-weight:500;">게임</span></div><div class="kpi-sub">총 ${fmtMFull(totalInvest)} 투자</div></div>
@@ -3517,6 +3611,15 @@ function renderStats() {
       <div class="kpi-box hl"><div class="kpi-label">ROI</div><div class="kpi-value ${roiPos?'green':'red'}">${roiPos?'+':''}${roi.toFixed(1)}<span style="font-size:12px;font-weight:500;">%</span></div><div class="kpi-sub">투자 대비 수익률</div></div>
       <div class="kpi-box"><div class="kpi-label">최고 당첨금</div><div class="kpi-value red" id="kpi-best-prize" style="font-size:16px;">-</div><div class="kpi-sub" id="kpi-best-prize-rank">-</div></div>
     </div>
+    <!-- 스트릭 분석 카드 (loadTicketHistory에서 채워짐) -->
+    <div id="streak-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:14px;display:none;">
+      <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        스트릭 분석
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="streak-grid"></div>
+    </div>
+
     <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">ROI 분석</div>
     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
@@ -3577,6 +3680,8 @@ async function loadTicketHistory() {
       return;
     }
 
+    window._ltbTickets = tickets; // CSV 내보내기용
+
     const rankLabel = r => r===1?'🥇 1등':r===2?'🥈 2등':r===3?'🥉 3등':r===4?'🎯 4등':r===5?'✅ 5등':'낙첨';
     const rankColor = r => r===1?'#dc2626':r===2?'#a855f7':r===3?'#10b981':r===4?'#3b82f6':r===5?'#64748b':'#94a3b8';
 
@@ -3607,6 +3712,55 @@ async function loadTicketHistory() {
           td.style.fontWeight = prize > 0 ? '700' : '400';
         }
       });
+    }
+
+    // 스트릭 계산
+    {
+      const streakCard = document.getElementById('streak-card');
+      const streakGrid = document.getElementById('streak-grid');
+      if (streakCard && streakGrid) {
+        // 연속 낙첨 현재 스트릭
+        let curLose = 0, maxLose = 0, curWin = 0, maxWin = 0;
+        let activeLose = true, activeWin = false;
+        let recentStreak = 0, recentDir = 'none';
+        for (const t of tickets) {
+          const won = t.prize_rank && t.prize_rank <= 5;
+          if (!won) {
+            curLose++;
+            maxLose = Math.max(maxLose, curLose);
+            if (curWin > 0 && activeWin) activeWin = false;
+            curWin = 0;
+          } else {
+            curWin++;
+            maxWin = Math.max(maxWin, curWin);
+            if (curLose > 0 && activeLose) activeLose = false;
+            curLose = 0;
+          }
+        }
+        const lastIsWin = tickets[0] && tickets[0].prize_rank && tickets[0].prize_rank <= 5;
+        const currentStreak = lastIsWin ? curWin : curLose;
+        const streakLabel = lastIsWin ? '당첨 연속' : '낙첨 연속';
+        const streakColor = lastIsWin ? '#16a34a' : '#dc2626';
+        const streakEmoji = lastIsWin ? '🎯' : '😤';
+        streakGrid.innerHTML = `
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:#64748b;margin-bottom:4px;">현재 ${streakLabel}</div>
+            <div style="font-size:22px;font-weight:900;color:${streakColor};">${streakEmoji}</div>
+            <div style="font-size:18px;font-weight:900;color:${streakColor};">${currentStreak}<span style="font-size:11px;">회</span></div>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:#64748b;margin-bottom:4px;">최장 낙첨 스트릭</div>
+            <div style="font-size:22px;font-weight:900;">😤</div>
+            <div style="font-size:18px;font-weight:900;color:#dc2626;">${maxLose}<span style="font-size:11px;">회</span></div>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:#64748b;margin-bottom:4px;">최장 당첨 스트릭</div>
+            <div style="font-size:22px;font-weight:900;">🎯</div>
+            <div style="font-size:18px;font-weight:900;color:#16a34a;">${maxWin}<span style="font-size:11px;">회</span></div>
+          </div>
+        `;
+        streakCard.style.display = 'block';
+      }
     }
 
     // 월별 통계 계산
@@ -4264,11 +4418,12 @@ async function writePost() {
     toast('✅ [검증] 게시글 등록됨 (mock)');
     return;
   }
+  const postTagPrefix = (_selectedPostTag && _selectedPostTag !== '') ? `[${_selectedPostTag}] ` : '';
   const { error } = await sb.from('posts').insert({
     user_id: currentUser.id,
     nickname: nick,
     tag: curCommTab,
-    title: text,
+    title: postTagPrefix + text,
     body: body || null,
     likes: 0,
     comment_count: 0,
@@ -4474,6 +4629,13 @@ function updateCommTabCounts() {
   const vBtn = $('ct-verify');
   if (fBtn) fBtn.textContent = `자유게시판 (${(commPosts.free||[]).length})`;
   if (vBtn) vBtn.textContent = `인증게시판 (${(commPosts.verify||[]).length})`;
+}
+
+let _selectedPostTag = '';
+function selectPostTag(btn, tag) {
+  _selectedPostTag = tag;
+  document.querySelectorAll('.post-tag-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
 }
 
 function expandPostForm() {
