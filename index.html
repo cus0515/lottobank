@@ -464,7 +464,13 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] #badge-content div[style*="background:#fff;"],
 [data-theme="dark"] #rank-content div[style*="background:#fff;"],
 [data-theme="dark"] #admin-content div[style*="background:#fff;"],
+[data-theme="dark"] #ticket-history-section table,
 [data-theme="dark"] #post-write-expanded { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #ticket-history-section tr[style*="background:#fafafa"] { background:#263244 !important; }
+[data-theme="dark"] #ticket-history-section tr[style*="background:#fff5f5"] { background:#2d1515 !important; }
+[data-theme="dark"] #ticket-history-section thead tr { background:#0f172a !important; }
+[data-theme="dark"] #ticket-history-section th { color:#94a3b8 !important; }
+[data-theme="dark"] #ticket-history-section td { color:#e2e8f0 !important; border-color:#334155 !important; }
 [data-theme="dark"] #community-content div[style*="background:#fff;"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #my-num-stats div[style*="background:#fff;"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #fortune-content div[style*="background:#f8fafc"],
@@ -601,6 +607,8 @@ input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px
 [data-theme="dark"] .danger-zone p { color: #94a3b8 !important; }
 [data-theme="dark"] .danger-zone button { background: #200808 !important; border-color: #991b1b !important; }
 [data-theme="dark"] #weekly-resonance-block { background: linear-gradient(135deg,#080c14,#0e0b1f) !important; }
+[data-theme="dark"] #fortune-content div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #near-miss-block .ball-context span[style*="background:#f8fafc"] { background:#263244 !important; }
 [data-theme="dark"] .comm-post-row:hover { background: rgba(30,41,59,.9) !important; }
 
 /* 숫자 볼 개선 */
@@ -929,8 +937,9 @@ input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px
           <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> 실물 로또 QR 당첨 인증</div>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">동행복권 앱 → 구매내역 → QR코드 → URL 복사 후 붙여넣기</p>
           <div style="position:relative;">
-            <input type="text" id="qr-url-input" class="input-custom" placeholder="로또 6/45 · 연금복권 720+ QR URL 붙여넣기" onkeyup="if(event.key==='Enter')verifyRealQR()" style="padding-right:72px;">
-            <button onclick="navigator.clipboard.readText().then(t=>{if($('qr-url-input'))$('qr-url-input').value=t;}).catch(()=>{})" title="클립보드에서 붙여넣기" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:var(--lotto-red);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">붙여넣기</button>
+            <input type="text" id="qr-url-input" class="input-custom" placeholder="로또 6/45 · 연금복권 720+ QR URL 붙여넣기" onkeyup="if(event.key==='Enter')verifyRealQR();qrInputPreview(this.value)" oninput="qrInputPreview(this.value)" style="padding-right:72px;">
+            <div id="qr-input-hint" style="min-height:18px;margin-top:4px;font-size:11px;"></div>
+            <button onclick="navigator.clipboard.readText().then(t=>{if($('qr-url-input')){$('qr-url-input').value=t;qrInputPreview(t);}}).catch(()=>{})" title="클립보드에서 붙여넣기" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:var(--lotto-red);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">붙여넣기</button>
           </div>
           <div style="display:flex;gap:8px;margin-top:8px;">
             <button class="btn-action" onclick="verifyRealQR()" style="background:var(--lotto-red);flex:1;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 당첨 인증하기</button>
@@ -1056,8 +1065,8 @@ input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px
     </div>
     <div style="display:flex; flex-direction:column; height:calc(100% - 49px);">
       <div class="chat-messages" id="chat-box">
-        <div class="chat-row"><span class="badge b-guest">공지</span><span class="chat-user">LottoBank:</span><br><span class="chat-text">실제 구매 QR 코드로 당첨 여부를 인증하고 전적을 기록하세요.</span></div>
-        <div class="chat-row"><span class="badge b-guest">일반</span><span class="chat-user">번호수집가:</span><br><span class="chat-text">QR 인증 탭에서 동행복권 앱 QR 주소 붙여넣으면 자동으로 등수 확인됩니다 👍</span></div>
+        <div class="chat-row"><span class="badge b-system">공지</span><span class="chat-user">LottoBank:</span><br><span class="chat-text">로또 6/45 · 연금복권 720+ QR 코드로 구매를 인증하고 전적을 자동 기록하세요 🎱</span></div>
+        <div class="chat-row"><span class="badge b-guest">팁</span><span class="chat-user">번호수집가:</span><br><span class="chat-text">동행복권 앱 → QR 조회 → URL 복사 → LottoBank QR 탭 붙여넣기 👍</span></div>
       </div>
       <div class="chat-input-area">
         <input type="text" id="chat-input" class="chat-input" placeholder="로그인 후 실시간 대화에 참여해보세요." onkeyup="if(event.key==='Enter')sendChat()" disabled>
@@ -1771,6 +1780,32 @@ async function verifyRealQR() {
       <div style="font-size:12px;opacity:.85;line-height:1.6;">당첨 결과는 <b>동행복권 공식 앱</b>에서 확인하세요.<br>연금복권은 번호 기반 등록으로 저장됩니다.</div>
       ${parsed.round ? `<div style="margin-top:12px;font-size:11px;opacity:.65;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:6px;display:inline-block;">${parsed.round}회차 · ${parsed.jo||'?'}조 · ${String(parsed.no||0).padStart(6,'0')}번</div>` : ''}
     </div>`;
+    // 연금복권도 usedQrKeys에 저장 (중복 방지)
+    if (!usedQrKeys.includes(parsed.key)) {
+      usedQrKeys.push(parsed.key);
+      saveStorage();
+      // DB 저장 (pension 타입)
+      if (isLoggedIn && currentUser && sb) {
+        try {
+          await sb.from('tickets').insert({
+            user_id: currentUser.id,
+            qr_url: parsed.key,
+            round_no: parsed.round || 0,
+            numbers: [],
+            game_count: 0,
+            best_rank: 0,
+            total_prize: 0,
+            ticket_type: 'pension'
+          });
+          await sb.from('activity_feed').insert({ user_id: currentUser.id, action_type: 'qr_register', data: { round: parsed.round, type: 'pension' } });
+          // 뱃지 체크
+          await checkAndAwardBadges();
+        } catch(e) { console.warn('pension save error', e); }
+      }
+    } else {
+      toast('⚠️ 이미 등록된 연금복권입니다.');
+      return;
+    }
     toast('🏦 연금복권이 등록되었습니다!');
     return;
   }
@@ -1960,14 +1995,24 @@ function shareURL(url, label) {
 }
 
 function copyNumSet(nums) {
-  const text = '로또 추천 번호: ' + nums.join(', ');
+  const text = '[LottoBank] 번호: ' + nums.join(', ') + ' — lottobank.pages.dev';
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => toast('✅ 번호 복사 완료: ' + nums.join(', ')));
+    navigator.clipboard.writeText(nums.join(', ')).then(() => toast('✅ 복사: ' + nums.join(', ')));
   } else {
     const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
+    ta.value = nums.join(', '); document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); document.body.removeChild(ta);
     toast('✅ 번호 복사 완료');
+  }
+}
+function shareNumSet(nums, label) {
+  const text = (label || '추천 번호') + ': ' + nums.join(', ') + '\n\n내 로또 전적은 lottobank.pages.dev 에서 관리 중 🎱';
+  if (navigator.share) {
+    navigator.share({ title: 'LottoBank 번호 공유', text }).catch(()=>{});
+  } else {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => toast('✅ 공유 텍스트 복사 완료'));
+    } else { toast('⚠️ 공유 기능을 지원하지 않는 브라우저입니다'); }
   }
 }
 
@@ -2830,6 +2875,26 @@ async function loadMyNumberStats() {
   } catch(e) { wrap.innerHTML = ''; }
 }
 
+// ── QR 입력 미리보기 ──
+function qrInputPreview(val) {
+  const hint = $('qr-input-hint');
+  if (!hint) return;
+  const v = (val || '').trim();
+  if (!v) { hint.innerHTML = ''; return; }
+  const parsed = parseQRUrl(v);
+  if (!parsed) {
+    hint.innerHTML = '<span style="color:#ef4444;font-size:10px;">⚠️ 올바른 동행복권 QR 형식이 아닙니다.</span>';
+    return;
+  }
+  if (parsed.type === 'pension') {
+    const detail = parsed.round ? ` · ${parsed.round}회차 ${parsed.jo||'?'}조 ${String(parsed.no||0).padStart(6,'0')}번` : '';
+    hint.innerHTML = `<span style="color:#7c3aed;font-weight:700;font-size:10px;">🏦 연금복권 720+${detail}</span>`;
+  } else {
+    const gc = parsed.games ? parsed.games.length : 0;
+    hint.innerHTML = `<span style="color:#16a34a;font-weight:700;font-size:10px;">✅ 로또 6/45 · ${parsed.round}회차 · ${gc}게임 인식됨</span>`;
+  }
+}
+
 // =====================================================
 // 투자 가이드
 // =====================================================
@@ -3083,12 +3148,150 @@ function renderFortune() {
     <div id="my-num-stats"></div>
     <!-- 6. 최근 당첨번호 vs 내 QR 매칭 (로그인 후 표시) -->
     <div id="my-match-section"></div>
+    <!-- 7. 아깝게 놓친 번호 분석 (로그인 후 표시) -->
+    <div id="near-miss-block"></div>
   `;
-  if (isLoggedIn && currentUser && sb) { loadMyNumberStats(); loadMyMatchSection(); }
+  if (isLoggedIn && currentUser && sb) { loadMyNumberStats(); loadMyMatchSection(); loadNearMissAnalysis(); }
 
   // 주간 공명 번호 + 로또 DNA
   renderWeeklyResonance(freq, hot6, cold6, rounds);
   if (isLoggedIn && currentUser) renderLottoDNA(freq, rounds);
+}
+
+// ── 뱃지 체크 (외부 호출용) ──
+async function checkAndAwardBadges() {
+  if (!sb || !currentUser || !isLoggedIn) return;
+  try {
+    const prevEarned = (window._prevBadgeIds || []);
+    const nowEarned  = BADGE_DEFS.filter(b => b.cond()).map(b => b.id);
+    const newBadges  = nowEarned.filter(id => !prevEarned.includes(id));
+    if (newBadges.length > 0) {
+      await sb.from('user_badges').upsert(
+        newBadges.map(id => ({ user_id: currentUser.id, badge_id: id, earned_at: new Date().toISOString() })),
+        { onConflict: 'user_id,badge_id', ignoreDuplicates: true }
+      );
+      newBadges.forEach(id => {
+        const bd = BADGE_DEFS.find(b => b.id === id);
+        if (bd) toast(`🏅 새 뱃지 획득: ${bd.icon} ${bd.name}`);
+      });
+      window._prevBadgeIds = nowEarned;
+    }
+  } catch(e) { console.warn('badge check error', e); }
+}
+
+// ── 아깝게 놓친 번호 분석 ──
+async function loadNearMissAnalysis() {
+  const el = $('near-miss-block');
+  if (!el || !sb || !currentUser) return;
+  try {
+    // 최근 20장 티켓 가져오기
+    const { data: tks } = await sb.from('tickets')
+      .select('round_no, numbers')
+      .eq('user_id', currentUser.id)
+      .not('numbers', 'is', null)
+      .order('round_no', { ascending: false })
+      .limit(40);
+    if (!tks || !tks.length) return;
+
+    // recentData 에서 당첨번호 확보 (없으면 fetchLotto)
+    await ensureRecentData();
+
+    const misses = []; // { round, game, myNums, winNums, bonus, matchCnt, missedNums }
+    for (const tk of tks) {
+      const round = tk.round_no;
+      if (!round) continue;
+      let winData = recentData[round];
+      if (!winData) { try { winData = await fetchLotto(round); if (winData) recentData[round] = winData; } catch(_){} }
+      if (!winData) continue;
+
+      const winSet = new Set(winData.nums);
+      const bonus = winData.bonus;
+
+      let nums = tk.numbers;
+      if (typeof nums === 'string') { try { nums = JSON.parse(nums); } catch(_) { continue; } }
+      if (!Array.isArray(nums)) continue;
+      const games = Array.isArray(nums[0]) ? nums : [nums];
+
+      for (let gi = 0; gi < games.length; gi++) {
+        const game = games[gi];
+        if (!Array.isArray(game) || game.length < 6) continue;
+        const sorted = [...game].sort((a,b) => a-b);
+        const matchCnt = sorted.filter(n => winSet.has(n)).length;
+        // 4개 일치(4등) 또는 5개 일치(3등/2등)만 — 아깝다!
+        if (matchCnt >= 4) {
+          const missedNums = winData.nums.filter(n => !sorted.includes(n));
+          misses.push({ round, game: gi+1, myNums: sorted, winNums: winData.nums, bonus, matchCnt, missedNums });
+        }
+      }
+      if (misses.length >= 10) break; // 최대 10개
+    }
+
+    if (misses.length === 0) {
+      // 3개 일치(5등)도 표시 — 0이면 보여주지 않음
+      let fiveRank = [];
+      for (const tk of tks.slice(0,10)) {
+        const round = tk.round_no; if (!round) continue;
+        const winData = recentData[round]; if (!winData) continue;
+        const winSet = new Set(winData.nums);
+        let nums = tk.numbers;
+        if (typeof nums === 'string') { try { nums = JSON.parse(nums); } catch(_) { continue; } }
+        if (!Array.isArray(nums)) continue;
+        const games = Array.isArray(nums[0]) ? nums : [nums];
+        for (let gi = 0; gi < games.length; gi++) {
+          const game = games[gi];
+          if (!Array.isArray(game)) continue;
+          const sorted = [...game].sort((a,b)=>a-b);
+          const matchCnt = sorted.filter(n => winSet.has(n)).length;
+          if (matchCnt === 3) { fiveRank.push({ round, game: gi+1, myNums: sorted, winNums: winData.nums, bonus: winData.bonus, matchCnt, missedNums: winData.nums.filter(n=>!sorted.includes(n)) }); }
+        }
+        if (fiveRank.length >= 3) break;
+      }
+      if (fiveRank.length === 0) return; // 5등도 없으면 숨김
+      misses.push(...fiveRank.slice(0,3));
+    }
+
+    // 배지별 이모지/메시지
+    function missLabel(m) {
+      if (m.matchCnt === 6) return { emoji:'🥇', text:'1등 당첨!', color:'#dc2626' };
+      if (m.matchCnt === 5 && m.myNums.includes(m.bonus)) return { emoji:'🥈', text:'2등 당첨!', color:'#a855f7' };
+      if (m.matchCnt === 5) return { emoji:'💔', text:'3등이 아깝게!', color:'#10b981' };
+      if (m.matchCnt === 4) return { emoji:'😤', text:'4등 아깝다!', color:'#3b82f6' };
+      return { emoji:'😅', text:'5등, 한 발짝!', color:'#64748b' };
+    }
+
+    const rows = misses.slice(0,5).map(m => {
+      const lbl = missLabel(m);
+      const winSet = new Set(m.winNums);
+      const ballsHtml = m.myNums.map(n => {
+        const hit = winSet.has(n);
+        return bH(n, hit);
+      }).join('');
+      const missedHtml = m.missedNums.slice(0, 3).map(n => `<span style="font-size:10px;color:#dc2626;font-weight:800;">${n}</span>`).join(', ');
+      return `<div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+          <span style="font-size:11px;font-weight:800;color:#94a3b8;">${m.round}회차 G${m.game}</span>
+          <span style="font-size:11px;font-weight:900;color:${lbl.color};">${lbl.emoji} ${lbl.text}</span>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+          ${ballsHtml}
+        </div>
+        ${m.matchCnt < 5 ? `<div style="font-size:10px;margin-top:6px;opacity:.65;">놓친 번호: <span style="color:#f87171;font-weight:800;">${missedHtml}</span>${m.missedNums.length > 3 ? ` 외 ${m.missedNums.length-3}개` : ''}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    el.innerHTML = `<div style="background:linear-gradient(135deg,#1a0a0a 0%,#2d0f0f 50%,#1a0a0a 100%);border-radius:12px;padding:16px;margin-bottom:12px;color:#fff;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(220,38,38,.3),transparent 70%);pointer-events:none;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div>
+          <div style="font-size:14px;font-weight:900;letter-spacing:.3px;">💔 아깝게 놓친 번호</div>
+          <div style="font-size:10px;opacity:.5;margin-top:2px;">내 QR 중 당첨과 가장 가까웠던 게임</div>
+        </div>
+        <span style="font-size:9px;background:rgba(220,38,38,.3);padding:3px 8px;border-radius:10px;border:1px solid rgba(220,38,38,.4);">근접 분석</span>
+      </div>
+      ${rows}
+      <div style="font-size:10px;opacity:.4;margin-top:4px;text-align:center;">※ 색이 있는 볼 = 당첨번호 일치 · 실제 등록 QR 기준</div>
+    </div>`;
+  } catch(e) { console.warn('near-miss error', e); }
 }
 
 // ── 주간 공명 번호 ──
@@ -3116,7 +3319,7 @@ function renderWeeklyResonance(freq, hot6, cold6, rounds) {
   }
   nums.sort((a,b)=>a-b);
   el.innerHTML = nums.map(n=>bH(n)).join('') +
-    `<button onclick="copyNumSet(${JSON.stringify(nums)})" style="margin-left:8px;font-size:10px;font-weight:700;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:5px 10px;cursor:pointer;font-family:inherit;">복사</button>`;
+    `<button onclick="shareNumSet(${JSON.stringify(nums)},'이번 주 공명 번호')" style="margin-left:8px;font-size:10px;font-weight:700;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:5px 10px;cursor:pointer;font-family:inherit;">공유</button><button onclick="copyNumSet(${JSON.stringify(nums)})" style="margin-left:4px;font-size:10px;font-weight:700;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:5px 10px;cursor:pointer;font-family:inherit;">복사</button>`;
 }
 
 // ── 로또 DNA 분석 (개인 맞춤) ──
@@ -3171,7 +3374,7 @@ async function renderLottoDNA(freq, rounds) {
       <div style="font-size:10px;opacity:.55;margin-bottom:8px;font-weight:600;letter-spacing:.5px;">▸ 내 패턴 기반 추천 번호</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
         ${dn.map(n=>bH(n)).join('')}
-        <button onclick="copyNumSet(${JSON.stringify(dn)})" style="margin-left:6px;font-size:10px;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:4px 9px;cursor:pointer;font-family:inherit;">복사</button>
+        <button onclick="copyNumSet(${JSON.stringify(dn)})" style="margin-left:4px;font-size:10px;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:4px 9px;cursor:pointer;font-family:inherit;">복사</button><button onclick="shareNumSet(${JSON.stringify(dn)},'내 로또 DNA 번호')" style="margin-left:4px;font-size:10px;font-weight:700;background:rgba(139,92,246,.3);color:#fff;border:1px solid rgba(139,92,246,.4);border-radius:5px;padding:4px 9px;cursor:pointer;font-family:inherit;">공유</button>
       </div>
       <div style="font-size:9px;opacity:.35;margin-top:5px;">내 구매 패턴 + 전체 통계 + 고유 DNA 시드 합산 · 매주 고정</div>
     </div>
@@ -3646,7 +3849,7 @@ function feedItemHtml(a) {
   const rankColors = { 1:'#dc2626', 2:'#a855f7', 3:'#10b981', 4:'#3b82f6', 5:'#64748b' };
   const rankEmoji  = { 1:'🥇', 2:'🥈', 3:'🥉', 4:'🎯', 5:'✅' };
   const labels = {
-    qr_register: d => `${d.games||1}게임 QR 등록 (${d.round}회)`,
+    qr_register: d => d.type==='pension' ? `🏦 연금복권 720+ 등록 (${d.round||''}회)` : `${d.games||1}게임 QR 등록 (${d.round}회)`,
     win: d => {
       const rc = rankColors[d.rank]||'#64748b';
       const re = rankEmoji[d.rank]||'';
@@ -3740,6 +3943,15 @@ const BADGE_DEFS = [
     cond: () => (dbStats?.total_spent||0) > 0 && (dbStats?.total_prize||0) > (dbStats?.total_spent||0) },
   { id: 'big_spender',icon: '💰',  name: '큰 손',      desc: '총 투자금 100만원 이상',
     cond: () => (dbStats?.total_spent||0) >= 1000000, progress: () => [dbStats?.total_spent||0, 1000000] },
+  // 연금복권 뱃지
+  { id: 'pension_first', icon: '🏦', name: '연금복권 입문', desc: '연금복권 720+ 첫 등록 완료',
+    cond: () => usedQrKeys.filter(k => k.startsWith('p')).length >= 1 },
+  { id: 'pension_5',    icon: '🎰', name: '연금복권 5회',  desc: '연금복권을 5회 이상 등록했습니다',
+    cond: () => usedQrKeys.filter(k => k.startsWith('p')).length >= 5,
+    progress: () => [usedQrKeys.filter(k => k.startsWith('p')).length, 5] },
+  { id: 'pension_20',   icon: '💜', name: '연금복권 마니아', desc: '연금복권을 20회 이상 등록했습니다',
+    cond: () => usedQrKeys.filter(k => k.startsWith('p')).length >= 20,
+    progress: () => [usedQrKeys.filter(k => k.startsWith('p')).length, 20] },
 ];
 
 async function renderBadge() {
@@ -3773,6 +3985,7 @@ async function renderBadge() {
     { label: '📊 게임 수',    ids: ['game_100','game_500','game_1000','big_spender'] },
     { label: '🏆 당첨 달성',  ids: ['first_win','rank5','rank4','rank3','rank2','rank1'] },
     { label: '📈 수익',       ids: ['roi_pos'] },
+    { label: '🏦 연금복권',   ids: ['pension_first','pension_5','pension_20'] },
   ];
 
   let html = `
@@ -4799,6 +5012,7 @@ function renderProfile() {
       <div class="profile-row"><span>ROI</span><span class="profile-row-val" style="color:${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0&&(prz-inv)/inv*100>=0?'#10b981':'#ef4444';})()};font-weight:700;">${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0?(((prz-inv)/inv*100).toFixed(1)+'%'):'-';})()}</span></div>
       <div class="profile-row"><span>최고 등수</span><span class="profile-row-val">${isLoggedIn&&dbStats&&dbStats.best_rank?dbStats.best_rank+'등':'-'}</span></div>
       <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
+      <div class="profile-row"><span>연금복권 등록</span><span class="profile-row-val">${usedQrKeys.filter(k=>k.startsWith('p')).length}회</span></div>
       <div class="profile-row"><span>획득 뱃지</span><span class="profile-row-val">${earnedCount} / ${BADGE_DEFS.length}개</span></div>
       <div class="profile-row"><span>당첨 횟수</span><span class="profile-row-val">${isLoggedIn&&dbStats?dbStats.total_wins||0:0}회</span></div>
     </div>
