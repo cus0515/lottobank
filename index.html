@@ -987,6 +987,85 @@ input:focus-visible { outline:none; }
 /* Ball context centering for result page */
 #res-balls { display: flex; gap: 7px; justify-content: center; align-items: center; margin: 16px 0; flex-wrap: wrap; }
 #res-balls .ball { width: 38px; height: 38px; font-size: 14px; font-weight: 900; }
+
+/* ── Task #117: DNA/추천 카드 프리미엄 업그레이드 ── */
+.dna-card .b-num, .dna-card .ball { width:40px!important; height:40px!important; font-size:15px!important; font-weight:900!important; box-shadow:inset -2px -3px 6px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3)!important; }
+.wisdom-card .b-num, .wisdom-card .ball { width:40px!important; height:40px!important; font-size:15px!important; font-weight:900!important; box-shadow:inset -2px -3px 6px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3)!important; }
+@keyframes dna-shimmer { 0%,100%{opacity:.6} 50%{opacity:1} }
+.dna-card::after { content:''; position:absolute; top:0; left:-60%; width:40%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent); animation:dna-shimmer 3s ease-in-out infinite; pointer-events:none; }
+.dna-card { background:linear-gradient(135deg,#0a0f1e 0%,#1a0a3e 40%,#0e0d2e 70%,#0a0f1e 100%)!important; border:1px solid rgba(139,92,246,.35)!important; box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(139,92,246,.15)!important; }
+.wisdom-card { background:linear-gradient(135deg,#071522 0%,#0d2341 50%,#071c38 100%)!important; border:1px solid rgba(59,130,246,.35)!important; box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(59,130,246,.15)!important; }
+.dna-card-label { font-size:9px!important; font-weight:800!important; letter-spacing:2px!important; opacity:.7!important; color:#c4b5fd!important; }
+.dna-card-title { font-size:16px!important; font-weight:900!important; letter-spacing:-.3px!important; }
+.dna-week-chip { background:rgba(139,92,246,.3)!important; border-color:rgba(139,92,246,.5)!important; color:#c4b5fd!important; font-weight:800!important; }
+.wisdom-pulse { box-shadow:0 0 6px #22c55e!important; }
+.dna-refresh-btn { background:rgba(255,255,255,.08)!important; border-color:rgba(255,255,255,.15)!important; letter-spacing:.3px!important; }
+.dna-refresh-btn:hover { background:rgba(255,255,255,.18)!important; transform:translateY(-1px)!important; border-color:rgba(255,255,255,.3)!important; }
+
+/* == Task #118: Hot/Cold + Fortune header premium == */
+/* Hot/cold container 2-col layout */
+#fortune-content .hot-cold-section { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.stat-kpi-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:12px; }
+.stat-kpi-card { background:var(--paper-white); border:1px solid rgba(226,232,240,.8); border-radius:12px; padding:14px 16px; box-shadow:0 1px 3px rgba(15,23,42,.04); position:relative; overflow:hidden; }
+.stat-kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:3px 3px 0 0; }
+.stat-kpi-card.red::before { background:linear-gradient(90deg,#e11d48,#f43f5e); }
+.stat-kpi-card.green::before { background:linear-gradient(90deg,#10b981,#34d399); }
+.stat-kpi-card.blue::before { background:linear-gradient(90deg,#3b82f6,#60a5fa); }
+.stat-kpi-card.purple::before { background:linear-gradient(90deg,#8b5cf6,#a78bfa); }
+.stat-kpi-num { font-size:22px; font-weight:900; letter-spacing:-1px; color:var(--text-dark); margin-top:6px; }
+.stat-kpi-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-muted); }
+.dna-card .ball-context { gap:8px!important; justify-content:flex-start!important; }
+.wisdom-card .ball-context { gap:8px!important; justify-content:flex-start!important; }
+#fortune-content .ball-context .b-num { font-weight:800; }
+#fortune-content > div[style*='paper-white'] { transition:box-shadow .15s; }
+#fortune-content > div[style*='paper-white']:hover { box-shadow:0 2px 12px rgba(15,23,42,.08)!important; }
+#draw-countdown-block { background:linear-gradient(135deg,#be123c 0%,#dc2626 60%,#b91c1c 100%)!important; box-shadow:0 6px 20px rgba(190,18,60,.4)!important; }
+#cd-d, #cd-h, #cd-m, #cd-s { text-shadow:0 2px 8px rgba(0,0,0,.3); }
+[data-theme='dark'] .stat-kpi-card { background:#162032; border-color:#1e3a5f; }
+[data-theme='dark'] #fortune-content > div[style*='paper-white']:hover { box-shadow:0 2px 12px rgba(0,0,0,.3)!important; }
+
+/* == Task #119: KPI card + badge page polish == */
+.kpi-box { position:relative; overflow:hidden; }
+.kpi-box::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--lotto-red),rgba(225,29,72,.3)); opacity:0; transition:opacity .2s; }
+.kpi-box:hover::before { opacity:1; }
+.kpi-box.hl::before { opacity:1; background:linear-gradient(90deg,var(--lotto-red),#f43f5e); }
+.kpi-value { font-size:22px!important; letter-spacing:-1px!important; }
+.kpi-box.hl { background:linear-gradient(135deg,#fff5f7,#fff)!important; }
+[data-theme='dark'] .kpi-box.hl { background:linear-gradient(135deg,#2d1020,#1e293b)!important; border-color:rgba(225,29,72,.5)!important; }
+.badge-card { border-radius:12px!important; border:1px solid rgba(226,232,240,.6)!important; transition:transform .15s,box-shadow .15s!important; }
+.badge-card:hover { transform:translateY(-2px)!important; box-shadow:0 6px 20px rgba(0,0,0,.1)!important; }
+.badge-card.earned { border-color:rgba(251,191,36,.5)!important; box-shadow:0 2px 12px rgba(251,191,36,.15)!important; }
+[data-theme='dark'] .badge-card { background:#1e293b!important; border-color:#334155!important; }
+[data-theme='dark'] .badge-card.earned { border-color:rgba(251,191,36,.4)!important; box-shadow:0 2px 12px rgba(251,191,36,.1)!important; }
+.comm-post-row { transition:background .12s!important; }
+.comm-post-row:hover { background:rgba(226,232,240,.5)!important; }
+[data-theme='dark'] .comm-post-row:hover { background:rgba(30,41,59,.8)!important; }
+.rank-row { transition:background .12s; }
+.rank-row.my-rank { background:rgba(225,29,72,.04)!important; border:1px solid rgba(225,29,72,.2)!important; border-radius:8px!important; }
+[data-theme='dark'] .rank-row.my-rank { background:rgba(225,29,72,.08)!important; }
+.qr-tab-btn.active, .qr-tab-btn.on { color:var(--lotto-red)!important; border-bottom-color:var(--lotto-red)!important; font-weight:800!important; }
+
+/* == Task #121: Typography + global polish == */
+header { background:linear-gradient(180deg,#0a0f1e 0%,#0f172a 100%)!important; box-shadow:0 1px 0 rgba(255,255,255,.06),0 4px 24px rgba(0,0,0,.35)!important; }
+[data-theme='light'] header { background:linear-gradient(180deg,#0f172a 0%,#1e293b 100%)!important; }
+.logo-title { font-size:21px!important; letter-spacing:-0.8px!important; }
+.tab-nav { border-bottom:1px solid rgba(255,255,255,.06)!important; }
+.tab-btn { font-size:12px!important; font-weight:700!important; letter-spacing:.2px!important; opacity:.6!important; transition:opacity .15s,border-color .15s!important; }
+.tab-btn.on, .tab-btn:hover { opacity:1!important; }
+.tab-btn.on { border-bottom:2px solid var(--lotto-red)!important; color:var(--lotto-red)!important; opacity:1!important; }
+#pg-stats > div:first-child, #pg-badge > div:first-child, #pg-rank > div:first-child, #pg-community > div:first-child { box-shadow:0 4px 20px rgba(0,0,0,.4)!important; }
+body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--bg-light); }
+::-webkit-scrollbar-thumb { background:rgba(148,163,184,.4); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:rgba(148,163,184,.7); }
+.bottom-nav-bar { backdrop-filter:blur(16px)!important; -webkit-backdrop-filter:blur(16px)!important; border-top:1px solid rgba(255,255,255,.08)!important; }
+[data-theme='light'] .bottom-nav-bar { background:rgba(15,23,42,.95)!important; }
+@keyframes skel-pulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
+.skel-card, .skel-line { animation:skel-pulse 1.5s ease-in-out infinite!important; }
+.profile-block { transition:box-shadow .15s!important; }
+.profile-block:hover { box-shadow:0 4px 20px rgba(0,0,0,.12)!important; }
+[data-theme='dark'] .profile-block:hover { box-shadow:0 4px 20px rgba(0,0,0,.3)!important; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
