@@ -2220,23 +2220,30 @@ async function chgRes() {
     ${(()=>{
       const myThisRound = MY.filter(m => String(m.drw) === String(round) && m.type !== 'recommend');
       if (!myThisRound.length) return '';
-      let cards = myThisRound.map(m => {
+      const rC = rk => rk===1?'#dc2626':rk===2?'#8b5cf6':rk===3?'#10b981':rk<=5?'#3b82f6':'#94a3b8';
+      const rL = rk => rk>0?['','🥇1등','🥈2등','🥉3등','4등','5등'][rk]:'낙첨';
+      let cards = myThisRound.map((m,gi) => {
         const r = checkWinRank(m.nums, d.nums, d.bonus);
         const matched = m.nums.filter(n => d.nums.includes(n));
         const bonusMatch = m.nums.includes(d.bonus);
-        const rankLabel = r.rank > 0 ? ['','🥇1등','🥈2등','🥉3등','4등','5등'][r.rank] : '낙첨';
-        const rankColor = r.rank===1?'#dc2626':r.rank===2?'#8b5cf6':r.rank===3?'#10b981':r.rank===4||r.rank===5?'#3b82f6':'#94a3b8';
-        const ballsHtml = m.nums.map(n => bH(n, d.nums.includes(n) || (r.rank===2 && n===d.bonus))).join('');
-        return '<div style="padding:8px 0;border-bottom:1px solid #f1f5f9;">'
-          + '<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">'
-          + ballsHtml
-          + '<span style="margin-left:6px;font-size:11px;font-weight:700;color:'+rankColor+';">'+rankLabel+'</span>'
-          + '<span style="font-size:10px;color:#94a3b8;">'+matched.length+'개 일치'+(bonusMatch&&r.rank!==2?' +보너스':'')+'</span>'
-          + '</div></div>';
+        const ballsHtml = m.nums.map(n => bH(n, d.nums.includes(n)||(r.rank===2&&n===d.bonus))).join('');
+        return `<div style="padding:7px 0;border-bottom:1px solid var(--border-dashed);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span style="font-size:9px;font-weight:700;color:var(--text-muted);min-width:22px;">G${gi+1}</span>
+          <div style="display:flex;gap:3px;flex:1;flex-wrap:wrap;">${ballsHtml}</div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;font-weight:900;color:${rC(r.rank)};">${rL(r.rank)}</div>
+            <div style="font-size:9px;color:var(--text-muted);">${matched.length}개 일치${bonusMatch&&r.rank!==2?' +보너스':''}</div>
+          </div>
+        </div>`;
       }).join('');
-      return '<div style="margin-top:10px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:10px 12px;">'
-        + '<div style="font-size:11px;font-weight:700;color:#166534;margin-bottom:6px;">🎫 이 회차 내 번호 결과 ('+myThisRound.length+'게임)</div>'
-        + cards + '</div>';
+      const hasWin = myThisRound.some(m=>{const r=checkWinRank(m.nums,d.nums,d.bonus);return r.rank>=1&&r.rank<=5;});
+      return `<div style="margin-top:10px;background:${hasWin?'linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.03))':'var(--bg-light)'};border:1.5px solid ${hasWin?'#6ee7b7':'var(--border-dashed)'};border-radius:10px;padding:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:12px;font-weight:900;color:${hasWin?'#059669':'var(--text-dark)'};">🎫 이 회차 내 번호 결과</span>
+          <span style="font-size:10px;font-weight:700;color:var(--text-muted);background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:2px 8px;">${myThisRound.length}게임</span>
+        </div>
+        ${cards}
+      </div>`;
     })()}
     <div id="store-section" style="margin-top:10px;"><div style="font-size:11px;color:#94a3b8;padding:4px 0;"> 판매소 데이터 로딩 중...</div></div>
   `;
