@@ -36,6 +36,7 @@
   --border-dashed: #cbd5e1;
   --text-dark: #1e293b;
   --text-muted: #64748b;
+  --bg-light: #f8fafc;
   --b-yellow: #f59e0b;
   --b-blue: #2563eb;
   --b-red: #dc2626;
@@ -67,7 +68,7 @@ header { background: var(--header-bg,#ffffff); border-bottom: 3px solid var(--lo
 .dd-logout { color:#dc2626 !important; border-top:1px solid var(--border-dashed); }
 .user-dd-header { padding:12px 14px 10px; border-bottom:1px solid var(--border-dashed); }
 .user-dd-nick { font-size:14px; font-weight:900; color:var(--text-dark); }
-.user-dd-badge { font-size:11px; color:#64748b; margin-top:2px; }
+.user-dd-badge { font-size:11px; color:var(--text-muted); margin-top:2px; }
 .user-dd-item { display:block; width:100%; padding:9px 14px; text-align:left; background:none; border:none; cursor:pointer; font-size:13px; font-weight:600; color:var(--text-dark); }
 .user-dd-item:hover { background:var(--bg-light); }
 .user-dd-item.danger { color:#ef4444; }
@@ -78,7 +79,7 @@ main.chat-hidden .chat-panel { display: none; }
 .chat-toggle-btn { background:none; border:none; cursor:pointer; font-size:14px; color:#94a3b8; padding:2px 6px; border-radius:4px; line-height:1; }
 .chat-toggle-btn:hover { background:#f1f5f9; color:var(--lotto-red); }
 .prize-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
-.prize-table th { background:var(--bg-light); color:#64748b; font-weight:700; padding:6px 8px; text-align:center; border-bottom:2px solid #e2e8f0; white-space:nowrap; }
+.prize-table th { background:var(--bg-light); color:var(--text-muted); font-weight:700; padding:6px 8px; text-align:center; border-bottom:2px solid var(--border-dashed); white-space:nowrap; }
 .prize-table td { padding:6px 8px; text-align:center; border-bottom:1px solid var(--border-dashed); }
 .prize-table tr:hover td { background:#fafafa; }
 .prize-rank-badge { display:inline-block; width:22px; height:22px; border-radius:50%; font-size:10px; font-weight:900; line-height:22px; }
@@ -87,18 +88,18 @@ main.chat-hidden .chat-panel { display: none; }
 .pr3 { background:#fed7aa; color:#9a3412; }
 .pr4 { background:#dbeafe; color:#1e40af; }
 .pr5 { background:#f0fdf4; color:#166534; }
-.winner-type { font-size:10px; color:#64748b; }
+.winner-type { font-size:10px; color:var(--text-muted); }
 .region-list { font-size:11px; color:var(--text-muted); margin-top:6px; padding:6px 8px; background:var(--bg-light); border-radius:6px; line-height:1.8; }
 @media (max-width: 1200px) { main { grid-template-columns: 1fr; height: auto; } }
 
-.panel { background: var(--paper-white); border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; height: 100%; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.panel-header { padding: 15px 20px; border-bottom: 2px solid var(--lotto-red); font-size: 15px; font-weight: 900; color: var(--lotto-red); display: flex; justify-content: space-between; align-items: center; background: #fff; }
+.panel { background: var(--paper-white); border-radius: 8px; border:1px solid var(--border-dashed); display: flex; flex-direction: column; height: 100%; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.panel-header { padding: 15px 20px; border-bottom: 2px solid var(--lotto-red); font-size: 15px; font-weight: 900; color: var(--lotto-red); display: flex; justify-content: space-between; align-items: center; background:var(--paper-white); }
 .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
 @keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } }
 .page-fade { animation: pageFadeIn 0.2s ease; }
 
-.lotto-slip { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; position: relative; }
+.lotto-slip { background:var(--paper-white); border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; position: relative; }
 .slip-header { border-bottom: 1px dashed var(--lotto-red); padding-bottom: 8px; margin-bottom: 12px; text-align: center; }
 .slip-header h2 { color: var(--lotto-red); font-size: 17px; font-weight: 900; }
 .slip-header p { font-size: 11px; color: var(--text-muted); }
@@ -116,7 +117,7 @@ main.chat-hidden .chat-panel { display: none; }
 .stats-box { background: var(--bg-light); border: 1px solid var(--border-dashed); padding: 10px; border-radius: 6px; }
 .stats-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
 .stats-value { font-size: 15px; font-weight: 900; margin-top: 2px; }
-.lotto-receipt { background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 4px; font-family: 'Courier New', monospace; margin-bottom: 8px; font-size: 12px; }
+.lotto-receipt { background:var(--paper-white); border: 1px solid #cbd5e1; padding: 12px; border-radius: 4px; font-family: 'Courier New', monospace; margin-bottom: 8px; font-size: 12px; }
 
 .live-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
 .live-card { background:var(--paper-white);border:1px solid var(--border-dashed); border-radius: 6px; padding: 10px; min-height: 68px;; transition:transform .18s ease,box-shadow .18s ease; }
@@ -133,9 +134,9 @@ main.chat-hidden .chat-panel { display: none; }
 .result-metric { background: var(--bg-light); border: 1px solid var(--border-dashed); border-radius: 6px; padding: 10px; text-align: center; }
 .result-metric span { display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; }
 .result-metric strong { display: block; margin-top: 4px; color: var(--text-dark); font-size: 14px; }
-.prize-table { margin-top: 12px; border: 1px solid var(--border-dashed); border-radius: 6px; overflow: hidden; background: #fff; }
-.prize-row { display: grid; grid-template-columns: 40px minmax(80px,1fr) 1fr 70px; gap: 6px; align-items: center; padding: 8px 10px; border-top: 1px solid #e2e8f0; font-size: 11px; white-space: nowrap; }
-.prize-row:first-child { border-top: none; background: #f8fafc; color: var(--text-muted); font-weight: 900; }
+.prize-table { margin-top: 12px; border: 1px solid var(--border-dashed); border-radius: 6px; overflow: hidden; background:var(--paper-white); }
+.prize-row { display: grid; grid-template-columns: 40px minmax(80px,1fr) 1fr 70px; gap: 6px; align-items: center; padding: 8px 10px; border-top:1px solid var(--border-dashed); font-size: 11px; white-space: nowrap; }
+.prize-row:first-child { border-top: none; background:var(--bg-light); color: var(--text-muted); font-weight: 900; }
 .prize-row b { color: var(--lotto-red); }
 
 .badge { display: inline-flex; align-items: center; padding: 3px 6px; font-size: 11px; font-weight: 900; color: #fff; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
@@ -163,20 +164,20 @@ main.chat-hidden .chat-panel { display: none; }
 .left-roi-bar { height:100%; border-radius:4px; transition:width 0.8s ease; }
 .chat-system-row { background:linear-gradient(90deg,#fff7ed,#fff); border-left:3px solid #f59e0b; padding:8px 10px; border-radius:0 6px 6px 0; margin:4px 0; }
 
-.chat-messages { height: calc(100% - 65px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+.chat-messages { height: calc(100% - 65px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; background:var(--bg-light); border-bottom:1px solid var(--border-dashed); }
 .chat-row { font-size: 13px; line-height: 1.4; }
 .chat-user { font-weight: 700; color: #334155; }
-.chat-text { color: #0f172a; background: #fff; padding: 6px 10px; border-radius: 6px; display: inline-block; max-width: 85%; margin-top: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-.chat-input-area { padding: 12px; background: #fff; display: flex; gap: 6px; }
+.chat-text { color: #0f172a; background:var(--paper-white); padding: 6px 10px; border-radius: 6px; display: inline-block; max-width: 85%; margin-top: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.chat-input-area { padding: 12px; background:var(--paper-white); display: flex; gap: 6px; }
 .chat-input { flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; outline: none; }
 .chat-input:focus { border-color: var(--lotto-red); }
 .btn-send { background: var(--lotto-red); color: #fff; border: none; padding: 0 14px; font-weight: 700; border-radius: 4px; cursor: pointer; }
 
-.select-custom, .input-custom { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: 700; background: #fff; margin-bottom: 10px; font-size: 13px; }
+.select-custom, .input-custom { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: 700; background:var(--paper-white); margin-bottom: 10px; font-size: 13px; }
 .select-custom { border-color: var(--lotto-red); }
 .btn-action { width: 100%; background: var(--lotto-red); color: #fff; font-weight: 700; padding: 11px; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; }
 .omr-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; background: #fffdf9; border: 1px solid #fbcfe8; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
-.omr-box { height: 28px; background: #fff; border: 1px solid var(--lotto-purple); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--lotto-purple); user-select: none; border-radius: 3px; }
+.omr-box { height: 28px; background:var(--paper-white); border: 1px solid var(--lotto-purple); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--lotto-purple); user-select: none; border-radius: 3px; }
 .omr-box.marked { background: var(--lotto-purple); color: #fff; }
 
 .api-status { font-size: 11px; padding: 4px 8px; border-radius: 3px; font-weight: 700; }
@@ -220,8 +221,8 @@ main.chat-hidden .chat-panel { display: none; }
 .feed-item:last-child { border-bottom:none; }
 .feed-avatar { width:30px;height:30px;border-radius:50%;background:var(--bg-light);border:1px solid var(--border-dashed);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
 .feed-body { min-width:0;flex:1; }
-.feed-nick { font-size:12px;font-weight:700;color:#1e293b; }
-.feed-label { font-size:11px;color:#64748b;margin-top:1px; }
+.feed-nick { font-size:12px;font-weight:700;color:var(--text-dark); }
+.feed-label { font-size:11px;color:var(--text-muted);margin-top:1px; }
 .feed-time { font-size:10px;color:#94a3b8;white-space:nowrap;flex-shrink:0;margin-top:2px; }
 
 /* ===== 뱃지 페이지 ===== */
@@ -241,9 +242,9 @@ main.chat-hidden .chat-panel { display: none; }
 /* ===== 랭킹 페이지 ===== */
 .rank-tab-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
 .rank-tab-row::-webkit-scrollbar { display: none; }
-.rank-tab-pill { padding: 5px 12px; font-size: 12px; font-weight: 700; border: 1px solid #e2e8f0; border-radius: 20px; background: #fff; cursor: pointer; color: var(--text-muted); white-space: nowrap; transition:all .15s ease; }
+.rank-tab-pill { padding: 5px 12px; font-size: 12px; font-weight: 700; border:1px solid var(--border-dashed); border-radius: 20px; background:var(--paper-white); cursor: pointer; color: var(--text-muted); white-space: nowrap; transition:all .15s ease; }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
-.rank-tab-pill:hover:not(.on) { background:#f8fafc; border-color:#cbd5e1; color:var(--text-dark); }
+.rank-tab-pill:hover:not(.on) { background:var(--bg-light); border-color:#cbd5e1; color:var(--text-dark); }
 .rank-board-table { width: 100%; border-collapse: collapse; background:var(--paper-white);border:1px solid var(--border-dashed); border-radius: 8px; overflow: hidden; }
 .rank-board-table th { font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 8px 10px; background: var(--bg-light); text-align: left; border-bottom: 2px solid var(--border-dashed); }
 .rank-board-table td { font-size: 12px; padding: 10px 10px; border-bottom: 1px solid var(--border-dashed); vertical-align: middle; }
@@ -258,8 +259,8 @@ main.chat-hidden .chat-panel { display: none; }
 /* ===== 커뮤니티 상세 / 댓글 ===== */
 .post-detail-back { display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--lotto-red);cursor:pointer;margin-bottom:12px;padding:4px 0; }
 .post-detail-title { font-size:16px;font-weight:900;color:var(--text-dark);margin-bottom:6px;line-height:1.4; }
-.post-detail-meta  { font-size:11px;color:var(--text-muted);display:flex;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #e2e8f0; }
-.post-like-btn     { background:none;border:1px solid #e2e8f0;border-radius:20px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;transition:all .15s; }
+.post-detail-meta  { font-size:11px;color:var(--text-muted);display:flex;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-dashed); }
+.post-like-btn     { background:none;border:1px solid var(--border-dashed);border-radius:20px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;transition:all .15s; }
 .post-like-btn:hover,.post-like-btn.liked { color:var(--lotto-red);border-color:var(--lotto-red); }
 .comment-section   { margin-top:14px; }
 .comment-section-title { font-size:12px;font-weight:700;color:var(--text-dark);margin-bottom:10px; }
@@ -277,7 +278,7 @@ main.chat-hidden .chat-panel { display: none; }
 
 /* ===== 커뮤니티 페이지 ===== */
 .comm-tab-row { display: flex; gap: 6px; margin-bottom: 12px; }
-.comm-tab-btn { padding: 5px 14px; font-size: 12px; font-weight: 700; border: 1px solid #e2e8f0; border-radius: 4px; background: #fff; cursor: pointer; color: var(--text-muted); }
+.comm-tab-btn { padding: 5px 14px; font-size: 12px; font-weight: 700; border:1px solid var(--border-dashed); border-radius: 4px; background:var(--paper-white); cursor: pointer; color: var(--text-muted); }
 .comm-tab-btn.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); }
 .post-write-bar { display: flex; gap: 8px; margin-bottom: 12px; }
 .post-write-input { flex: 1; padding: 9px 12px; border: 1px solid var(--border-dashed); border-radius: 4px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; }
@@ -290,7 +291,7 @@ main.chat-hidden .chat-panel { display: none; }
 .tag-verify { background: var(--lotto-red); }
 .post-card-title { font-size: 13px; font-weight: 700; color: var(--text-dark); }
 .post-card-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 12px; margin-top: 5px; }
-.post-like-btn { background: none; border: 1px solid #e2e8f0; border-radius: 3px; padding: 2px 8px; font-size: 11px; cursor: pointer; color: var(--text-muted); }
+.post-like-btn { background: none; border:1px solid var(--border-dashed); border-radius: 3px; padding: 2px 8px; font-size: 11px; cursor: pointer; color: var(--text-muted); }
 .post-like-btn:hover { border-color: var(--lotto-red); color: var(--lotto-red); }
 
 /* ===== 프로필 페이지 ===== */
@@ -369,22 +370,22 @@ main.chat-hidden .chat-panel { display: none; }
 .auth-err { color:#dc2626; font-size:12px; font-weight:700; min-height:18px; margin-top:10px; }
 
 /* Dark Mode */
-[data-theme="dark"] { --bg-floor:#0f172a; --paper-white:#1e293b; --text-dark:#f1f5f9; --text-muted:#94a3b8; --border-dashed:#475569; }
+[data-theme="dark"] { --bg-floor:#0f172a; --paper-white:#1e293b; --text-dark:#f1f5f9; --text-muted:#94a3b8; --border-dashed:#475569; --bg-light:#263244; }
 [data-theme="dark"] body { background:var(--bg-floor); color:var(--text-dark); }
 [data-theme="dark"] header { background:#1e293b !important; }
 [data-theme="dark"] .panel { background:#1e293b; border-color:#334155; }
 [data-theme="dark"] .panel-header { background:#1e293b !important; }
 [data-theme="dark"] .panel-body { background:#1e293b; }
-[data-theme="dark"] .lotto-slip { background:#1e293b; border-color:#475569; }
+[data-theme="dark"] .lotto-slip { background:#1e293b; border-color:var(--text-muted); }
 [data-theme="dark"] .left-dashboard-card { background:#263244; border-color:#334155; }
 [data-theme="dark"] .left-stat-box { background:#1a2537; border-color:#334155; }
 [data-theme="dark"] .left-roi-bar-wrap { background:#334155; }
 [data-theme="dark"] .chat-messages { background:#0f172a; border-color:#334155; }
 [data-theme="dark"] .chat-row .chat-text { background:#1e293b; color:#e2e8f0; }
 [data-theme="dark"] .chat-input-area { background:#1e293b; border-top-color:#334155; }
-[data-theme="dark"] .chat-input { background:#0f172a; border-color:#475569; color:#f1f5f9; }
+[data-theme="dark"] .chat-input { background:#0f172a; border-color:var(--text-muted); color:#f1f5f9; }
 [data-theme="dark"] .chat-user { color:#94a3b8; }
-[data-theme="dark"] .select-custom,[data-theme="dark"] .input-custom { background:#1e293b; color:#f1f5f9; border-color:#475569; }
+[data-theme="dark"] .select-custom,[data-theme="dark"] .input-custom { background:#1e293b; color:#f1f5f9; border-color:var(--text-muted); }
 [data-theme="dark"] .menu-btn { color:#94a3b8; }
 [data-theme="dark"] .menu-btn.on { color:var(--lotto-red); }
 [data-theme="dark"] .user-btn { color:#f1f5f9; }
@@ -404,7 +405,7 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .prize-table th { background:#0f172a; color:#94a3b8; border-color:#334155; }
 [data-theme="dark"] .prize-table td { border-color:#334155; }
 [data-theme="dark"] .prize-table tr:hover td { background:#263244; }
-[data-theme="dark"] .lotto-receipt { background:#1e293b; border-color:#475569; color:#e2e8f0; }
+[data-theme="dark"] .lotto-receipt { background:#1e293b; border-color:var(--text-muted); color:#e2e8f0; }
 [data-theme="dark"] .stats-box { background:#0f172a; border-color:#334155; }
 [data-theme="dark"] .kpi-box { background:#263244 !important; border-color:#334155 !important; }
 [data-theme="dark"] .kpi-label { color:#94a3b8 !important; }
@@ -413,31 +414,31 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .rank-board-table td { border-color:#334155; color:#f1f5f9; }
 [data-theme="dark"] .rank-board-table tr:hover td { background:#263244; }
 [data-theme="dark"] .my-row td { background:#1a3a5f !important; }
-[data-theme="dark"] .rank-tab-pill { background:#334155; color:#94a3b8; border-color:#475569; }
+[data-theme="dark"] .rank-tab-pill { background:#334155; color:#94a3b8; border-color:var(--text-muted); }
 [data-theme="dark"] .rank-tab-pill.on { background:var(--lotto-red); color:#fff; }
 .comm-sort-btn { padding:4px 10px; font-size:11px; font-weight:700; border:1px solid var(--border-dashed); border-radius:4px; background:var(--paper-white); cursor:pointer; color:var(--text-muted); }
 .comm-sort-btn.on { background:#334155; color:#fff; border-color:#334155; }
-.post-tag-btn { padding:3px 9px; border:1px solid var(--border-dashed); border-radius:12px; font-size:11px; font-weight:600; cursor:pointer; background:#f8fafc; color:#64748b; font-family:inherit; transition:all .15s; }
+.post-tag-btn { padding:3px 9px; border:1px solid var(--border-dashed); border-radius:12px; font-size:11px; font-weight:600; cursor:pointer; background:var(--bg-light); color:var(--text-muted); font-family:inherit; transition:all .15s; }
 .post-tag-btn.on { background:#dc2626; color:#fff; border-color:#dc2626; }
 [data-theme="dark"] .post-tag-btn { background:#1e293b; color:#94a3b8; border-color:#334155; }
 [data-theme="dark"] .post-tag-btn.on { background:#dc2626; color:#fff; border-color:#dc2626; }
-[data-theme="dark"] .comm-tab-btn { background:#334155; color:#94a3b8; border-color:#475569; }
+[data-theme="dark"] .comm-tab-btn { background:#334155; color:#94a3b8; border-color:var(--text-muted); }
 [data-theme="dark"] .comm-tab-btn.on { background:var(--lotto-red); color:#fff; }
-[data-theme="dark"] .comm-sort-btn { background:#1e293b; color:#94a3b8; border-color:#475569; }
+[data-theme="dark"] .comm-sort-btn { background:#1e293b; color:#94a3b8; border-color:var(--text-muted); }
 [data-theme="dark"] .comm-sort-btn.on { background:#f1f5f9; color:#0f172a; border-color:#f1f5f9; }
 [data-theme="dark"] #comm-search-input { background:#1e293b !important; border-color:#475569 !important; color:#f1f5f9 !important; }
 [data-theme="dark"] .post-card { background:#263244; border-color:#334155; }
 [data-theme="dark"] .post-card:hover { background:#2d3e55; }
 [data-theme="dark"] .post-card-title { color:#f1f5f9; }
 [data-theme="dark"] .post-write-bar { background:#263244; border-color:#334155; }
-[data-theme="dark"] .post-write-input { background:#1a2537; color:#f1f5f9; border-color:#475569; }
+[data-theme="dark"] .post-write-input { background:#1a2537; color:#f1f5f9; border-color:var(--text-muted); }
 [data-theme="dark"] .post-write-btn { background:#334155; color:#f1f5f9; }
 [data-theme="dark"] .post-detail-back { color:#94a3b8; }
 [data-theme="dark"] .post-detail-title { color:#f1f5f9; }
 [data-theme="dark"] .comment-item { background:#263244; border-color:#334155; }
 [data-theme="dark"] .comment-nick { color:#f1f5f9; }
 [data-theme="dark"] .comment-body { color:#cbd5e1; }
-[data-theme="dark"] .comment-input { background:#0f172a; color:#f1f5f9; border-color:#475569; }
+[data-theme="dark"] .comment-input { background:#0f172a; color:#f1f5f9; border-color:var(--text-muted); }
 [data-theme="dark"] .badge-card-item { background:#263244; border-color:#334155; }
 [data-theme="dark"] .badge-card-item.earned { background:#1a3020; border-color:#166534; }
 [data-theme="dark"] .badge-name-text { color:#f1f5f9; }
@@ -470,12 +471,12 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .section-mini-title { color:#f1f5f9; }
 [data-theme="dark"] .btn-login { background:#334155; }
 /* Dark mode: JS 생성 인라인 흰배경 오버라이드 */
-[data-theme="dark"] #fortune-content div[style*="background:#fff;"],
-[data-theme="dark"] #stats-content div[style*="background:#fff;"],
-[data-theme="dark"] #ticket-history-section div[style*="background:#fff;"],
-[data-theme="dark"] #badge-content div[style*="background:#fff;"],
-[data-theme="dark"] #rank-content div[style*="background:#fff;"],
-[data-theme="dark"] #admin-content div[style*="background:#fff;"],
+[data-theme="dark"] #fortune-content div[style*="background:var(--paper-white);"],
+[data-theme="dark"] #stats-content div[style*="background:var(--paper-white);"],
+[data-theme="dark"] #ticket-history-section div[style*="background:var(--paper-white);"],
+[data-theme="dark"] #badge-content div[style*="background:var(--paper-white);"],
+[data-theme="dark"] #rank-content div[style*="background:var(--paper-white);"],
+[data-theme="dark"] #admin-content div[style*="background:var(--paper-white);"],
 [data-theme="dark"] #ticket-history-section table,
 [data-theme="dark"] #post-write-expanded { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #pg-ticket details { background:#1e293b !important; border-color:#334155 !important; }
@@ -487,8 +488,8 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] #ticket-history-section thead tr { background:#0f172a !important; }
 [data-theme="dark"] #ticket-history-section th { color:#94a3b8 !important; }
 [data-theme="dark"] #ticket-history-section td { color:#e2e8f0 !important; border-color:#334155 !important; }
-[data-theme="dark"] #community-content div[style*="background:#fff;"] { background:#1e293b !important; border-color:#334155 !important; }
-[data-theme="dark"] #my-num-stats div[style*="background:#fff;"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #community-content div[style*="background:var(--paper-white);"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #my-num-stats div[style*="background:var(--paper-white);"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #fortune-content div[style*="background:#f8fafc"],
 [data-theme="dark"] #stats-content div[style*="background:#f8fafc"],
 [data-theme="dark"] #my-num-stats div[style*="background:#f8fafc"] { background:#263244 !important; }
@@ -512,21 +513,21 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] #nick-input { background:#1e293b !important; border-color:#475569 !important; color:#f1f5f9 !important; }
 [data-theme="dark"] .auth-box { background:#1e293b !important; }
 [data-theme="dark"] .auth-box input { background:#0f172a !important; border-color:#475569 !important; color:#f1f5f9 !important; }
-[data-theme="dark"] #qr-result-display div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
-[data-theme="dark"] #qr-history-section div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #qr-result-display div[style*="background:var(--paper-white)"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #qr-history-section div[style*="background:var(--paper-white)"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #qr-result-display div[style*="background:#f8fafc"] { background:#263244 !important; border-color:#334155 !important; }
 [data-theme="dark"] .post-detail-meta { border-color:#334155 !important; }
 [data-theme="dark"] .comment-item { border-color:#334155 !important; }
 [data-theme="dark"] .comment-write-bar .comment-input { background:#0f172a !important; border-color:#475569 !important; color:#f1f5f9 !important; }
-[data-theme="dark"] #community-content div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #community-content div[style*="background:var(--paper-white)"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #left-prize-card { background:#0f2a18 !important; border-color:#166534 !important; }
-[data-theme="dark"] #my-match-section div[style*="background:#fff"],[data-theme="dark"] #my-match-section div[style*="background: #fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #my-match-section div[style*="background:var(--paper-white)"],[data-theme="dark"] #my-match-section div[style*="background: #fff"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #my-match-section div[style*="background:#f8fafc"],[data-theme="dark"] #my-match-section div[style*="background:#f1f5f9"] { background:#263244 !important; }
 [data-theme="dark"] #auth-success-banner { background:#0f2a18 !important; border-color:#166534 !important; color:#86efac !important; }
 [data-theme="dark"] #left-cost-card { background:#2a0f0f !important; border-color:#991b1b !important; }
 [data-theme="dark"] #left-feed-section { border-top-color:#334155 !important; }
-[data-theme="dark"] #left-feed-section > div[style*="color:#64748b"] { color:#94a3b8 !important; }
-[data-theme="dark"] .badge-content,[data-theme="dark"] #badge-content > div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #left-feed-section > div[style*="color:var(--text-muted)"] { color:#94a3b8 !important; }
+[data-theme="dark"] .badge-content,[data-theme="dark"] #badge-content > div[style*="background:var(--paper-white)"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #badge-content > div > div[style*="background:#f8fafc"] { background:#263244 !important; }
 [data-theme="dark"] .post-detail-wrap { background:#1e293b; border-color:#334155; }
 /* ── 푸터 ── */
@@ -535,7 +536,7 @@ main.chat-hidden .chat-panel { display: none; }
 .site-footer a:hover { color:var(--lotto-red); }
 .site-footer-inner { max-width:1500px; margin:0 auto; }
 .footer-links { display:flex; gap:16px; justify-content:center; margin-bottom:8px; flex-wrap:wrap; }
-[data-theme="dark"] .site-footer { background:#0f172a; border-top-color:#1e293b; }
+[data-theme="dark"] .site-footer { background:#0f172a; border-top-color:var(--text-dark); }
 [data-theme="dark"] #terms-modal > div { background:#1e293b !important; }
 [data-theme="dark"] #terms-modal #terms-title { color:#f1f5f9 !important; }
 [data-theme="dark"] #terms-modal #terms-body { color:#cbd5e1 !important; }
@@ -623,7 +624,7 @@ input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px
 [data-theme="dark"] .danger-zone p { color: #94a3b8 !important; }
 [data-theme="dark"] .danger-zone button { background: #200808 !important; border-color: #991b1b !important; }
 [data-theme="dark"] #weekly-resonance-block { background: linear-gradient(135deg,#080c14,#0e0b1f) !important; }
-[data-theme="dark"] #fortune-content div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #fortune-content div[style*="background:var(--paper-white)"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #streak-card { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #streak-card div[style*="background:#f8fafc"] { background:#263244 !important; border-color:#334155 !important; }
 [data-theme="dark"] #near-miss-block .ball-context span[style*="background:#f8fafc"] { background:#263244 !important; }
@@ -747,7 +748,7 @@ input:focus, textarea:focus { box-shadow:0 0 0 3px rgba(220,38,38,.1) !important
 [data-theme="dark"] #res-jump-input { background:#1e293b !important; color:#f1f5f9 !important; border-color:#334155 !important; }
 
 /* fortune page dark mode */
-[data-theme="dark"] #fortune-content > div[style*="background:#fff"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #fortune-content > div[style*="background:var(--paper-white)"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #fortune-content div[style*="background:#f8fafc"] { background:#263244 !important; }
 [data-theme="dark"] #fortune-content div[style*="background:#f1f5f9"] { background:#1e293b !important; }
 [data-theme="dark"] #draw-countdown-block { box-shadow: 0 4px 14px rgba(220,38,38,.15) !important; }
@@ -772,7 +773,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 [data-theme="dark"] #fortune-savedbox div[style*="background:#fff5f5"] { background:#2d1515 !important; border-color:#7f1d1d !important; }
 [data-theme="dark"] #fortune-savedbox button { background:#263244 !important; border-color:#475569 !important; color:#94a3b8 !important; }
 [data-theme="dark"] #stats-content div[style*="background:var(--paper-white)"] { background:#1e293b !important; }
-[data-theme="dark"] #stats-content div[style*="background:#fff;"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #stats-content div[style*="background:var(--paper-white);"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #monthly-trend-chart { filter:brightness(.85); }
 [data-theme="dark"] .rank-history-table { border-color:#334155; }
 [data-theme="dark"] .rank-history-table thead { background:#1e293b; }
@@ -794,11 +795,11 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 [data-theme="dark"] .home-dna-card { background: linear-gradient(135deg, #1e293b, #1e1b4b) !important; }
 
 /* ===== Dark mode comprehensive additions ===== */
-[data-theme="dark"] #badge-content div[style*="background:#fff;"],
+[data-theme="dark"] #badge-content div[style*="background:var(--paper-white);"],
 [data-theme="dark"] #badge-content div[style*="background:#fff "],
-[data-theme="dark"] #profile-content div[style*="background:#fff"],
-[data-theme="dark"] #comm-section div[style*="background:#fff;"],
-[data-theme="dark"] #community-content div[style*="background:#fff;"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #profile-content div[style*="background:var(--paper-white)"],
+[data-theme="dark"] #comm-section div[style*="background:var(--paper-white);"],
+[data-theme="dark"] #community-content div[style*="background:var(--paper-white);"] { background:#1e293b !important; border-color:#334155 !important; }
 
 [data-theme="dark"] #badge-content div[style*="background:#f8fafc"],
 [data-theme="dark"] #badge-content div[style*="background:#f1f5f9"],
@@ -811,7 +812,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 [data-theme="dark"] .roi-bar-wrap { background:#334155 !important; }
 
 /* Rank table */
-[data-theme="dark"] #rank-content div[style*="background:#fff;"] { background:#1e293b !important; border-color:#334155 !important; }
+[data-theme="dark"] #rank-content div[style*="background:var(--paper-white);"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #rank-content div[style*="background:#f8fafc"] { background:#263244 !important; }
 
 /* QR result display dark */
@@ -858,7 +859,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 
 /* Res (당첨결과) page dark */
 [data-theme="dark"] #res-wrap > div { color:var(--text-dark); }
-[data-theme="dark"] #res-wrap div[style*="background:#fff;"],
+[data-theme="dark"] #res-wrap div[style*="background:var(--paper-white);"],
 [data-theme="dark"] #res-wrap div[style*="background:#fff "] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #res-wrap div[style*="background:#f8fafc"],
 [data-theme="dark"] #res-wrap div[style*="background:#f1f5f9"] { background:#263244 !important; }
@@ -930,9 +931,9 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
       <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;color:#dc2626;">관리자</button>
     </div>
     <div class="auth-zone">
-      <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크/라이트 모드 전환" style="background:none;border:1px solid #e2e8f0;border-radius:6px;padding:5px 8px;cursor:pointer;font-size:16px;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="테마 전환">🌙</button>
+      <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크/라이트 모드 전환" style="background:none;border:1px solid var(--border-dashed);border-radius:6px;padding:5px 8px;cursor:pointer;font-size:16px;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="테마 전환">🌙</button>
       <button id="chat-reopen-btn" onclick="toggleChat()" title="채팅 열기"
-        style="display:none;align-items:center;gap:4px;padding:4px 10px;font-size:12px;font-weight:700;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;">
+        style="display:none;align-items:center;gap:4px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--text-muted);background:#f1f5f9;border:1px solid var(--border-dashed);border-radius:6px;cursor:pointer;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 채팅
       </button>
       <button id="btn-auth" class="btn-login" onclick="showAuthModal()">로그인</button>
@@ -1082,12 +1083,22 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
           <div style="font-size:11px;font-weight:800;color:#dc2626;margin-bottom:10px;letter-spacing:0.3px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>플랫폼 전체 통계</div>
           <div class="left-stat-row">
             <div class="left-stat-box">
+              <div class="left-stat-label">회원 수</div>
+              <div class="left-stat-val" id="gs-members" style="color:var(--lotto-red);">-</div>
+            </div>
+            <div class="left-stat-box">
               <div class="left-stat-label">총 인증 게임</div>
               <div class="left-stat-val" id="gs-tickets">-</div>
             </div>
+          </div>
+          <div class="left-stat-row">
             <div class="left-stat-box">
               <div class="left-stat-label">총 당첨 횟수</div>
               <div class="left-stat-val" id="gs-wins" style="color:#16a34a;">-</div>
+            </div>
+            <div class="left-stat-box">
+              <div class="left-stat-label">1등 인증자</div>
+              <div class="left-stat-val" id="gs-rank1" style="color:#dc2626;">-명</div>
             </div>
           </div>
           <div class="left-stat-row">
@@ -1100,7 +1111,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
               <div class="left-stat-val" id="gs-roi">-</div>
             </div>
           </div>
-          <div style="padding:12px;background:linear-gradient(135deg,#fff5f5,#fef2f2);border:1.5px solid #fecaca;border-radius:10px;text-align:center;">
+          <div style="padding:12px;background:linear-gradient(135deg,rgba(220,38,38,.07),rgba(220,38,38,.04));border:1.5px solid rgba(220,38,38,.2);border-radius:10px;text-align:center;">
             <div style="font-size:18px;margin-bottom:6px;">🎯</div>
             <div style="font-size:12px;font-weight:800;color:var(--text-dark);margin-bottom:4px;">지금 바로 시작하세요</div>
             <div style="font-size:10px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">로또·연금복권 QR 등록으로<br>내 전적을 데이터로 관리하세요</div>
@@ -1119,14 +1130,14 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 <div id="left-hot-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:10px 12px;">
           <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span style="font-size:10px;font-weight:800;color:#64748b;">유저들이 자주 선택한 번호</span>
+            <span style="font-size:10px;font-weight:800;color:var(--text-muted);">유저들이 자주 선택한 번호</span>
           </div>
           <div id="gs-hot-nums" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;">
             <span style="font-size:11px;color:#94a3b8;">데이터 수집 중...</span>
           </div>
           <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            <span style="font-size:10px;font-weight:800;color:#64748b;">가장 적게 고른 번호 (제외수)</span>
+            <span style="font-size:10px;font-weight:800;color:var(--text-muted);">가장 적게 고른 번호 (제외수)</span>
           </div>
           <div id="gs-cold-nums" style="display:flex;gap:4px;flex-wrap:wrap;">
             <span style="font-size:11px;color:#94a3b8;">데이터 수집 중...</span>
@@ -1159,19 +1170,19 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
             </div>
           </div>
           <div id="left-invest-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;margin-top:4px;">
-            <div id="left-prize-card" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:7px;text-align:center;">
-              <div style="font-size:10px;color:#64748b;margin-bottom:2px;">총 당첨금</div>
+            <div id="left-prize-card" style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;padding:7px;text-align:center;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px;">총 당첨금</div>
               <div id="my-total-prize" style="font-weight:900;color:#15803d;">-</div>
             </div>
-            <div id="left-cost-card" style="background:#fff5f5;border:1px solid #fecaca;border-radius:6px;padding:7px;text-align:center;">
-              <div style="font-size:10px;color:#64748b;margin-bottom:2px;">총 투자금</div>
+            <div id="left-cost-card" style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;padding:7px;text-align:center;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px;">총 투자금</div>
               <div id="my-total-cost" style="font-weight:900;color:#dc2626;">-</div>
             </div>
           </div>
         </div>
         <!-- Chart.js 투자 차트 -->
         <div class="left-dashboard-card" style="padding:12px;">
-          <div style="font-size:10px;font-weight:800;color:#64748b;margin-bottom:8px;">투자금 vs 당첨금</div>
+          <div style="font-size:10px;font-weight:800;color:var(--text-muted);margin-bottom:8px;">투자금 vs 당첨금</div>
           <canvas id="roi-chart" height="110"></canvas>
         </div>
       </div>
@@ -1184,8 +1195,8 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
         <button onclick="go('rank')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">🏆 랭킹</button>
       </div>
       <!-- 실시간 활동 피드 (항상 표시) -->
-      <div id="left-feed-section" style="margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">
+      <div id="left-feed-section" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border-dashed);">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 실시간 활동 피드
         </div>
         <div id="feed-list-left" style="min-height:32px;"></div>
@@ -1210,7 +1221,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
   <!-- 가운데: 탭별 메인 콘텐츠 -->
   <section class="panel">
     <div id="mid-title" class="panel-header"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 회차별 당첨 번호 조회</div>
-    <div class="panel-body" style="background:#f8fafc;">
+    <div class="panel-body" style="background:var(--bg-light);">
 
       <!-- 1. 종합 데스크 -->
       <div id="pg-home" class="page-content" style="display:none;">
@@ -1225,11 +1236,11 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
           <div style="font-size:11px;opacity:.5;">역대 회차 당첨번호 · 1등 당첨금 · 내 번호 비교</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:0;">
-          <button id="res-older-btn" onclick="resNavPage(-1)" title="이전 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#475569;font-size:12px;font-weight:700;cursor:pointer;">◀◀</button>
+          <button id="res-older-btn" onclick="resNavPage(-1)" title="이전 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">◀◀</button>
           <select id="res-sel" onchange="chgRes()" class="select-custom" style="flex:1;margin:0;">
             <option>회차 목록 로딩 중...</option>
           </select>
-          <button id="res-newer-btn" onclick="resNavPage(1)" title="다음 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#475569;font-size:12px;font-weight:700;cursor:pointer;">▶▶</button>
+          <button id="res-newer-btn" onclick="resNavPage(1)" title="다음 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">▶▶</button>
         </div>
         <div style="display:flex;gap:6px;margin-top:6px;">
           <button id="res-prev-btn" onclick="resNavStep(-1)" title="이전 회차" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">◀ 이전 회차</button>
@@ -1799,7 +1810,7 @@ function renderLatestOnLeft(data) {
     const cntStr = (p.cnt && p.cnt !== '?') ? fmtCnt(p.cnt) + '명' : '?명';
     return `<tr>
       <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
-      <td style="font-size:11px;color:#475569;">${p.cond}</td>
+      <td style="font-size:11px;color:var(--text-muted);">${p.cond}</td>
       <td style="font-weight:700;">${cntStr}</td>
       <td style="font-weight:700;color:var(--lotto-red);">${p.rank===1||p.rank===2?fmtMFull(p.amt):fmtMShort(p.amt)}</td>
       <td${p.rank<=2?` id="h-auto-${p.rank}"`:''}>${autoStr}</td>
@@ -1879,6 +1890,36 @@ function renderHomeLive() {
       <div class="insight-item"><span>연속 번호</span><b>${a.seq ? a.seq + '쌍 발견' : '없음'}</b></div>
       <div class="insight-item"><span>데이터 출처</span><b>동행복권 공식 API</b></div>
     </div>
+
+    <!-- 최근 5회차 미니 스트립 -->
+    ${(()=>{
+      const recRounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a).slice(0,5);
+      if (recRounds.length < 2) return '';
+      return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:11px;font-weight:800;color:var(--text-dark);">📋 최근 5회 결과</span>
+          <button onclick="go('result')" style="font-size:10px;color:var(--lotto-red);background:none;border:none;cursor:pointer;font-weight:700;font-family:inherit;padding:0;">전체 조회 →</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${recRounds.map(r=>{
+            const rd=recentData[r];
+            if(!rd)return'';
+            const myNums = MY.filter(m=>String(m.drw)===String(r));
+            const hasWin = myNums.some(m=>{ const res=checkWinRank(m.nums,rd.nums,rd.bonus); return res.rank>=1&&res.rank<=5; });
+            const hasMy = myNums.length > 0;
+            return `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border-dashed);">
+              <span style="font-size:10px;font-weight:700;color:var(--text-muted);min-width:38px;">${r}회</span>
+              <div style="display:flex;gap:2px;flex:1;">${rd.nums.map(n=>`<div style="width:20px;height:20px;border-radius:50%;background:${n<=9?'#ef4444':n<=19?'#f97316':n<=29?'#eab308':n<=39?'#3b82f6':'#64748b'};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#fff;">${n}</div>`).join('')}
+                <span style="color:var(--text-muted);font-size:12px;margin:0 2px;">+</span>
+                <div style="width:20px;height:20px;border-radius:50%;background:#9ca3af;border:2px solid #6b7280;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#fff;">${rd.bonus}</div>
+              </div>
+              ${hasWin?'<span style="font-size:9px;font-weight:800;color:#dc2626;background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:1px 5px;white-space:nowrap;">당첨!</span>':hasMy?'<span style="font-size:9px;font-weight:700;color:var(--text-muted);background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;padding:1px 5px;white-space:nowrap;">등록</span>':''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    })()}
+
     <div class="section-mini-title" style="margin-top:2px;"><span>실시간 활동 피드</span><em>최신순</em></div>
     <div id="feed-list" style="min-height:40px;"></div>
     ${isLoggedIn ? (() => {
@@ -2141,11 +2182,11 @@ async function chgRes() {
 
 
   $('res-list').innerHTML = `
-    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0;font-size:12px;">
-      <span style="color:#64748b;">추첨일</span><span style="font-weight:700;">${d.date}</span>
+    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-dashed);font-size:12px;">
+      <span style="color:var(--text-muted);">추첨일</span><span style="font-weight:700;">${d.date}</span>
     </div>
-    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0;font-size:12px;">
-      <span style="color:#64748b;">총 판매액</span><span style="font-weight:700;">${fmtMFull(d.totalSales)}</span>
+    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-dashed);font-size:12px;">
+      <span style="color:var(--text-muted);">총 판매액</span><span style="font-weight:700;">${fmtMFull(d.totalSales)}</span>
     </div>
     <table class="prize-table" style="margin-top:6px;">
       <thead><tr><th>등수</th><th>당첨 조건</th><th>당첨자</th><th>1인당 금액</th><th>수동/자동</th></tr></thead>
@@ -2157,7 +2198,7 @@ async function chgRes() {
           const autoId = (p.rank <= 2) ? ` id="res-auto-${p.rank}"` : '';
           return `<tr>
             <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
-            <td style="font-size:11px;color:#475569;">${p.cond}</td>
+            <td style="font-size:11px;color:var(--text-muted);">${p.cond}</td>
             <td style="font-weight:700;">${p.cnt}명</td>
             <td style="font-weight:700;color:var(--lotto-red);">${fmtMShort(p.amt)}</td>
             <td${autoId}>${autoStr}</td>
@@ -2171,7 +2212,7 @@ async function chgRes() {
       <div class="result-metric"><span>연속</span><strong>${a.seq ? a.seq + '쌍' : '없음'}</strong></div>
     </div>
     <div style="margin-top:10px;padding-top:8px;border-top:1px dashed #e2e8f0;display:flex;gap:6px;justify-content:flex-end;">
-      <button onclick="shareURL('https://lottobank.pages.dev','LottoBank 링크')" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;font-size:11px;font-weight:700;color:#475569;cursor:pointer;font-family:inherit;">
+      <button onclick="shareURL('https://lottobank.pages.dev','LottoBank 링크')" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--bg-light);font-size:11px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:inherit;">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
         공유
       </button>
@@ -3207,6 +3248,9 @@ function updateLeftUserPanel(buy, wins, inv, prz, roi) {
 async function loadGuestStats() {
   // 비로그인 상태: 플랫폼 전체 통계 로드
   try {
+    const { count: memberCount } = await sb.from('user_stats').select('*', { count: 'exact', head: true });
+    const el0 = $('gs-members');
+    if (el0) { el0.textContent = memberCount > 0 ? fmtCnt(memberCount) + '명' : '0명'; }
     const { data } = await sb.from('user_stats')
       .select('total_tickets, total_wins, total_spent, total_prize, rank_1_count');
     const tot = (data||[]).reduce((a, r) => ({
@@ -3492,7 +3536,7 @@ async function loadMyMatchSection() {
         else if (matchCount === 5 && hasBonus) rankLabel = '<span style="color:#a855f7;font-weight:900;">🥈 2등!</span>';
         else if (matchCount === 5) rankLabel = '<span style="color:#10b981;font-weight:900;">🥉 3등!</span>';
         else if (matchCount === 4) rankLabel = '<span style="color:#3b82f6;font-weight:700;">🎯 4등</span>';
-        else if (matchCount === 3) rankLabel = '<span style="color:#64748b;font-weight:700;">✅ 5등</span>';
+        else if (matchCount === 3) rankLabel = '<span style="color:var(--text-muted);font-weight:700;">✅ 5등</span>';
         else rankLabel = '<span style="color:#94a3b8;">' + matchCount + '개 일치</span>';
         const ballsHtml = sorted.map(n => bH(n, winNums.has(n))).join('');
         rows += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
@@ -3549,9 +3593,9 @@ async function loadMyNumberStats() {
       </div>
       <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;">가장 많이 구매한 번호 TOP 10</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-        ${top10.map(item=>`<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">${bH(item.n)}<span style="font-size:9px;color:#64748b;font-weight:700;">${item.c}회</span></div>`).join('')}
+        ${top10.map(item=>`<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">${bH(item.n)}<span style="font-size:9px;color:var(--text-muted);font-weight:700;">${item.c}회</span></div>`).join('')}
       </div>
-      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">출현 빈도 비교</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;">출현 빈도 비교</div>
       ${top10.map(item=>{
         const pct=Math.round(item.c/maxCnt*100);
         const cl=item.n<=9?'#ef4444':item.n<=19?'#f97316':item.n<=29?'#eab308':item.n<=39?'#3b82f6':'#6b7280';
@@ -3927,10 +3971,10 @@ function genRecommended() {
           전략별 추천 5세트
           <span style="font-size:9px;font-weight:500;color:#94a3b8;margin-left:4px;">매 재생성마다 변경</span>
         </div>
-        <button onclick="renderFortune()" style="font-size:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:4px 10px;cursor:pointer;color:#64748b;font-weight:700;transition:all .15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">🔄 재생성</button>
+        <button onclick="renderFortune()" style="font-size:11px;background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;padding:4px 10px;cursor:pointer;color:var(--text-muted);font-weight:700;transition:all .15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">🔄 재생성</button>
       </div>
       ${sets.map((nums, i) => `
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;transition:background .15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+        <div style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;transition:background .15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
           <div style="flex-shrink:0;min-width:72px;">
             <div style="font-size:9px;font-weight:800;color:var(--text-dark);margin-bottom:1px;">${['🔥','⚖️','🧊','🎯','🎲'][i]} ${['핫번호','밸런스','콜드번호','패턴','랜덤'][i]}</div>
             <span style="font-size:9px;color:#94a3b8;">${setLabels[i]}세트</span>
@@ -3938,7 +3982,7 @@ function genRecommended() {
           <div class="ball-context" style="margin:0;gap:4px;flex:1;">${nums.map(n=>bH(n)).join('')}</div>
           <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
             <button onclick="saveFortuneSet('${JSON.stringify(nums)}')" style="font-size:10px;font-weight:700;background:#dc2626;color:#fff;border:none;border-radius:5px;padding:4px 8px;cursor:pointer;">저장</button>
-            <button onclick="copyNumSet(${JSON.stringify(nums)})" style="font-size:10px;font-weight:700;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:5px;padding:4px 8px;cursor:pointer;">복사</button>
+            <button onclick="copyNumSet(${JSON.stringify(nums)})" style="font-size:10px;font-weight:700;background:#f1f5f9;color:var(--text-muted);border:1px solid var(--border-dashed);border-radius:5px;padding:4px 8px;cursor:pointer;">복사</button>
           </div>
         </div>`).join('')}
       <div style="font-size:10px;color:#94a3b8;margin-top:8px;text-align:center;">※ 통계적 추천 · 당첨 보장 없음 · 오락 목적</div>
@@ -3953,7 +3997,7 @@ function genRecommended() {
       <div style="display:flex;flex-direction:column;gap:3px;">
         ${heatmapRows.join('')}
       </div>
-      <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;font-size:10px;color:#64748b;">
+      <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;font-size:10px;color:var(--text-muted);">
         <span><span style="display:inline-block;width:8px;height:8px;border:2px solid #dc2626;border-radius:50%;vertical-align:middle;"></span> 핫 번호 TOP6</span>
         <span><span style="display:inline-block;width:8px;height:8px;border:2px dashed #94a3b8;border-radius:50%;vertical-align:middle;"></span> 콜드 번호 BOTTOM6</span>
         <span>색 진할수록 출현 빈도 높음</span>
@@ -3967,26 +4011,26 @@ function genRecommended() {
         패턴 분석
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-        <div style="background:#f8fafc;border-radius:6px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:#64748b;margin-bottom:4px;">최신회 홀/짝</div>
+        <div style="background:var(--bg-light);border-radius:6px;padding:10px;text-align:center;">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">최신회 홀/짝</div>
           <div style="font-size:15px;font-weight:900;">${odd}홀 ${even}짝</div>
         </div>
-        <div style="background:#f8fafc;border-radius:6px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:#64748b;margin-bottom:4px;">저/고 번호</div>
+        <div style="background:var(--bg-light);border-radius:6px;padding:10px;text-align:center;">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">저/고 번호</div>
           <div style="font-size:15px;font-weight:900;">${low}저 ${high}고</div>
         </div>
-        <div style="background:#f8fafc;border-radius:6px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:#64748b;margin-bottom:4px;">최신회 합계</div>
+        <div style="background:var(--bg-light);border-radius:6px;padding:10px;text-align:center;">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">최신회 합계</div>
           <div style="font-size:15px;font-weight:900;">${latestSum}</div>
         </div>
       </div>
 
-      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">연번(연속번호) 출현 비율 (최근 20회)</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;">연번(연속번호) 출현 비율 (최근 20회)</div>
       ${[['없음',consecNone],['2연번',consec2],['3연번+',consec3]].map(([label,cnt])=>{
         const pct = Math.round(cnt/consecTotal*100);
         const cs = label==='없음'?'#94a3b8':label==='2연번'?'#3b82f6':'#dc2626';
         return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <span style="font-size:10px;color:#64748b;min-width:42px;">${label}</span>
+          <span style="font-size:10px;color:var(--text-muted);min-width:42px;">${label}</span>
           <div style="flex:1;background:#f1f5f9;border-radius:3px;height:10px;overflow:hidden;">
             <div style="height:100%;width:${pct}%;background:${cs};border-radius:3px;"></div>
           </div>
@@ -3994,12 +4038,12 @@ function genRecommended() {
         </div>`;
       }).join('')}
 
-      <div style="font-size:11px;font-weight:700;color:#64748b;margin-top:10px;margin-bottom:6px;">합계 범위 분포 (최근 20회)</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-top:10px;margin-bottom:6px;">합계 범위 분포 (최근 20회)</div>
       ${sumBucketLabels.map((label,i)=>{
         const pct = Math.round(sumBuckets[i]/sumTotal*100);
         const cs = i===2?'#10b981':i===1||i===3?'#3b82f6':'#94a3b8';
         return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <span style="font-size:10px;color:#64748b;min-width:48px;">${label}</span>
+          <span style="font-size:10px;color:var(--text-muted);min-width:48px;">${label}</span>
           <div style="flex:1;background:#f1f5f9;border-radius:3px;height:10px;overflow:hidden;">
             <div style="height:100%;width:${pct}%;background:${cs};border-radius:3px;"></div>
           </div>
@@ -4007,12 +4051,12 @@ function genRecommended() {
         </div>`;
       }).join('')}
 
-      <div style="font-size:11px;font-weight:700;color:#64748b;margin-top:10px;margin-bottom:6px;">구간별 출현 비율 (최근 20회)</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-top:10px;margin-bottom:6px;">구간별 출현 비율 (최근 20회)</div>
       ${['1~9','10~19','20~29','30~39','40~45'].map((zone,i)=>{
         const pct = Math.round(zones[i]/zoneTotal*100);
         const colors = ['#ef4444','#f97316','#eab308','#3b82f6','#6b7280'];
         return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <span style="font-size:10px;color:#64748b;min-width:36px;">${zone}</span>
+          <span style="font-size:10px;color:var(--text-muted);min-width:36px;">${zone}</span>
           <div style="flex:1;background:#f1f5f9;border-radius:3px;height:10px;overflow:hidden;">
             <div style="height:100%;width:${pct}%;background:${colors[i]};border-radius:3px;"></div>
           </div>
@@ -4160,7 +4204,7 @@ function genRecommended() {
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M20 7H4a2 2 0 0 0-2 2v10c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
           내 번호 보관함 <span style="font-size:10px;font-weight:500;color:#94a3b8;">${saved.length}세트 저장됨</span>
         </div>
-        <button onclick="if(confirm('보관함을 비울까요?')){MY=MY.filter(m=>m.type!=='recommend');saveStorage();renderFortune();}" style="font-size:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;padding:3px 8px;cursor:pointer;color:#94a3b8;font-weight:700;">전체삭제</button>
+        <button onclick="if(confirm('보관함을 비울까요?')){MY=MY.filter(m=>m.type!=='recommend');saveStorage();renderFortune();}" style="font-size:10px;background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:5px;padding:3px 8px;cursor:pointer;color:#94a3b8;font-weight:700;">전체삭제</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;">
         ${(()=>{
@@ -4818,7 +4862,7 @@ function openGoalModal() {
       <input id="goal-label-input" type="text" value="${label}" maxlength="20" placeholder="예: 전세 보증금, 세계일주..." style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'">
     </div>
     <div style="display:flex;gap:8px;">
-      <button onclick="document.getElementById('goal-modal-overlay').remove()" style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">취소</button>
+      <button onclick="document.getElementById('goal-modal-overlay').remove()" style="flex:1;padding:10px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">취소</button>
       <button onclick="confirmGoal()" style="flex:2;padding:10px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">저장</button>
     </div>
     <div style="text-align:center;margin-top:8px;">
@@ -5004,7 +5048,7 @@ function renderStats() {
         <tr><td>5등</td><td>3개 일치</td><td style="font-weight:700;text-align:center;">${rankCounts[5]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
       </tbody>
     </table>
-    ${!isLoggedIn ? '<div style="margin-top:14px;padding:12px;background:#fff5f5;border:1px solid #fecaca;border-radius:6px;text-align:center;font-size:12px;"><b style=\"color:#dc2626;\">로그인</b><span style=\"color:#64748b;">하면 실제 QR 인증 데이터 기반 전적이 기록됩니다</span><br><button onclick=\"showAuthModal()\" style=\"margin-top:8px;background:#dc2626;color:#fff;border:none;border-radius:4px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;\">로그인하기</button></div>' : isMock ? '<div style="margin-top:14px;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:6px;text-align:center;font-size:12px;color:var(--text-muted);">QR 인증 탭에서 실제 복권 QR을 등록하면 전적이 자동으로 기록됩니다</div>' : ''}
+    ${!isLoggedIn ? '<div style="margin-top:14px;padding:12px;background:#fff5f5;border:1px solid #fecaca;border-radius:6px;text-align:center;font-size:12px;"><b style=\"color:#dc2626;\">로그인</b><span style=\"color:var(--text-muted);">하면 실제 QR 인증 데이터 기반 전적이 기록됩니다</span><br><button onclick=\"showAuthModal()\" style=\"margin-top:8px;background:#dc2626;color:#fff;border:none;border-radius:4px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;\">로그인하기</button></div>' : isMock ? '<div style="margin-top:14px;padding:12px;background:var(--bg-light);border:1px dashed #cbd5e1;border-radius:6px;text-align:center;font-size:12px;color:var(--text-muted);">QR 인증 탭에서 실제 복권 QR을 등록하면 전적이 자동으로 기록됩니다</div>' : ''}
   `;
 
   // 티켓 이력 비동기 로드
@@ -5165,18 +5209,18 @@ async function loadTicketHistory() {
         const streakColor = lastIsWin ? '#16a34a' : '#dc2626';
         const streakEmoji = lastIsWin ? '🎯' : '😤';
         streakGrid.innerHTML = `
-          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:9px;color:#64748b;margin-bottom:4px;">현재 ${streakLabel}</div>
+          <div style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:var(--text-muted);margin-bottom:4px;">현재 ${streakLabel}</div>
             <div style="font-size:22px;font-weight:900;color:${streakColor};">${streakEmoji}</div>
             <div style="font-size:18px;font-weight:900;color:${streakColor};">${currentStreak}<span style="font-size:11px;">회</span></div>
           </div>
-          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:9px;color:#64748b;margin-bottom:4px;">최장 낙첨 스트릭</div>
+          <div style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:var(--text-muted);margin-bottom:4px;">최장 낙첨 스트릭</div>
             <div style="font-size:22px;font-weight:900;">😤</div>
             <div style="font-size:18px;font-weight:900;color:#dc2626;">${maxLose}<span style="font-size:11px;">회</span></div>
           </div>
-          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:9px;color:#64748b;margin-bottom:4px;">최장 당첨 스트릭</div>
+          <div style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:var(--text-muted);margin-bottom:4px;">최장 당첨 스트릭</div>
             <div style="font-size:22px;font-weight:900;">🎯</div>
             <div style="font-size:18px;font-weight:900;color:#16a34a;">${maxWin}<span style="font-size:11px;">회</span></div>
           </div>
@@ -5232,7 +5276,7 @@ async function loadTicketHistory() {
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:900;color:var(--text-dark);">QR 인증 이력 <span style="font-size:10px;font-weight:500;color:#94a3b8;">(최근 ${tickets.length}건)</span></div>
-        <button onclick="if(window._ltbTickets)downloadTicketCSV(window._ltbTickets);else toast('데이터 없음')" style="background:none;border:1px solid #e2e8f0;border-radius:5px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='var(--text-muted)'">
+        <button onclick="if(window._ltbTickets)downloadTicketCSV(window._ltbTickets);else toast('데이터 없음')" style="background:none;border:1px solid var(--border-dashed);border-radius:5px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='var(--text-muted)'">
           <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           CSV 내보내기
         </button>
@@ -5240,11 +5284,11 @@ async function loadTicketHistory() {
       <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
           <thead>
-            <tr style="background:#f8fafc;border-bottom:1px solid #e2e8f0;">
-              <th style="padding:8px 10px;text-align:left;font-weight:700;color:#64748b;">회차</th>
-              <th style="padding:8px 6px;text-align:center;font-weight:700;color:#64748b;">결과</th>
-              <th style="padding:8px 10px;text-align:right;font-weight:700;color:#64748b;">당첨금</th>
-              <th style="padding:8px 10px;text-align:right;font-weight:700;color:#64748b;">날짜</th>
+            <tr style="background:var(--bg-light);border-bottom:1px solid var(--border-dashed);">
+              <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--text-muted);">회차</th>
+              <th style="padding:8px 6px;text-align:center;font-weight:700;color:var(--text-muted);">결과</th>
+              <th style="padding:8px 10px;text-align:right;font-weight:700;color:var(--text-muted);">당첨금</th>
+              <th style="padding:8px 10px;text-align:right;font-weight:700;color:var(--text-muted);">날짜</th>
             </tr>
           </thead>
           <tbody>
@@ -5254,7 +5298,7 @@ async function loadTicketHistory() {
                 <td style="padding:7px 10px;font-weight:700;">${t.round_no}회</td>
                 <td style="padding:7px 6px;text-align:center;font-weight:700;color:${rankColor(t.prize_rank)};">${rankLabel(t.prize_rank)}</td>
                 <td style="padding:7px 10px;text-align:right;font-weight:${t.prize_amount>0?'700':'400'};color:${t.prize_amount>0?'#16a34a':'#94a3b8'};">${t.prize_amount>0?fmtMFull(t.prize_amount):'-'}</td>
-                <td style="padding:7px 10px;text-align:right;color:#64748b;font-size:11px;">${t.purchase_date||'-'}</td>
+                <td style="padding:7px 10px;text-align:right;color:var(--text-muted);font-size:11px;">${t.purchase_date||'-'}</td>
               </tr>`).join('')}
           </tbody>
         </table>
@@ -5453,7 +5497,7 @@ function feedItemHtml(a) {
   const label = labels[aType] ? labels[aType](aData) : (aType || '활동');
   const time  = relativeTime(a.created_at);
   return `<div class="feed-item">
-    <div class="feed-avatar" style="background:#f8fafc;">${icon}</div>
+    <div class="feed-avatar" style="background:var(--bg-light);">${icon}</div>
     <div class="feed-body">
       <div class="feed-nick">${aNick}</div>
       <div class="feed-label" style="line-height:1.5;">${label}</div>
@@ -5581,7 +5625,7 @@ async function renderBadge() {
         </div>
         <div style="display:flex;align-items:center;justify-content:center;width:42px;height:42px;background:#fff8e1;border-radius:12px;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg></div>
       </div>
-      <div style="margin-top:10px;background:#f8fafc;border-radius:6px;height:8px;overflow:hidden;">
+      <div style="margin-top:10px;background:var(--bg-light);border-radius:6px;height:8px;overflow:hidden;">
         <div style="height:100%;width:${Math.round(earned.length/BADGE_DEFS.length*100)}%;background:linear-gradient(90deg,#dc2626,#f59e0b);border-radius:6px;transition:width 0.6s;"></div>
       </div>
       <div style="font-size:10px;color:#94a3b8;margin-top:4px;text-align:right;">${Math.round(earned.length/BADGE_DEFS.length*100)}% 달성</div>
@@ -6356,7 +6400,7 @@ async function adminTab(tab, btn) {
         <td>${i+1}</td>
         <td style="font-weight:700;" id="unick-${u.id}">${u.nickname||'-'}</td>
         <td style="font-size:11px;color:var(--text-muted);">${u.created_at?u.created_at.slice(0,10):'-'}</td>
-        <td><button data-uid="${u.id}" data-nick="${u.nickname||''}" onclick="adminEditUser(this.dataset.uid,this.dataset.nick,'')" style="padding:3px 8px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
+        <td><button data-uid="${u.id}" data-nick="${u.nickname||''}" onclick="adminEditUser(this.dataset.uid,this.dataset.nick,'')" style="padding:3px 8px;background:#f1f5f9;color:var(--text-muted);border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
       </tr>`).join('')}</tbody></table>`;
     } else if (tab === 'tickets') {
       const { data } = await sb.from('tickets').select('id,round_no,created_at,user_id,game_count,prize_amount').order('created_at', { ascending: false }).limit(100);
@@ -6376,7 +6420,7 @@ async function adminTab(tab, btn) {
         <td id="tprize-${t.id}" style="color:var(--lotto-red);font-weight:700;">${fmtMShort(t.prize_amount||0)}</td>
         <td style="font-size:11px;color:var(--text-muted);">${t.created_at?t.created_at.slice(0,10):'-'}</td>
         <td style="display:flex;gap:4px;">
-          <button onclick="adminEditTicket('${t.id}',${t.round_no||0},${t.game_count||0},${t.prize_amount||0})" style="padding:3px 6px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button>
+          <button onclick="adminEditTicket('${t.id}',${t.round_no||0},${t.game_count||0},${t.prize_amount||0})" style="padding:3px 6px;background:#f1f5f9;color:var(--text-muted);border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button>
           <button onclick="adminDelete('tickets','${t.id}')" style="padding:3px 6px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;font-size:11px;cursor:pointer;">삭제</button>
         </td>
       </tr>`).join('')}</tbody></table>`;
@@ -6410,20 +6454,20 @@ async function adminTab(tab, btn) {
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
             <div>
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">대상 회원 닉네임</label>
-              <input id="ins-nick" type="text" placeholder="닉네임 입력" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">대상 회원 닉네임</label>
+              <input id="ins-nick" type="text" placeholder="닉네임 입력" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">회차</label>
-              <input id="ins-round" type="number" placeholder="${latestRound}" value="${latestRound}" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">회차</label>
+              <input id="ins-round" type="number" placeholder="${latestRound}" value="${latestRound}" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">게임 수</label>
-              <input id="ins-games" type="number" placeholder="5" value="5" min="1" max="100" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">게임 수</label>
+              <input id="ins-games" type="number" placeholder="5" value="5" min="1" max="100" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">당첨 등수 (0=낙첨)</label>
-              <select id="ins-rank" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">당첨 등수 (0=낙첨)</label>
+              <select id="ins-rank" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
                 <option value="0">낙첨</option>
                 <option value="5">5등 (5,000원)</option>
                 <option value="4">4등 (50,000원)</option>
@@ -6433,8 +6477,8 @@ async function adminTab(tab, btn) {
               </select>
             </div>
             <div style="grid-column:1/-1;">
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">당첨금 직접 입력 (원, 선택사항)</label>
-              <input id="ins-prize" type="number" placeholder="당첨금 (비워두면 자동)" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">당첨금 직접 입력 (원, 선택사항)</label>
+              <input id="ins-prize" type="number" placeholder="당첨금 (비워두면 자동)" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
             </div>
           </div>
           <button onclick="adminInsertTicket()" style="width:100%;padding:9px;background:#dc2626;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;">티켓 삽입하기</button>
@@ -6448,28 +6492,28 @@ async function adminTab(tab, btn) {
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
             <div>
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">대상 닉네임</label>
-              <input id="ins-stat-nick" type="text" placeholder="닉네임" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">대상 닉네임</label>
+              <input id="ins-stat-nick" type="text" placeholder="닉네임" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">총 구매 게임수</label>
-              <input id="ins-stat-tickets" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 구매 게임수</label>
+              <input id="ins-stat-tickets" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">총 투자금 (원)</label>
-              <input id="ins-stat-spent" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 투자금 (원)</label>
+              <input id="ins-stat-spent" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">총 당첨금 (원)</label>
-              <input id="ins-stat-prize" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 당첨금 (원)</label>
+              <input id="ins-stat-prize" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">총 당첨 횟수</label>
-              <input id="ins-stat-wins" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 당첨 횟수</label>
+              <input id="ins-stat-wins" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">최고 등수 (1~5)</label>
-              <input id="ins-stat-best" type="number" placeholder="5" min="1" max="5" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;box-sizing:border-box;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">최고 등수 (1~5)</label>
+              <input id="ins-stat-best" type="number" placeholder="5" min="1" max="5" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
             </div>
           </div>
           <button onclick="adminUpdateStats()" style="width:100%;padding:9px;background:#475569;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;">전적 업데이트하기</button>
@@ -6496,7 +6540,7 @@ async function adminTab(tab, btn) {
           <td style="color:${roiColor};font-weight:700;">${roi !== '-' ? (parseFloat(roi) >= 0 ? '+' : '') + roi + '%' : '-'}</td>
           <td>${s.best_rank ? s.best_rank + '등' : '-'}</td>
           <td>${fmtCnt(s.rank_1_count||0)}회</td>
-          <td><button data-uid="${s.user_id}" data-nick="${sNickMap[s.user_id]||''}" data-tickets="${s.total_tickets||0}" data-spent="${s.total_spent||0}" data-prize="${s.total_prize||0}" data-wins="${s.total_wins||0}" data-best="${s.best_rank||0}" onclick="adminEditStat(this.dataset.uid,this.dataset.nick,+this.dataset.tickets,+this.dataset.spent,+this.dataset.prize,+this.dataset.wins,+this.dataset.best)" style="padding:3px 8px;background:#f1f5f9;color:#475569;border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
+          <td><button data-uid="${s.user_id}" data-nick="${sNickMap[s.user_id]||''}" data-tickets="${s.total_tickets||0}" data-spent="${s.total_spent||0}" data-prize="${s.total_prize||0}" data-wins="${s.total_wins||0}" data-best="${s.best_rank||0}" onclick="adminEditStat(this.dataset.uid,this.dataset.nick,+this.dataset.tickets,+this.dataset.spent,+this.dataset.prize,+this.dataset.wins,+this.dataset.best)" style="padding:3px 8px;background:#f1f5f9;color:var(--text-muted);border:none;border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
         </tr>`;
       }).join('')}</tbody></table>`;
     }
@@ -6529,7 +6573,7 @@ function adminEditUser(id, nick, email) {
   row.innerHTML = `
     <td colspan="4">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span style="font-size:11px;font-weight:700;color:#64748b;">닉네임</span>
+        <span style="font-size:11px;font-weight:700;color:var(--text-muted);">닉네임</span>
         <input class="adm-input" id="edit-unick-${id}" value="${nick.replace(/"/g,'&quot;')}" style="width:120px;">
         <button class="adm-save-btn" onclick="adminSaveUser('${id}')">저장</button>
         <button class="adm-cancel-btn" onclick="adminTab('users')">취소</button>
@@ -6555,11 +6599,11 @@ function adminEditTicket(id, drwNo, games, prize) {
   row.innerHTML = `
     <td colspan="5">
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0;">
-        <span style="font-size:11px;font-weight:700;color:#64748b;">회차</span>
+        <span style="font-size:11px;font-weight:700;color:var(--text-muted);">회차</span>
         <input class="adm-input" id="edit-tdrw-${id}" value="${drwNo}" style="width:60px;" type="number">
-        <span style="font-size:11px;font-weight:700;color:#64748b;">게임수</span>
+        <span style="font-size:11px;font-weight:700;color:var(--text-muted);">게임수</span>
         <input class="adm-input" id="edit-tgame-${id}" value="${games}" style="width:55px;" type="number">
-        <span style="font-size:11px;font-weight:700;color:#64748b;">당첨금</span>
+        <span style="font-size:11px;font-weight:700;color:var(--text-muted);">당첨금</span>
         <input class="adm-input" id="edit-tprize-${id}" value="${prize}" style="width:90px;" type="number">
         <button class="adm-save-btn" onclick="adminSaveTicket('${id}')">저장</button>
         <button class="adm-cancel-btn" onclick="adminTab('tickets')">취소</button>
@@ -6591,15 +6635,15 @@ function adminEditStat(uid, nick, tickets, spent, prize, wins, best) {
   div.innerHTML = `
     <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:12px;">전적 수정 — ${nick}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div><label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">구매 게임수</label>
+      <div><label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">구매 게임수</label>
         <input id="sedit-tickets" type="number" value="${tickets}" class="adm-input"></div>
-      <div><label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">총 투자금</label>
+      <div><label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 투자금</label>
         <input id="sedit-spent" type="number" value="${spent}" class="adm-input"></div>
-      <div><label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">총 당첨금</label>
+      <div><label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 당첨금</label>
         <input id="sedit-prize" type="number" value="${prize}" class="adm-input"></div>
-      <div><label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">총 당첨 횟수</label>
+      <div><label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 당첨 횟수</label>
         <input id="sedit-wins" type="number" value="${wins}" class="adm-input"></div>
-      <div><label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">최고 등수</label>
+      <div><label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">최고 등수</label>
         <input id="sedit-best" type="number" value="${best||''}" min="1" max="5" class="adm-input"></div>
     </div>
     <div style="display:flex;gap:8px;">
@@ -6749,16 +6793,16 @@ function renderProfile() {
       <button onclick="shareURL('https://lottobank.pages.dev','LottoBank 프로필')" style="position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border-dashed);color:var(--text-muted);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>공유</button>
       <div class="profile-avatar-circle" onclick="openAvatarPicker()" style="cursor:pointer;position:relative;" title="아바타 변경">
         <span id="prof-avatar-display">${window._myAvatar || nick.charAt(0)||'?'}</span>
-        <span style="position:absolute;bottom:0;right:0;background:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;box-shadow:0 1px 4px rgba(0,0,0,.2);">✏️</span>
+        <span style="position:absolute;bottom:0;right:0;background:var(--paper-white);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;box-shadow:0 1px 4px rgba(0,0,0,.2);">✏️</span>
       </div>
       <div id="avatar-picker-panel" style="display:none;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:10px;margin-bottom:8px;max-width:260px;margin-left:auto;margin-right:auto;">
-        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px;text-align:center;">아바타 선택</div>
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-align:center;">아바타 선택</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
           ${['🎱','🎰','🍀','🎯','💎','👑','🔥','⚡','🌟','🎪','🦁','🐯','🦊','🐺','🦄','🎭','🚀','💫','🎲','🃏'].map(e=>
             `<button onclick="selectAvatar('${e}')" style="width:36px;height:36px;border-radius:50%;border:2px solid ${window._myAvatar===e?'#dc2626':'#e2e8f0'};background:${window._myAvatar===e?'#fff5f5':'transparent'};font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">${e}</button>`
           ).join('')}
         </div>
-        <button onclick="closeAvatarPicker()" style="margin-top:8px;width:100%;border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:11px;cursor:pointer;background:transparent;color:#64748b;font-family:inherit;">닫기</button>
+        <button onclick="closeAvatarPicker()" style="margin-top:8px;width:100%;border:1px solid var(--border-dashed);border-radius:6px;padding:5px;font-size:11px;cursor:pointer;background:transparent;color:var(--text-muted);font-family:inherit;">닫기</button>
       </div>
       <div class="profile-nick">${nick}</div>
       <div class="profile-sub-text">${getMyBadgeHtml()}&nbsp;LottoBank 회원</div>
