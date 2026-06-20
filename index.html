@@ -1066,6 +1066,21 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .profile-block { transition:box-shadow .15s!important; }
 .profile-block:hover { box-shadow:0 4px 20px rgba(0,0,0,.12)!important; }
 [data-theme='dark'] .profile-block:hover { box-shadow:0 4px 20px rgba(0,0,0,.3)!important; }
+
+/* == Task #122: QR result card upgrade == */
+.qr-err-card{display:flex;align-items:flex-start;gap:12px;border-radius:14px;padding:16px 18px;border:1px solid rgba(225,29,72,.25);background:linear-gradient(135deg,rgba(225,29,72,.05),rgba(255,255,255,0));animation:pageFadeIn .3s ease;}
+[data-theme='dark'] .qr-err-card{background:linear-gradient(135deg,rgba(225,29,72,.1),rgba(15,23,42,0));border-color:rgba(225,29,72,.35);}
+.qr-err-icon{font-size:22px;line-height:1;flex-shrink:0;margin-top:1px;}
+.qr-err-title{font-size:13px;font-weight:800;color:#e11d48;margin-bottom:3px;}
+.qr-err-body{font-size:12px;color:var(--text-muted);line-height:1.55;}
+.qr-warn-card{display:flex;align-items:flex-start;gap:12px;border-radius:14px;padding:16px 18px;border:1px solid rgba(245,158,11,.3);background:linear-gradient(135deg,rgba(245,158,11,.05),rgba(255,255,255,0));animation:pageFadeIn .3s ease;}
+[data-theme='dark'] .qr-warn-card{background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(15,23,42,0));border-color:rgba(245,158,11,.4);}
+.qr-warn-title{font-size:13px;font-weight:800;color:#d97706;margin-bottom:3px;}
+.qr-warn-body{font-size:12px;color:var(--text-muted);line-height:1.55;}
+.qr-dup-card{display:flex;align-items:flex-start;gap:12px;border-radius:14px;padding:16px 18px;border:1px solid rgba(139,92,246,.3);background:linear-gradient(135deg,rgba(139,92,246,.05),rgba(255,255,255,0));animation:pageFadeIn .3s ease;}
+[data-theme='dark'] .qr-dup-card{background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(15,23,42,0));border-color:rgba(139,92,246,.4);}
+.qr-dup-title{font-size:13px;font-weight:800;color:#7c3aed;margin-bottom:3px;}
+.qr-dup-body{font-size:12px;color:var(--text-muted);line-height:1.55;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -2708,24 +2723,20 @@ async function verifyRealQR() {
     return;
   }
   if (!parsed) {
-    $('qr-result-display').innerHTML = '<div style="color:var(--b-red);font-size:12px;padding:8px;background:var(--comm-hot-bg,#fee2e2);border-radius:4px;">⚠️ 올바른 동행복권 QR 형식이 아닙니다.<br>동행복권 앱에서 복사한 URL을 그대로 붙여넣어 주세요.</div>';
+    $('qr-result-display').innerHTML = '<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div><div class="qr-warn-title">잘못된 QR 형식</div><div class="qr-warn-body">올바른 동행복권 QR 형식이 아닙니다.<br>동행복권 앱에서 복사한 URL을 그대로 붙여넣어 주세요.</div></div></div>';
     return;
   }
 
   if (usedQrKeys.includes(parsed.key)) {
-    $('qr-result-display').innerHTML = '<div style="color:var(--b-red);font-size:12px;padding:8px;background:var(--comm-hot-bg,#fee2e2);border-radius:4px;">❌ 이미 인증된 영수증입니다. 중복 인증 불가.</div>';
+    $('qr-result-display').innerHTML = '<div class="qr-dup-card"><span class="qr-err-icon">🔁</span><div><div class="qr-dup-title">중복 인증</div><div class="qr-dup-body">이미 인증된 영수증입니다. 중복 인증 불가.</div></div></div>';
     return;
   }
 
-  $('qr-result-display').innerHTML = `<div style="text-align:center;padding:20px 12px;color:var(--text-muted);">
-    <div style="font-size:24px;margin-bottom:8px;animation:spin 1s linear infinite;display:inline-block;">⏳</div>
-    <div style="font-size:12px;font-weight:600;">당첨번호 조회 중...</div>
-    <div style="font-size:10px;margin-top:4px;opacity:.6;">${parsed.round}회차 데이터를 불러오고 있습니다</div>
-  </div>`;
+  $('qr-result-display').innerHTML = `<div class="qr-loading-card"><div class="qr-loading-spinner"></div><div class="qr-loading-text">당첨번호 조회 중...</div><div style="font-size:11px;color:var(--text-muted);opacity:.6;">${parsed.round}회차 데이터를 불러오는 중</div></div>`;
 
   const winData = await fetchLotto(parsed.round);
   if (!winData) {
-    $('qr-result-display').innerHTML = '<div style="color:var(--b-red);font-size:12px;padding:8px;background:var(--comm-hot-bg,#fee2e2);border-radius:4px;">⚠️ 해당 회차 당첨번호를 조회할 수 없습니다. 잠시 후 다시 시도해주세요.</div>';
+    $('qr-result-display').innerHTML = '<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div><div class="qr-warn-title">당첨번호 조회 실패</div><div class="qr-warn-body">해당 회차 당첨번호를 조회할 수 없습니다. 잠시 후 다시 시도해주세요.</div></div></div>';
     return;
   }
 
