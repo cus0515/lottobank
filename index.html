@@ -1424,6 +1424,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
           <div style="font-size:16px;font-weight:900;margin-bottom:2px;">🏆 전국 로또 랭킹</div>
           <div style="font-size:11px;opacity:.5;">QR 인증 데이터 기반 실시간 순위</div>
         </div>
+        <div id="my-rank-banner" style="margin-bottom:10px;"></div>
         <div class="rank-tab-row" id="rank-tab-row" style="overflow-x:auto;padding-bottom:2px;flex-wrap:nowrap;white-space:nowrap;"></div>
         <div id="rank-content"></div>
       </div>
@@ -5980,6 +5981,28 @@ async function renderRank(catId) {
       } catch(_) {}
     }
 
+    // ===== 내 순위 강조 배너 =====
+    const _myBannerEl = $('my-rank-banner');
+    if (_myBannerEl) {
+      if (myUid) {
+        const _myIdx = sorted.findIndex(r => r.user_id === myUid);
+        const _myRankPos = _myIdx >= 0 ? _myIdx + 1 : null;
+        const _myRow = _myIdx >= 0 ? sorted[_myIdx] : null;
+        if (_myRankPos && _myRow) {
+          const _myVal = col.field(_myRow);
+          const _myDisp = col.fmt ? col.fmt(_myVal) : (_myVal + col.unit);
+          const _isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          const _rankEmoji = _myRankPos === 1 ? '🥇' : _myRankPos === 2 ? '🥈' : _myRankPos === 3 ? '🥉' : '🏅';
+          _myBannerEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${_isDark?'linear-gradient(135deg,#2a0f0f,#1a0505)':'linear-gradient(135deg,#fff5f5,#fee2e2)'};border:1.5px solid ${_isDark?'#991b1b':'#fca5a5'};border-radius:10px;"><div style="font-size:28px;line-height:1;">${_rankEmoji}</div><div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:.5px;">내 순위 · ${cat.label}</div><div style="font-size:20px;font-weight:900;color:#dc2626;line-height:1.2;">${_myRankPos}위</div><div style="font-size:11px;color:var(--text-muted);margin-top:1px;">${_myDisp}</div></div><div style="text-align:right;"><div style="font-size:10px;color:#94a3b8;">전체 ${sorted.length}명 중</div><div style="margin-top:4px;background:#dc2626;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;">TOP ${(((_myRankPos-1)/Math.max(sorted.length,1))*100).toFixed(0)}%</div></div></div>`;
+          _myBannerEl.style.display = 'block';
+        } else {
+          // 로그인했지만 목록 외 (통상 정책 50위 밖)
+          _myBannerEl.style.display = 'none';
+        }
+      } else {
+        _myBannerEl.style.display = 'none';
+      }
+    }
     $('rank-content').innerHTML = html;
   } catch(e) {
     $('rank-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--b-red);font-size:12px;">랭킹 로드 실패: ' + e.message + '</div>';
