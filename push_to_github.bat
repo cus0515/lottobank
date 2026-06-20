@@ -1,6 +1,9 @@
 @echo off
-chcp 65001 >nul
-cd /d "%~dp0"
+cd /d "C:\Users\최우석\Desktop\LottoBank"
+echo === GitHub Push Start ===
 git add -A
-git commit -m "chore: sync" --allow-empty
-git pull --rebase orig
+git status
+git commit -m "sync" --allow-empty
+git push origin main
+echo === Done ===
+pause
