@@ -192,6 +192,7 @@ main.chat-hidden .chat-panel { display: none; }
 .left-roi-bar { height:100%; border-radius:4px; transition:width 0.8s ease; }
 .chat-system-row { background:linear-gradient(90deg,#fff7ed,#fff); border-left:3px solid #f59e0b; padding:8px 10px; border-radius:0 6px 6px 0; margin:4px 0; }
 [data-theme="dark"] .chat-system-row { background:linear-gradient(90deg,#1a0f00,#0f172a) !important; border-left-color:#d97706 !important; }
+[data-theme="dark"] .chat-system-row span:last-child { color:#fbbf24 !important; }
 
 .chat-messages { flex:1; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:8px; scroll-behavior:smooth; }
 .chat-row { font-size: 13px; line-height: 1.4; }
@@ -3427,7 +3428,7 @@ function appendChatRow(msg) {
   const esc = t => (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   if (msg.is_system || msg.nickname === 'LottoBank') {
     row.className = 'chat-system-row';
-    row.innerHTML = `<span class="badge b-system"> 시스템</span><span style="font-size:12px;color:#92400e;font-weight:700;">${esc(msg.message)}</span>`;
+    row.innerHTML = `<span class="badge b-system"> 시스템</span><span style="font-size:12px;color:#92400e;font-weight:700;" class="chat-sys-text">${esc(msg.message)}</span>`;
   } else {
     row.className = 'chat-row';
     row.innerHTML = `${getChatBadgeHtml(msg.verified_title)}<span class="chat-user">${esc(msg.nickname)}:</span><br><span class="chat-text">${esc(msg.message)}</span>`;
@@ -6194,7 +6195,7 @@ async function renderRank(catId) {
     if (periodStart) {
       // 기간 필터: tickets 집계
       const { data: tData } = await sb.from('tickets')
-        .select('user_id, prize_amount, winning_rank')
+        .select('user_id, prize_amount, prize_rank')
         .gte('purchase_date', periodStart);
       if (!tData || !tData.length) {
         $('rank-content').innerHTML = `${periodBtns}<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
@@ -6212,11 +6213,11 @@ async function renderRank(catId) {
         a.total_spent += 1000;
         const p = t.prize_amount || 0;
         if (p > 0) { a.total_wins++; a.total_prize += p; }
-        if (t.winning_rank === 1) a.rank_1_count++;
-        else if (t.winning_rank === 2) a.rank_2_count++;
-        else if (t.winning_rank === 3) a.rank_3_count++;
-        else if (t.winning_rank === 4) a.rank_4_count++;
-        else if (t.winning_rank === 5) a.rank_5_count++;
+        if (t.prize_rank === 1) a.rank_1_count++;
+        else if (t.prize_rank === 2) a.rank_2_count++;
+        else if (t.prize_rank === 3) a.rank_3_count++;
+        else if (t.prize_rank === 4) a.rank_4_count++;
+        else if (t.prize_rank === 5) a.rank_5_count++;
       });
       stats = Object.values(agg);
     } else {
@@ -6381,6 +6382,17 @@ let curCommTab = 'free';
 let commPosts = { free: [], verify: [] };
 let commDisplayLimit = 20;
 let myLikedPostIds = new Set();
+let commChannel = null;
+
+function subscribeComm() {
+  if (commChannel) { try { sb.removeChannel(commChannel); } catch(_){} commChannel = null; }
+  commChannel = sb.channel('comm_realtime')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, async () => {
+      await loadCommunityPosts();
+      toast('🆕 새 게시글이 등록됐습니다');
+    })
+    .subscribe();
+}
 let curCommSort = 'newest';
 let commSearchQuery = '';
 
@@ -6480,18 +6492,43 @@ function renderCommunityList() {
     ${commSearchQuery?`<button onclick="$('comm-search-input').value='';commSearch('')" style="background:var(--comm-hot-bg,#fff5f5);border:1px solid var(--comm-hot-border,#fecaca);border-radius:12px;padding:2px 9px;font-size:10px;font-weight:700;cursor:pointer;color:var(--comm-hot-text,#dc2626);font-family:inherit;">✕ 초기화</button>`:''}
   </div>` : '';
 
+  // 검색 키워드 하이라이트 헬퍼
+  function hlSearch(text, q) {
+    if (!q || !text) return text ? text.replace(/</g,'&lt;') : '';
+    const safe = text.replace(/</g,'&lt;');
+    const safeQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/</g,'&lt;');
+    return safe.replace(new RegExp('(' + safeQ + ')', 'gi'), '<mark style="background:rgba(220,38,38,.18);color:var(--lotto-red);border-radius:2px;padding:0 1px;">$1</mark>');
+  }
+  // 검색 시 본문 컨텍스트 스니펫: 매칭 위치 주변 80자 추출
+  function bodySnippet(body, q) {
+    if (!body) return '';
+    if (q) {
+      const idx = body.toLowerCase().indexOf(q.toLowerCase());
+      if (idx >= 0) {
+        const start = Math.max(0, idx - 20);
+        const end = Math.min(body.length, idx + q.length + 60);
+        const snippet = (start > 0 ? '…' : '') + body.slice(start, end) + (end < body.length ? '…' : '');
+        return hlSearch(snippet, q);
+      }
+    }
+    const plain = body.replace(/</g,'&lt;').slice(0,80) + (body.length > 80 ? '…' : '');
+    return plain;
+  }
+
   const visiblePosts = posts.slice(0, commDisplayLimit);
   const hasMore = posts.length > commDisplayLimit;
   const loadMoreBtn = hasMore ? `<button onclick="commLoadMore()" style="width:100%;margin-top:8px;padding:10px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">더 보기 (${posts.length - commDisplayLimit}개 남음)</button>` : '';
   $('community-content').innerHTML = tagsHtml + visiblePosts.map((p,idx) => {
     const liked = myLikedPostIds.has(p.id);
-    const bodyPreview = p.body ? (p.body.replace(/</g,'&lt;').slice(0,80) + (p.body.length > 80 ? '…' : '')) : '';
+    const bodyPreview = bodySnippet(p.body, commSearchQuery);
     const isHot = (p.likes||0) >= 5;
     const isNew = (Date.now() - new Date(p.created_at).getTime()) < 3600000;
+    const {tag, cleanTitle} = parsePostTag(p.title||'');
+    const titleHl = commSearchQuery ? hlSearch(cleanTitle, commSearchQuery) : cleanTitle.replace(/</g,'&lt;');
     return `<div class="post-card" onclick="openPostDetail('${p.id}')" style="${isHot?'border-color:var(--comm-hot-border,#fecaca);background:linear-gradient(to right,var(--paper-white),var(--comm-hot-bg,rgba(255,245,245,.5)));':''}">
       <div class="post-card-top">
         <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='free'?'자유':'인증'}</span>
-        ${(()=>{const {tag,cleanTitle}=parsePostTag(p.title||'');return tagChip(tag)+`<span class="post-card-title">${cleanTitle.replace(/</g,'&lt;')}</span>`;})()}
+        ${tagChip(tag)}<span class="post-card-title">${titleHl}</span>
         ${isHot ? '<span style="font-size:9px;font-weight:700;color:var(--comm-hot-text,#dc2626);background:var(--comm-hot-bg,#fff5f5);border:1px solid var(--comm-hot-border,#fecaca);border-radius:10px;padding:1px 6px;margin-left:4px;">🔥인기</span>' : ''}
         ${isNew ? '<span style="font-size:9px;font-weight:700;color:#059669;background:var(--comm-new-bg,#f0fdf4);border:1px solid var(--comm-new-border,#86efac);border-radius:10px;padding:1px 6px;margin-left:4px;">NEW</span>' : ''}
       </div>
@@ -6748,6 +6785,7 @@ async function renderCommunity() {
   if (pinput) { pinput.disabled = !isLoggedIn; pinput.placeholder = isLoggedIn ? '클릭하여 글쓰기...' : '로그인 후 글 작성 가능합니다'; }
   collapsePostForm();
   await loadCommunityPosts();
+  subscribeComm();
 }
 
 function updateCommTabCounts() {
@@ -6768,7 +6806,7 @@ function selectPostTag(btn, tag) {
 function openCommunityShare(rankLabel, roundStr) {
   if (!isLoggedIn) { showAuthModal(); return; }
   // 커뮤니티 탭으로 이동
-  showPage('community');
+  go('community');
   // 인증 탭 선택 (verify)
   setTimeout(() => {
     const verifyTab = $('ct-verify');
@@ -7353,13 +7391,4 @@ function renderProfile() {
     <div class="profile-block">
       <div class="profile-block-title">계정 정보</div>
       <div class="profile-row"><span>이메일</span><span class="profile-row-val" style="font-size:12px;">${email}</span></div>
-      <div class="profile-row"><span>인증 등급</span><span class="profile-row-val">${myVerifiedTitle||'일반 회원'}</span></div>
-      <div class="profile-row"><span>가입 방식</span><span class="profile-row-val">이메일 로그인</span></div>
-      <div class="profile-row"><span>가입일</span><span class="profile-row-val" style="font-size:12px;">${currentUser?.created_at ? new Date(currentUser.created_at).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}) : '-'}</span></div>
-    </div>
-    <div class="profile-block">
-      <div class="profile-block-title">나의 활동 요약</div>
-      <div class="profile-row"><span>총 구매 금액</span><span class="profile-row-val">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_spent||0:totalBuy*1000)}</span></div>
-      <div class="profile-row"><span>총 당첨 금액</span><span class="profile-row-val" style="color:var(--lotto-red);font-weight:700;">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</span></div>
-      <div class="profile-row"><span title="투자 대비 수익률 (ROI = (당첨금-투자금)/투자금 ×100)" style="cursor:help;border-bottom:1px dashed var(--border-dashed);">ROI</span><span class="profile-row-val" style="color:${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0&&(prz-inv)/inv*100>=0?'#10b981':'#ef4444';})()};font-weight:700;">${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0?(((prz-inv)/inv*100).toFixed(1)+'%'):'-';})()}</span></div>
-      ${(()=>{const s=i
+      <div class="profile-row"><span>�
