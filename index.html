@@ -3887,7 +3887,7 @@ function go(id) {
     renderCommunity();
   }
   if (id === 'admin')     { renderAdmin(); }
-  if (id === 'profile')   { renderProfile(); rList(); const ms = $('my-numbers-section'); if(ms && isLoggedIn) ms.style.display=''; }
+  if (id === 'profile')   { renderProfile(); rList(); const ms = $('my-numbers-section'); if(ms && isLoggedIn) ms.style.display=''; if(isLoggedIn && !window._ltbTickets) loadProfileRecentTickets(); }
 }
 
 // =====================================================
@@ -5531,7 +5531,7 @@ async function loadTicketHistory() {
 
   try {
     const { data: tickets } = await sb.from('tickets')
-      .select('round_no, prize_rank, prize_amount, purchase_date, game_count, qr_url')
+      .select('round_no, prize_rank, prize_amount, purchase_date, game_count, qr_url, numbers')
       .eq('user_id', currentUser.id)
       .order('round_no', { ascending: false })
       .limit(50);
@@ -5762,6 +5762,22 @@ async function loadTicketHistory() {
   }
 }
 
+// 프로필 페이지 최근 QR 이력 비동기 로드 (전적 탭 미방문 시 사용)
+async function loadProfileRecentTickets() {
+  if (!isLoggedIn || !currentUser || !sb) return;
+  try {
+    const { data } = await sb.from('tickets')
+      .select('round_no, prize_rank, prize_amount, purchase_date, numbers')
+      .eq('user_id', currentUser.id)
+      .order('round_no', { ascending: false })
+      .limit(10);
+    if (data && data.length) {
+      window._ltbTickets = data;
+      // 현재 프로필 페이지에 있으면 재랜더
+      if (document.getElementById('profile-content')) renderProfile();
+    }
+  } catch(_) {}
+}
 
 
 // =====================================================
@@ -6383,13 +6399,21 @@ let commPosts = { free: [], verify: [] };
 let commDisplayLimit = 20;
 let myLikedPostIds = new Set();
 let commChannel = null;
+let _ownPostTs = 0; // 자신이 등록한 직후 Realtime 중복 토스트 방지
 
 function subscribeComm() {
   if (commChannel) { try { sb.removeChannel(commChannel); } catch(_){} commChannel = null; }
   commChannel = sb.channel('comm_realtime')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, async () => {
+      if (Date.now() - _ownPostTs < 3000) return; // 자신이 올린 글은 writePost에서 이미 처리
       await loadCommunityPosts();
       toast('🆕 새 게시글이 등록됐습니다');
+    })
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'posts' }, async () => {
+      await loadCommunityPosts();
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'posts' }, async () => {
+      await loadCommunityPosts();
     })
     .subscribe();
 }
@@ -6577,6 +6601,7 @@ async function writePost() {
     return;
   }
   const postTagPrefix = (_selectedPostTag && _selectedPostTag !== '') ? `[${_selectedPostTag}] ` : '';
+  _ownPostTs = Date.now(); // Realtime 중복 알림 억제
   const { error } = await sb.from('posts').insert({
     user_id: currentUser.id,
     nickname: nick,
@@ -6586,7 +6611,7 @@ async function writePost() {
     likes: 0,
     comment_count: 0,
   });
-  if (error) { toast('❌ 등록 실패: ' + error.message); return; }
+  if (error) { _ownPostTs = 0; toast('❌ 등록 실패: ' + error.message); return; }
   collapsePostForm();
   toast('✅ 게시글이 등록되었습니다');
   await loadCommunityPosts();
@@ -7377,18 +7402,4 @@ function renderProfile() {
             `<button onclick="selectAvatar('${e}')" style="width:36px;height:36px;border-radius:50%;border:2px solid ${window._myAvatar===e?'#dc2626':'var(--border-dashed)'};background:${window._myAvatar===e?(document.documentElement.getAttribute('data-theme')==='dark'?'#2a0f0f':'#fff5f5'):'transparent'};font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">${e}</button>`
           ).join('')}
         </div>
-        <button onclick="closeAvatarPicker()" style="margin-top:8px;width:100%;border:1px solid var(--border-dashed);border-radius:6px;padding:5px;font-size:11px;cursor:pointer;background:transparent;color:var(--text-muted);font-family:inherit;">닫기</button>
-      </div>
-      <div class="profile-nick">${nick}</div>
-      <div class="profile-sub-text">${getMyBadgeHtml()}&nbsp;LottoBank 회원</div>
-    </div>
-    <div class="profile-stats-strip">
-      <div class="profile-stat-cell"><div class="profile-stat-val">${totalBuy}</div><div class="profile-stat-lbl">총 구매</div></div>
-      <div class="profile-stat-cell"><div class="profile-stat-val">${qrCount}</div><div class="profile-stat-lbl">QR 인증</div></div>
-      <div class="profile-stat-cell"><div class="profile-stat-val">${earnedCount}</div><div class="profile-stat-lbl">보유 뱃지</div></div>
-      <div class="profile-stat-cell"><div class="profile-stat-val" style="font-size:13px;font-weight:900;">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</div><div class="profile-stat-lbl">총 당첨금</div></div>
-    </div>
-    <div class="profile-block">
-      <div class="profile-block-title">계정 정보</div>
-      <div class="profile-row"><span>이메일</span><span class="profile-row-val" style="font-size:12px;">${email}</span></div>
-      <div class="profile-row"><span>�
+        <button onclick="closeAvatarPicker()" style="margin-top:8px;width:100%;border:1px solid var(--border-dash
