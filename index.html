@@ -1194,16 +1194,25 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 </head>
 <body>
 <!-- 스크롤 업 버튼 -->
-<button id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="맨 위로"
+<button id="scroll-top-btn" onclick="document.querySelectorAll('.panel-body').forEach(p=>p.scrollTo({top:0,behavior:'smooth'}));window.scrollTo({top:0,behavior:'smooth'});" title="맨 위로"
   style="display:none;position:fixed;bottom:72px;right:16px;z-index:1000;width:40px;height:40px;border-radius:50%;background:var(--lotto-red);color:#fff;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(220,38,38,.4);font-size:18px;line-height:1;transition:opacity .2s,transform .2s;align-items:center;justify-content:center;">↑</button>
 <script>
 (function(){
   const btn = document.getElementById('scroll-top-btn');
   if (!btn) return;
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 400) { btn.style.display='flex'; }
-    else { btn.style.display='none'; }
-  }, { passive: true });
+  // panel-body 스크롤 감지 (desktop) + window 스크롤 감지 (mobile)
+  function checkScroll() {
+    const pbs = document.querySelectorAll('.panel-body');
+    let anyScrolled = Array.from(pbs).some(pb => pb.scrollTop > 400);
+    if (anyScrolled || window.scrollY > 400) {
+      btn.style.display = 'flex';
+    } else {
+      btn.style.display = 'none';
+    }
+  }
+  window.addEventListener('scroll', checkScroll, { passive: true });
+  // panel-body 스크롤도 감지
+  document.addEventListener('scroll', checkScroll, { passive: true, capture: true });
 })();
 </script>
 <a href="#main-content" style="position:absolute;left:-9999px;top:6px;background:var(--lotto-red);color:#fff;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:700;z-index:9999;text-decoration:none;" onfocus="this.style.left='6px'" onblur="this.style.left='-9999px'">본문으로 바로가기</a>
@@ -1842,8 +1851,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   </div>
 </div>
 
-<!-- 맨 위로 버튼 -->
-<button id="scroll-top-btn" onclick="document.getElementById('main-content').scrollTop=0" title="맨 위로" style="position:fixed;bottom:72px;right:16px;width:38px;height:38px;border-radius:50%;background:var(--lotto-red);color:#fff;border:none;cursor:pointer;font-size:16px;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(220,38,38,.4);z-index:800;">▲</button>
+<!-- scroll-top-btn은 헤더 위에서 이미 정의됨 (중복 제거) -->
 <div id="toast"></div>
 
 <script>
@@ -7333,5 +7341,4 @@ function renderProfile() {
       <div class="profile-row"><span>최고 등수</span><span class="profile-row-val">${isLoggedIn&&dbStats&&dbStats.best_rank?dbStats.best_rank+'등':'-'}</span></div>
       <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
       <div class="profile-row"><span>연금복권 등록</span><span class="profile-row-val">${usedQrKeys.filter(k=>k.startsWith('p')).length}회</span></div>
-      <div class="profile-row"><span>획득 뱃지</span><span class="profile-row-val">${earnedCount} / ${BADGE_DEFS.length}개</span></div>
-      <div class="profile-row"><span>당첨 횟수
+      <div class="profile-row"><span>획득 뱃지</s
