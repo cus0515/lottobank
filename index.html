@@ -5656,7 +5656,8 @@ async function loadTicketHistory() {
         let curLose = 0, maxLose = 0, curWin = 0, maxWin = 0;
         let activeLose = true, activeWin = false;
         let recentStreak = 0, recentDir = 'none';
-        for (const t of tickets) {
+        const streakTickets = tickets.filter(t => t.result !== 'pension'); // 연금복권은 스트릭 집계 제외
+        for (const t of streakTickets) {
           const won = t.prize_rank && t.prize_rank <= 5;
           if (!won) {
             curLose++;
@@ -5670,7 +5671,7 @@ async function loadTicketHistory() {
             curLose = 0;
           }
         }
-        const lastIsWin = tickets[0] && tickets[0].prize_rank && tickets[0].prize_rank <= 5;
+        const lastIsWin = streakTickets[0] && streakTickets[0].prize_rank && streakTickets[0].prize_rank <= 5;
         const currentStreak = lastIsWin ? curWin : curLose;
         const streakLabel = lastIsWin ? '당첨 연속' : '낙첨 연속';
         const streakColor = lastIsWin ? '#16a34a' : '#dc2626';
@@ -7544,5 +7545,4 @@ function renderProfile() {
       <div class="profile-block-title" style="color:#dc2626;">위험 구역</div>
       <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">탈퇴 시 QR 인증 기록, 전적, 뱃지, 게시글이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</p>
       <button onclick="deleteAccount()"
-        style="width:100%;padding:9px;background:var(--comm-hot-bg,#fff5f5);border:1.5px solid #fecaca;border-radius:6px;font-size:13px;font-weight:700;color:#dc2626;cursor:pointer;font-family:inherit;">
-        <sv
+        style="width:100%;padding:9px;background:var(--comm-hot-bg,#fff5f
