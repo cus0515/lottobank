@@ -2737,7 +2737,7 @@ async function renderQRHistory() {
         <div style="font-size:32px;margin-bottom:10px;">🔖</div>
         <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">아직 등록된 QR이 없습니다</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">동행복권 앱에서 구매 내역 QR을 복사해<br>위 입력창에 붙여넣기 하세요.</div>
-        <button onclick="go('qr')" style="padding:8px 20px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,.3);">📱 QR 등록하기</button>
+        <button onclick="go('ticket')" style="padding:8px 20px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,.3);">📱 QR 등록하기</button>
       </div>`;
       return;
     }
@@ -4872,7 +4872,7 @@ function renderPensionSection() {
     </div>`}
 
     <div style="display:flex;gap:6px;margin-top:10px;">
-      <button onclick="go('qr')" style="flex:1;background:rgba(124,58,237,.3);border:1px solid rgba(124,58,237,.5);color:#c4b5fd;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">🏦 연금복권 등록</button>
+      <button onclick="go('ticket')" style="flex:1;background:rgba(124,58,237,.3);border:1px solid rgba(124,58,237,.5);color:#c4b5fd;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">🏦 연금복권 등록</button>
       <button onclick="go('stats')" style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📊 내 전적 보기</button>
     </div>
   </div>`;
@@ -7354,4 +7354,4 @@ function renderProfile() {
       <div class="profile-row"><span>총 구매 금액</span><span class="profile-row-val">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_spent||0:totalBuy*1000)}</span></div>
       <div class="profile-row"><span>총 당첨 금액</span><span class="profile-row-val" style="color:var(--lotto-red);font-weight:700;">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</span></div>
       <div class="profile-row"><span title="투자 대비 수익률 (ROI = (당첨금-투자금)/투자금 ×100)" style="cursor:help;border-bottom:1px dashed var(--border-dashed);">ROI</span><span class="profile-row-val" style="color:${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0&&(prz-inv)/inv*100>=0?'#10b981':'#ef4444';})()};font-weight:700;">${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0?(((prz-inv)/inv*100).toFixed(1)+'%'):'-';})()}</span></div>
-      ${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;if(!inv)return '';const roi=(prz-inv)/inv*100;const pos=roi>=0;const pct=Math.min(Math.abs(roi),100);return `<div style="padding:8px 0 4px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>ROI 게이지</span><span style="font-weight:700;color:${pos?'#10b981':'#ef4444'};">${pos?'+':''}${roi.toFixed(1)}%</span></div><div style="background:var(--bg-light);border-radius:4px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:${pos?'5
+      ${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;if(!inv)return '';const roi=(prz-inv)/inv*100;const pos=roi>=0;const pct=Math.min(Math.abs(roi),100);return `<div style="padding:8px 0 4px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>ROI 게이지</span><span style="font-weight:700;color:${pos?'#10b981':'#ef4444'};">${pos?'+':''}${roi.toFixed(1)}%</span></div><div style="background:var(--bg-light);border-radius:4px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:
