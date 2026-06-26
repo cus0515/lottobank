@@ -5759,14 +5759,21 @@ async function loadTicketHistory() {
             </tr>
           </thead>
           <tbody>
-            ${tickets.map((t,i) => `
-              <tr style="border-bottom:1px solid var(--border-dashed);${i%2===0?'':document.documentElement.getAttribute('data-theme')==='dark'?'background:#1e293b':'background:#fafafa'};${t.prize_rank&&t.prize_rank<=3?(document.documentElement.getAttribute('data-theme')==='dark'?'background:#2a0f0f;':'background:#fff5f5;'):''}"
-              >
+            ${tickets.map((t,i) => {
+              const isPension = t.result === 'pension';
+              const _tdm = document.documentElement.getAttribute('data-theme')==='dark';
+              const trBg = isPension
+                ? (_tdm ? 'background:#1e0a3e;' : 'background:#f5f3ff;')
+                : (t.prize_rank&&t.prize_rank<=3 ? (_tdm?'background:#2a0f0f;':'background:#fff5f5;') : (i%2===0?'':_tdm?'background:#1e293b':'background:#fafafa'));
+              const resultLabel = isPension ? '🏦 연금복권' : rankLabel(t.prize_rank);
+              const resultColor = isPension ? '#7c3aed' : rankColor(t.prize_rank);
+              return `<tr style="border-bottom:1px solid var(--border-dashed);${trBg}">
                 <td style="padding:7px 10px;font-weight:700;">${t.round_no}회</td>
-                <td style="padding:7px 6px;text-align:center;font-weight:700;color:${rankColor(t.prize_rank)};">${rankLabel(t.prize_rank)}</td>
+                <td style="padding:7px 6px;text-align:center;font-weight:700;color:${resultColor};">${resultLabel}</td>
                 <td style="padding:7px 10px;text-align:right;font-weight:${t.prize_amount>0?'700':'400'};color:${t.prize_amount>0?'#16a34a':'#94a3b8'};">${t.prize_amount>0?fmtMFull(t.prize_amount):'-'}</td>
                 <td style="padding:7px 10px;text-align:right;color:var(--text-muted);font-size:11px;">${t.purchase_date||'-'}</td>
-              </tr>`).join('')}
+              </tr>`;
+            }).join('')}
           </tbody>
         </table>
       </div>`;
@@ -7534,8 +7541,4 @@ function renderProfile() {
       <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">탈퇴 시 QR 인증 기록, 전적, 뱃지, 게시글이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</p>
       <button onclick="deleteAccount()"
         style="width:100%;padding:9px;background:var(--comm-hot-bg,#fff5f5);border:1.5px solid #fecaca;border-radius:6px;font-size:13px;font-weight:700;color:#dc2626;cursor:pointer;font-family:inherit;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-        회원 탈퇴
-      </button>
-    </div>
-    <div sty
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" 
