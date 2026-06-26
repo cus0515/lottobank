@@ -766,6 +766,10 @@ input:focus, textarea:focus { box-shadow:0 0 0 3px rgba(220,38,38,.1) !important
 .post-tag-chip[data-tag="인증"] { background:#dbeafe !important; color:#1e40af !important; border:1px solid #93c5fd !important; }
 .post-tag-chip[data-tag="자랑"] { background:#fef3c7 !important; color:#92400e !important; border:1px solid #fde68a !important; }
 .post-tag-chip[data-tag="전략"] { background:#f3e8ff !important; color:#6b21a8 !important; border:1px solid #d8b4fe !important; }
+[data-theme="dark"] .post-tag-chip[data-tag="당첨"] { background:#022c22 !important; color:#34d399 !important; border-color:#065f46 !important; }
+[data-theme="dark"] .post-tag-chip[data-tag="인증"] { background:#0c1a35 !important; color:#60a5fa !important; border-color:#1e3a8a !important; }
+[data-theme="dark"] .post-tag-chip[data-tag="자랑"] { background:var(--amber-bg) !important; color:var(--amber-text) !important; border-color:#92400e !important; }
+[data-theme="dark"] .post-tag-chip[data-tag="전략"] { background:#2d1f5e !important; color:#a78bfa !important; border-color:#4c3b7a !important; }
 /* community empty state */
 .comm-empty { text-align:center; padding:40px 20px; color:var(--text-muted); }
 /* Rank podium bar bg */
@@ -1346,7 +1350,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     <div style="text-align:center">
       <button class="auth-switch" id="auth-switch" onclick="toggleAuthMode()">회원가입</button>
     </div>
-    <div id="admin-test-btn-wrap" style="display:none;margin-top:16px;padding-top:14px;border-top:1px dashed #e2e8f0;">
+    <div id="admin-test-btn-wrap" style="display:none;margin-top:16px;padding-top:14px;border-top:1px dashed var(--border-dashed);">
       <div style="font-size:11px;color:#94a3b8;text-align:center;margin-bottom:8px;">관리자 전용</div>
       <button onclick="adminTestLogin()" style="width:100%;padding:10px;background:#1e293b;color:#fff;font-size:13px;font-weight:700;border:none;border-radius:7px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -4450,7 +4454,7 @@ function genRecommended() {
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:900;color:var(--text-dark);">🗺️ 번호 히트맵 <span style="font-size:10px;font-weight:500;color:var(--text-muted);">최근 ${totalDraws}회 기준</span></div>
         <div style="display:flex;gap:4px;align-items:center;font-size:9px;color:var(--text-muted);">
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fef2f2;border:1px solid #fecaca;"></span>낮음
+          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--comm-hot-bg,#fef2f2);border:1px solid var(--comm-hot-border,#fecaca);"></span>낮음
           <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fca5a5;"></span>중간
           <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc2626;"></span>높음
         </div>
@@ -4459,13 +4463,16 @@ function genRecommended() {
         ${(()=>{
           const maxF = Math.max(...freq.slice(1));
           const minF = Math.min(...freq.slice(1));
+          const _hmDm = document.documentElement.getAttribute('data-theme')==='dark';
           let out = '';
           for(let i=1;i<=45;i++){
             const cnt = freq[i]||0;
             const ratio = maxF>minF ? (cnt-minF)/(maxF-minF) : 0;
-            const bg = ratio>0.7?'#dc2626':ratio>0.4?'#fca5a5':'#fef2f2';
-            const tc = ratio>0.7?'#fff':'#dc2626';
-            const sc = ratio>0.7?'rgba(255,255,255,.75)':'#94a3b8';
+            const bg = _hmDm
+              ? (ratio>0.7?'#dc2626':ratio>0.4?'#9f1239':'#263244')
+              : (ratio>0.7?'#dc2626':ratio>0.4?'#fca5a5':'#fef2f2');
+            const tc = ratio>0.7?'#fff':(_hmDm?(ratio>0.4?'#fda4af':'#94a3b8'):'#dc2626');
+            const sc = ratio>0.7?'rgba(255,255,255,.75)':(_hmDm?'rgba(255,255,255,.35)':'#94a3b8');
             out += '<div style="background:'+bg+';border-radius:4px;padding:3px 1px;text-align:center;cursor:default;" title="'+i+'번: '+cnt+'회">'
               +'<div style="font-size:10px;font-weight:700;color:'+tc+';">'+i+'</div>'
               +'<div style="font-size:8px;color:'+sc+';">'+cnt+'</div>'
@@ -4507,7 +4514,7 @@ function genRecommended() {
         <span style="font-size:10px;font-weight:500;color:var(--text-muted);margin-left:6px;">숫자 입력 후 패턴 확인</span>
       </div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;" id="analyze-balls">
-        ${Array.from({length:6},(_,i)=>`<div style="width:32px;height:32px;border-radius:50%;border:2px dashed #e2e8f0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#94a3b8;cursor:pointer;background:var(--bg-light);" onclick="promptAnalyzeNum(${i})" id="aball-${i}" title="번호 입력">?</div>`).join('')}
+        ${Array.from({length:6},(_,i)=>`<div style="width:32px;height:32px;border-radius:50%;border:2px dashed var(--border-dashed);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#94a3b8;cursor:pointer;background:var(--bg-light);" onclick="promptAnalyzeNum(${i})" id="aball-${i}" title="번호 입력">?</div>`).join('')}
         <button onclick="analyzeMyNums()" style="padding:0 12px;height:32px;border-radius:8px;background:var(--lotto-red);color:#fff;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">분석</button>
         <button onclick="clearAnalyzeNums()" style="padding:0 10px;height:32px;border-radius:8px;background:var(--bg-light);color:var(--text-muted);border:1px solid var(--border-dashed);font-size:11px;cursor:pointer;font-family:inherit;">초기화</button>
       </div>
@@ -4590,7 +4597,7 @@ function genRecommended() {
               else if(matchCnt===3) matchLabel='✅ 5등';
               else matchLabel=matchCnt+'개 일치';
             }
-            const borderColor = matchCnt>=3?'#fecaca':'#e2e8f0';
+            const borderColor = matchCnt>=3?'var(--comm-hot-border,#fecaca)':'var(--border-dashed)';
             const _dmc = document.documentElement.getAttribute('data-theme')==='dark';
             const bg = matchCnt>=3?(_dmc?'#2a0f0f':'#fff5f5'):(_dmc?'#1e293b':'#f8fafc');
             return '<div style="background:'+bg+';border:1px solid '+borderColor+';border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">'
@@ -4864,7 +4871,7 @@ function clearAnalyzeNums() {
   _analyzePicked = [];
   for (let i=0;i<6;i++) {
     const el = document.getElementById(`aball-${i}`);
-    if (el) { el.style.background='var(--bg-light)'; el.style.borderColor='#e2e8f0'; el.style.borderStyle='dashed'; el.style.color='#94a3b8'; el.textContent='?'; }
+    if (el) { el.style.background='var(--bg-light)'; el.style.borderColor='var(--border-dashed)'; el.style.borderStyle='dashed'; el.style.color='#94a3b8'; el.textContent='?'; }
   }
   const r = document.getElementById('analyze-result');
   if (r) r.innerHTML = '';
@@ -5233,11 +5240,11 @@ function openGoalModal() {
     <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:14px;">🎯 당첨 목표 설정</div>
     <div style="margin-bottom:10px;">
       <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;">목표 당첨금 (원)</label>
-      <input id="goal-amount-input" type="number" value="${cur}" min="0" step="1000" placeholder="예: 1000000000" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'">
+      <input id="goal-amount-input" type="number" value="${cur}" min="0" step="1000" placeholder="예: 1000000000" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'">
     </div>
     <div style="margin-bottom:16px;">
       <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;">목표 이름 (선택)</label>
-      <input id="goal-label-input" type="text" value="${label}" maxlength="20" placeholder="예: 전세 보증금, 세계일주..." style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='#e2e8f0'">
+      <input id="goal-label-input" type="text" value="${label}" maxlength="20" placeholder="예: 전세 보증금, 세계일주..." style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'">
     </div>
     <div style="display:flex;gap:8px;">
       <button onclick="document.getElementById('goal-modal-overlay').remove()" style="flex:1;padding:10px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">취소</button>
@@ -5654,7 +5661,7 @@ async function loadTicketHistory() {
             const hasWin = monthMap[m].win > 0;
             return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
               <div style="font-size:9px;color:#94a3b8;font-weight:700;">${monthMap[m].buy}</div>
-              <div style="width:100%;background:${hasWin?'#fef2f2':'#f8fafc'};border:1px solid ${hasWin?'#fecaca':'#e2e8f0'};border-radius:3px;overflow:hidden;height:${Math.max(pct*0.6,4)}px;">
+              <div style="width:100%;background:${hasWin?'var(--comm-hot-bg,#fef2f2)':'var(--bg-light)'};border:1px solid ${hasWin?'var(--comm-hot-border,#fecaca)':'var(--border-dashed)'};border-radius:3px;overflow:hidden;height:${Math.max(pct*0.6,4)}px;">
                 <div style="width:100%;height:100%;background:${hasWin?'#dc2626':'#3b82f6'};opacity:0.7;"></div>
               </div>
             </div>`;
@@ -5672,7 +5679,7 @@ async function loadTicketHistory() {
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:900;color:var(--text-dark);">QR 인증 이력 <span style="font-size:10px;font-weight:500;color:#94a3b8;">(최근 ${tickets.length}건)</span></div>
-        <button onclick="if(window._ltbTickets)downloadTicketCSV(window._ltbTickets);else toast('데이터 없음')" style="background:none;border:1px solid var(--border-dashed);border-radius:5px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='var(--text-muted)'">
+        <button onclick="if(window._ltbTickets)downloadTicketCSV(window._ltbTickets);else toast('데이터 없음')" style="background:none;border:1px solid var(--border-dashed);border-radius:5px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='var(--border-dashed)';this.style.color='var(--text-muted)'">
           <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           CSV 내보내기
         </button>
@@ -6274,7 +6281,7 @@ async function renderRank(catId) {
           // 내 순위 = 나보다 높은 사람 수 + 1
           const myRankPos = sorted.filter(r => col.field(r) > myVal).length + 1;
           html = html.replace('</tbody></table>', `</tbody></table>
-<div style="margin-top:8px;border-top:2px dashed #e2e8f0;padding-top:8px;">
+<div style="margin-top:8px;border-top:2px dashed var(--border-dashed);padding-top:8px;">
   <table class="rank-board-table"><tbody>
     <tr class="my-row" style="font-weight:700;">
       <td class="rank-no-cell" style="color:var(--lotto-red);">${myRankPos}</td>
@@ -6551,9 +6558,14 @@ async function openPostDetail(postId) {
       <div class="comment-section-title">댓글 <span id="comment-count-label">로딩 중...</span></div>
       <div id="comment-list"></div>
       ${isLoggedIn ? `
-        <div class="comment-write-bar">
-          <input type="text" id="comment-input" class="comment-input" placeholder="댓글을 입력하세요..." maxlength="200" onkeyup="if(event.key==='Enter')submitComment('${postId}')">
-          <button class="comment-submit-btn" onclick="submitComment('${postId}')">등록</button>
+        <div class="comment-write-bar" style="flex-direction:column;gap:4px;">
+          <div style="display:flex;gap:6px;">
+            <input type="text" id="comment-input" class="comment-input" placeholder="댓글을 입력하세요..." maxlength="200"
+              onkeyup="if(event.key==='Enter')submitComment('${postId}');const c=document.getElementById('cmt-char-cnt');if(c){c.textContent=this.value.length+'/200';c.style.color=this.value.length>160?'#dc2626':'#94a3b8';}"
+              oninput="const c=document.getElementById('cmt-char-cnt');if(c){c.textContent=this.value.length+'/200';c.style.color=this.value.length>160?'#dc2626':'#94a3b8';}">
+            <button class="comment-submit-btn" onclick="submitComment('${postId}')">등록</button>
+          </div>
+          <div style="text-align:right;"><span id="cmt-char-cnt" style="font-size:10px;color:#94a3b8;">0/200</span></div>
         </div>` : `<div style="padding:10px;background:var(--bg-light);border-radius:6px;font-size:12px;color:var(--text-muted);text-align:center;">로그인 후 댓글을 작성할 수 있습니다</div>`}
     </div>`;
   await loadComments(postId);
@@ -6630,7 +6642,7 @@ async function submitComment(postId) {
   if (btn) { btn.disabled = true; btn.textContent = '등록 중...'; }
   try {
     if (isAdminTestMode) {
-      if (inp) inp.value = '';
+      if (inp) { inp.value = ''; const cc=$('cmt-char-cnt');if(cc)cc.textContent='0/200'; }
       const mockCmt = { id: 'mock-cmt-' + Date.now(), post_id: postId, user_id: currentUser.id, nickname: nick, body, created_at: new Date().toISOString() };
       const cl = $('comment-list');
       if (cl) {
@@ -6647,7 +6659,7 @@ async function submitComment(postId) {
     // 게시글 comment_count 증가
     const cur = [...(commPosts.free||[]),...(commPosts.verify||[])].find(p=>String(p.id)===String(postId));
     if (cur) await sb.from('posts').update({ comment_count: (cur.comment_count||0)+1 }).eq('id', postId);
-    if (inp) inp.value = '';
+    if (inp) { inp.value = ''; const cc=$('cmt-char-cnt');if(cc)cc.textContent='0/200'; }
     await loadComments(postId);
     await loadCommunityPosts();
   } catch(e) {
@@ -7243,7 +7255,7 @@ function renderProfile() {
         <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-align:center;">아바타 선택</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
           ${['🎱','🎰','🍀','🎯','💎','👑','🔥','⚡','🌟','🎪','🦁','🐯','🦊','🐺','🦄','🎭','🚀','💫','🎲','🃏'].map(e=>
-            `<button onclick="selectAvatar('${e}')" style="width:36px;height:36px;border-radius:50%;border:2px solid ${window._myAvatar===e?'#dc2626':'#e2e8f0'};background:${window._myAvatar===e?(document.documentElement.getAttribute('data-theme')==='dark'?'#2a0f0f':'#fff5f5'):'transparent'};font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">${e}</button>`
+            `<button onclick="selectAvatar('${e}')" style="width:36px;height:36px;border-radius:50%;border:2px solid ${window._myAvatar===e?'#dc2626':'var(--border-dashed)'};background:${window._myAvatar===e?(document.documentElement.getAttribute('data-theme')==='dark'?'#2a0f0f':'#fff5f5'):'transparent'};font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">${e}</button>`
           ).join('')}
         </div>
         <button onclick="closeAvatarPicker()" style="margin-top:8px;width:100%;border:1px solid var(--border-dashed);border-radius:6px;padding:5px;font-size:11px;cursor:pointer;background:transparent;color:var(--text-muted);font-family:inherit;">닫기</button>
@@ -7327,26 +7339,4 @@ function renderProfile() {
           const _dmp = document.documentElement.getAttribute('data-theme')==='dark';
           return `<div title="${b.name}: ${b.desc}" style="width:44px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:8px;border:1.5px solid ${ok?(_dmp?'#991b1b':'#fecaca'):(_dmp?'#334155':'#e2e8f0')};background:${ok?(_dmp?'#2a0f0f':'#fff5f5'):(_dmp?'#1e293b':'#f8fafc')};${ok?'':'filter:grayscale(1);opacity:0.4;'}cursor:default;">
             <span style="font-size:20px;line-height:1;">${b.icon}</span>
-            <span style="font-size:8px;font-weight:700;color:${ok?'#dc2626':'#94a3b8'};text-align:center;line-height:1.2;max-width:40px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.name}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>
-    <div class="profile-block">
-      <div class="profile-block-title">닉네임 변경</div>
-      <div style="display:flex;gap:8px;align-items:center;padding:8px 0;">
-        <input type="text" id="nick-input" value="${nick}" maxlength="12"
-          style="flex:1;padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);"
-          onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'">
-        <button id="nick-save-btn" onclick="changeNickname()"
-          style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">저장</button>
-      </div>
-      <div style="font-size:11px;color:var(--text-muted);">2~12자, 한글/영문/숫자 사용 가능</div>
-    </div>
-    <div class="profile-block">
-      <div class="profile-block-title">비밀번호 변경</div>
-      <div style="display:flex;flex-direction:column;gap:8px;padding:8px 0;">
-        <input type="password" id="pw-new" placeholder="새 비밀번호 (8자 이상)" maxlength="50" autocomplete="new-password"
-          style="padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);">
-        <input type="password" id="pw-new2" placeholder="새 비밀번호 확인" maxlength="50" autocomplete="new-password"
-          style="padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-s
+            <span style="font-size:8px;
