@@ -174,7 +174,8 @@ main.chat-hidden .chat-panel { display: none; }
 .emoji-gap { margin-right: 6px; }
 .adm-edit-row { background: #fffbeb; }
 [data-theme="dark"] .adm-edit-row { background:#1a1200 !important; }
-.adm-input { width:100%; padding:4px 6px; border:1px solid #fbbf24; border-radius:4px; font-size:11px; box-sizing:border-box; }
+.adm-input { width:100%; padding:4px 6px; border:1px solid #fbbf24; border-radius:4px; font-size:11px; box-sizing:border-box; background:var(--paper-white); color:var(--text-dark); }
+[data-theme="dark"] .adm-input { background:#1e293b !important; color:#f1f5f9 !important; border-color:#fbbf24 !important; }
 .adm-save-btn { padding:3px 10px; background:#16a34a; color:#fff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; }
 .adm-cancel-btn { padding:3px 8px; background:var(--bg-light); color:var(--text-muted); border:none; border-radius:4px; font-size:11px; cursor:pointer; margin-left:4px; }
 @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
@@ -926,6 +927,13 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 [data-theme="dark"] #qc-4,[data-theme="dark"] #qc-5,[data-theme="dark"] #qc-6 {
   background:#1e293b !important; color:#e2e8f0 !important; border-color:#334155 !important;
 }
+/* Admin insert/stat tab plain inputs dark mode */
+[data-theme="dark"] #admin-table-wrap input:not(.adm-input),
+[data-theme="dark"] #admin-table-wrap select:not(.adm-input) {
+  background:#1e293b !important; color:#f1f5f9 !important; border-color:#475569 !important;
+}
+/* Admin stat edit modal inputs */
+[data-theme="dark"] #stat-edit-modal input { background:#1e293b !important; color:#f1f5f9 !important; border-color:#475569 !important; }
 [data-theme="dark"] #quick-check-result div { color:var(--text-dark); }
 
 /* Scrollbar dark */
@@ -7354,4 +7362,4 @@ function renderProfile() {
       <div class="profile-row"><span>총 구매 금액</span><span class="profile-row-val">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_spent||0:totalBuy*1000)}</span></div>
       <div class="profile-row"><span>총 당첨 금액</span><span class="profile-row-val" style="color:var(--lotto-red);font-weight:700;">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</span></div>
       <div class="profile-row"><span title="투자 대비 수익률 (ROI = (당첨금-투자금)/투자금 ×100)" style="cursor:help;border-bottom:1px dashed var(--border-dashed);">ROI</span><span class="profile-row-val" style="color:${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0&&(prz-inv)/inv*100>=0?'#10b981':'#ef4444';})()};font-weight:700;">${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0?(((prz-inv)/inv*100).toFixed(1)+'%'):'-';})()}</span></div>
-      ${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;if(!inv)return '';const roi=(prz-inv)/inv*100;const pos=roi>=0;const pct=Math.min(Math.abs(roi),100);return `<div style="padding:8px 0 4px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>ROI 게이지</span><span style="font-weight:700;color:${pos?'#10b981':'#ef4444'};">${pos?'+':''}${roi.toFixed(1)}%</span></div><div style="background:var(--bg-light);border-radius:4px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:
+      ${(()=>{const s=i
