@@ -3663,8 +3663,10 @@ async function loadGuestStats() {
     if (tData && tData.length) {
       const freq = new Array(46).fill(0);
       tData.forEach(t => {
-        const nums = Array.isArray(t.numbers) ? t.numbers : (typeof t.numbers === 'string' ? JSON.parse(t.numbers) : []);
-        nums.forEach(n => { if (n >= 1 && n <= 45) freq[n]++; });
+        let nums = Array.isArray(t.numbers) ? t.numbers : (typeof t.numbers === 'string' ? JSON.parse(t.numbers) : []);
+        // 2D 배열 (멀티게임) 평탄화
+        const flatNums = Array.isArray(nums[0]) ? nums.flat() : nums;
+        flatNums.forEach(n => { if (typeof n === 'number' && n >= 1 && n <= 45) freq[n]++; });
       });
       const indexed = freq.map((c,i) => ({ n:i, c })).slice(1);
       const sorted = [...indexed].sort((a,b) => b.c - a.c);
@@ -6525,7 +6527,7 @@ async function loadCommunityPosts() {
     const { data } = await sb.from('posts')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(50);
+      .limit(100);
     if (data) {
       commPosts.free   = data.filter(p => p.tag === 'free');
       commPosts.verify = data.filter(p => p.tag === 'verify');
@@ -7327,25 +7329,9 @@ function renderProfile() {
       <div class="profile-row"><span>총 구매 금액</span><span class="profile-row-val">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_spent||0:totalBuy*1000)}</span></div>
       <div class="profile-row"><span>총 당첨 금액</span><span class="profile-row-val" style="color:var(--lotto-red);font-weight:700;">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</span></div>
       <div class="profile-row"><span title="투자 대비 수익률 (ROI = (당첨금-투자금)/투자금 ×100)" style="cursor:help;border-bottom:1px dashed var(--border-dashed);">ROI</span><span class="profile-row-val" style="color:${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0&&(prz-inv)/inv*100>=0?'#10b981':'#ef4444';})()};font-weight:700;">${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0?(((prz-inv)/inv*100).toFixed(1)+'%'):'-';})()}</span></div>
+      ${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;if(!inv)return '';const roi=(prz-inv)/inv*100;const pos=roi>=0;const pct=Math.min(Math.abs(roi),100);return `<div style="padding:8px 0 4px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>ROI 게이지</span><span style="font-weight:700;color:${pos?'#10b981':'#ef4444'};">${pos?'+':''}${roi.toFixed(1)}%</span></div><div style="background:var(--bg-light);border-radius:4px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:${pos?'50%':'calc(50% - '+pct/2+'%)'};width:${pct/2}%;height:100%;background:${pos?'#10b981':'#ef4444'};border-radius:0 4px 4px 0;transition:width .6s;"></div><div style="position:absolute;left:50%;top:-1px;bottom:-1px;width:1px;background:var(--border-dashed);"></div></div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);margin-top:2px;"><span>-100%</span><span>0</span><span>+100%</span></div></div>`;})()}
       <div class="profile-row"><span>최고 등수</span><span class="profile-row-val">${isLoggedIn&&dbStats&&dbStats.best_rank?dbStats.best_rank+'등':'-'}</span></div>
       <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
       <div class="profile-row"><span>연금복권 등록</span><span class="profile-row-val">${usedQrKeys.filter(k=>k.startsWith('p')).length}회</span></div>
       <div class="profile-row"><span>획득 뱃지</span><span class="profile-row-val">${earnedCount} / ${BADGE_DEFS.length}개</span></div>
-      <div class="profile-row"><span>당첨 횟수</span><span class="profile-row-val">${isLoggedIn&&dbStats?dbStats.total_wins||0:0}회</span></div>
-    </div>
-    ${isLoggedIn ? `
-    <div class="profile-block" style="background:linear-gradient(135deg,rgba(225,29,72,.04),rgba(124,58,237,.04));border-color:rgba(225,29,72,.15);">
-      <div class="profile-block-title" style="color:var(--lotto-red);">🎂 LottoBank 가입 기념일</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div>
-          <div style="font-size:22px;font-weight:900;color:var(--text-dark);letter-spacing:-1px;">
-            ${currentUser?.created_at ? Math.floor((Date.now() - new Date(currentUser.created_at)) / 86400000) : 0}
-            <span style="font-size:13px;font-weight:600;color:var(--text-muted);">일째</span>
-          </div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">
-            가입일: ${currentUser?.created_at ? new Date(currentUser.created_at).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}) : '-'}
-          </div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:10px;color:var(--text-muted);">다음 기념일까지</div>
-  
+      <div class="profile-row"><span>당첨 횟수
