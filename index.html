@@ -487,8 +487,7 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .comment-nick { color:#f1f5f9; }
 [data-theme="dark"] .comment-body { color:#cbd5e1; }
 [data-theme="dark"] .comment-input { background:#0f172a; color:#f1f5f9; border-color:var(--text-muted); }
-[data-theme="dark"] .badge-card-item { background:#263244; border-color:#334155; }
-[data-theme="dark"] .badge-card-item.earned { background:#1a3020; border-color:#166534; }
+/* badge-card-item dark: line 894에서 통합 정의 */
 [data-theme="dark"] .badge-name-text { color:#f1f5f9; }
 [data-theme="dark"] .profile-hero { background:#1e293b; border-color:#334155; }
 [data-theme="dark"] #profile-content div[style*="background:#f8fafc"] { background:#263244 !important; border-color:#334155 !important; }
@@ -891,8 +890,8 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 [data-theme="dark"] .post-tag-badge { background:#334155 !important; color:#94a3b8 !important; }
 
 /* Badge cards dark */
-[data-theme="dark"] .badge-card-item { background:#1e293b !important; border-color:#334155 !important; }
-[data-theme="dark"] .badge-card-item.earned { background:#2d1a1a !important; border-color:#7f1d1d !important; }
+[data-theme="dark"] .badge-card-item { background:#1e293b; border-color:#334155; }
+[data-theme="dark"] .badge-card-item.earned { background:linear-gradient(160deg,rgba(225,29,72,.12),rgba(15,23,42,0)); border-color:rgba(225,29,72,.4); }
 
 /* Profile page inputs */
 [data-theme="dark"] #nick-input { background:#0f172a !important; color:#e2e8f0 !important; border-color:#334155 !important; }
@@ -1182,8 +1181,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .kpi-value.green{color:#059669;}
 [data-theme='dark'] .kpi-box{background:#1e293b;border-color:#334155;}
 [data-theme='dark'] .kpi-box.hl{background:linear-gradient(160deg,rgba(225,29,72,.12),rgba(15,23,42,0));border-color:rgba(225,29,72,.35);}
-[data-theme='dark'] .badge-card-item{background:#1e293b;border-color:#334155;}
-[data-theme='dark'] .badge-card-item.earned{background:linear-gradient(160deg,rgba(225,29,72,.1),rgba(15,23,42,0));border-color:rgba(225,29,72,.35);}
+/* badge-card-item dark: line 894에서 통합 정의 */
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -1303,6 +1301,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     <span class="mob-drawer-logo">🎱 LottoBank</span>
     <button class="mob-drawer-close" onclick="closeMobMenu()">✕</button>
   </div>
+  <button class="mob-menu-item" onclick="go('home');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 홈</button>
   <button class="mob-menu-item" onclick="go('result');closeMobMenu()">회차 조회</button>
   <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 번호 분석</button>
   <button class="mob-menu-item" onclick="go('rank');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> 랭킹</button>
@@ -2096,6 +2095,15 @@ function parseQRUrl(url) {
       for (let i = 0; i < 12; i += 2) nums.push(parseInt(g.slice(i, i+2)));
       nums.sort((a, b) => a - b);
       return { type: 'lotto', round: parseInt(oldFmt[1]), games: [nums], nums, key: v };
+    }
+
+    // 연금복권 720+ 포맷: {4}j{2조}{6번호}
+    const pensionFmt = v.match(/^(\d{4})j(\d{2})(\d{6})/);
+    if (pensionFmt) {
+      const round = parseInt(pensionFmt[1]);
+      const jo    = parseInt(pensionFmt[2]);
+      const no    = parseInt(pensionFmt[3]);
+      return { type: 'pension', round, jo, no, key: 'p' + v };
     }
 
     return null;
@@ -3736,7 +3744,7 @@ async function saveTicketToDB(parsed, winData, gameResults) {
       round_no: parsed.round,
       numbers: parsed.games[0],
       game_count: parsed.games.length,
-      purchase_date: winData.drwNoDate || null,
+      purchase_date: winData.date || null,
       result: 'checked',
       prize_rank: bestResult.rank <= 5 ? bestResult.rank : null,
       prize_amount: totalPrize,
@@ -7399,7 +7407,4 @@ function renderProfile() {
         <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-align:center;">아바타 선택</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
           ${['🎱','🎰','🍀','🎯','💎','👑','🔥','⚡','🌟','🎪','🦁','🐯','🦊','🐺','🦄','🎭','🚀','💫','🎲','🃏'].map(e=>
-            `<button onclick="selectAvatar('${e}')" style="width:36px;height:36px;border-radius:50%;border:2px solid ${window._myAvatar===e?'#dc2626':'var(--border-dashed)'};background:${window._myAvatar===e?(document.documentElement.getAttribute('data-theme')==='dark'?'#2a0f0f':'#fff5f5'):'transparent'};font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">${e}</button>`
-          ).join('')}
-        </div>
-        <button onclick="closeAvatarPicker()" style="margin-top:8px;width:100%;border:1px solid var(--border-dash
+            `<button onclick="selectAvatar('${e}')" style="width:36px;height:3
