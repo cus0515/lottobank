@@ -1816,7 +1816,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
         <div class="chat-row"><span class="badge b-guest">팁</span><span class="chat-user">번호수집가:</span><br><span class="chat-text">동행복권 앱 → QR 조회 → URL 복사 → LottoBank QR 탭 붙여넣기 👍</span></div>
       </div>
       <div class="chat-input-area">
-        <input type="text" id="chat-input" class="chat-input" placeholder="로그인 후 실시간 대화에 참여해보세요." onkeyup="if(event.key==='Enter')sendChat()" disabled>
+        <input type="text" id="chat-input" class="chat-input" placeholder="로그인 후 실시간 대화에 참여해보세요." maxlength="200" onkeyup="if(event.key==='Enter')sendChat()" disabled>
         <button class="btn-send" onclick="sendChat()">전송</button>
       </div>
     </div>
@@ -2216,7 +2216,7 @@ function renderHomeLive() {
         <div style="font-size:11px;font-weight:700;color:${_dmF?'#fbbf24':'#92400e'};margin-bottom:6px;">📋 ${thisRound}회차 내 등록 게임 (${myThisRound.length}게임)</div>
         <div style="display:flex;flex-direction:column;gap:4px;">
           ${myThisRound.slice(0,3).map(m=>`<div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap;">${m.nums.map(n=>bH(n)).join('')}</div>`).join('')}
-          ${myThisRound.length>3?`<div style="font-size:10px;color:#92400e;opacity:.7;">+${myThisRound.length-3}게임 더</div>`:''}
+          ${myThisRound.length>3?`<div style="font-size:10px;color:${_dmF?'#fbbf24':'#92400e'};opacity:.7;">+${myThisRound.length-3}게임 더</div>`:''}
         </div>
       </div>`;
     })() : ''}
@@ -2567,7 +2567,7 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
         <div style="font-size:13px;font-weight:900;margin-top:2px;">${a.odd}:${a.even}</div>
       </div>
       <div style="background:var(--bg-light);border-radius:8px;padding:8px;text-align:center;">
-        <div style="font-size:10px;color:var(--text-muted);font-weight:700;">차합고</div>
+        <div style="font-size:10px;color:var(--text-muted);font-weight:700;">저/고</div>
         <div style="font-size:13px;font-weight:900;margin-top:2px;">${a.low}:${a.high}</div>
       </div>
       <div style="background:var(--bg-light);border-radius:8px;padding:8px;text-align:center;">
@@ -2592,7 +2592,7 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
             <div style="font-size:11px;font-weight:900;color:${rankColor};">${rankLabel}</div>
           </div>
           <div style="display:flex;gap:4px;flex-wrap:wrap;">${nums.map(n=>bH(n,d.nums.includes(n))).join('')}${bonusMatch?'<span style="font-size:11px;margin-left:2px;color:#7c3aed;font-weight:700;">(+보너스)</span>':''}</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">${matches}갸 일치${bonusMatch&&rank!==2?' +보너스':''}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">${matches}개 일치${bonusMatch&&rank!==2?' +보너스':''}</div>
         </div>`;
       }).join('');
       return `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border-dashed);">
@@ -4030,6 +4030,7 @@ function saveFortuneSet(numsJson) {
 }
 
 function renderFortune() {
+  const _dm = document.documentElement.getAttribute('data-theme') === 'dark';
   const rounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
   const d = latestData;
   if (!d || rounds.length === 0) {
@@ -4225,7 +4226,7 @@ function genRecommended() {
       const color = n<=9?`rgba(239,68,68,${alpha})`:n<=19?`rgba(249,115,22,${alpha})`:n<=29?`rgba(234,179,8,${alpha})`:n<=39?`rgba(59,130,246,${alpha})`:`rgba(107,114,128,${alpha})`;
       const isHot = hot6.includes(n);
       const isCold = cold6.includes(n);
-      cells += `<div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:${color};font-size:10px;font-weight:${isHot?'900':'600'};color:${ratio>0.5?'#fff':'#1e293b'};position:relative;border:${isHot?'2px solid #dc2626':isCold?'2px dashed #94a3b8':'1px solid transparent'};cursor:default;" title="${totalDraws}회 중 ${freq[n]}회 출현">${n}</div>`;
+      cells += `<div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:${color};font-size:10px;font-weight:${isHot?'900':'600'};color:${ratio>0.5?'#fff':(_dm?'#e2e8f0':'#1e293b')};position:relative;border:${isHot?'2px solid #dc2626':isCold?'2px dashed #94a3b8':'1px solid transparent'};cursor:default;" title="${totalDraws}회 중 ${freq[n]}회 출현">${n}</div>`;
     }
     heatmapRows.push(`<div style="display:flex;gap:3px;justify-content:center;">${cells}</div>`);
   }
@@ -5091,6 +5092,22 @@ function toggleDarkMode() {
   localStorage.setItem('ltb-theme', next);
   const btn = $('dark-toggle-btn');
   if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
+  // 다크모드 전환 시 Chart.js 인스턴스 색상 즉시 업데이트
+  setTimeout(() => {
+    const gridColor = next === 'dark' ? '#334155' : '#f1f5f9';
+    const tickColor = next === 'dark' ? '#94a3b8' : '#475569';
+    if (roiChartInstance) {
+      roiChartInstance.options.scales.y.grid.color = gridColor;
+      roiChartInstance.options.scales.x.ticks.color = tickColor;
+      roiChartInstance.update('none');
+    }
+    if (window._monthlyChart) { window._monthlyChart.destroy(); window._monthlyChart = null; }
+    if (window._rankDonut)    { window._rankDonut.destroy();    window._rankDonut = null; }
+    const statsPg = $('pg-stats');
+    const rankPg  = $('pg-rank');
+    if (statsPg && statsPg.style.display !== 'none') renderStats();
+    if (rankPg  && rankPg.style.display  !== 'none') renderRank();
+  }, 50);
 }
 // 페이지 로드 시 다크모드 버튼 아이콘 초기화
 (function() {
@@ -7337,8 +7354,4 @@ function renderProfile() {
       <div class="profile-row"><span>총 구매 금액</span><span class="profile-row-val">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_spent||0:totalBuy*1000)}</span></div>
       <div class="profile-row"><span>총 당첨 금액</span><span class="profile-row-val" style="color:var(--lotto-red);font-weight:700;">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</span></div>
       <div class="profile-row"><span title="투자 대비 수익률 (ROI = (당첨금-투자금)/투자금 ×100)" style="cursor:help;border-bottom:1px dashed var(--border-dashed);">ROI</span><span class="profile-row-val" style="color:${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0&&(prz-inv)/inv*100>=0?'#10b981':'#ef4444';})()};font-weight:700;">${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0?(((prz-inv)/inv*100).toFixed(1)+'%'):'-';})()}</span></div>
-      ${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;if(!inv)return '';const roi=(prz-inv)/inv*100;const pos=roi>=0;const pct=Math.min(Math.abs(roi),100);return `<div style="padding:8px 0 4px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>ROI 게이지</span><span style="font-weight:700;color:${pos?'#10b981':'#ef4444'};">${pos?'+':''}${roi.toFixed(1)}%</span></div><div style="background:var(--bg-light);border-radius:4px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:${pos?'50%':'calc(50% - '+pct/2+'%)'};width:${pct/2}%;height:100%;background:${pos?'#10b981':'#ef4444'};border-radius:0 4px 4px 0;transition:width .6s;"></div><div style="position:absolute;left:50%;top:-1px;bottom:-1px;width:1px;background:var(--border-dashed);"></div></div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);margin-top:2px;"><span>-100%</span><span>0</span><span>+100%</span></div></div>`;})()}
-      <div class="profile-row"><span>최고 등수</span><span class="profile-row-val">${isLoggedIn&&dbStats&&dbStats.best_rank?dbStats.best_rank+'등':'-'}</span></div>
-      <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
-      <div class="profile-row"><span>연금복권 등록</span><span class="profile-row-val">${usedQrKeys.filter(k=>k.startsWith('p')).length}회</span></div>
-      <div class="profile-row"><span>획득 뱃지</s
+      ${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;if(!inv)return '';const roi=(prz-inv)/inv*100;const pos=roi>=0;const pct=Math.min(Math.abs(roi),100);return `<div style="padding:8px 0 4px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>ROI 게이지</span><span style="font-weight:700;color:${pos?'#10b981':'#ef4444'};">${pos?'+':''}${roi.toFixed(1)}%</span></div><div style="background:var(--bg-light);border-radius:4px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:${pos?'5
