@@ -3202,7 +3202,6 @@ async function doAuth() {
   try {
     if (authMode === 'login') {
       const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-      console.log('signIn result:', { data: data?.user?.email, error: error?.message, status: error?.status });
       if (error) throw error;
       closeAuthModal();
       toast('🔓 로그인 완료');
@@ -7407,4 +7406,4 @@ function renderProfile() {
         <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-align:center;">아바타 선택</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
           ${['🎱','🎰','🍀','🎯','💎','👑','🔥','⚡','🌟','🎪','🦁','🐯','🦊','🐺','🦄','🎭','🚀','💫','🎲','🃏'].map(e=>
-            `<button onclick="selectAvatar('${e}')" style="width:36px;height:3
+            `<button onclick="selectAvatar('${e}')" style="width:36px;height:36px;border-radius:50%;border:2px solid ${window._myAvatar===e?'#dc2626':'var(--border-dashed)'};background:${win
