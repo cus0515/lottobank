@@ -2745,7 +2745,7 @@ async function renderQRHistory() {
   }
   try {
     const { data: tks } = await sb.from('tickets')
-      .select('round_no, prize_rank, prize_amount, purchase_date, game_count')
+      .select('round_no, prize_rank, prize_amount, purchase_date, game_count, result')
       .eq('user_id', currentUser.id)
       .order('created_at', { ascending: false })
       .limit(5);
@@ -2780,14 +2780,19 @@ async function renderQRHistory() {
       </div>
       <div style="display:flex;flex-direction:column;gap:5px;">
         ${tks.map(t => {
+          const isPension = t.result === 'pension';
           const rk = t.prize_rank||0;
           const won = rk>=1&&rk<=5;
-          return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:${rankBg(rk)};border:1px solid ${rankBorder(rk)};border-radius:8px;">
+          const dispLabel = isPension ? '🏦 연금복권' : rankLabel(rk);
+          const dispColor = isPension ? '#7c3aed' : rankColor(rk);
+          const dispBg    = isPension ? (_dm?'#1e0a3e':'#f5f3ff') : rankBg(rk);
+          const dispBorder= isPension ? (_dm?'#4c1d95':'#ddd6fe') : rankBorder(rk);
+          return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:${dispBg};border:1px solid ${dispBorder};border-radius:8px;">
             <div>
               <span style="font-size:12px;font-weight:700;color:var(--text-dark);">${t.round_no||'-'}회</span>
-              <span style="font-size:10px;color:var(--text-muted);margin-left:5px;">${t.game_count||1}게임</span>
+              <span style="font-size:10px;color:var(--text-muted);margin-left:5px;">${isPension?'연금복권':(t.game_count||1)+'게임'}</span>
             </div>
-            <span style="font-size:11px;font-weight:900;color:${rankColor(rk)};">${rankLabel(rk)}${won&&t.prize_amount?' · '+fmtMFull(t.prize_amount):''}</span>
+            <span style="font-size:11px;font-weight:900;color:${dispColor};">${dispLabel}${won&&t.prize_amount?' · '+fmtMFull(t.prize_amount):''}</span>
           </div>`;
         }).join('')}
       </div>
@@ -2819,16 +2824,16 @@ async function verifyRealQR() {
       // DB 저장 (pension 타입)
       if (isLoggedIn && currentUser && sb) {
         try {
-          await sb.from('tickets').insert({
+          await sb.from('tickets').upsert({
             user_id: currentUser.id,
             qr_url: parsed.key,
             round_no: parsed.round || 0,
             numbers: [],
             game_count: 0,
-            best_rank: 0,
-            total_prize: 0,
-            ticket_type: 'pension'
-          });
+            result: 'pension',
+            prize_rank: null,
+            prize_amount: 0,
+          }, { onConflict: 'qr_url' });
           insertActivity('qr_register', { round: parsed.round, games: 1, type: 'pension' });
           // 뱃지 체크
           await checkAndAwardBadges();
@@ -3827,7 +3832,7 @@ async function upsertUserStats(gameCount, gameResults, totalPrize = 0, winData =
     rank_4_count:  (c.rank_4_count  || 0) + gameResults.filter(r => r.rank === 4).length,
     rank_5_count:  (c.rank_5_count  || 0) + gameResults.filter(r => r.rank === 5).length,
     updated_at: new Date().toISOString(),
-  });
+  }, { onConflict: 'user_id' });
 }
 
 // =====================================================
@@ -5539,7 +5544,7 @@ async function loadTicketHistory() {
 
   try {
     const { data: tickets } = await sb.from('tickets')
-      .select('round_no, prize_rank, prize_amount, purchase_date, game_count, qr_url, numbers')
+      .select('round_no, prize_rank, prize_amount, purchase_date, game_count, qr_url, numbers, result')
       .eq('user_id', currentUser.id)
       .order('round_no', { ascending: false })
       .limit(50);
@@ -5775,7 +5780,7 @@ async function loadProfileRecentTickets() {
   if (!isLoggedIn || !currentUser || !sb) return;
   try {
     const { data } = await sb.from('tickets')
-      .select('round_no, prize_rank, prize_amount, purchase_date, numbers')
+      .select('round_no, prize_rank, prize_amount, purchase_date, numbers, result')
       .eq('user_id', currentUser.id)
       .order('round_no', { ascending: false })
       .limit(10);
@@ -7469,13 +7474,17 @@ function renderProfile() {
       <div class="profile-block-title" style="display:flex;justify-content:space-between;">📱 최근 QR 등록 이력 <span style="font-weight:600;color:var(--text-muted);font-size:10px;">최근 ${Math.min(window._ltbTickets.length,5)}건</span></div>
       <div style="display:flex;flex-direction:column;gap:6px;">
         ${window._ltbTickets.slice(0,5).map((t,i) => {
+          const isPension = t.result === 'pension';
           const nums = Array.isArray(t.numbers) ? t.numbers : (t.nums || []);
-          const won = t.prize_rank ? t.prize_rank+'등' : '미확인';
-          const wonColor = t.prize_rank ? (t.prize_rank<=2?'#dc2626':'#059669') : '#94a3b8';
+          const won = isPension ? '🏦 연금복권' : (t.prize_rank ? t.prize_rank+'등' : '낙첨');
+          const wonColor = isPension ? '#7c3aed' : (t.prize_rank ? (t.prize_rank<=2?'#dc2626':'#059669') : '#94a3b8');
           const dateStr = t.purchase_date ? new Date(t.purchase_date).toLocaleDateString('ko-KR',{month:'short',day:'numeric'}) : '-';
+          const numDisplay = isPension
+            ? `<span style="font-size:11px;color:#7c3aed;font-weight:700;">720+ 연금복권</span>`
+            : nums.slice(0,6).map(n=>bH(n)).join('');
           return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;${i>0?'border-top:1px solid var(--border-dashed)':''}">
             <div style="font-size:10px;color:var(--text-muted);font-weight:700;min-width:32px;">${dateStr}</div>
-            <div style="display:flex;gap:3px;align-items:center;flex:1;">${nums.slice(0,6).map(n=>bH(n)).join('')}</div>
+            <div style="display:flex;gap:3px;align-items:center;flex:1;">${numDisplay}</div>
             <div style="font-size:11px;font-weight:700;color:${wonColor};">${won}</div>
           </div>`;
         }).join('')}
@@ -7529,18 +7538,4 @@ function renderProfile() {
         회원 탈퇴
       </button>
     </div>
-    <div style="margin-top:8px;">
-      </div>
-    ` : `
-    <div class="profile-block" style="text-align:center;padding:20px;">
-      <div style="font-size:32px;margin-bottom:8px;">🔒</div>
-      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">로그인이 필요합니다</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">프로필을 보려면 먼저 로그인하세요.</div>
-      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
-    </div>
-    `}
-  `;
-}
-</script>
-</body>
-</html>
+    <div sty
