@@ -48,6 +48,16 @@
   --shadow-lg: 0 8px 16px rgba(15,23,42,.08),0 24px 48px rgba(15,23,42,.1);
   --radius-card: 14px;
   --header-h: 64px;
+  --comm-hot-bg: #fff5f5;
+  --comm-hot-border: #fecaca;
+  --comm-hot-text: #dc2626;
+  --comm-analysis-bg: #f5f3ff;
+  --comm-analysis-border: #ddd6fe;
+  --comm-analysis-text: #7c3aed;
+  --comm-new-bg: #f0fdf4;
+  --amber-bg: #fef3c7;
+  --amber-border: #fde68a;
+  --amber-text: #92400e;
 }
 body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-floor); color: var(--text-dark); line-height: 1.5; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; min-height:100vh; }
 
@@ -401,7 +411,7 @@ main.chat-hidden .chat-panel { display: none; }
 .auth-err { color:#dc2626; font-size:12px; font-weight:700; min-height:18px; margin-top:10px; }
 
 /* Dark Mode */
-[data-theme="dark"] { --bg-floor:#0f172a; --paper-white:#1e293b; --text-dark:#f1f5f9; --text-muted:#94a3b8; --border-dashed:#475569; --bg-light:#263244; --amber-bg:#1a1200; --amber-border:#92400e; --amber-text:#fbbf24; }
+[data-theme="dark"] { --bg-floor:#0f172a; --paper-white:#1e293b; --text-dark:#f1f5f9; --text-muted:#94a3b8; --border-dashed:#475569; --bg-light:#263244; --amber-bg:#1a1200; --amber-border:#92400e; --amber-text:#fbbf24; --comm-hot-bg:#3b0a0a; --comm-hot-border:#7f1d1d; --comm-hot-text:#f87171; --comm-analysis-bg:#1e1a2e; --comm-analysis-border:#4c3b7a; --comm-analysis-text:#a78bfa; --comm-new-bg:#0a2818; }
 [data-theme="dark"] body { background:var(--bg-floor); color:var(--text-dark); }
 [data-theme="dark"] header { background:#0a0f1e !important; }
 [data-theme="dark"] .panel { background:#162032; border-color:#1e3a5f; box-shadow:0 2px 4px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.25); }
@@ -1595,9 +1605,9 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           </div>
           <div style="position:relative;">
             <input type="text" id="qr-url-input" class="input-custom" placeholder="로또 6/45 · 연금복권 720+ QR URL 붙여넣기" onkeyup="if(event.key==='Enter')verifyRealQR();qrInputPreview(this.value)" oninput="qrInputPreview(this.value)" style="padding-right:72px;">
-            <div id="qr-input-hint" style="min-height:18px;margin-top:4px;font-size:11px;"></div>
             <button onclick="navigator.clipboard.readText().then(t=>{if($('qr-url-input')){$('qr-url-input').value=t;qrInputPreview(t);}}).catch(()=>{})" title="클립보드에서 붙여넣기" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:var(--lotto-red);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">붙여넣기</button>
           </div>
+          <div id="qr-input-hint" style="min-height:18px;margin-top:4px;font-size:11px;"></div>
           <div style="display:flex;gap:8px;margin-top:8px;">
             <button class="btn-action" onclick="verifyRealQR()" style="background:var(--lotto-red);flex:1;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 당첨 인증하기</button>
             <button class="btn-action" id="cam-btn" onclick="toggleCameraQR()" style="background:#3b82f6;min-width:44px;padding:0 12px;" title="카메라로 QR 스캔"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
@@ -1615,9 +1625,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
             </div>
           </div>
           <div id="qr-result-display" style="margin-top:10px;"></div>
-<div style="margin-top:8px;font-size:10px;color:var(--text-muted);text-align:center;padding:6px;background:var(--bg-light);border-radius:6px;">
-  동행복권 앱 → 구매내역 → QR코드 아이콘 → URL 복사 → 위 입력창에 붙여넣기
-</div>
         </div>
         <!-- QR 등록 가이드 -->
         <details style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:0;margin-bottom:10px;overflow:hidden;">
@@ -1715,13 +1722,16 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <button class="post-write-btn" onclick="expandPostForm()">글쓰기</button>
         </div>
         <div id="post-write-expanded" style="display:none;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px;margin-bottom:10px;">
-          <input type="text" id="post-input-title" class="post-write-input" placeholder="제목을 입력하세요..." style="margin-bottom:8px;width:100%;box-sizing:border-box;" maxlength="100">
+          <div style="position:relative;margin-bottom:8px;">
+            <input type="text" id="post-input-title" class="post-write-input" placeholder="제목을 입력하세요..." style="width:100%;box-sizing:border-box;padding-right:52px;" maxlength="100" oninput="const c=$('post-title-count');if(c){c.textContent=this.value.length+'/100';c.style.color=this.value.length>80?'#dc2626':'#94a3b8'}">
+            <span id="post-title-count" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:#94a3b8;pointer-events:none;">0/100</span>
+          </div>
           <div style="display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap;">
             <span style="font-size:10px;color:var(--text-muted);font-weight:600;align-self:center;">태그</span>
             <button class="post-tag-btn" onclick="selectPostTag(this,'일반')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">일반</button>
             <button class="post-tag-btn" onclick="selectPostTag(this,'후기')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">후기</button>
-            <button class="post-tag-btn" onclick="selectPostTag(this,'당첨')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid #fecaca;border-radius:10px;background:var(--comm-hot-bg,#fff5f5);color:#dc2626;cursor:pointer;">🎉 당첨</button>
-            <button class="post-tag-btn" onclick="selectPostTag(this,'분석')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid #ddd6fe;border-radius:10px;background:#f5f3ff;color:#7c3aed;cursor:pointer;">분석</button>
+            <button class="post-tag-btn" onclick="selectPostTag(this,'당첨')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--comm-hot-border,#fecaca);border-radius:10px;background:var(--comm-hot-bg,#fff5f5);color:var(--comm-hot-text,#dc2626);cursor:pointer;">🎉 당첨</button>
+            <button class="post-tag-btn" onclick="selectPostTag(this,'분석')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--comm-analysis-border,#ddd6fe);border-radius:10px;background:var(--comm-analysis-bg,#f5f3ff);color:var(--comm-analysis-text,#7c3aed);cursor:pointer;">분석</button>
             <button class="post-tag-btn" onclick="selectPostTag(this,'유머')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">😄 유머</button>
           </div>
           <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid var(--border-dashed);border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:var(--text-dark);background:var(--paper-white);" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'" oninput="const c=$('post-body-count');if(c){c.textContent=this.value.length+'/2000';c.style.color=this.value.length>1800?'#dc2626':'var(--text-muted)'}"></textarea>
@@ -4304,7 +4314,24 @@ function genRecommended() {
       </div>
     </div>
 
-    <!-- 1-3. 통계 기반 5세트 (펼치기/접기) -->
+    <!-- 1-3. 주간 행운 번호 (핫/콜드 통계 기반, 주마다 고정) -->
+    <div style="background:linear-gradient(135deg,#0a1628,#1e3a8a);border-radius:12px;padding:14px;margin-bottom:12px;color:#fff;border:1px solid rgba(59,130,246,.25);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div>
+          <span style="font-size:12px;font-weight:900;">⭐ 이번 주 행운 번호</span>
+          <span style="font-size:10px;opacity:.45;margin-left:6px;">핫·콜드 균형 조합</span>
+        </div>
+        <span style="font-size:9px;background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);border-radius:10px;padding:2px 8px;font-weight:700;">WEEKLY</span>
+      </div>
+      <div class="ball-context" style="margin:0 0 10px;gap:6px;">${luckyNums.map(n=>bH(n)).join('')}</div>
+      <div style="font-size:10px;opacity:.4;margin-bottom:10px;">최근 ${totalDraws}회 출현 균형 알고리즘 · 매주 월요일 갱신</div>
+      <div style="display:flex;gap:6px;">
+        <button class="dna-refresh-btn" onclick="saveFortuneSet('${JSON.stringify(luckyNums)}')" style="background:rgba(59,130,246,.2);border-color:rgba(59,130,246,.4);">💾 저장</button>
+        <button class="dna-refresh-btn" onclick="copyNumSet(${JSON.stringify(luckyNums)})" style="background:rgba(59,130,246,.2);border-color:rgba(59,130,246,.4);">📋 복사</button>
+      </div>
+    </div>
+
+    <!-- 1-4. 통계 기반 5세트 (펼치기/접기) -->
     <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:14px;margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:900;color:var(--text-dark);">
@@ -4312,10 +4339,10 @@ function genRecommended() {
           전략별 추천 5세트
           <span style="font-size:9px;font-weight:500;color:#94a3b8;margin-left:4px;">매 재생성마다 변경</span>
         </div>
-        <button onclick="renderFortune()" style="font-size:11px;background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;padding:4px 10px;cursor:pointer;color:var(--text-muted);font-weight:700;transition:all .15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">🔄 재생성</button>
+        <button onclick="renderFortune()" style="font-size:11px;background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;padding:4px 10px;cursor:pointer;color:var(--text-muted);font-weight:700;transition:all .15s;" onmouseover="this.style.background='var(--border-dashed)'" onmouseout="this.style.background='var(--bg-light)'">🔄 재생성</button>
       </div>
       ${sets.map((nums, i) => `
-        <div style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;transition:background .15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+        <div style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;transition:background .15s;" onmouseover="this.style.background='var(--border-dashed)'" onmouseout="this.style.background='var(--bg-light)'">
           <div style="flex-shrink:0;min-width:72px;">
             <div style="font-size:9px;font-weight:800;color:var(--text-dark);margin-bottom:1px;">${['🔥','⚖️','🧊','🎯','🎲'][i]} ${['핫번호','밸런스','콜드번호','패턴','랜덤'][i]}</div>
             <span style="font-size:9px;color:#94a3b8;">${setLabels[i]}세트</span>
@@ -6504,7 +6531,7 @@ async function openPostDetail(postId) {
   $('community-content').innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
       <div class="post-detail-back" onclick="closePostDetail()" style="margin:0;">${backSvg} 목록으로</div>
-      ${isLoggedIn && currentUser && post.user_id === currentUser.id ? `<button onclick="deletePost('${postId}')" style="background:none;border:1px solid #fca5a5;color:#ef4444;font-size:11px;cursor:pointer;padding:4px 10px;border-radius:4px;font-weight:700;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">삭제</button>` : ''}
+      ${isLoggedIn && currentUser && post.user_id === currentUser.id ? `<button onclick="deletePost('${postId}')" style="background:none;border:1px solid #fca5a5;color:#ef4444;font-size:11px;cursor:pointer;padding:4px 10px;border-radius:4px;font-weight:700;" onmouseover="this.style.background='rgba(239,68,68,.15)'" onmouseout="this.style.background='none'">삭제</button>` : ''}
     </div>
     <div class="post-detail-wrap" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:16px;margin-bottom:12px;">
       <div style="margin-bottom:6px;">
@@ -7241,7 +7268,7 @@ function renderProfile() {
       <div class="profile-block-title">나의 활동 요약</div>
       <div class="profile-row"><span>총 구매 금액</span><span class="profile-row-val">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_spent||0:totalBuy*1000)}</span></div>
       <div class="profile-row"><span>총 당첨 금액</span><span class="profile-row-val" style="color:var(--lotto-red);font-weight:700;">${fmtMFull(isLoggedIn&&dbStats?dbStats.total_prize||0:0)}</span></div>
-      <div class="profile-row"><span title="투자 대비 수익를 (ROI = (당첨금-미늬금)/미늬금 ×100)" style="cursor:help;border-bottom:1px dashed var(--border-dashed);">ROI</span><span class="profile-row-val" style="color:${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0&&(prz-inv)/inv*100>=0?'#10b981':'#ef4444';})()};font-weight:700;">${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0?(((prz-inv)/inv*100).toFixed(1)+'%'):'-';})()}</span></div>
+      <div class="profile-row"><span title="투자 대비 수익률 (ROI = (당첨금-투자금)/투자금 ×100)" style="cursor:help;border-bottom:1px dashed var(--border-dashed);">ROI</span><span class="profile-row-val" style="color:${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0&&(prz-inv)/inv*100>=0?'#10b981':'#ef4444';})()};font-weight:700;">${(()=>{const s=isLoggedIn&&dbStats;const inv=s?s.total_spent||0:totalBuy*1000;const prz=s?s.total_prize||0:0;return inv>0?(((prz-inv)/inv*100).toFixed(1)+'%'):'-';})()}</span></div>
       <div class="profile-row"><span>최고 등수</span><span class="profile-row-val">${isLoggedIn&&dbStats&&dbStats.best_rank?dbStats.best_rank+'등':'-'}</span></div>
       <div class="profile-row"><span>QR 인증 횟수</span><span class="profile-row-val">${usedQrKeys.length}회</span></div>
       <div class="profile-row"><span>연금복권 등록</span><span class="profile-row-val">${usedQrKeys.filter(k=>k.startsWith('p')).length}회</span></div>
@@ -7322,25 +7349,4 @@ function renderProfile() {
         <input type="password" id="pw-new" placeholder="새 비밀번호 (8자 이상)" maxlength="50" autocomplete="new-password"
           style="padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);">
         <input type="password" id="pw-new2" placeholder="새 비밀번호 확인" maxlength="50" autocomplete="new-password"
-          style="padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);">
-        <button id="pw-change-btn" onclick="changePassword()"
-          style="padding:9px 16px;background:#1e293b;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">비밀번호 변경</button>
-      </div>
-      <div style="font-size:11px;color:var(--text-muted);">8자 이상 입력하세요. 변경 후 재로그인이 필요할 수 있습니다.</div>
-    </div>
-    <div class="profile-block danger-zone" style="border-color:#fecaca;">
-      <div class="profile-block-title" style="color:#dc2626;">위험 구역</div>
-      <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">탈퇴 시 QR 인증 기록, 전적, 뱃지, 게시글이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</p>
-      <button onclick="deleteAccount()"
-        style="width:100%;padding:9px;background:var(--comm-hot-bg,#fff5f5);border:1.5px solid #fecaca;border-radius:6px;font-size:13px;font-weight:700;color:#dc2626;cursor:pointer;font-family:inherit;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-        회원 탈퇴
-      </button>
-    </div>
-    <div style="margin-top:8px;">
-      </div>
-    ` : `
-    <div class="profile-block" style="text-align:center;padding:20px;">
-      <div style="font-size:32px;margin-bottom:8px;">🔒</div>
-      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">로그인이 필요합니다</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-bo
+          style="padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-s
