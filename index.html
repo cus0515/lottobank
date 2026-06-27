@@ -2599,26 +2599,35 @@ function renderPensionResult(d, container, round) {
   try {
     const _sd = document.createElement('div');
     _sd.style.cssText = 'margin-top:10px;';
-    _sd.innerHTML = '<div style="font-size:11px;color:#94a3b8;padding:4px 0;">판매점 조회 중...</div>';
+    _sd.innerHTML = '<div style="font-size:11px;color:#94a3b8;padding:4px 0;">판매소 조회 중...</div>';
     container.appendChild(_sd);
     fetch('/api/lotto-region?round='+round+'&type=pension',{cache:'no-cache'})
       .then(r=>r.json()).then(j=>{
         const s1=j.stores1||[],s2=j.stores2||[];
-        if(!s1.length&&!s2.length){_sd.innerHTML='';return;}
-        let uid=Date.now();
+        if(!s1.length&&!s2.length){
+          if(j._unavailable){
+            _sd.innerHTML='<div style="margin-top:10px;padding-top:8px;border-top:2px solid var(--border-dashed);"><div style="font-size:11px;color:#94a3b8;text-align:center;padding:8px 0;">판매소 정보는 <a href="https://www.dhlottery.co.kr/pt720/result" target="_blank" rel="noopener" style="color:#16a34a;text-decoration:underline;">동행복권 공식 사이트</a>에서 확인하세요.</div></div>';
+          } else {
+            _sd.innerHTML='';
+          }
+          return;
+        }
+        let pUid=Date.now();
+        const _mapSvg='<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
         function _pStore(stores,color,emoji,title){
           if(!stores.length)return'';
-          const rMap={};stores.forEach(s=>{const r=s.region||'기타';rMap[r]=(rMap[r]||0)+1;});
-          const chips=Object.entries(rMap).sort((a,b)=>b[1]-a[1]).map(([r,c])=>`<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
           const autoC=stores.filter(s=>s.auto==='자동').length;
           const manC=stores.filter(s=>s.auto==='수동').length;
           const semiC=stores.filter(s=>s.auto==='반자동').length;
-          const cntStr='자동 <b style="color:'+color+';">'+autoC+'</b> / 수동 <b>'+manC+'</b>'+(semiC>0?' / 반자동 <b>'+semiC+'</b>':'');
-          const rows=stores.map(s=>`<tr style="border-bottom:1px solid var(--border-dashed);"><td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">${s.name}</a></td><td style="padding:4px 6px;font-size:10px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td><td style="padding:4px 6px;font-size:11px;text-align:center;color:var(--text-muted);white-space:nowrap;">${s.auto||'—'}</td></tr>`).join('');
-          uid++;
-          return `<div style="margin-bottom:8px;border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;"><div onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none'" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-light);cursor:pointer;user-select:none;"><div><div style="font-size:12px;font-weight:700;color:${color};white-space:nowrap;">${emoji} ${title} (${stores.length}곳)</div><div style="font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;">${cntStr}</div></div><span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">▲</span></div><div><div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;"><colgroup><col style="width:32%"><col style="width:46%"><col style="width:22%"></colgroup><thead><tr style="background:var(--bg-light);"><th style="padding:4px 6px;text-align:left;font-size:10px;font-weight:600;color:var(--text-muted);">판매점</th><th style="padding:4px 6px;text-align:left;font-size:10px;font-weight:600;color:var(--text-muted);">주소</th><th style="padding:4px 6px;text-align:center;font-size:10px;font-weight:600;color:var(--text-muted);">구분</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+          const rMap={};stores.forEach(s=>{const r=s.region||'기타';rMap[r]=(rMap[r]||0)+1;});
+          const chips=Object.entries(rMap).sort((a,b)=>b[1]-a[1]).map(([r,c])=>`<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
+          const rows=stores.map(s=>`<tr style="border-bottom:1px solid var(--border-dashed);"><td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;" title="${s.name}">${s.name} ${_mapSvg}</a></td><td style="padding:4px 6px;font-size:10px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td><td style="padding:4px 6px;font-size:11px;text-align:center;color:var(--text-muted);white-space:nowrap;">${s.auto||'—'}</td></tr>`).join('');
+          const sid='psb-'+(pUid++);
+          return `<div style="margin-bottom:8px;border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;"><div onclick="(function(el){var b=document.getElementById('${sid}');var arr=el.querySelector('.sarr');if(b.style.display==='none'){b.style.display='';arr.textContent='▲';}else{b.style.display='none';arr.textContent='▼';}})(this)" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-light);cursor:pointer;user-select:none;gap:6px;"><div style="min-width:0;flex:1;"><div style="font-size:12px;font-weight:700;color:${color};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${emoji} ${title} (${stores.length}곳)</div><div style="font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;">자동 <b style="color:${color};">${autoC}</b> / 수동 <b>${manC}</b>${semiC>0?' / 반자동 <b>'+semiC+'</b>':''}</div></div><span class="sarr" style="font-size:10px;color:var(--text-muted);flex-shrink:0;">▲</span></div><div id="${sid}"><div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div><table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;"><colgroup><col style="width:32%"><col style="width:46%"><col style="width:22%"></colgroup><thead><tr style="background:var(--bg-light);"><th style="padding:4px 6px;text-align:left;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">판매점</th><th style="padding:4px 6px;text-align:left;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">주소</th><th style="padding:4px 6px;text-align:center;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">구분</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
         }
-        _sd.innerHTML='<div style="margin-top:10px;padding-top:8px;border-top:2px solid var(--border-dashed);">'+_pStore(s1,'#16a34a','🏆','1등 당첨 판매점')+_pStore(s2,'#2563eb','🥈','2등 당첨 판매점')+'</div>';
+        const _svg1='<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M2 19h20"/><path d="m2 9 5 5 5-8 5 8 5-5"/></svg>';
+        const _svg2='<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg>';
+        _sd.innerHTML='<div style="margin-top:10px;padding-top:8px;border-top:2px solid var(--border-dashed);">'+_pStore(s1,'#16a34a',_svg1,'1등 당첨 판매소')+_pStore(s2,'#2563eb',_svg2,'2등 당첨 판매소')+'</div>';
       }).catch(()=>{_sd.innerHTML='';}); 
   } catch(_){}
 }
