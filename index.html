@@ -120,8 +120,7 @@ main.chat-hidden .chat-panel { display: none; }
 .panel { background: var(--paper-white); border-radius: 14px; border:1px solid rgba(226,232,240,.7); display: flex; flex-direction: column; height: 100%; overflow: hidden; box-shadow: 0 2px 4px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06); }
 .panel-header { padding: 14px 20px; border-bottom: 1px solid var(--border-dashed); font-size: 14px; font-weight: 800; color: var(--text-dark); display: flex; justify-content: space-between; align-items: center; background:var(--paper-white); letter-spacing:-.2px; }
 .panel-body { padding: 16px 18px; overflow-y: auto; flex: 1; scroll-behavior:smooth; }
-@keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .page-fade { animation: pageFadeIn 0.2s ease; }
 
 .lotto-slip { background:var(--paper-white); border: 1px solid rgba(226,232,240,.8); border-radius: 14px; padding: 18px; position: relative; box-shadow: 0 2px 8px rgba(15,23,42,.06); }
@@ -646,7 +645,6 @@ input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px
 [data-theme="dark"] .skeleton { background: linear-gradient(90deg,#1e293b 25%,#334155 50%,#1e293b 75%); background-size:800px 100%; animation:shimmer 1.4s infinite; }
 
 /* 페이지 전환 fade */
-@keyframes pageFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 .page-fade { animation: pageFadeIn .22s ease forwards; }
 
 /* 연금복권 배지 색상 */
@@ -5275,6 +5273,8 @@ async function init() {
   }
 }
 
+document.addEventListener('DOMContentLoaded', () => { init(); });
+
   // Keyboard shortcuts: arrow keys navigate rounds on result page
   document.addEventListener('keydown', (e) => {
     if (document.getElementById('pg-result') && document.getElementById('pg-result').style.display === 'none') return;
@@ -7545,4 +7545,23 @@ function renderProfile() {
       <div class="profile-block-title" style="color:#dc2626;">위험 구역</div>
       <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">탈퇴 시 QR 인증 기록, 전적, 뱃지, 게시글이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</p>
       <button onclick="deleteAccount()"
-        style="width:100%;padding:9px;background:var(--comm-hot-bg,#fff5f
+        style="width:100%;padding:9px;background:var(--comm-hot-bg,#fff5f5);border:1.5px solid #fecaca;border-radius:6px;font-size:13px;font-weight:700;color:#dc2626;cursor:pointer;font-family:inherit;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        회원 탈퇴
+      </button>
+    </div>
+    <div style="margin-top:8px;">
+      </div>
+    ` : `
+    <div class="profile-block" style="text-align:center;padding:20px;">
+      <div style="font-size:32px;margin-bottom:8px;">🔒</div>
+      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">로그인이 필요합니다</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">프로필을 보려면 먼저 로그인하세요.</div>
+      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
+    </div>
+    `}
+  `;
+}
+</script>
+</body>
+</html>
