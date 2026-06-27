@@ -1046,7 +1046,7 @@ input:focus-visible { outline:none; }
 #fortune-content > div[style*='paper-white'] { transition:box-shadow .15s; }
 #fortune-content > div[style*='paper-white']:hover { box-shadow:0 2px 12px rgba(15,23,42,.08)!important; }
 #draw-countdown-block { background:var(--paper-white)!important; border:1px solid var(--border-dashed)!important; box-shadow:none!important; }
-#cd-d, #cd-h, #cd-m, #cd-s { text-shadow:0 2px 8px rgba(0,0,0,.3); }
+#cd-d, #cd-h, #cd-m, #cd-s { text-shadow:none; }
 [data-theme='dark'] .stat-kpi-card { background:#162032; border-color:#1e3a5f; }
 [data-theme='dark'] #fortune-content > div[style*='paper-white']:hover { box-shadow:0 2px 12px rgba(0,0,0,.3)!important; }
 
@@ -1232,8 +1232,9 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
         </div>
     </div>
     <div class="menu-tabs">
+      <button id="m-home" class="menu-btn" onclick="go('home')">홈</button>
       <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
-      <button id="m-fortune" class="menu-btn" onclick="go('fortune')">번호분석</button>
+      <button id="m-fortune" class="menu-btn" onclick="go('fortune')">당첨 인증 피드</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
       <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;color:#dc2626;">관리자</button>
@@ -1275,7 +1276,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
             </div>
           </div>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('ticket')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증</button>
-          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('fortune')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 번호 분석</button>
+          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('fortune')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 당첨 인증 피드</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('stats')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('badge')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg> 뱃지</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('profile')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필</button>
@@ -1298,7 +1299,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   </div>
   <button class="mob-menu-item" onclick="go('home');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 홈</button>
   <button class="mob-menu-item" onclick="go('result');closeMobMenu()">회차 조회</button>
-  <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 번호 분석</button>
+  <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 당첨 인증 피드</button>
   <button class="mob-menu-item" onclick="go('rank');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> 랭킹</button>
   <button class="mob-menu-item" onclick="go('community');closeMobMenu()">커뮤니티</button>
   <div id="mob-auth-section" style="display:none;border-top:2px solid var(--border-dashed);margin-top:4px;">
@@ -1313,11 +1314,11 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 
 <!-- 바텀 네비게이션 -->
 <nav class="mob-bottom-nav" role="navigation" aria-label="하단 메뉴">
-  <button class="mob-nav-btn on" id="mob-btn-result" onclick="go('result')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>회차조회</button>
+  <button class="mob-nav-btn on" id="mob-btn-home" onclick="go('home')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>홈</button>
+  <button class="mob-nav-btn" id="mob-btn-result" onclick="go('result')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>회차조회</button>
   <button class="mob-nav-btn" id="mob-btn-ticket" onclick="go('ticket')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg></span>QR인증</button>
   <button class="mob-nav-btn" id="mob-btn-stats" onclick="go('stats')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>전적</button>
-  <button class="mob-nav-btn" id="mob-btn-badge" onclick="go('badge')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg></span>뱃지</button>
-  <button class="mob-nav-btn" id="mob-btn-fortune" onclick="go('fortune')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>번호분석</button>
+  <button class="mob-nav-btn" id="mob-btn-fortune" onclick="go('fortune')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>인증피드</button>
   <button class="mob-nav-btn" id="mob-btn-more" onclick="openMobMenu()"><span class="mob-nav-icon">☰</span>더보기</button>
 </nav>
 
@@ -1468,13 +1469,12 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg>
               <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">실제 당첨 인증</div><div style="font-size:10px;color:var(--text-muted);">랭킹 진입·커뮤니티 공유</div></div>
             </div>
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);">
+            <div onclick="go('fortune')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);cursor:pointer;">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">번호 분석</div><div style="font-size:10px;color:var(--text-muted);">동향·놓친 번호 전략 확인</div></div>
+              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">실시간 당첨 인증</div><div style="font-size:10px;color:var(--text-muted);">회원들의 최신 인증 소식</div></div>
             </div>
           </div>
           <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 0;font-size:12px;font-weight:900;cursor:pointer;width:100%;letter-spacing:.3px;">무료로 시작하기</button>
-          <div style="text-align:center;margin-top:6px;font-size:10px;color:var(--text-muted);">3초 만에 가입 · 신용카드 불필요</div>
         </div>
         <div id="left-lucky-card" class="left-dashboard-card" style="margin-bottom:10px;background:var(--paper-white);border:1px solid var(--border-dashed);">
   <div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px;">오늘의 행운 점수</div>
@@ -1861,7 +1861,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     <div class="footer-links">
       <a href="javascript:void(0)" onclick="go('community')">커뮤니티</a>
       <a href="javascript:void(0)" onclick="go('rank')">랭킹</a>
-      <a href="javascript:void(0)" onclick="go('fortune')">번호분석</a>
+      <a href="javascript:void(0)" onclick="go('fortune')">당첨 인증 피드</a>
       <span style="color:var(--border-dashed);">|</span>
       <a href="https://dhlottery.co.kr" target="_blank" rel="noopener">동행복권</a>
     </div>
@@ -2211,7 +2211,6 @@ function renderHomeLive() {
   const d = latestData;
   if (!d) { $('home-live').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px;">데이터 로딩 중...</div>'; return; }
   const a = analyzeNumbers(d.nums);
-  const hot = getHotNums();
   $('home-live').innerHTML = `
     <!-- 최신 당첨번호 배너 -->
     <div style="background:linear-gradient(135deg,#991b1b 0%,#b91c1c 100%);border-radius:14px;padding:18px 20px;margin-bottom:14px;color:#fff;box-shadow:0 4px 20px rgba(153,27,27,.35);border:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden;">
@@ -2242,13 +2241,6 @@ function renderHomeLive() {
       </div>
     </div>
 
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div style="font-size:11px;font-weight:800;color:var(--text-dark);">최근 10회차 핫 넘버</div>
-        <button onclick="go('fortune')" style="font-size:10px;color:var(--lotto-red);background:none;border:none;cursor:pointer;font-weight:700;font-family:inherit;padding:0;">번호분석 →</button>
-      </div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;">${hot.map(n => bH(n)).join('')}</div>
-    </div>
     ${isLoggedIn && MY.length > 0 ? (() => {
       const thisRound = d.round;
       const myThisRound = MY.filter(m => String(m.drw) === String(thisRound));
@@ -2299,34 +2291,6 @@ function renderHomeLive() {
 
     <div class="section-mini-title" style="margin-top:2px;"><span>실시간 활동 피드</span><em>최신순</em></div>
     <div id="feed-list" style="min-height:40px;"></div>
-    ${isLoggedIn ? (() => {
-      const nick = (currentUser && currentUser.user_metadata && currentUser.user_metadata.nickname) || 'user';
-      let seed = 0;
-      for (const c of nick) seed = (seed * 31 + c.charCodeAt(0)) & 0x7fffffff;
-      const today = new Date();
-      const mon = new Date(today);
-      mon.setDate(today.getDate() - today.getDay() + 1);
-      mon.setHours(0,0,0,0);
-      const wSeed = (mon.getTime() / 1000) | 0;
-      let s = (seed ^ wSeed) >>> 0;
-      const nums = [];
-      for (let t = 0; t < 200 && nums.length < 6; t++) {
-        s = (s * 1664525 + 1013904223) >>> 0;
-        const v = (s % 45) + 1;
-        if (!nums.includes(v)) nums.push(v);
-      }
-      nums.sort((a, b) => a - b);
-      const cm = n => n<=9?'#ef4444':n<=19?'#f97316':n<=29?'#eab308':n<=39?'#3b82f6':'#64748b';
-      const balls = nums.map(n => `<div style="width:30px;height:30px;border-radius:50%;background:${cm(n)};display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;">${n}</div>`).join('');
-      return `<div style="margin-top:14px;background:linear-gradient(135deg,#0f172a,#1e1b4b);border-radius:10px;padding:14px;color:#fff;cursor:pointer;" onclick="go('fortune')">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <span style="font-size:11px;font-weight:700;opacity:.6;letter-spacing:.5px;">🧬 이번 주 내 DNA 번호</span>
-          <span style="font-size:10px;opacity:.4;">번호분석 →</span>
-        </div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;">${balls}</div>
-      </div>`;
-    })() : ''}
-
     ${!isLoggedIn ? `<div style="margin-top:14px;background:linear-gradient(135deg,#0f172a,#1e1035);border-radius:16px;padding:20px;color:#fff;position:relative;overflow:hidden;">
       <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(220,38,38,.2) 0%,transparent 70%);pointer-events:none;"></div>
       <div style="font-size:11px;font-weight:700;opacity:.4;letter-spacing:1px;margin-bottom:6px;">START NOW</div>
@@ -2378,10 +2342,10 @@ function rList() {
     w.innerHTML = `<div style="text-align:center;padding:30px 16px;color:var(--text-muted);">
       <div style="font-size:40px;margin-bottom:12px;">🎱</div>
       <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">보관함이 비어 있습니다</div>
-      <div style="font-size:11px;line-height:1.7;margin-bottom:16px;">번호분석 탭에서 추천번호를 저장하거나<br>QR 인증으로 구매 이력을 등록하세요.</div>
+      <div style="font-size:11px;line-height:1.7;margin-bottom:16px;">QR 인증으로 구매 이력을 등록하면<br>당첨 결과와 전적이 자동 반영됩니다.</div>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-        <button onclick="go('fortune')" style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🎯 번호분석</button>
-        <button onclick="go('ticket')" style="padding:9px 16px;background:var(--paper-white);color:var(--text-dark);border:1px solid var(--border-dashed);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 QR 인증</button>
+        <button onclick="go('ticket')" style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">QR 인증</button>
+        <button onclick="go('fortune')" style="padding:9px 16px;background:var(--paper-white);color:var(--text-dark);border:1px solid var(--border-dashed);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">인증 피드</button>
       </div>
     </div>`;
     return;
@@ -2568,7 +2532,7 @@ function renderPensionResult(d, container, round) {
       const siStr = (p.store != null && p.internet != null)
         ? `<span class="winner-type">판매 ${Number(p.store).toLocaleString()}<br>인터넷 ${Number(p.internet).toLocaleString()}</span>`
         : `<span style="color:#94a3b8;font-size:10px;">—</span>`;
-      return `<tr><td style="padding:5px 6px;font-size:11px;font-weight:700;color:${col};">${rankLabels[rk]||rk+'등'}</td><td style="padding:5px 4px;font-size:10px;color:var(--text-muted);text-align:center;">${rankPrizes[rk]||''}</td><td style="padding:5px 4px;font-size:10px;text-align:center;font-weight:700;">${Number(p.total).toLocaleString()}매</td><td style="padding:5px 6px;font-size:10px;font-weight:700;color:var(--text-dark);text-align:right;">${totalStr}</td><td style="padding:5px 6px;font-size:10px;text-align:center;">${siStr}</td></tr>`;
+      return `<tr><td style="font-weight:700;color:${col};">${rankLabels[rk]||rk+'등'}</td><td style="font-size:11px;color:var(--text-muted);">${rankPrizes[rk]||''}</td><td style="font-weight:700;">${Number(p.total).toLocaleString()}매</td><td style="font-weight:800;color:var(--text-dark);">${totalStr}</td><td>${siStr}</td></tr>`;
     }).join('');
   }
 
@@ -2589,8 +2553,8 @@ function renderPensionResult(d, container, round) {
     ${prizes.length > 0 ? `
     <div style="border-top:1px solid var(--border-dashed);padding-top:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">등수별 당첨 현황</div>
-      <table style="width:100%;border-collapse:collapse;">
-        <thead><tr style="border-bottom:1px solid var(--border-dashed);"><th style="padding:4px 6px;font-size:9px;color:var(--text-muted);text-align:left;font-weight:700;">등수</th><th style="padding:4px 4px;font-size:9px;color:var(--text-muted);text-align:center;font-weight:700;">당첨금</th><th style="padding:4px 4px;font-size:9px;color:var(--text-muted);text-align:center;font-weight:700;">당첨수</th><th style="padding:4px 6px;font-size:9px;color:var(--text-muted);text-align:right;font-weight:700;">총액</th><th style="padding:4px 6px;font-size:9px;color:var(--text-muted);text-align:center;font-weight:700;">판매/인터넷</th></tr></thead>
+      <table class="prize-table" style="margin-top:0;">
+        <thead><tr><th>등수</th><th>당첨금</th><th>당첨수</th><th>총액</th><th>판매/인터넷</th></tr></thead>
         <tbody>${prizeRows}</tbody>
       </table>
     </div>` : `<div style="border-top:1px solid var(--border-dashed);padding-top:8px;text-align:center;"><div style="font-size:10px;color:var(--text-muted);">1등: 월 700만원 × 20년 · 보너스: 월 100만원 × 10년</div></div>`}
@@ -4085,7 +4049,7 @@ function go(id) {
   pg.classList.add('page-fade');
   const mBtn = $('m-' + id);
   if (mBtn) mBtn.classList.add('on');
-  ['result','ticket','stats','badge','fortune','rank','community'].forEach(k => {
+  ['home','result','ticket','stats','badge','fortune','rank','community'].forEach(k => {
     const btn = $('mob-btn-' + k);
     if (btn) btn.classList.toggle('on', k === id);
   });
@@ -4093,7 +4057,7 @@ function go(id) {
     home:      '최신 당첨 정보',
     result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증 & 번호 저장',
-    fortune:   '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> 번호 출현 패턴 분석',
+    fortune:   '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 실시간 당첨 인증 피드',
     stats:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적',
     badge:     '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg> 획득 뱃지',
     rank:      '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg> 전체 랭킹',
@@ -4103,12 +4067,12 @@ function go(id) {
   };
   $('mid-title').innerHTML = titles[id] || '';
   // 페이지 타이틀 동적 업데이트
-  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', fortune:'번호분석 & 로또 DNA', stats:'나의 전적', badge:'획득 뱃지', rank:'전체 랭킹', community:'커뮤니티', admin:'관리자 패널', profile:'내 프로필', home:'내 번호 보관함' };
+  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', fortune:'실시간 당첨 인증 피드', stats:'나의 전적', badge:'획득 뱃지', rank:'전체 랭킹', community:'커뮤니티', admin:'관리자 패널', profile:'내 프로필', home:'최신 당첨 정보' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
   if (id === 'ticket')    { chgMode(); renderQRHistory(); }
-  if (id === 'fortune')   { ensureRecentData().then(() => renderFortune()); }
+  if (id === 'fortune')   { renderFortune(); }
   if (id === 'stats') {
     $('stats-content').innerHTML = '<div class="skel-card"><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div></div></div>';
     renderStats();
@@ -4281,6 +4245,21 @@ function saveFortuneSet(numsJson) {
 }
 
 function renderFortune() {
+  $('fortune-content').innerHTML = `
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border-dashed);">
+        <div>
+          <div style="font-size:13px;font-weight:900;color:var(--text-dark);">실시간 당첨 인증</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">QR로 확인된 당첨과 회원 활동을 최신순으로 보여드립니다.</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;color:#16a34a;">LIVE</span>
+      </div>
+      <div id="feed-list-live" style="min-height:160px;"></div>
+    </div>
+    <button onclick="go('ticket')" style="width:100%;margin-top:10px;padding:10px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">QR 당첨 인증하기</button>
+  `;
+  renderFeed();
+  return;
   const _dm = document.documentElement.getAttribute('data-theme') === 'dark';
   const rounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
   const d = latestData;
@@ -5405,7 +5384,7 @@ document.addEventListener('keydown', function(e) {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
   if (e.altKey) {
     const keyMap = {'1':'result','2':'ticket','3':'fortune','4':'stats','5':'badge','6':'rank','7':'community','8':'profile'};
-    const nameMap = {'result':'당첨결과','ticket':'QR인증','fortune':'번호분석','stats':'전적','badge':'뱃지','rank':'랭킹','community':'커뮤니티','profile':'프로필'};
+    const nameMap = {'result':'당첨결과','ticket':'QR인증','fortune':'당첨 인증 피드','stats':'전적','badge':'뱃지','rank':'랭킹','community':'커뮤니티','profile':'프로필'};
     if (keyMap[e.key]) { e.preventDefault(); go(keyMap[e.key]); toast('📌 ' + nameMap[keyMap[e.key]]); }
   }
   if (e.key === 'Escape') {
@@ -6229,13 +6208,15 @@ async function renderFeed() {
       : data.map(feedItemHtml).join('');
     const el1 = document.getElementById('feed-list');
     const el2 = document.getElementById('feed-list-left');
+    const el3 = document.getElementById('feed-list-live');
     if (el1) el1.innerHTML = html;
+    if (el3) el3.innerHTML = html;
     if (el2) el2.innerHTML = data && data.length
       ? data.slice(0,5).map(feedItemHtml).join('')
       : '<div style="font-size:11px;color:#94a3b8;padding:4px 0;">활동 없음</div>';
   } catch(e) {
     const msg = '<div style="font-size:11px;color:#94a3b8;">로드 실패</div>';
-    ['feed-list','feed-list-left'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=msg; });
+    ['feed-list','feed-list-left','feed-list-live'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=msg; });
   }
 }
 
@@ -6251,6 +6232,12 @@ function subscribeFeed() {
           const html = feedItemHtml(payload.new, true);
           el.insertAdjacentHTML('afterbegin', html);
           while (el.children.length > 20) el.lastChild.remove();
+        }
+        const el3 = document.getElementById('feed-list-live');
+        if (el3) {
+          const html = feedItemHtml(payload.new, true);
+          el3.insertAdjacentHTML('afterbegin', html);
+          while (el3.children.length > 20) el3.lastChild.remove();
         }
         // 좌측 패널도 업데이트
         const el2 = document.getElementById('feed-list-left');
