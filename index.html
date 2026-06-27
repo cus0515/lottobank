@@ -104,6 +104,7 @@ main.chat-hidden .chat-panel { display: none; }
 .prize-table td { padding:6px 8px; text-align:center; border-bottom:1px solid var(--border-dashed); }
 .prize-table tr:hover td { background:#fafafa; }
 [data-theme="dark"] .prize-table tr:hover td { background:#263244; }
+.round-result-header { background:var(--paper-white) !important; color:var(--text-dark) !important; border-bottom:1px solid var(--border-dashed); }
 #res-pension-ui .prize-table th,
 #res-pension-ui .prize-table td { padding:6px 3px; overflow-wrap:anywhere; }
 .prize-rank-badge { display:inline-block; width:22px; height:22px; border-radius:50%; font-size:10px; font-weight:900; line-height:22px; }
@@ -1583,7 +1584,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
         </div>
 
         <div id="res-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
-          <div id="res-round-header" style="padding:12px 16px;background:var(--lotto-red);color:#fff;display:none;">
+          <div id="res-round-header" class="round-result-header" style="padding:12px 16px;display:none;">
             <div id="res-round-label" style="font-size:16px;font-weight:900;"></div>
           </div>
           <div style="padding:16px;">
@@ -1605,7 +1606,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <button id="pen-next-btn" onclick="penNavStep(-1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
         </div>
         <div id="pen-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
-          <div id="pen-round-header" style="padding:12px 16px;background:#16a34a;color:#fff;display:none;">
+          <div id="pen-round-header" class="round-result-header" style="padding:12px 16px;display:none;">
                         <div id="pen-round-label" style="font-size:16px;font-weight:900;"></div>
           </div>
           <div style="padding:16px;">
@@ -2176,7 +2177,7 @@ function renderLatestOnLeft(data) {
       <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
       <td style="font-size:11px;color:var(--text-muted);">${p.cond}</td>
       <td style="font-weight:700;">${cntStr}</td>
-      <td style="font-weight:700;color:var(--lotto-red);">${p.rank===1||p.rank===2?fmtMFull(p.amt):fmtMFull(p.amt)}</td>
+      <td style="font-weight:700;color:var(--text-dark);">${p.rank===1||p.rank===2?fmtMFull(p.amt):fmtMFull(p.amt)}</td>
       <td${p.rank<=2?` id="h-auto-${p.rank}"`:''}>${autoStr}</td>
     </tr>`;
   }).join('');
@@ -2524,7 +2525,7 @@ function renderPensionResult(d, container, round) {
   const bnsStr = String(d.bnsRnkVl || '');
   const dateStr = d.drwNoDate || '';
   // 헤더 레이블 날짜 포함 업데이트
-  const _lbl = $('pen-round-label'); if (_lbl && dateStr) _lbl.innerHTML = `제 <span style="color:#fbbf24;font-size:20px;">${round}</span>회 &nbsp;·&nbsp; ${dateStr}`;
+  const _lbl = $('pen-round-label'); if (_lbl && dateStr) _lbl.innerHTML = `제 <span style="color:#16a34a;font-size:20px;">${round}</span>회 &nbsp;·&nbsp; ${dateStr}`;
   const prizes = Array.isArray(d.prizes) ? d.prizes : [];
 
   const digitLabels = ['십만','만','천','백','십','일'];
@@ -2571,7 +2572,7 @@ function renderPensionResult(d, container, round) {
       <div style="font-size:11px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">등수별 당첨 현황</div>
       <table class="prize-table" style="margin-top:0;table-layout:fixed;font-size:11px;">
         <colgroup><col style="width:11%"><col style="width:23%"><col style="width:14%"><col style="width:29%"><col style="width:23%"></colgroup>
-        <thead><tr><th>등수</th><th>당첨금</th><th>당첨수</th><th>총액</th><th>판매/인터넷</th></tr></thead>
+        <thead><tr><th>등수</th><th>조건</th><th>당첨수</th><th>당첨금</th><th>구입 형태</th></tr></thead>
         <tbody>${prizeRows}</tbody>
       </table>
     </div>` : `<div style="border-top:1px solid var(--border-dashed);padding-top:8px;text-align:center;"><div style="font-size:10px;color:var(--text-muted);">1등: 월 700만원 × 20년 · 보너스: 월 100만원 × 10년</div></div>`}
@@ -2735,7 +2736,7 @@ async function chgRes() {
   const a = analyzeNumbers(d.nums);
   // Update result card header
   const _rh = $('res-round-header'); const _rl = $('res-round-label');
-  if (_rh) { _rh.style.display='block'; if(_rl) _rl.innerHTML=`제 <span style='color:#fbbf24;font-size:20px;'>${d.round}</span>회 &nbsp;·&nbsp; ${d.date}`; }
+  if (_rh) { _rh.style.display='block'; if(_rl) _rl.innerHTML=`제 <span style='color:var(--lotto-red);font-size:20px;'>${d.round}</span>회 &nbsp;·&nbsp; ${d.date}`; }
 $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
     '<span style="font-weight:900;color:var(--text-muted);font-size:20px;margin:0 4px;">+</span>' + bH(d.bonus);
 
@@ -2767,8 +2768,8 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
         <th>등수</th>
         <th>조건</th>
         <th>당첨수</th>
-        <th>1인당</th>
-        <th>자동/수동</th>
+        <th>당첨금</th>
+        <th>구입 형태</th>
       </tr></thead>
       <tbody>
         ${prizes.map(p => {
@@ -2783,7 +2784,7 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
             <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
             <td style="font-size:11px;color:var(--text-muted);">${p.cond}</td>
             <td style="font-weight:700;">${cntStr}</td>
-            <td style="font-weight:800;color:var(--lotto-red);">${p.rank<=2?fmtMFull(p.amt):fmtMFull(p.amt)}</td>
+            <td style="font-weight:800;color:var(--text-dark);">${p.rank<=2?fmtMFull(p.amt):fmtMFull(p.amt)}</td>
             <td${autoId}>${autoStr}</td>
           </tr>`;
         }).join('')}
