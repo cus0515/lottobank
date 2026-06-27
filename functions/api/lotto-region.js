@@ -33,40 +33,36 @@ export async function onRequest(context) {
   // ── 연금복권: pt720 전용 API ──────────────────────────────────────
   if (type === 'pension') {
     try {
-      const endpoints = [
-        `https://www.dhlottery.co.kr/pt720/selectPstPt720WnShpList.do?srchPsltEpsd=${round}`,
-        `https://www.dhlottery.co.kr/pt720/selectPstPt720WnShpInfo.do?srchPsltEpsd=${round}`,
-      ];
-      for (const ep of endpoints) {
-        try {
-          const r = await ft(ep, { headers: { ...headers, Referer: 'https://www.dhlottery.co.kr/pt720/result' } });
-          if (!r.ok) continue;
-          const txt = await r.text();
-          if (!txt || txt.trim().charAt(0) !== '{') continue;
-          const json = JSON.parse(txt);
-          const list = json?.data?.result ?? json?.data?.list ?? json?.data ?? [];
-          if (!Array.isArray(list) || list.length === 0) continue;
+      const apiUrl =
+        `https://www.dhlottery.co.kr/wnprchsplcsrch/selectPtWnShp.do?srchWnShpRnk=all&srchLtEpsd=${round}&srchShpLctn=`;
+      const r = await ft(apiUrl, {
+        headers: {
+          ...headers,
+          Referer: `https://www.dhlottery.co.kr/wnprchsplcsrch/home?ltGds=pt720&ltEpsd=${round}`,
+        },
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
 
-          const stores1 = [], stores2 = [];
-          for (const item of list) {
-            const rnk = item.wnShpRnk ?? item.rnk ?? item.rank;
-            const store = {
-              name: item.shpNm ?? item.storeName ?? item.nm ?? '',
-              addr: (item.shpAddr ?? item.addr ?? item.address ?? '').trim(),
-              region: (item.tm1ShpLctnAddr ?? item.region ?? item.lctnAddr ?? '').trim(),
-              auto: item.atmtPsvYn === 'Q' ? '자동' : item.atmtPsvYn === 'S' ? '수동' : (item.autoYn ?? ''),
-            };
-            if (rnk == 1) stores1.push(store);
-            else if (rnk == 2) stores2.push(store);
-          }
-          if (stores1.length > 0 || stores2.length > 0) {
-            return new Response(JSON.stringify({ stores1, stores2 }), { headers: cors });
-          }
-        } catch(_) {}
+      const json = await r.json();
+      const list = json?.data?.list ?? [];
+      const stores1 = [], stores2 = [];
+
+      for (const item of list) {
+        const rank = String(item.wnShpRnk ?? '');
+        const store = {
+          name: item.shpNm || '',
+          addr: (item.shpAddr || '').trim(),
+          region: (item.region || '').trim(),
+          auto: item.atmtPsvYnTxt || '판매점',
+        };
+        if (rank === '1') stores1.push(store);
+        else if (rank === '2') stores2.push(store);
       }
-    } catch(_) {}
-    // pt720 API 실패 시 빈 응답 반환 (잘못된 데이터 방지)
-    return new Response(JSON.stringify({ stores1: [], stores2: [], _unavailable: true }), { headers: cors });
+
+      return new Response(JSON.stringify({ stores1, stores2 }), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ stores1: [], stores2: [], error: e.message }), { headers: cors });
+    }
   }
 
   // ── 로또: 기존 wnprchsplcsrch 엔드포인트 ────────────────────────
