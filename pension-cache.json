@@ -1,0 +1,18 @@
+{
+  "returnValue": "success",
+  "drwNo": 321,
+  "drwNoDate": "2026-06-25",
+  "wnBndNo": "5",
+  "wnRnkVl": "686709",
+  "bnsRnkVl": "326599",
+  "prizes": [
+    {"rank": 1, "store": 1, "internet": 0, "total": 1, "totAmt": 1680000000},
+    {"rank": 2, "store": 4, "internet": 0, "total": 4, "totAmt": 480000000},
+    {"rank": 3, "store": 45, "internet": 25, "total": 70, "totAmt": 70000000},
+    {"rank": 4, "store": 297, "internet": 293, "total": 590, "totAmt": 59000000},
+    {"rank": 5, "store": 3414, "internet": 3235, "total": 6649, "totAmt": 332450000},
+    {"rank": 6, "store": 30638, "internet": 31394, "total": 62032, "totAmt": 310160000},
+    {"rank": 7, "store": 344320, "internet": 312478, "total": 656798, "totAmt": 656798000},
+    {"rank": 8, "store": 5, "internet": 0, "total": 5, "totAmt": 600000000}
+  ]
+}

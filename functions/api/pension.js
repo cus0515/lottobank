@@ -27,18 +27,20 @@ export async function onRequest(context) {
     } catch (e) { clearTimeout(t); throw e; }
   }
 
-  const baseHeaders = {
+  const browserHeaders = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Accept': 'application/json, text/javascript, */*; q=0.01',
     'Accept-Language': 'ko-KR,ko;q=0.9',
-    'Referer': 'https://www.dhlottery.co.kr/gameResult.do?method=win720s',
+    'Referer': 'https://www.dhlottery.co.kr/pt720/result',
     'X-Requested-With': 'XMLHttpRequest',
   };
 
-  // ── 1) 구 API (common.do) ────────────────────────────────────
+  // ── 1) GitHub 캐시 확인 ──────────────────────────────────────
   try {
     const r = await ft(
-      `https://www.dhlottery.co.kr/common.do?method=getPension720Number&drwNo=${round}`,
-      { headers: baseHeaders }
+      'https://raw.githubusercontent.com/cus0515/lottobank/main/pension-cache.json',
+      {},
+      5000
     );
     if (r.ok) {
+      const txt = aw
