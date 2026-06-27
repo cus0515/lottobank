@@ -1232,10 +1232,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
         </div>
     </div>
     <div class="menu-tabs">
-      <div id="header-countdown-chip" style="display:none;align-items:center;gap:5px;padding:4px 10px;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:20px;font-size:11px;font-weight:700;color:var(--lotto-red);white-space:nowrap;cursor:pointer;" onclick="go('fortune')" title="번호분석으로 이동">
-        <span style="font-size:12px;">🎰</span>
-        <span id="header-cd-text">추첨까지 --:--:--</span>
-      </div>
       <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
       <button id="m-fortune" class="menu-btn" onclick="go('fortune')">번호분석</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
@@ -1391,20 +1387,39 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     <div class="panel-body" style="padding:14px;">
 
       <!-- 추첨 카운트다운 (항상 표시) -->
-      <div id="draw-countdown-block" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <div>
-            <div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;margin-bottom:2px;">다음 추첨까지</div>
-            <div style="font-size:10px;color:var(--text-muted);opacity:.7;">(토요일 오후 8:35 · <span id="next-round-label">-</span>회)</div>
+      <div id="draw-countdown-block" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:10px 14px;margin-bottom:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <!-- 로또 -->
+          <div style="border-right:1px solid var(--border-dashed);padding-right:10px;">
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:800;color:var(--lotto-red);letter-spacing:.5px;">로또 6/45</span>
+            </div>
+            <div style="font-size:9px;color:var(--text-muted);opacity:.7;margin-bottom:6px;">토요일 오후 8:35 · <span id="next-round-label">-</span>회</div>
+            <div style="display:flex;gap:3px;align-items:center;">
+              <div style="text-align:center;"><div id="cd-d" style="font-size:16px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">일</div></div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
+              <div style="text-align:center;"><div id="cd-h" style="font-size:16px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">시</div></div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
+              <div style="text-align:center;"><div id="cd-m" style="font-size:16px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">분</div></div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
+              <div style="text-align:center;"><div id="cd-s" style="font-size:16px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">초</div></div>
+            </div>
           </div>
-          <div style="display:flex;gap:4px;align-items:center;">
-            <div style="text-align:center;"><div id="cd-d" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">일</div></div>
-            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
-            <div style="text-align:center;"><div id="cd-h" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">시</div></div>
-            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
-            <div style="text-align:center;"><div id="cd-m" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">분</div></div>
-            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
-            <div style="text-align:center;"><div id="cd-s" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">초</div></div>
+          <!-- 연금복권 -->
+          <div>
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:800;color:#16a34a;letter-spacing:.5px;">연금복권 720+</span>
+            </div>
+            <div style="font-size:9px;color:var(--text-muted);opacity:.7;margin-bottom:6px;">목요일 오전 10시 · <span id="pen-next-round-label">-</span>회</div>
+            <div style="display:flex;gap:3px;align-items:center;">
+              <div style="text-align:center;"><div id="pen-cd-d" style="font-size:16px;font-weight:900;color:#16a34a;line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">일</div></div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
+              <div style="text-align:center;"><div id="pen-cd-h" style="font-size:16px;font-weight:900;color:#16a34a;line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">시</div></div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
+              <div style="text-align:center;"><div id="pen-cd-m" style="font-size:16px;font-weight:900;color:#16a34a;line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">분</div></div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
+              <div style="text-align:center;"><div id="pen-cd-s" style="font-size:16px;font-weight:900;color:#16a34a;line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">초</div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1580,7 +1595,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 
         <div id="res-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
           <div id="res-round-header" style="padding:12px 16px;background:linear-gradient(135deg,#1a0000,#7f1d1d);color:#fff;display:none;">
-            <div style="font-size:10px;opacity:.5;letter-spacing:1px;font-weight:700;">DRAW RESULT</div>
             <div id="res-round-label" style="font-size:16px;font-weight:900;"></div>
           </div>
           <div style="padding:16px;">
@@ -1603,8 +1617,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
         </div>
         <div id="pen-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
           <div id="pen-round-header" style="padding:12px 16px;background:linear-gradient(135deg,#1a2e0a,#1d4e1a);color:#fff;display:none;">
-            <div style="font-size:10px;opacity:.5;letter-spacing:1px;font-weight:700;">PENSION LOTTERY</div>
-            <div id="pen-round-label" style="font-size:16px;font-weight:900;"></div>
+                        <div id="pen-round-label" style="font-size:16px;font-weight:900;"></div>
           </div>
           <div style="padding:16px;">
             <div id="pen-result-body" style="font-size:13px;color:var(--text-muted);text-align:center;">회차를 선택하세요.</div>
@@ -2550,13 +2563,16 @@ function renderPensionResult(d, container, round) {
       const rk = p.rank;
       const col = rankColors[rk] || '#94a3b8';
       const totalStr = p.totAmt ? fmtMFull(Number(p.totAmt)) : '-';
-      return `<tr><td style="padding:5px 6px;font-size:11px;font-weight:700;color:${col};">${rankLabels[rk]||rk+'등'}</td><td style="padding:5px 4px;font-size:10px;color:var(--text-muted);text-align:center;">${rankPrizes[rk]||''}</td><td style="padding:5px 4px;font-size:10px;color:var(--text-muted);text-align:right;">${Number(p.total).toLocaleString()}매</td><td style="padding:5px 6px;font-size:10px;font-weight:700;color:var(--text-dark);text-align:right;">${totalStr}</td></tr>`;
+      const siStr = (p.store != null && p.internet != null)
+        ? `<span class="winner-type">판매 ${Number(p.store).toLocaleString()}<br>인터넷 ${Number(p.internet).toLocaleString()}</span>`
+        : `<span style="color:#94a3b8;font-size:10px;">—</span>`;
+      return `<tr><td style="padding:5px 6px;font-size:11px;font-weight:700;color:${col};">${rankLabels[rk]||rk+'등'}</td><td style="padding:5px 4px;font-size:10px;color:var(--text-muted);text-align:center;">${rankPrizes[rk]||''}</td><td style="padding:5px 4px;font-size:10px;text-align:center;font-weight:700;">${Number(p.total).toLocaleString()}매</td><td style="padding:5px 6px;font-size:10px;font-weight:700;color:var(--text-dark);text-align:right;">${totalStr}</td><td style="padding:5px 6px;font-size:10px;text-align:center;">${siStr}</td></tr>`;
     }).join('');
   }
 
   container.innerHTML = `
     <div style="text-align:center;margin-bottom:14px;">
-      <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;">${dateStr} 추첨 · 제 ${round}회</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;">추첨일 ${dateStr} · 제 ${round}회차</div>
       <div style="font-size:11px;font-weight:700;color:#16a34a;margin-bottom:10px;">1등 당첨번호</div>
       <div style="display:flex;align-items:flex-start;justify-content:center;gap:4px;flex-wrap:wrap;">
         <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-right:2px;"><div style="min-width:40px;height:34px;border-radius:8px;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;padding:0 8px;box-shadow:0 2px 6px #16a34a55;">${jo}조</div><div style="font-size:8px;color:var(--text-muted);font-weight:700;">조</div></div>
@@ -2572,7 +2588,7 @@ function renderPensionResult(d, container, round) {
     <div style="border-top:1px solid var(--border-dashed);padding-top:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">등수별 당첨 현황</div>
       <table style="width:100%;border-collapse:collapse;">
-        <thead><tr style="border-bottom:1px solid var(--border-dashed);"><th style="padding:4px 6px;font-size:9px;color:var(--text-muted);text-align:left;font-weight:700;">등수</th><th style="padding:4px 4px;font-size:9px;color:var(--text-muted);text-align:center;font-weight:700;">당첨금</th><th style="padding:4px 4px;font-size:9px;color:var(--text-muted);text-align:right;font-weight:700;">매수</th><th style="padding:4px 6px;font-size:9px;color:var(--text-muted);text-align:right;font-weight:700;">총액</th></tr></thead>
+        <thead><tr style="border-bottom:1px solid var(--border-dashed);"><th style="padding:4px 6px;font-size:9px;color:var(--text-muted);text-align:left;font-weight:700;">등수</th><th style="padding:4px 4px;font-size:9px;color:var(--text-muted);text-align:center;font-weight:700;">당첨금</th><th style="padding:4px 4px;font-size:9px;color:var(--text-muted);text-align:center;font-weight:700;">당첨수</th><th style="padding:4px 6px;font-size:9px;color:var(--text-muted);text-align:right;font-weight:700;">총액</th><th style="padding:4px 6px;font-size:9px;color:var(--text-muted);text-align:center;font-weight:700;">판매/인터넷</th></tr></thead>
         <tbody>${prizeRows}</tbody>
       </table>
     </div>` : `<div style="border-top:1px solid var(--border-dashed);padding-top:8px;text-align:center;"><div style="font-size:10px;color:var(--text-muted);">1등: 월 700만원 × 20년 · 보너스: 월 100만원 × 10년</div></div>`}
@@ -2753,7 +2769,7 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
       <thead><tr>
         <th>등수</th>
         <th>조건</th>
-        <th>비첨수</th>
+        <th>당첨수</th>
         <th>1인당</th>
         <th>자동/수동</th>
       </tr></thead>
@@ -2776,21 +2792,6 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
         }).join('')}
       </tbody>
     </table>
-    <!-- Number analysis -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;">
-      <div style="background:var(--bg-light);border-radius:8px;padding:8px;text-align:center;">
-        <div style="font-size:10px;color:var(--text-muted);font-weight:700;">홀수:짝수</div>
-        <div style="font-size:13px;font-weight:900;margin-top:2px;">${a.odd}:${a.even}</div>
-      </div>
-      <div style="background:var(--bg-light);border-radius:8px;padding:8px;text-align:center;">
-        <div style="font-size:10px;color:var(--text-muted);font-weight:700;">저/고</div>
-        <div style="font-size:13px;font-weight:900;margin-top:2px;">${a.low}:${a.high}</div>
-      </div>
-      <div style="background:var(--bg-light);border-radius:8px;padding:8px;text-align:center;">
-        <div style="font-size:10px;color:var(--text-muted);font-weight:700;">연속수</div>
-        <div style="font-size:13px;font-weight:900;margin-top:2px;">${a.seq ? a.seq+'세트' : '없음'}</div>
-      </div>
-    </div>
     ${(()=>{
       if (!isLoggedIn || !MY.length) return '';
       const myThisRound = MY.filter(t => t.round === d.round);
@@ -4088,9 +4089,6 @@ function go(id) {
   // 페이지 타이틀 동적 업데이트
   const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', fortune:'번호분석 & 로또 DNA', stats:'나의 전적', badge:'획득 뱃지', rank:'전체 랭킹', community:'커뮤니티', admin:'관리자 패널', profile:'내 프로필', home:'내 번호 보관함' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
-  // 번호분석 탭에서는 헤더 카운트다운 칩 숨김
-  const _chip = $('header-countdown-chip');
-  if (_chip) _chip.style.display = id === 'fortune' ? 'none' : (window._cdActive ? 'flex' : 'none');
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
   if (id === 'ticket')    { chgMode(); renderQRHistory(); }
@@ -4853,23 +4851,27 @@ function genRecommended() {
   // 카운트다운 타이머 시작
   if (window._cdTimer) clearInterval(window._cdTimer);
   function updateCD() {
-    const { d, h, m, s, total } = getNextDraw();
+    // 로또 카운트다운
+    const { d, h, m, s } = getNextDraw();
     const cdD = $('cd-d'), cdH = $('cd-h'), cdM = $('cd-m'), cdS = $('cd-s');
-    if (!cdD) { clearInterval(window._cdTimer); return; }
-    cdD.textContent = String(d).padStart(2,'0');
-    cdH.textContent = String(h).padStart(2,'0');
-    cdM.textContent = String(m).padStart(2,'0');
-    cdS.textContent = String(s).padStart(2,'0');
+    if (cdD) { cdD.textContent = String(d).padStart(2,'0'); cdH.textContent = String(h).padStart(2,'0'); cdM.textContent = String(m).padStart(2,'0'); cdS.textContent = String(s).padStart(2,'0'); }
     const nrl = $('next-round-label');
     if (nrl && latestRound) nrl.textContent = latestRound + 1;
-    // 헤더 카운트다운 칩 업데이트
-    const chip = $('header-countdown-chip');
-    const chipTxt = $('header-cd-text');
-    if (chip && chipTxt) {
-      window._cdActive = true;
-      chip.style.display = 'flex';
-      chipTxt.textContent = d>0 ? `추첨까지 ${d}일 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `추첨까지 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    }
+    // 연금복권 카운트다운
+    const now2 = new Date();
+    const day2 = now2.getDay();
+    const diffToThu = (4 - day2 + 7) % 7 || 7;
+    const nextThu = new Date(now2);
+    nextThu.setDate(now2.getDate() + diffToThu);
+    nextThu.setHours(10, 0, 0, 0);
+    if (nextThu <= now2) nextThu.setDate(nextThu.getDate() + 7);
+    const pdiff = nextThu - now2;
+    const pd = Math.floor(pdiff/86400000), ph = Math.floor((pdiff%86400000)/3600000);
+    const pm = Math.floor((pdiff%3600000)/60000), ps = Math.floor((pdiff%60000)/1000);
+    const pcdD=$('pen-cd-d'),pcdH=$('pen-cd-h'),pcdM=$('pen-cd-m'),pcdS=$('pen-cd-s');
+    if (pcdD) { pcdD.textContent=String(pd).padStart(2,'0'); pcdH.textContent=String(ph).padStart(2,'0'); pcdM.textContent=String(pm).padStart(2,'0'); pcdS.textContent=String(ps).padStart(2,'0'); }
+    const pnrl = $("pen-next-round-label");
+    if (pnrl) { const penBase=new Date("2020-05-07"); const penWeeks=Math.floor((now2-penBase)/(7*24*3600*1000)); pnrl.textContent = penWeeks+2; }
   }
   updateCD();
   window._cdTimer = setInterval(updateCD, 1000);
