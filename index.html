@@ -103,6 +103,8 @@ main.chat-hidden .chat-panel { display: none; }
 .prize-table td { padding:6px 8px; text-align:center; border-bottom:1px solid var(--border-dashed); }
 .prize-table tr:hover td { background:#fafafa; }
 [data-theme="dark"] .prize-table tr:hover td { background:#263244; }
+#res-pension-ui .prize-table th,
+#res-pension-ui .prize-table td { padding:6px 3px; overflow-wrap:anywhere; }
 .prize-rank-badge { display:inline-block; width:22px; height:22px; border-radius:50%; font-size:10px; font-weight:900; line-height:22px; }
 .pr1 { background:#fef08a; color:#854d0e; }
 [data-theme="dark"] .pr1 { background:#422006; color:#fef08a; }
@@ -2553,7 +2555,8 @@ function renderPensionResult(d, container, round) {
     ${prizes.length > 0 ? `
     <div style="border-top:1px solid var(--border-dashed);padding-top:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">등수별 당첨 현황</div>
-      <table class="prize-table" style="margin-top:0;">
+      <table class="prize-table" style="margin-top:0;table-layout:fixed;font-size:11px;">
+        <colgroup><col style="width:11%"><col style="width:23%"><col style="width:14%"><col style="width:29%"><col style="width:23%"></colgroup>
         <thead><tr><th>등수</th><th>당첨금</th><th>당첨수</th><th>총액</th><th>판매/인터넷</th></tr></thead>
         <tbody>${prizeRows}</tbody>
       </table>
