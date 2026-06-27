@@ -19,7 +19,7 @@ export async function onRequest(context) {
 
   async function ft(u, opts, ms) {
     const ac = new AbortController();
-    const t = setTimeout(() => ac.abort(), ms || 6000);
+    const t = setTimeout(() => ac.abort(), ms || 7000);
     try {
       const r = await fetch(u, Object.assign({ signal: ac.signal }, opts || {}));
       clearTimeout(t);
@@ -27,22 +27,18 @@ export async function onRequest(context) {
     } catch (e) { clearTimeout(t); throw e; }
   }
 
-  const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+  const baseHeaders = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'ko-KR,ko;q=0.9',
     'Referer': 'https://www.dhlottery.co.kr/gameResult.do?method=win720s',
+    'X-Requested-With': 'XMLHttpRequest',
   };
 
+  // ── 1) 구 API (common.do) ────────────────────────────────────
   try {
     const r = await ft(
       `https://www.dhlottery.co.kr/common.do?method=getPension720Number&drwNo=${round}`,
-      { headers }
+      { headers: baseHeaders }
     );
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const d = await r.json();
-    if (!d || d.returnValue === 'fail') throw new Error('no data');
-    return new Response(JSON.stringify(d), { headers: cors });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 502, headers: cors });
-  }
-}
+    if (r.ok) {

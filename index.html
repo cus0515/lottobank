@@ -1390,6 +1390,25 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     </div>
     <div class="panel-body" style="padding:14px;">
 
+      <!-- 추첨 카운트다운 (항상 표시) -->
+      <div id="draw-countdown-block" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;margin-bottom:2px;">다음 추첨까지</div>
+            <div style="font-size:10px;color:var(--text-muted);opacity:.7;">(토요일 오후 8:35 · <span id="next-round-label">-</span>회)</div>
+          </div>
+          <div style="display:flex;gap:4px;align-items:center;">
+            <div style="text-align:center;"><div id="cd-d" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">일</div></div>
+            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
+            <div style="text-align:center;"><div id="cd-h" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">시</div></div>
+            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
+            <div style="text-align:center;"><div id="cd-m" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">분</div></div>
+            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
+            <div style="text-align:center;"><div id="cd-s" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">초</div></div>
+          </div>
+        </div>
+      </div>
+
       <!-- 비로그인: 플랫폼 통계 + 가입 유도 -->
       <div id="left-guest">
         <div class="left-dashboard-card">
@@ -2506,10 +2525,18 @@ async function loadPensionResult() {
   try {
     const res = await fetch(`/api/pension?round=${round}`);
     const d = await res.json();
+    if (d.returnValue === 'fail' || d.error === 'API unavailable') throw new Error('unavailable');
     if (!res.ok || d.error) throw new Error(d.error || 'API error');
     renderPensionResult(d, body, round);
   } catch(e) {
-    if (body) body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px 0;">데이터를 불러올 수 없습니다.<br><a href="https://www.dhlottery.co.kr/" target="_blank" style="color:#16a34a;font-weight:700;">동행복권 공식사이트 ↗</a></div>`;
+    if (body) body.innerHTML = `
+      <div style="text-align:center;padding:16px 8px;">
+        <div style="font-size:28px;margin-bottom:8px;">🔧</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-dark);margin-bottom:4px;">연금복권 API 점검 중</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">동행복권 서버 응답 지연으로 데이터를 불러올 수 없습니다.<br>동행복권 공식 사이트에서 직접 확인해 주세요.</div>
+        <a href="https://www.dhlottery.co.kr/gameResult.do?method=win720s" target="_blank" rel="noopener"
+          style="display:inline-block;padding:7px 14px;background:#16a34a;color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;">동행복권 연금복권 ↗</a>
+      </div>`;
   }
 }
 
@@ -7665,16 +7692,3 @@ function renderProfile() {
     <div style="margin-top:8px;">
       </div>
     ` : `
-    <div class="profile-block" style="text-align:center;padding:20px;">
-      <div style="font-size:32px;margin-bottom:8px;">🔒</div>
-      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">로그인이 필요합니다</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">프로필을 보려면 먼저 로그인하세요.</div>
-      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
-    </div>
-    `}
-  `;
-}
-</script>
-</body>
-</html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
