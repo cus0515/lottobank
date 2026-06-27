@@ -65,7 +65,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-floor); col
 
 header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
 .nav-container { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 64px; }
-.logo-title { font-size: 20px; font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; }
+.logo-title { font-size: 26px; font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; }
 .logo-title span { font-size: 11px; color: var(--text-muted); font-weight: 500; }
 .menu-tabs { display: flex; height: 100%; gap: 2px; }
 .menu-btn { height: 64px; padding: 0 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); border: none; background: none; cursor: pointer; display: flex; align-items: center; position: relative; white-space: nowrap; transition: color .15s ease; }
@@ -949,7 +949,7 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 
 /* ===== subtle background grid ===== */
 body::before { content:""; position:fixed; inset:0; background-image:radial-gradient(circle at 1px 1px,rgba(148,163,184,.1) 1px,transparent 0); background-size:24px 24px; pointer-events:none; z-index:0; }
-main, header { position:relative; z-index:1; }
+main { position:relative; z-index:1; }
 [data-theme="dark"] body::before { background-image:radial-gradient(circle at 1px 1px,rgba(51,65,85,.35) 1px,transparent 0); }
 
 /* ===== global focus ring ===== */
@@ -1074,7 +1074,7 @@ input:focus-visible { outline:none; }
 /* == Task #121: Typography + global polish == */
 header { background:#ffffff!important; border-bottom:3px solid var(--lotto-red)!important; box-shadow:0 1px 6px rgba(0,0,0,.08)!important; }
 [data-theme='dark'] header { background:#1e293b!important; border-bottom-color:var(--lotto-red)!important; }
-.logo-title { font-size:21px!important; letter-spacing:-0.8px!important; }
+.logo-title { font-size:26px!important; letter-spacing:-0.8px!important; }
 .tab-nav { border-bottom:1px solid rgba(255,255,255,.06)!important; }
 .tab-btn { font-size:12px!important; font-weight:700!important; letter-spacing:.2px!important; opacity:.6!important; transition:opacity .15s,border-color .15s!important; }
 .tab-btn.on, .tab-btn:hover { opacity:1!important; }
@@ -1240,7 +1240,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <button id="m-fortune" class="menu-btn" onclick="go('fortune')">번호분석</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
-      <button id="m-pension" class="menu-btn" onclick="go('fortune');setTimeout(()=>{const e=document.getElementById('pension-section-block');if(e)e.scrollIntoView({behavior:'smooth'})},400)">연금복권</button>
       <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;color:#dc2626;">관리자</button>
     </div>
     <div class="auth-zone">
@@ -1391,25 +1390,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     </div>
     <div class="panel-body" style="padding:14px;">
 
-      <!-- 추첨 카운트다운 -->
-      <div id="draw-countdown-block" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <div>
-            <div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;margin-bottom:2px;">다음 추첨까지</div>
-            <div style="font-size:10px;color:var(--text-muted);opacity:.7;">(토요일 오후 8:35 · <span id="next-round-label">-</span>회)</div>
-          </div>
-          <div style="display:flex;gap:4px;align-items:center;">
-            <div style="text-align:center;"><div id="cd-d" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">일</div></div>
-            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
-            <div style="text-align:center;"><div id="cd-h" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">시</div></div>
-            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
-            <div style="text-align:center;"><div id="cd-m" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">분</div></div>
-            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
-            <div style="text-align:center;"><div id="cd-s" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">초</div></div>
-          </div>
-        </div>
-      </div>
-
       <!-- 비로그인: 플랫폼 통계 + 가입 유도 -->
       <div id="left-guest">
         <div class="left-dashboard-card">
@@ -1531,13 +1511,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
         </div>
       </div>
 
-      <!-- 빠른 바로가기 -->
-      <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:5px;">
-        <button onclick="go('ticket')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">🔍 QR 인증</button>
-        <button onclick="go('fortune')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">번호분석</button>
-        <button onclick="go('stats')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">내 전적</button>
-        <button onclick="go('rank')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">🏆 랭킹</button>
-      </div>
       <!-- 실시간 활동 피드 (항상 표시) -->
       <div id="left-feed-section" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border-dashed);">
         <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;">
@@ -1587,11 +1560,9 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
         <!-- 로또 조회 UI -->
         <div id="res-lotto-ui">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:0;">
-          <button id="res-older-btn" onclick="resNavPage(-1)" title="이전 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">◀◀</button>
           <select id="res-sel" onchange="chgRes()" class="select-custom" style="flex:1;margin:0;">
             <option>회차 목록 로딩 중...</option>
           </select>
-          <button id="res-newer-btn" onclick="resNavPage(1)" title="다음 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">▶▶</button>
         </div>
         <div style="display:flex;gap:6px;margin-top:6px;">
           <button id="res-prev-btn" onclick="resNavStep(-1)" title="이전 회차" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">◀ 이전 회차</button>
@@ -2462,6 +2433,7 @@ function resJumpTo() {
 }
 
 // 회차 조회 탭 전환 함수
+const PENSION_GREEN = '#16a34a';
 function switchResultTab(type) {
   const lottoUi = $('res-lotto-ui');
   const pensionUi = $('res-pension-ui');
@@ -2480,9 +2452,9 @@ function switchResultTab(type) {
   } else {
     lottoUi.style.display = 'none';
     pensionUi.style.display = '';
-    pensionBtn.style.background = 'var(--lotto-red)';
+    pensionBtn.style.background = PENSION_GREEN;
     pensionBtn.style.color = '#fff';
-    pensionBtn.style.borderColor = 'var(--lotto-red)';
+    pensionBtn.style.borderColor = PENSION_GREEN;
     lottoBtn.style.background = 'var(--paper-white)';
     lottoBtn.style.color = 'var(--text-muted)';
     lottoBtn.style.borderColor = 'var(--border-dashed)';
@@ -2520,7 +2492,7 @@ function penNavStep(dir) {
   loadPensionResult();
 }
 
-function loadPensionResult() {
+async function loadPensionResult() {
   const sel = $('pen-sel');
   if (!sel) return;
   penCurrentIdx = sel.selectedIndex;
@@ -2530,7 +2502,42 @@ function loadPensionResult() {
   const body = $('pen-result-body');
   if (header) header.style.display = '';
   if (label) label.textContent = `제 ${round}회 연금복권 720+`;
-  if (body) body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px 0;">연금복권 당첨번호 데이터는 서비스 준비 중입니다.<br><a href="https://www.dhlottery.co.kr/" target="_blank" style="color:var(--lotto-red);font-weight:700;">동행복권 공식사이트 확인 ↗</a></div>`;
+  if (body) body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px 0;">불러오는 중...</div>`;
+  try {
+    const res = await fetch(`/api/pension?round=${round}`);
+    const d = await res.json();
+    if (!res.ok || d.error) throw new Error(d.error || 'API error');
+    renderPensionResult(d, body, round);
+  } catch(e) {
+    if (body) body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px 0;">데이터를 불러올 수 없습니다.<br><a href="https://www.dhlottery.co.kr/" target="_blank" style="color:#16a34a;font-weight:700;">동행복권 공식사이트 ↗</a></div>`;
+  }
+}
+
+function renderPensionResult(d, container, round) {
+  if (!container) return;
+  // d: { returnValue, drwNo, firstWiNum, firstWiNum1, winNum1~6, bonusNum, totSellamnt, firstWinAmount, ... }
+  const nums = [d.winNum1, d.winNum2, d.winNum3, d.winNum4, d.winNum5, d.winNum6].filter(Boolean);
+  const jo = d.firstWiNum || '-';
+  const bonus = d.bonusNum || '-';
+  const dateStr = d.drwNoDate || '';
+  const prize1 = d.firstWinAmount ? Number(d.firstWinAmount).toLocaleString() + '원' : '-';
+  container.innerHTML = `
+    <div style="text-align:center;margin-bottom:12px;">
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">${dateStr} 추첨</div>
+      <div style="font-size:11px;font-weight:700;color:#16a34a;margin-bottom:8px;">1등 당첨번호</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;">
+        <div style="background:#16a34a;color:#fff;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;">${jo}조</div>
+        ${nums.map(n=>`<div style="width:32px;height:32px;border-radius:50%;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;">${n}</div>`).join('')}
+        <div style="color:var(--text-muted);font-size:11px;">+</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:#f59e0b;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;">${bonus}</div>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">보너스 번호: <b>${bonus}</b></div>
+    </div>
+    <div style="border-top:1px solid var(--border-dashed);padding-top:8px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;"><span>1등 당첨금</span><span style="font-weight:700;color:#16a34a;">${prize1}</span></div>
+      <div style="font-size:10px;color:var(--text-muted);">월 700만원 × 20년 (연금)</div>
+    </div>
+  `;
 }
 
 function quickCheckNumbers() {
@@ -3602,8 +3609,13 @@ async function sendChat() {
   const msg = inp.value.trim();
   if (!msg) return;
   inp.value = '';
-  const nick = currentUser.user_metadata?.nickname || currentUser.email.split('@')[0];
+  // profiles DB 닉네임 우선, 없으면 user_metadata, 없으면 이메일 앞
+  let nick = window._profileNickname || currentUser.user_metadata?.nickname || currentUser.email.split('@')[0];
   try {
+    if (!window._profileNickname) {
+      const { data: prof } = await sb.from('profiles').select('nickname').eq('id', currentUser.id).single();
+      if (prof?.nickname) { nick = prof.nickname; window._profileNickname = nick; }
+    }
     await sb.from('chat_messages').insert({
       user_id: currentUser.id,
       nickname: nick,
@@ -3671,6 +3683,7 @@ async function loadUserDataFromDB() {
     }
     // 닉네임: profiles DB 우선, 없으면 user_metadata, 없으면 이메일 앞
     const nick2 = profile?.nickname || currentUser?.user_metadata?.nickname || currentUser?.email?.split('@')[0] || '?';
+    window._profileNickname = nick2;
     updateHeaderUser(nick2, myVerifiedTitle || '');
     updateBadgeUI();
     updateDropdownStats();
@@ -7664,3 +7677,4 @@ function renderProfile() {
 </script>
 </body>
 </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   

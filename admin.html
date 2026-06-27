@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LottoBank 관리자</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root {
+    --red: #e11d48;
+    --green: #16a34a;
+    --bg: #f1f5f9;
+    --white: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, sans-serif; }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* 로그인 */
+  #login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; }
+  .login-box { background:var(--white); border-radius:16px; padding:36px 32px; width:340px; box-shadow:0 4px 24px rgba(0,0,0,.10); }
+  .login-logo { font-size:22px; font-weight:900; color:var(--red); margin-bottom:4px; }
+  .login-sub { font-size:12px; color:var(--muted); margin-bottom:24px; }
+  .form-label { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:4px; display:block; }
+  .form-input { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-size:13px; outline:none; margin-bottom:12px; }
+  .form-input:focus { border-color:var(--red); }
+  .btn-login { width:100%; padding:11px; background:var(--red); color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; }
+  .login-err { font-size:12px; color:var(--red); margin-top:8px; text-align:center; }
+
+  /* 메인 레이아웃 */
+  #admin-screen { display:none; }
+  header { background:var(--white); border-bottom:3px solid var(--red); padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+  .header-logo { font-size:18px; font-weight:900; color:var(--red); }
+  .header-info { font-size:12px; color:var(--muted); }
+  .btn-logout { padding:6px 14px; background:none; border:1.5px solid var(--border); border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; color:var(--muted); }
+
+  .container { max-width:1200px; margin:0 auto; padding:24px 16px; }
+
+  /* 탭 */
+  .tabs { display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; }
+  .tab-btn { padding:8px 18px; border-radius:8px; border:1.5px solid var(--border); background:var(--white); font-size:13px; font-weight:700; cursor:pointer; color:var(--muted); transition:all .15s; }
+  .tab-btn.on { background:var(--red); color:#fff; border-color:var(--red); }
+
+  /* 테이블 */
+  .table-wrap { background:var(--white); border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+  .table-header { padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .table-title { font-size:14px; font-weight:900; }
+  .table-actions { display:flex; gap:8px; align-items:center; }
+  .search-input { padding:7px 12px; border:1.5px solid var(--border); border-radius:7px; font-size:12px; outline:none; width:200px; }
+  .search-input:focus { border-color:var(--red); }
+  .btn-refresh { padding:7px 14px; background:var(--bg); border:1.5px solid var(--border); border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; }
+  .btn-refresh:hover { border-color:var(--red); color:var(--red); }
+
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th { padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:var(--muted); border-bottom:1px solid var(--border); background:#f8fafc; white-space:nowrap; }
+  td { padding:9px 12px; border-bottom:1px solid var(--border); color:var(--text); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#fef2f2; }
+
+  .btn-del { padding:3px 10px; background:#fff5f5; border:1px solid #fecaca; border-radius:5px; font-size:11px; font-weight:700; color:#dc2626; cursor:pointer; }
+  .btn-del:hover { background:#dc2626; color:#fff; }
+
+  .badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; }
+  .badge-green { background:#dcfce7; color:#16a34a; }
+  .badge-red { background:#fef2f2; color:#dc2626; }
+  .badge-blue { background:#dbeafe; color:#2563eb; }
+  .badge-gray { background:#f1f5f9; color:#64748b; }
+
+  .loading { padding:40px; text-align:center; color:var(--muted); font-size:13px; }
+  .count-badge { font-size:11px; color:var(--muted); font-weight:600; }
+
+  /* 모달 */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--white); border-radius:14px; padding:24px; width:480px; max-width:95vw; max-height:80vh; overflow-y:auto; }
+  .modal-title { font-size:15px; font-weight:900; margin-bottom:16px; }
+  .modal-row { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid var(--border); font-size:12px; }
+  .modal-row:last-child { border-bottom:none; }
+  .modal-key { color:var(--muted); font-weight:600; min-width:120px; }
+  .modal-val { color:var(--text); word-break:break-all; text-align:right; }
+  .btn-close-modal { margin-top:16px; width:100%; padding:9px; background:var(--bg); border:1.5px solid var(--border); border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
+
+  .pagination { display:flex; gap:6px; justify-content:center; padding:12px; }
+  .page-btn { padding:5px 12px; border:1.5px solid var(--border); border-radius:6px; background:var(--white); font-size:12px; font-weight:700; cursor:pointer; }
+  .page-btn.on { background:var(--red); color:#fff; border-color:var(--red); }
+  .page-btn:hover:not(.on) { border-color:var(--red); color:var(--red); }
+</style>
+</head>
+<body>
+
+<!-- 로그인 화면 -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">LottoBank</div>
+    <div class="login-sub">관리자 전용 페이지</div>
+    <label class="form-label">이메일</label>
+    <input class="form-input" type="email" id="adm-email" value="jobdevil23@gmail.com" placeholder="관리자 이메일">
+    <label class="form-label">비밀번호</label>
+    <input class="form-input" type="password" id="adm-pw" placeholder="비밀번호" onkeyup="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">로그인</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- 관리자 화면 -->
+<div id="admin-screen">
+  <header>
+    <div class="header-logo">LottoBank 관리자</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="header-info" id="adm-user-label"></div>
+      <button class="btn-logout" onclick="doLogout()">로그아웃</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn on" onclick="switchTab('users')">👤 유저</button>
+      <button class="tab-btn" onclick="switchTab('tickets')">🎫 티켓</button>
+      <button class="tab-btn" onclick="switchTab('posts')">📝 게시글</button>
+      <button class="tab-btn" onclick="switchTab('comments')">💬 댓글</button>
+      <button class="tab-btn" onclick="switchTab('chat')">🗨️ 채팅</button>
+      <button class="tab-btn" onclick="switchTab('stats')">📊 전적</button>
+    </div>
+
+    <div id="table-area"></div>
+  </div>
+</div>
+
+<!-- 상세 모달 -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">상세 정보</div>
+    <div id="modal-body"></div>
+    <button class="btn-close-modal" onclick="closeModal()">닫기</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://wosbpljbdyofavsbrkyn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_WhehbHhTwxo-9uEyWbEEtA_52ACEDbj';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentTab = 'users';
+let currentPage = 1;
+const PAGE_SIZE = 30;
+let searchQuery = '';
+
+// ── 로그인 ──────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('adm-email').value.trim();
+  const pw = document.getElementById('adm-pw').value;
+  const err = document.getElementById('login-err');
+  err.textContent = '';
+  if (!email || !pw) { err.textContent = '이메일과 비밀번호를 입력하세요.'; return; }
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+    if (error) throw error;
+    // 관리자 확인 (이메일 체크)
+    if (data.user.email !== 'jobdevil23@gmail.com') {
+      await sb.auth.signOut();
+      err.textContent = '관리자 계정이 아닙니다.';
+      return;
+    }
+    document.getElementById('adm-user-label').textContent = data.user.email;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = '';
+    loadTab('users');
+  } catch(e) {
+    err.textContent = e.message || '로그인 실패';
+  }
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
+// ── 탭 전환 ─────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  currentPage = 1;
+  searchQuery = '';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+  event.target.classList.add('on');
+  loadTab(tab);
+}
+
+async function loadTab(tab) {
+  const area = document.getElementById('table-area');
+  area.innerHTML = '<div class="loading">불러오는 중...</div>';
+
+  const configs = {
+    users: { table: 'profiles', cols: ['id','nickname','created_at'], label: '유저 목록', searchCol: 'nickname' },
+    tickets: { table: 'tickets', cols: ['id','user_id','round_no','prize_rank','numbers','created_at'], label: '티켓(QR 등록)', searchCol: 'round_no' },
+    posts: { table: 'posts', cols: ['id','nickname','tag','title','likes','comment_count','created_at'], label: '게시글', searchCol: 'title' },
+    comments: { table: 'comments', cols: ['id','post_id','nickname','body','created_at'], label: '댓글', searchCol: 'body' },
+    chat: { table: 'chat_messages', cols: ['id','nickname','message','created_at'], label: '채팅', searchCol: 'nickname' },
+    stats: { table: 'user_stats', cols: ['id','user_id','total_tickets','total_spent','total_prize','total_wins','best_rank','updated_at'], label: '전적 통계', searchCol: 'user_id' },
+  };
+
+  const cfg = configs[tab];
+  if (!cfg) return;
+
+  try {
+    let query = sb.from(cfg.table).select('*', { count: 'exact' });
+    if (searchQuery && cfg.searchCol) {
+      query = query.ilike(cfg.searchCol, `%${searchQuery}%`);
+    }
+    const from = (currentPage - 1) * PAGE_SIZE;
+    query = query.order('created_at', { ascending: false }).range(from, from + PAGE_SIZE - 1);
+
+    const { data, error, count } = await query;
+    if (error) throw error;
+
+    renderTable(cfg, data || [], count || 0);
+  } catch(e) {
+    area.innerHTML = `<div class="loading" style="color:#dc2626;">오류: ${e.message}</div>`;
+  }
+}
+
+function renderTable(cfg, rows, total) {
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const area = document.getElementById('table-area');
+
+  const colLabels = {
+    id:'ID', user_id:'유저ID', nickname:'닉네임', email:'이메일', created_at:'생성일',
+    updated_at:'수정일', round_no:'회차', prize_rank:'등수', numbers:'번호', tag:'태그',
+    title:'제목', body:'내용', likes:'좋아요', comment_count:'댓글수', message:'메시지',
+    total_tickets:'총게임', total_spent:'총투자', total_prize:'총당첨', total_wins:'당첨수',
+    best_rank:'최고등수', post_id:'게시글ID',
+  };
+
+  let html = `
+  <div class="table-wrap">
+    <div class="table-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="table-title">${cfg.label}</span>
+        <span class="count-badge">총 ${total.toLocaleString()}건</span>
+      </div>
+      <div class="table-actions">
+        <input class="search-input" placeholder="검색..." value="${searchQuery}"
+          onkeyup="if(event.key==='Enter'){searchQuery=this.value;currentPage=1;loadTab('${cfg.table==='profiles'?'users':currentTab}')}"
+          oninput="searchQuery=this.value">
+        <button class="btn-refresh" onclick="currentPage=1;loadTab('${currentTab}')">새로고침</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+    <table>
+      <thead><tr>
+        ${cfg.cols.map(c=>`<th>${colLabels[c]||c}</th>`).join('')}
+        <th>액션</th>
+      </tr></thead>
+      <tbody>
+        ${rows.length === 0 ? `<tr><td colspan="${cfg.cols.length+1}" style="text-align:center;color:var(--muted);padding:30px;">데이터 없음</td></tr>` :
+          rows.map(row => `
+          <tr onclick="showDetail(${JSON.stringify(JSON.stringify(row))})" style="cursor:pointer;">
+            ${cfg.cols.map(c => {
+              let val = row[c];
+              if (val === null || val === undefined) val = '-';
+              if (c === 'created_at' || c === 'updated_at') val = val !== '-' ? new Date(val).toLocaleString('ko-KR') : '-';
+              if (c === 'prize_rank') val = val !== '-' ? `<span class="badge ${val<=2?'badge-red':val<=3?'badge-blue':'badge-gray'}">${val}등</span>` : '-';
+              if (c === 'id' || c === 'user_id' || c === 'post_id') val = `<span style="font-size:10px;color:var(--muted);">${String(val).slice(0,8)}...</span>`;
+              if (c === 'total_spent' || c === 'total_prize') val = val !== '-' ? Number(val).toLocaleString()+'원' : '-';
+              return `<td>${val}</td>`;
+            }).join('')}
+            <td onclick="event.stopPropagation()">
+              <button class="btn-del" onclick="deleteRow('${cfg.table}','${rows[rows.indexOf(row)].id}')">삭제</button>
+            </td>
+          </tr>`
+          ).join('')}
+      </tbody>
+    </table>
+    </div>
+    ${totalPages > 1 ? `
+    <div class="pagination">
+      ${currentPage > 1 ? `<button class="page-btn" onclick="changePage(${currentPage-1})">◀</button>` : ''}
+      ${Array.from({length:Math.min(totalPages,10)}, (_,i)=>i+1).map(p=>
+        `<button class="page-btn ${p===currentPage?'on':''}" onclick="changePage(${p})">${p}</button>`
+      ).join('')}
+      ${currentPage < totalPages ? `<button class="page-btn" onclick="changePage(${currentPage+1})">▶</button>` : ''}
+    </div>` : ''}
+  </div>`;
+
+  area.innerHTML = html;
+}
+
+function changePage(p) {
+  currentPage = p;
+  loadTab(currentTab);
+}
+
+async function deleteRow(table, id) {
+  if (!confirm(`정말 삭제하시겠습니까?\n테이블: ${table}\nID: ${id}`)) return;
+  try {
+    const { error } = await sb.from(table).delete().eq('id', id);
+    if (error) throw error;
+    alert('삭제되었습니다.');
+    loadTab(currentTab);
+  } catch(e) {
+    alert('삭제 실패: ' + e.message);
+  }
+}
+
+function showDetail(jsonStr) {
+  const obj = JSON.parse(jsonStr);
+  document.getElementById('modal-title').textContent = '상세 정보';
+  const body = document.getElementById('modal-body');
+  body.innerHTML = Object.entries(obj).map(([k,v]) => {
+    let display = v;
+    if (v === null || v === undefined) display = '-';
+    if (k.includes('_at') && v) display = new Date(v).toLocaleString('ko-KR');
+    return `<div class="modal-row"><span class="modal-key">${k}</span><span class="modal-val">${display}</span></div>`;
+  }).join('');
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('detail-modal').classList.remove('open');
+}
+
+document.getElementById('detail-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// 자동 로그인 확인
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (session && session.user.email === 'jobdevil23@gmail.com') {
+    document.getElementById('adm-user-label').textContent = session.user.email;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = '';
+    loadTab('users');
+  }
+});
+</script>
+</body>
+</html>
