@@ -1045,7 +1045,7 @@ input:focus-visible { outline:none; }
 #fortune-content .ball-context .b-num { font-weight:800; }
 #fortune-content > div[style*='paper-white'] { transition:box-shadow .15s; }
 #fortune-content > div[style*='paper-white']:hover { box-shadow:0 2px 12px rgba(15,23,42,.08)!important; }
-#draw-countdown-block { background:linear-gradient(135deg,#be123c 0%,#dc2626 60%,#b91c1c 100%)!important; box-shadow:0 6px 20px rgba(190,18,60,.4)!important; }
+#draw-countdown-block { background:var(--paper-white)!important; border:1px solid var(--border-dashed)!important; box-shadow:none!important; }
 #cd-d, #cd-h, #cd-m, #cd-s { text-shadow:0 2px 8px rgba(0,0,0,.3); }
 [data-theme='dark'] .stat-kpi-card { background:#162032; border-color:#1e3a5f; }
 [data-theme='dark'] #fortune-content > div[style*='paper-white']:hover { box-shadow:0 2px 12px rgba(0,0,0,.3)!important; }
@@ -1391,6 +1391,25 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     </div>
     <div class="panel-body" style="padding:14px;">
 
+      <!-- 추첨 카운트다운 -->
+      <div id="draw-countdown-block" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;margin-bottom:2px;">다음 추첨까지</div>
+            <div style="font-size:10px;color:var(--text-muted);opacity:.7;">(토요일 오후 8:35 · <span id="next-round-label">-</span>회)</div>
+          </div>
+          <div style="display:flex;gap:4px;align-items:center;">
+            <div style="text-align:center;"><div id="cd-d" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">일</div></div>
+            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
+            <div style="text-align:center;"><div id="cd-h" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">시</div></div>
+            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
+            <div style="text-align:center;"><div id="cd-m" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">분</div></div>
+            <div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">:</div>
+            <div style="text-align:center;"><div id="cd-s" style="font-size:18px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:9px;color:var(--text-muted);margin-top:1px;">초</div></div>
+          </div>
+        </div>
+      </div>
+
       <!-- 비로그인: 플랫폼 통계 + 가입 유도 -->
       <div id="left-guest">
         <div class="left-dashboard-card">
@@ -1426,30 +1445,30 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
             </div>
           </div>
           <!-- 세 가지 핵심 가치 제안 -->
-          <div style="margin:10px 0;display:flex;flex-direction:column;gap:6px;">
-            <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:linear-gradient(90deg,rgba(220,38,38,.06),transparent);border-radius:7px;border-left:3px solid #dc2626;">
-              <span style="font-size:16px;">📱</span>
+          <div style="margin:10px 0;display:flex;flex-direction:column;gap:5px;">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/></svg>
               <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">QR 스캔 단 한 번에</div><div style="font-size:10px;color:var(--text-muted);">전적·ROI·뱃지 자동 집계</div></div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:linear-gradient(90deg,rgba(245,158,11,.08),transparent);border-radius:7px;border-left:3px solid #f59e0b;">
-              <span style="font-size:16px;">🏆</span>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg>
               <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">실제 당첨 인증</div><div style="font-size:10px;color:var(--text-muted);">랭킹 진입·커뮤니티 공유</div></div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:linear-gradient(90deg,rgba(16,185,129,.08),transparent);border-radius:7px;border-left:3px solid #10b981;">
-              <span style="font-size:16px;">📊</span>
-              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">번호 분석·추첨</div><div style="font-size:10px;color:var(--text-muted);">동향·놓친 번호 전략 확인</div></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">번호 분석</div><div style="font-size:10px;color:var(--text-muted);">동향·놓친 번호 전략 확인</div></div>
             </div>
           </div>
-          <button onclick="showAuthModal()" style="background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:8px;padding:10px 0;font-size:12px;font-weight:900;cursor:pointer;width:100%;box-shadow:0 4px 12px rgba(220,38,38,.35);letter-spacing:.3px;">🚀 무료로 시작하기</button>
+          <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 0;font-size:12px;font-weight:900;cursor:pointer;width:100%;letter-spacing:.3px;">무료로 시작하기</button>
           <div style="text-align:center;margin-top:6px;font-size:10px;color:var(--text-muted);">3초 만에 가입 · 신용카드 불필요</div>
         </div>
-        <div id="left-lucky-card" class="left-dashboard-card" style="margin-bottom:10px;background:linear-gradient(135deg,#1e1b4b,#312e81);color:#fff;border:none;">
-  <div style="font-size:10px;font-weight:700;opacity:.5;letter-spacing:1px;margin-bottom:6px;">오늘의 행운 점수</div>
-  <div id="lucky-score-display" style="font-size:32px;font-weight:900;margin-bottom:4px;">-</div>
-  <div id="lucky-score-bar" style="height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin-bottom:8px;">
-    <div id="lucky-bar-fill" style="height:100%;background:linear-gradient(90deg,#818cf8,#c084fc);border-radius:2px;width:0%;transition:width 1s ease;"></div>
+        <div id="left-lucky-card" class="left-dashboard-card" style="margin-bottom:10px;background:var(--paper-white);border:1px solid var(--border-dashed);">
+  <div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px;">오늘의 행운 점수</div>
+  <div id="lucky-score-display" style="font-size:32px;font-weight:900;color:var(--lotto-red);margin-bottom:4px;">-</div>
+  <div id="lucky-score-bar" style="height:4px;background:var(--border-dashed);border-radius:2px;margin-bottom:8px;">
+    <div id="lucky-bar-fill" style="height:100%;background:var(--lotto-red);border-radius:2px;width:0%;transition:width 1s ease;"></div>
   </div>
-  <div id="lucky-score-msg" style="font-size:10px;opacity:.6;margin-bottom:8px;"></div>
+  <div id="lucky-score-msg" style="font-size:10px;color:var(--text-muted);margin-bottom:8px;"></div>
   <div id="lucky-nums-today" style="display:flex;gap:4px;justify-content:flex-start;flex-wrap:wrap;"></div>
 </div>
 <div id="left-hot-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:10px 12px;">
@@ -1560,6 +1579,13 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <div style="font-size:16px;font-weight:900;color:var(--text-dark);margin-bottom:1px;">당첨 결과 조회</div>
           <div style="font-size:11px;color:var(--text-muted);">역대 회차 당첨번호 · 1등 당첨금 · 내 번호 비교</div>
         </div>
+        <!-- 로또 / 연금복권 탭 -->
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <button id="res-tab-lotto" onclick="switchResultTab('lotto')" style="flex:1;padding:8px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>
+          <button id="res-tab-pension" onclick="switchResultTab('pension')" style="flex:1;padding:8px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>
+        </div>
+        <!-- 로또 조회 UI -->
+        <div id="res-lotto-ui">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:0;">
           <button id="res-older-btn" onclick="resNavPage(-1)" title="이전 20회차" style="flex-shrink:0;padding:7px 10px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">◀◀</button>
           <select id="res-sel" onchange="chgRes()" class="select-custom" style="flex:1;margin:0;">
@@ -1591,7 +1617,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
         </div>
         <!-- 번호 직접 확인 -->
         <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;margin-top:10px;">
-          <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">🔢 번호 직접 확인</div>
+          <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">번호 직접 확인</div>
           <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">6개 번호 입력 후 현재 회차와 비교</div>
           <div style="display:flex;gap:4px;margin-bottom:6px;" id="quick-check-inputs">
             <input type="number" id="qc-1" min="1" max="45" placeholder="1" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-2').focus()">
@@ -1604,6 +1630,34 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <button onclick="quickCheckNumbers()" style="width:100%;padding:8px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">확인하기</button>
           <div id="quick-check-result" style="margin-top:8px;"></div>
         </div>
+        </div><!-- /res-lotto-ui -->
+
+        <!-- 연금복권 조회 UI -->
+        <div id="res-pension-ui" style="display:none;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <select id="pen-sel" onchange="loadPensionResult()" class="select-custom" style="flex:1;margin:0;">
+            <option>회차 목록 로딩 중...</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button onclick="penNavStep(-1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">◀ 이전 회차</button>
+          <button onclick="penNavStep(1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
+        </div>
+        <div id="pen-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
+          <div id="pen-round-header" style="padding:12px 16px;background:linear-gradient(135deg,#1a2e0a,#1d4e1a);color:#fff;display:none;">
+            <div style="font-size:10px;opacity:.5;letter-spacing:1px;font-weight:700;">PENSION LOTTERY</div>
+            <div id="pen-round-label" style="font-size:16px;font-weight:900;"></div>
+          </div>
+          <div style="padding:16px;">
+            <div id="pen-result-body" style="font-size:13px;color:var(--text-muted);text-align:center;">회차를 선택하세요.</div>
+          </div>
+        </div>
+        <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;margin-top:10px;">
+          <div style="font-size:11px;font-weight:700;color:var(--text-dark);margin-bottom:4px;">연금복권 720+ 안내</div>
+          <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">매주 목요일 추첨 · 1등 월 700만원 × 20년 지급 · 조(1~5조) + 6자리 번호로 구성됩니다.</div>
+        </div>
+        </div><!-- /res-pension-ui -->
+
       </div>
 
       <!-- 3. QR 인증 -->
@@ -2405,6 +2459,78 @@ function resJumpTo() {
   initRoundSelector(target);
   inp.value = '';
   inp.blur();
+}
+
+// 회차 조회 탭 전환 함수
+function switchResultTab(type) {
+  const lottoUi = $('res-lotto-ui');
+  const pensionUi = $('res-pension-ui');
+  const lottoBtn = $('res-tab-lotto');
+  const pensionBtn = $('res-tab-pension');
+  if (!lottoUi || !pensionUi) return;
+  if (type === 'lotto') {
+    lottoUi.style.display = '';
+    pensionUi.style.display = 'none';
+    lottoBtn.style.background = 'var(--lotto-red)';
+    lottoBtn.style.color = '#fff';
+    lottoBtn.style.borderColor = 'var(--lotto-red)';
+    pensionBtn.style.background = 'var(--paper-white)';
+    pensionBtn.style.color = 'var(--text-muted)';
+    pensionBtn.style.borderColor = 'var(--border-dashed)';
+  } else {
+    lottoUi.style.display = 'none';
+    pensionUi.style.display = '';
+    pensionBtn.style.background = 'var(--lotto-red)';
+    pensionBtn.style.color = '#fff';
+    pensionBtn.style.borderColor = 'var(--lotto-red)';
+    lottoBtn.style.background = 'var(--paper-white)';
+    lottoBtn.style.color = 'var(--text-muted)';
+    lottoBtn.style.borderColor = 'var(--border-dashed)';
+    initPensionTab();
+  }
+}
+
+// 연금복권 회차 초기화
+let penRounds = [];
+let penCurrentIdx = 0;
+function initPensionTab() {
+  const sel = $('pen-sel');
+  if (!sel) return;
+  if (penRounds.length > 0) { loadPensionResult(); return; }
+  // 연금복권 720+ 1회(2012년 4월 5일) 기준 목요일 추첨
+  // 현재 회차 추정: 2012-04-05 기준 주수 계산
+  const base = new Date('2012-04-05');
+  const now = new Date();
+  const weeks = Math.floor((now - base) / (7 * 24 * 3600 * 1000));
+  const latest = weeks + 1;
+  penRounds = [];
+  for (let i = latest; i >= Math.max(1, latest - 99); i--) penRounds.push(i);
+  penCurrentIdx = 0;
+  sel.innerHTML = penRounds.map(r => `<option value="${r}">${r}회</option>`).join('');
+  loadPensionResult();
+}
+
+function penNavStep(dir) {
+  const sel = $('pen-sel');
+  if (!sel) return;
+  const newIdx = penCurrentIdx + dir;
+  if (newIdx < 0 || newIdx >= penRounds.length) return;
+  penCurrentIdx = newIdx;
+  sel.selectedIndex = penCurrentIdx;
+  loadPensionResult();
+}
+
+function loadPensionResult() {
+  const sel = $('pen-sel');
+  if (!sel) return;
+  penCurrentIdx = sel.selectedIndex;
+  const round = penRounds[penCurrentIdx];
+  const header = $('pen-round-header');
+  const label = $('pen-round-label');
+  const body = $('pen-result-body');
+  if (header) header.style.display = '';
+  if (label) label.textContent = `제 ${round}회 연금복권 720+`;
+  if (body) body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px 0;">연금복권 당첨번호 데이터는 서비스 준비 중입니다.<br><a href="https://www.dhlottery.co.kr/" target="_blank" style="color:var(--lotto-red);font-weight:700;">동행복권 공식사이트 확인 ↗</a></div>`;
 }
 
 function quickCheckNumbers() {
@@ -4255,39 +4381,10 @@ function genRecommended() {
 
   $('fortune-content').innerHTML = `
     <!-- page banner -->
-    <div style="background:linear-gradient(135deg,#1a0a2e 0%,#4c1d95 100%);border-radius:14px;padding:16px 20px;margin-bottom:14px;color:#fff;box-shadow:0 6px 24px rgba(76,29,149,.35);border:1px solid rgba(139,92,246,.2);position:relative;overflow:hidden;">
-      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(167,139,250,.18) 0%,transparent 70%);pointer-events:none;"></div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span style="font-size:22px;">🎯</span>
-        <div>
-          <div style="font-size:15px;font-weight:900;letter-spacing:-.3px;">번호분석 &amp; 로또 DNA</div>
-          <div style="font-size:10px;opacity:.5;margin-top:2px;font-weight:600;">출현 패턴 · 냉온 번호 · 나만의 이번주 추천 번호</div>
-        </div>
-      </div>
-    </div>
-    <!-- 0. 다음 추첨 카운트다운 -->
-    <div id="draw-countdown-block" style="background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%);border-radius:12px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 14px rgba(220,38,38,.3);">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-      <div>
-        <div style="font-size:10px;opacity:.7;font-weight:700;letter-spacing:.5px;margin-bottom:4px;">다음 추첨까지</div>
-        <div style="font-size:11px;font-weight:500;opacity:.65;">(토요일 오후 8:35)</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <div style="text-align:center;"><div id="cd-d" style="font-size:22px;font-weight:900;line-height:1;">-</div><div style="font-size:9px;opacity:.6;margin-top:1px;">일</div></div>
-        <div style="font-size:20px;font-weight:900;opacity:.5;margin-bottom:4px;">:</div>
-        <div style="text-align:center;"><div id="cd-h" style="font-size:22px;font-weight:900;line-height:1;">-</div><div style="font-size:9px;opacity:.6;margin-top:1px;">시</div></div>
-        <div style="font-size:20px;font-weight:900;opacity:.5;margin-bottom:4px;">:</div>
-        <div style="text-align:center;"><div id="cd-m" style="font-size:22px;font-weight:900;line-height:1;">-</div><div style="font-size:9px;opacity:.6;margin-top:1px;">분</div></div>
-        <div style="font-size:20px;font-weight:900;opacity:.5;margin-bottom:4px;">:</div>
-        <div style="text-align:center;"><div id="cd-s" style="font-size:22px;font-weight:900;line-height:1;">-</div><div style="font-size:9px;opacity:.6;margin-top:1px;">초</div></div>
-      </div>
-      </div>
-      <div style="text-align:right;margin-top:8px;">
-        <div style="display:flex;gap:6px;align-items:center;">
-        <div style="font-size:10px;opacity:.65;">다음 회차 예상 <b id="next-round-label">-</b>회</div>
-        <button onclick="requestDrawNotification()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:4px 12px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;">🔔 추첨 알림</button>
-      </div>
-      </div>
+    <div style="border-left:4px solid var(--lotto-red);background:var(--paper-white);border-radius:0 10px 10px 0;padding:12px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(225,29,72,.06);">
+      <div style="font-size:9px;color:var(--lotto-red);font-weight:800;letter-spacing:1.5px;margin-bottom:2px;">NUMBER ANALYSIS</div>
+      <div style="font-size:16px;font-weight:900;color:var(--text-dark);margin-bottom:1px;">번호분석 &amp; 로또 DNA</div>
+      <div style="font-size:11px;color:var(--text-muted);">출현 패턴 · 냉온 번호 · 나만의 이번주 추천 번호</div>
     </div>
 
     <!-- 번호 미출현 간격 분석 -->
