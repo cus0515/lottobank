@@ -165,7 +165,7 @@ async function doLogin() {
     }
     document.getElementById('adm-user-label').textContent = data.user.email;
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = '';
+    document.getElementById('admin-screen').style.display = 'block';
     loadTab('users');
   } catch(e) {
     err.textContent = e.message || '로그인 실패';
@@ -329,10 +329,9 @@ sb.auth.getSession().then(({ data: { session } }) => {
   if (session && session.user.email === 'jobdevil23@gmail.com') {
     document.getElementById('adm-user-label').textContent = session.user.email;
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = '';
+    document.getElementById('admin-screen').style.display = 'block';
     loadTab('users');
   }
 });
 </script>
-</body>
-</html>
+</body

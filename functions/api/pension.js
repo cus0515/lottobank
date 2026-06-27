@@ -35,12 +35,82 @@ export async function onRequest(context) {
     'X-Requested-With': 'XMLHttpRequest',
   };
 
-  // ── 1) GitHub 캐시 확인 ──────────────────────────────────────
+  // 1) GitHub 캐시
   try {
-    const r = await ft(
-      'https://raw.githubusercontent.com/cus0515/lottobank/main/pension-cache.json',
-      {},
-      5000
-    );
+    const r = await ft('https://raw.githubusercontent.com/cus0515/lottobank/main/pension-cache.json', {}, 5000);
     if (r.ok) {
-      const txt = aw
+      const txt = await r.text();
+      if (txt && txt.trim().charAt(0) === '{') {
+        const cached = JSON.parse(txt);
+        if (cached.returnValue === 'success' && cached.drwNo === round) {
+          return new Response(JSON.stringify(cached), { headers: cors });
+        }
+      }
+    }
+  } catch (_) {}
+
+  // 2) 신규 API (pt720)
+  try {
+    const listR = await ft('https://www.dhlottery.co.kr/pt720/selectPstPt720WnList.do', { headers: browserHeaders }, 8000);
+    if (listR.ok) {
+      const txt = await listR.text();
+      if (txt && txt.trim().charAt(0) === '{') {
+        const listData = JSON.parse(txt);
+        const item = (listData.data && listData.data.result || []).find(function(r) { return r.psltEpsd === round; });
+        if (item) {
+          var prizes = [];
+          try {
+            const infoR = await ft('https://www.dhlottery.co.kr/pt720/selectPstPt720WnInfo.do?srchPsltEpsd=' + round, { headers: browserHeaders }, 8000);
+            if (infoR.ok) {
+              const infoTxt = await infoR.text();
+              if (infoTxt && infoTxt.trim().charAt(0) === '{') {
+                const infoData = JSON.parse(infoTxt);
+                prizes = (infoData.data && infoData.data.result || []).map(function(p) {
+                  return { rank: p.wnRnk, store: p.wnStoreCnt, internet: p.wnInternetCnt, total: p.wnTotalCnt, totAmt: p.totAmt };
+                });
+              }
+            }
+          } catch (_) {}
+          const dateStr = item.psltRflYmd.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+          return new Response(JSON.stringify({
+            returnValue: 'success',
+            drwNo: round,
+            drwNoDate: dateStr,
+            wnBndNo: item.wnBndNo,
+            wnRnkVl: item.wnRnkVl,
+            bnsRnkVl: item.bnsRnkVl,
+            prizes: prizes,
+          }), { headers: cors });
+        }
+      }
+    }
+  } catch (_) {}
+
+  // 3) 구 API
+  try {
+    const r = await ft('https://www.dhlottery.co.kr/common.do?method=getPension720Number&drwNo=' + round, { headers: browserHeaders });
+    if (r.ok) {
+      const txt = await r.text();
+      if (txt && txt.trim().charAt(0) === '{') {
+        const d = JSON.parse(txt);
+        if (d && d.returnValue !== 'fail') {
+          const wnRnkVl = [d.winNum1, d.winNum2, d.winNum3, d.winNum4, d.winNum5, d.winNum6].join('');
+          return new Response(JSON.stringify({
+            returnValue: 'success',
+            drwNo: round,
+            drwNoDate: d.drwNoDate || '',
+            wnBndNo: String(d.firstWiNum || ''),
+            wnRnkVl: wnRnkVl,
+            bnsRnkVl: String(d.bonusNum || ''),
+            prizes: [],
+          }), { headers: cors });
+        }
+      }
+    }
+  } catch (_) {}
+
+  return new Response(
+    JSON.stringify({ returnValue: 'fail', error: 'API unavailable', round: round }),
+    { status: 200, headers: cors }
+  );
+}
