@@ -1556,7 +1556,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 
   <!-- 가운데: 탭별 메인 콘텐츠 -->
   <section class="panel">
-    <div id="mid-title" class="panel-header"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 회차별 당첨 번호 조회</div>
+    <div id="mid-title" class="panel-header"></div>
     <div class="panel-body" style="background:var(--bg-light);">
 
       <!-- 1. 종합 데스크 -->
@@ -1566,16 +1566,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 
       <!-- 2. 회차별 조회 -->
       <div id="pg-result" class="page-content" style="display:none;">
-        <div style="border-left:4px solid #dc2626;background:var(--paper-white);border-radius:0 10px 10px 0;padding:12px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(220,38,38,.08);">
-          <div style="font-size:9px;color:#dc2626;font-weight:800;letter-spacing:1.5px;margin-bottom:2px;">DRAW RESULTS</div>
-          <div style="font-size:16px;font-weight:900;color:var(--text-dark);margin-bottom:1px;">당첨 결과 조회</div>
-          <div style="font-size:11px;color:var(--text-muted);">역대 회차 당첨번호 · 1등 당첨금 · 내 번호 비교</div>
-        </div>
-        <!-- 로또 / 연금복권 탭 -->
-        <div style="display:flex;gap:6px;margin-bottom:10px;">
-          <button id="res-tab-lotto" onclick="switchResultTab('lotto')" style="flex:1;padding:8px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">🎰 로또 6/45</button>
-          <button id="res-tab-pension" onclick="switchResultTab('pension')" style="flex:1;padding:8px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">🧧 연금복권 720+</button>
-        </div>
         <!-- 로또 조회 UI -->
         <div id="res-lotto-ui">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:0;">
@@ -2432,6 +2422,7 @@ function resJumpTo() {
 // 회차 조회 탭 전환 함수
 const PENSION_GREEN = '#16a34a';
 function switchResultTab(type) {
+  window._curResTab = type;
   const lottoUi = $('res-lotto-ui');
   const pensionUi = $('res-pension-ui');
   const lottoBtn = $('res-tab-lotto');
@@ -2846,6 +2837,7 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
         if (!stores.length) return `<div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">데이터 없음</div>`;
         const autoC = stores.filter(s => s.auto === '자동').length;
         const manC = stores.filter(s => s.auto === '수동').length;
+        const semiC = stores.filter(s => s.auto === '반자동').length;
         const regionMap = {};
         stores.forEach(s => { const r = s.region || '기타'; regionMap[r] = (regionMap[r] || 0) + 1; });
         const chips = Object.entries(regionMap).sort((a,b) => b[1]-a[1])
@@ -2860,7 +2852,7 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
                style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-light);cursor:pointer;user-select:none;gap:6px;">
             <div style="min-width:0;flex:1;">
               <div style="font-size:12px;font-weight:700;color:${color};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${emoji} ${title} (${stores.length}곳)</div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;">자동 <b style="color:${color};">${autoC}</b> / 수동 <b>${manC}</b></div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;">자동 <b style="color:${color};">${autoC}</b> / 수동 <b>${manC}</b>${semiC>0?' / 반자동 <b>'+semiC+'</b>':''}</div>
             </div>
             <span class="sarr" style="font-size:10px;color:var(--text-muted);flex-shrink:0;">▲</span>
           </div>
@@ -4082,7 +4074,7 @@ function go(id) {
   });
   const titles = {
     home:      '최신 당첨 정보',
-    result:    '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 회차별 당첨 번호 조회',
+    result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증 & 번호 저장',
     fortune:   '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> 번호 출현 패턴 분석',
     stats:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적',
@@ -4100,7 +4092,7 @@ function go(id) {
   const _chip = $('header-countdown-chip');
   if (_chip) _chip.style.display = id === 'fortune' ? 'none' : (window._cdActive ? 'flex' : 'none');
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
-  if (id === 'result')    { initRoundSelector(latestRound); }
+  if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
   if (id === 'ticket')    { chgMode(); renderQRHistory(); }
   if (id === 'fortune')   { ensureRecentData().then(() => renderFortune()); }
   if (id === 'stats') {
