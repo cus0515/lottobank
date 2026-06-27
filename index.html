@@ -1587,14 +1587,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <button id="res-prev-btn" onclick="resNavStep(-1)" title="이전 회차" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">◀ 이전 회차</button>
           <button id="res-next-btn" onclick="resNavStep(1)" title="다음 회차" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
         </div>
-        <div style="display:flex;gap:6px;margin-top:6px;align-items:center;">
-          <input type="number" id="res-jump-input" placeholder="회차 직접 입력" min="1" max="9999"
-            style="flex:1;padding:7px 10px;border:1px solid var(--border-dashed);border-radius:8px;font-size:12px;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;"
-            onkeyup="if(event.key==='Enter')resJumpTo()"
-            onfocus="this.style.borderColor='var(--lotto-red)'"
-            onblur="this.style.borderColor=''">
-          <button onclick="resJumpTo()" style="padding:7px 14px;border:1px solid var(--lotto-red);border-radius:8px;background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">이동</button>
-        </div>
+
         <div id="res-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
           <div id="res-round-header" style="padding:12px 16px;background:linear-gradient(135deg,#1a0000,#7f1d1d);color:#fff;display:none;">
             <div style="font-size:10px;opacity:.5;letter-spacing:1px;font-weight:700;">DRAW RESULT</div>
@@ -1604,21 +1597,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
             <div id="res-balls" class="ball-context"></div>
             <div id="res-list" style="font-size:13px;"></div>
           </div>
-        </div>
-        <!-- 번호 직접 확인 -->
-        <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;margin-top:10px;">
-          <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">번호 직접 확인</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">6개 번호 입력 후 현재 회차와 비교</div>
-          <div style="display:flex;gap:4px;margin-bottom:6px;" id="quick-check-inputs">
-            <input type="number" id="qc-1" min="1" max="45" placeholder="1" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-2').focus()">
-            <input type="number" id="qc-2" min="1" max="45" placeholder="2" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-3').focus()">
-            <input type="number" id="qc-3" min="1" max="45" placeholder="3" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-4').focus()">
-            <input type="number" id="qc-4" min="1" max="45" placeholder="4" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-5').focus()">
-            <input type="number" id="qc-5" min="1" max="45" placeholder="5" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(this.value.length>=2||parseInt(this.value)>4)$('qc-6').focus()">
-            <input type="number" id="qc-6" min="1" max="45" placeholder="6" style="width:40px;height:36px;border:1.5px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);outline:none;" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor=''" onkeyup="if(event.key==='Enter')quickCheckNumbers()">
-          </div>
-          <button onclick="quickCheckNumbers()" style="width:100%;padding:8px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">확인하기</button>
-          <div id="quick-check-result" style="margin-top:8px;"></div>
         </div>
         </div><!-- /res-lotto-ui -->
 
@@ -2207,7 +2185,7 @@ function renderLatestOnLeft(data) {
       <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
       <td style="font-size:11px;color:var(--text-muted);">${p.cond}</td>
       <td style="font-weight:700;">${cntStr}</td>
-      <td style="font-weight:700;color:var(--lotto-red);">${p.rank===1||p.rank===2?fmtMFull(p.amt):fmtMShort(p.amt)}</td>
+      <td style="font-weight:700;color:var(--lotto-red);">${p.rank===1||p.rank===2?fmtMFull(p.amt):fmtMFull(p.amt)}</td>
       <td${p.rank<=2?` id="h-auto-${p.rank}"`:''}>${autoStr}</td>
     </tr>`;
   }).join('');
@@ -2496,7 +2474,7 @@ function initPensionTab() {
   penRounds = [];
   for (let i = latest; i >= Math.max(1, latest - 99); i--) penRounds.push(i);
   penCurrentIdx = 0;
-  sel.innerHTML = penRounds.map(r => `<option value="${r}">${r}회</option>`).join('');
+  sel.innerHTML = penRounds.map(r => `<option value="${r}">제 ${r}회 결과 보기</option>`).join('');
   loadPensionResult();
 }
 
@@ -2565,7 +2543,7 @@ function renderPensionResult(d, container, round) {
     prizeRows = prizes.map(p => {
       const rk = p.rank;
       const col = rankColors[rk] || '#94a3b8';
-      const totalStr = p.totAmt ? Number(p.totAmt).toLocaleString() + '원' : '-';
+      const totalStr = p.totAmt ? fmtMFull(Number(p.totAmt)) : '-';
       return `<tr><td style="padding:5px 6px;font-size:11px;font-weight:700;color:${col};">${rankLabels[rk]||rk+'등'}</td><td style="padding:5px 4px;font-size:10px;color:var(--text-muted);text-align:center;">${rankPrizes[rk]||''}</td><td style="padding:5px 4px;font-size:10px;color:var(--text-muted);text-align:right;">${Number(p.total).toLocaleString()}매</td><td style="padding:5px 6px;font-size:10px;font-weight:700;color:var(--text-dark);text-align:right;">${totalStr}</td></tr>`;
     }).join('');
   }
@@ -2593,6 +2571,29 @@ function renderPensionResult(d, container, round) {
       </table>
     </div>` : `<div style="border-top:1px solid var(--border-dashed);padding-top:8px;text-align:center;"><div style="font-size:10px;color:var(--text-muted);">1등: 월 700만원 × 20년 · 보너스: 월 100만원 × 10년</div></div>`}
   `;
+  container.innerHTML = html;
+  // 연금복권 판매점 조회 시도
+  try {
+    const _sd = document.createElement('div');
+    _sd.style.cssText = 'margin-top:10px;';
+    _sd.innerHTML = '<div style="font-size:11px;color:#94a3b8;padding:4px 0;">판매점 조회 중...</div>';
+    container.appendChild(_sd);
+    fetch('/api/lotto-region?round='+round+'&type=pension',{cache:'no-cache'})
+      .then(r=>r.json()).then(j=>{
+        const s1=j.stores1||[],s2=j.stores2||[];
+        if(!s1.length&&!s2.length){_sd.innerHTML='';return;}
+        let uid=Date.now();
+        function _pStore(stores,color,emoji,title){
+          if(!stores.length)return'';
+          const rMap={};stores.forEach(s=>{const r=s.region||'기타';rMap[r]=(rMap[r]||0)+1;});
+          const chips=Object.entries(rMap).sort((a,b)=>b[1]-a[1]).map(([r,c])=>`<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
+          const rows=stores.map(s=>`<tr><td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">${s.name}</a></td><td style="padding:4px 6px;font-size:10px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;">${s.addr}</td><td style="padding:4px 6px;font-size:11px;text-align:center;color:var(--text-muted);">${s.auto}</td></tr>`).join('');
+          uid++;
+          return `<div style="margin-bottom:8px;border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;"><div onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none'" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-light);cursor:pointer;"><div style="font-size:12px;font-weight:700;color:${color};">${emoji} ${title} (${stores.length}곳)</div><span style="font-size:10px;color:var(--text-muted);">▲</span></div><div><div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-light);"><th style="padding:4px 6px;text-align:left;font-size:10px;font-weight:600;color:var(--text-muted);">판매점</th><th style="padding:4px 6px;text-align:left;font-size:10px;font-weight:600;color:var(--text-muted);">주소</th><th style="padding:4px 6px;text-align:center;font-size:10px;font-weight:600;color:var(--text-muted);">구분</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+        }
+        _sd.innerHTML='<div style="margin-top:10px;padding-top:8px;border-top:2px solid var(--border-dashed);">'+_pStore(s1,'#16a34a','🏆','1등 당첨 판매점')+_pStore(s2,'#2563eb','🥈','2등 당첨 판매점')+'</div>';
+      }).catch(()=>{_sd.innerHTML='';}); 
+  } catch(_){}
 }
 
 function quickCheckNumbers() {
@@ -2694,8 +2695,13 @@ async function chgRes() {
   const d = await fetchLotto(round);
   if (!d) {
     $('res-balls').innerHTML = '<span style="color:var(--b-red);font-size:12px;">데이터 없음 — 추첨 전이거나 API 오류</span>';
+    // 다음 회차 버튼 비활성화 (결과 없는 회차)
+    const _nb = $('res-next-btn'); if(_nb) { _nb.disabled=true; _nb.style.opacity='0.4'; _nb.style.cursor='not-allowed'; }
     return;
   }
+  // 결과 있으면 다음 버튼 상태 복원
+  const _nb2 = $('res-next-btn');
+  if(_nb2) { _nb2.disabled = (round >= latestRound); _nb2.style.opacity = (round >= latestRound) ? '0.4' : '1'; _nb2.style.cursor = (round >= latestRound) ? 'not-allowed' : 'pointer'; }
   // 좌측 패널 연동 — 선택 회차가 최신이 아니면 표시
   const isLatest = (round === latestRound);
   if (!isLatest) {
@@ -2759,7 +2765,7 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
             <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
             <td style="font-size:11px;color:var(--text-muted);">${p.cond}</td>
             <td style="font-weight:700;">${cntStr}</td>
-            <td style="font-weight:800;color:var(--lotto-red);">${p.rank<=2?fmtMFull(p.amt):fmtMShort(p.amt)}</td>
+            <td style="font-weight:800;color:var(--lotto-red);">${p.rank<=2?fmtMFull(p.amt):fmtMFull(p.amt)}</td>
             <td${autoId}>${autoStr}</td>
           </tr>`;
         }).join('')}

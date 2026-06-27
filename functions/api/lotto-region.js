@@ -1,7 +1,8 @@
-// 동행복권 1등/2등 당첨 판매소 조회 Cloudflare Pages Function
+// 동행복권 1등/2등 당첨 판매소 조회 Cloudflare Pages Function (로또 + 연금복권 지원)
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const round = parseInt(url.searchParams.get('round') || '0');
+  const type = url.searchParams.get('type') || 'lotto';
 
   const cors = {
     'Content-Type': 'application/json; charset=utf-8',
@@ -13,11 +14,14 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ error: 'round required' }), { status: 400, headers: cors });
   }
 
+  // 연금복권은 ltKndCd=720 파라미터 추가
+  const ltKndCd = type === 'pension' ? '&ltKndCd=720' : '';
+
   try {
     const ac = new AbortController();
     const t = setTimeout(() => ac.abort(), 8000);
     const r = await fetch(
-      `https://www.dhlottery.co.kr/wnprchsplcsrch/selectLtWnShp.do?srchWnShpRnk=all&srchLtEpsd=${round}&srchShpLctn=`,
+      `https://www.dhlottery.co.kr/wnprchsplcsrch/selectLtWnShp.do?srchWnShpRnk=all&srchLtEpsd=${round}&srchShpLctn=${ltKndCd}`,
       {
         signal: ac.signal,
         headers: {
@@ -48,7 +52,7 @@ export async function onRequest(context) {
       else if (item.wnShpRnk === 2) stores2.push(store);
     }
 
-    return new Response(JSON.stringify({ stores1, stores2, total: list.length }), { headers: cors });
+    return new Response(JSON.stringify({ stores1, stores2 }), { headers: cors });
   } catch (e) {
     return new Response(JSON.stringify({ stores1: [], stores2: [], error: e.message }), { headers: cors });
   }
