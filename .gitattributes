@@ -1,5 +1,0 @@
-# Auto detect text files and perform LF normalization
-* text=auto
-
-# index.html은 binary로 처리 (latin-1 인코딩 보호)
-index.html -text
