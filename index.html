@@ -63,21 +63,21 @@
 }
 body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-floor); color: var(--text-dark); line-height: 1.5; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; min-height:100vh; }
 
-header { background: var(--header-bg,#b91c1c); border-bottom: none; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 12px rgba(0,0,0,.3); }
+header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
 .nav-container { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 64px; }
-.logo-title { font-size: 20px; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
-.logo-title span { font-size: 11px; color: rgba(255,255,255,.55); font-weight: 500; }
+.logo-title { font-size: 20px; font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; }
+.logo-title span { font-size: 11px; color: var(--text-muted); font-weight: 500; }
 .menu-tabs { display: flex; height: 100%; gap: 2px; }
-.menu-btn { height: 64px; padding: 0 12px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.7); border: none; background: none; cursor: pointer; display: flex; align-items: center; position: relative; white-space: nowrap; transition: color .15s ease; }
-.menu-btn:hover:not(.on) { color: #fff; }
-.menu-btn.on { color: #fff; font-weight: 700; }
-.menu-btn.on::after { content: ''; position: absolute; bottom: 0; left: 8px; right: 8px; height: 3px; background: rgba(255,255,255,.95); border-radius: 2px 2px 0 0; }
+.menu-btn { height: 64px; padding: 0 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); border: none; background: none; cursor: pointer; display: flex; align-items: center; position: relative; white-space: nowrap; transition: color .15s ease; }
+.menu-btn:hover:not(.on) { color: var(--lotto-red); }
+.menu-btn.on { color: var(--lotto-red); font-weight: 700; }
+.menu-btn.on::after { content: ''; position: absolute; bottom: 0; left: 8px; right: 8px; height: 3px; background: var(--lotto-red); border-radius: 2px 2px 0 0; }
 .auth-zone { display: flex; align-items: center; gap: 10px; }
 .btn-login { padding: 7px 18px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg,#e11d48,#be123c); color: #fff; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(225,29,72,.4); transition: filter .15s,transform .1s; letter-spacing:.2px; }
 .btn-login:hover { filter:brightness(1.1); transform:translateY(-1px); }
 .user-profile { display: none; align-items: center; position: relative; }
-.user-btn { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); cursor:pointer; font-size:13px; font-weight:600; color:rgba(226,232,240,.9); padding:5px 12px; border-radius:8px; transition:background .15s; }
-.user-btn:hover { background:rgba(255,255,255,.14); }
+.user-btn { display:flex; align-items:center; gap:8px; background:rgba(225,29,72,.06); border:1px solid rgba(225,29,72,.2); cursor:pointer; font-size:13px; font-weight:600; color:var(--text-dark); padding:5px 12px; border-radius:8px; transition:background .15s; }
+.user-btn:hover { background:rgba(225,29,72,.1); }
 .user-avatar { width:32px; height:32px; border-radius:50%; background:var(--lotto-red); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:900; flex-shrink:0; }
 .user-btn-arrow { font-size:10px; color:rgba(148,163,184,.7); }
 .user-dropdown { display:none; position:absolute; top:calc(100% + 8px); right:0; background:var(--paper-white); border:1px solid rgba(226,232,240,.7); border-radius:14px; box-shadow:0 12px 32px rgba(0,0,0,.16),0 0 0 1px rgba(0,0,0,.04); min-width:190px; z-index:9999; overflow:hidden; }
@@ -416,7 +416,7 @@ main.chat-hidden .chat-panel { display: none; }
 /* Dark Mode */
 [data-theme="dark"] { --bg-floor:#0f172a; --paper-white:#1e293b; --text-dark:#f1f5f9; --text-muted:#94a3b8; --border-dashed:#475569; --bg-light:#263244; --amber-bg:#1a1200; --amber-border:#92400e; --amber-text:#fbbf24; --comm-hot-bg:#3b0a0a; --comm-hot-border:#7f1d1d; --comm-hot-text:#f87171; --comm-analysis-bg:#1e1a2e; --comm-analysis-border:#4c3b7a; --comm-analysis-text:#a78bfa; --comm-new-bg:#0a2818; --comm-new-border:#166534; }
 [data-theme="dark"] body { background:var(--bg-floor); color:var(--text-dark); }
-[data-theme="dark"] header { background:#7f1d1d !important; }
+[data-theme="dark"] header { background:#1e293b !important; border-bottom-color:var(--lotto-red) !important; }
 [data-theme="dark"] .omr-grid { background:#0f172a !important; border-color:#374151 !important; }
 [data-theme="dark"] .api-status.loading { background:#1a1200 !important; color:#fbbf24 !important; }
 [data-theme="dark"] .api-status.ok { background:#052e16 !important; color:#4ade80 !important; }
@@ -599,9 +599,9 @@ main.chat-hidden .chat-panel { display: none; }
 a, button { transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .1s ease, opacity .18s ease !important; }
 button:active { transform: scale(0.97); }
 
-/* 헤더 메뉴 버튼 개선 - 레드 헤더 기준 흰색 강조 */
-.menu-btn:hover { color: #fff !important; background: rgba(255,255,255,.12) !important; border-radius: 6px; }
-.menu-btn.on { color: #fff !important; background: rgba(255,255,255,.18) !important; border-radius: 6px; }
+/* 헤더 메뉴 버튼 - 흰색 헤더 기준 붉은 강조 */
+.menu-btn:hover { color: var(--lotto-red) !important; background: rgba(225,29,72,.06) !important; border-radius: 6px; }
+.menu-btn.on { color: var(--lotto-red) !important; background: rgba(225,29,72,.08) !important; border-radius: 6px; }
 
 /* 좌측 패널 카드 호버 */
 .left-panel > * { transition: box-shadow .2s ease; }
@@ -1072,9 +1072,8 @@ input:focus-visible { outline:none; }
 .qr-tab-btn.active, .qr-tab-btn.on { color:var(--lotto-red)!important; border-bottom-color:var(--lotto-red)!important; font-weight:800!important; }
 
 /* == Task #121: Typography + global polish == */
-header { background:var(--header-bg,#b91c1c)!important; box-shadow:0 2px 12px rgba(0,0,0,.2)!important; }
-[data-theme='light'] header { background:#b91c1c!important; }
-[data-theme='dark'] header { background:#7f1d1d!important; }
+header { background:#ffffff!important; border-bottom:3px solid var(--lotto-red)!important; box-shadow:0 1px 6px rgba(0,0,0,.08)!important; }
+[data-theme='dark'] header { background:#1e293b!important; border-bottom-color:var(--lotto-red)!important; }
 .logo-title { font-size:21px!important; letter-spacing:-0.8px!important; }
 .tab-nav { border-bottom:1px solid rgba(255,255,255,.06)!important; }
 .tab-btn { font-size:12px!important; font-weight:700!important; letter-spacing:.2px!important; opacity:.6!important; transition:opacity .15s,border-color .15s!important; }
@@ -1241,7 +1240,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <button id="m-fortune" class="menu-btn" onclick="go('fortune')">번호분석</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
-      <button id="m-pension" class="menu-btn" onclick="go('fortune');setTimeout(()=>{const e=document.getElementById('pension-section-block');if(e)e.scrollIntoView({behavior:'smooth'})},400)">🏦 연금복권</button>
+      <button id="m-pension" class="menu-btn" onclick="go('fortune');setTimeout(()=>{const e=document.getElementById('pension-section-block');if(e)e.scrollIntoView({behavior:'smooth'})},400)">연금복권</button>
       <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;color:#dc2626;">관리자</button>
     </div>
     <div class="auth-zone">
@@ -1299,7 +1298,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 <div id="mob-overlay" class="mob-overlay" onclick="closeMobMenu()"></div>
 <div id="mob-drawer" class="mob-drawer">
   <div class="mob-drawer-head">
-    <span class="mob-drawer-logo">🎱 LottoBank</span>
+    <span class="mob-drawer-logo">LottoBank</span>
     <button class="mob-drawer-close" onclick="closeMobMenu()">✕</button>
   </div>
   <button class="mob-menu-item" onclick="go('home');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 홈</button>
@@ -1333,7 +1332,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     <button class="auth-close" onclick="closeAuthModal()">✕</button>
     <div style="text-align:center;margin-bottom:16px;">
       <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border-radius:12px;padding:8px 16px;font-size:15px;font-weight:900;letter-spacing:-.3px;box-shadow:0 4px 12px rgba(220,38,38,.3);">
-        🎱 LottoBank
+        LottoBank
       </div>
     </div>
     <h2 id="auth-title" style="text-align:center;">로그인</h2>
@@ -1516,8 +1515,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <!-- 빠른 바로가기 -->
       <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:5px;">
         <button onclick="go('ticket')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">🔍 QR 인증</button>
-        <button onclick="go('fortune')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">🎯 번호분석</button>
-        <button onclick="go('stats')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">📊 내 전적</button>
+        <button onclick="go('fortune')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">번호분석</button>
+        <button onclick="go('stats')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">내 전적</button>
         <button onclick="go('rank')" style="padding:7px 6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='';this.style.color=''">🏆 랭킹</button>
       </div>
       <!-- 실시간 활동 피드 (항상 표시) -->
@@ -1558,7 +1557,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <div id="pg-result" class="page-content" style="display:none;">
         <div style="border-left:4px solid #dc2626;background:var(--paper-white);border-radius:0 10px 10px 0;padding:12px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(220,38,38,.08);">
           <div style="font-size:9px;color:#dc2626;font-weight:800;letter-spacing:1.5px;margin-bottom:2px;">DRAW RESULTS</div>
-          <div style="font-size:16px;font-weight:900;color:var(--text-dark);margin-bottom:1px;">🎱 당첨 결과 조회</div>
+          <div style="font-size:16px;font-weight:900;color:var(--text-dark);margin-bottom:1px;">당첨 결과 조회</div>
           <div style="font-size:11px;color:var(--text-muted);">역대 회차 당첨번호 · 1등 당첨금 · 내 번호 비교</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:0;">
@@ -1694,7 +1693,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <div id="pg-stats" class="page-content" style="display:none;">
         <div style="background:linear-gradient(135deg,#0f2a18,#14532d);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 16px rgba(20,83,45,.4);">
           <div style="font-size:10px;opacity:.4;font-weight:700;letter-spacing:1px;margin-bottom:3px;">MY RECORD</div>
-          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">📊 나의 전적</div>
+          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">나의 전적</div>
           <div style="font-size:11px;opacity:.5;">QR 인증 기반 실제 투자 · 당첨 기록</div>
         </div>
         <div id="stats-content"></div>
@@ -1704,7 +1703,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <div id="pg-badge" class="page-content" style="display:none;">
         <div style="background:linear-gradient(135deg,#451a03,#92400e);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 16px rgba(146,64,14,.4);">
           <div style="font-size:10px;opacity:.4;font-weight:700;letter-spacing:1px;margin-bottom:3px;">ACHIEVEMENTS</div>
-          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">🏅 뱃지 컬렉션</div>
+          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">뱃지 컬렉션</div>
           <div style="font-size:11px;opacity:.5;">QR 인증 활동으로 뱃지를 획득하세요</div>
         </div>
         <div id="badge-content"></div>
@@ -2220,7 +2219,7 @@ function renderHomeLive() {
 
     <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div style="font-size:11px;font-weight:800;color:var(--text-dark);">🔥 최근 10회차 핫 넘버</div>
+        <div style="font-size:11px;font-weight:800;color:var(--text-dark);">최근 10회차 핫 넘버</div>
         <button onclick="go('fortune')" style="font-size:10px;color:var(--lotto-red);background:none;border:none;cursor:pointer;font-weight:700;font-family:inherit;padding:0;">번호분석 →</button>
       </div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;">${hot.map(n => bH(n)).join('')}</div>
@@ -3862,7 +3861,7 @@ function go(id) {
     if (btn) btn.classList.toggle('on', k === id);
   });
   const titles = {
-    home:      '🎱 최신 당첨 정보',
+    home:      '최신 당첨 정보',
     result:    '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 회차별 당첨 번호 조회',
     ticket:    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증 & 번호 저장',
     fortune:   '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> 번호 출현 패턴 분석',
