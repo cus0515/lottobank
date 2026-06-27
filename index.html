@@ -7692,4 +7692,43 @@ function renderProfile() {
           style="flex:1;padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);"
           onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'">
         <button id="nick-save-btn" onclick="changeNickname()"
-          style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:
+          style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">저장</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);">2~12자, 한글/영문/숫자 사용 가능</div>
+    </div>
+    <div class="profile-block">
+      <div class="profile-block-title">비밀번호 변경</div>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:8px 0;">
+        <input type="password" id="pw-new" placeholder="새 비밀번호 (8자 이상)" maxlength="50" autocomplete="new-password"
+          style="padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);">
+        <input type="password" id="pw-new2" placeholder="새 비밀번호 확인" maxlength="50" autocomplete="new-password"
+          style="padding:9px 12px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--paper-white);color:var(--text-dark);">
+        <button id="pw-change-btn" onclick="changePassword()"
+          style="padding:9px 16px;background:#1e293b;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">비밀번호 변경</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);">8자 이상 입력하세요. 변경 후 재로그인이 필요할 수 있습니다.</div>
+    </div>
+    <div class="profile-block danger-zone" style="border-color:#fecaca;">
+      <div class="profile-block-title" style="color:#dc2626;">위험 구역</div>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">탈퇴 시 QR 인증 기록, 전적, 뱃지, 게시글이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</p>
+      <button onclick="deleteAccount()"
+        style="width:100%;padding:9px;background:var(--comm-hot-bg,#fff5f5);border:1.5px solid #fecaca;border-radius:6px;font-size:13px;font-weight:700;color:#dc2626;cursor:pointer;font-family:inherit;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        회원 탈퇴
+      </button>
+    </div>
+    <div style="margin-top:8px;">
+      </div>
+    ` : `
+    <div class="profile-block" style="text-align:center;padding:20px;">
+      <div style="font-size:32px;margin-bottom:8px;">🔒</div>
+      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">로그인이 필요합니다</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">프로필을 보려면 먼저 로그인하세요.</div>
+      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
+    </div>
+    `}
+  `;
+}
+</script>
+</body>
+</html>
