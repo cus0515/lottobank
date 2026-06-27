@@ -65,8 +65,9 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-floor); col
 
 header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
 .nav-container { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 64px; }
-.logo-title { font-size: 30px; font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; }
-.logo-title span { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.logo-title { font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; display:flex; align-items:center; }
+.logo-title .logo-brand { font-size:22px; font-weight:900; line-height:1; }
+.logo-title .logo-tagline { font-size:11px; color:var(--text-muted); font-weight:400; }
 .menu-tabs { display: flex; height: 100%; gap: 2px; }
 .menu-btn { height: 64px; padding: 0 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); border: none; background: none; cursor: pointer; display: flex; align-items: center; position: relative; white-space: nowrap; transition: color .15s ease; }
 .menu-btn:hover:not(.on) { color: var(--lotto-red); }
@@ -384,8 +385,8 @@ main.chat-hidden .chat-panel { display: none; }
   .btn-login { padding:5px 10px; font-size:12px; }
   .user-profile { font-size:12px; }
   .nav-container { height:56px; padding:0 14px; }
-  .logo-title { font-size:22px; }
-  .logo-title span { display:none; }
+  .logo-title .logo-brand { font-size:20px; }
+  .logo-title .logo-tagline { display:none; }
   main { display:flex !important; flex-direction:column; margin: 16px 12px 80px; padding: 0; height: auto; min-height: unset; gap: 12px; }
   .panel:last-child { display:none; }
   /* 모바일: 중앙 패널(콘텐츠)이 먼저, 좌측 대시보드는 아래에 */
@@ -1076,8 +1077,7 @@ input:focus-visible { outline:none; }
 /* == Task #121: Typography + global polish == */
 header { background:#ffffff!important; border-bottom:3px solid var(--lotto-red)!important; box-shadow:0 1px 6px rgba(0,0,0,.08)!important; }
 [data-theme='dark'] header { background:#1e293b!important; border-bottom-color:var(--lotto-red)!important; }
-.logo-title { font-size:30px!important; letter-spacing:-0.8px!important; }
-@media(max-width:700px){.logo-title{font-size:22px!important;}}
+.logo-title { letter-spacing:-0.8px!important; }
 .tab-nav { border-bottom:1px solid rgba(255,255,255,.06)!important; }
 .tab-btn { font-size:12px!important; font-weight:700!important; letter-spacing:.2px!important; opacity:.6!important; transition:opacity .15s,border-color .15s!important; }
 .tab-btn.on, .tab-btn:hover { opacity:1!important; }
@@ -1230,8 +1230,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   <div class="nav-container">
     <div class="logo-area">
       <div class="logo-title" onclick="go('home')" style="cursor:pointer;letter-spacing:-.3px;" title="홈으로 이동">
-          <span style="background:linear-gradient(135deg,#ef4444,#dc2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900;">Lotto</span><span style="font-weight:900;">Bank</span>
-          <span style="font-weight:400;opacity:.5;font-size:11px;margin-left:6px;">| 로또 전적 &amp; 인증</span>
+          <span class="logo-brand" style="background:linear-gradient(135deg,#ef4444,#dc2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lotto</span><span class="logo-brand" style="color:var(--text-dark);">Bank</span>
+          <span class="logo-tagline" style="opacity:.5;margin-left:8px;">| 로또 전적 &amp; 인증</span>
         </div>
     </div>
     <div class="menu-tabs">
@@ -1241,7 +1241,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;color:#dc2626;">관리자</button>
     </div>
     <div class="auth-zone">
-      <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크/라이트 모드 전환" style="background:none;border:1px solid var(--border-dashed);border-radius:6px;padding:5px 8px;cursor:pointer;font-size:16px;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="테마 전환">🌙</button>
+      <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크 모드로 전환" style="width:34px;height:30px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-dashed);border-radius:6px;padding:0;cursor:pointer;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="다크 모드로 전환"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
       <button id="chat-reopen-btn" onclick="toggleChat()" title="채팅 열기"
         style="display:none;align-items:center;gap:4px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--text-muted);background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;cursor:pointer;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 채팅
@@ -1379,9 +1379,9 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 <main id="main-content">
   <!-- 좌측: 대시보드 패널 -->
   <section class="panel">
-    <div class="panel-header" style="justify-content:center;">
+    <div class="panel-header" style="justify-content:center;gap:6px;">
       <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-      LottoBank 대시보드
+      LottoBank
     </div>
     <div class="panel-body" style="padding:14px;">
 
@@ -1583,7 +1583,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
         </div>
 
         <div id="res-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
-          <div id="res-round-header" style="padding:12px 16px;background:linear-gradient(135deg,#1a0000,#7f1d1d);color:#fff;display:none;">
+          <div id="res-round-header" style="padding:12px 16px;background:var(--lotto-red);color:#fff;display:none;">
             <div id="res-round-label" style="font-size:16px;font-weight:900;"></div>
           </div>
           <div style="padding:16px;">
@@ -1605,7 +1605,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <button id="pen-next-btn" onclick="penNavStep(-1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
         </div>
         <div id="pen-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
-          <div id="pen-round-header" style="padding:12px 16px;background:linear-gradient(135deg,#1a2e0a,#1d4e1a);color:#fff;display:none;">
+          <div id="pen-round-header" style="padding:12px 16px;background:#16a34a;color:#fff;display:none;">
                         <div id="pen-round-label" style="font-size:16px;font-weight:900;"></div>
           </div>
           <div style="padding:16px;">
@@ -5308,6 +5308,17 @@ async function renderLottoDNA(freq, rounds) {
 // =====================================================
 
 // 다크모드 토글
+function setThemeToggleIcon(isDark) {
+  const btn = $('dark-toggle-btn');
+  if (!btn) return;
+  btn.innerHTML = isDark
+    ? '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.42 1.42"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>'
+    : '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+  const label = isDark ? '라이트 모드로 전환' : '다크 모드로 전환';
+  btn.title = label;
+  btn.setAttribute('aria-label', label);
+}
+
 function toggleDarkMode() {
   const root = document.documentElement;
   const isDark = root.getAttribute('data-theme') === 'dark';
@@ -5315,8 +5326,7 @@ function toggleDarkMode() {
   root.setAttribute('data-theme', next);
   document.body.setAttribute('data-theme', next); // CSS selector compatibility
   localStorage.setItem('ltb-theme', next);
-  const btn = $('dark-toggle-btn');
-  if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
+  setThemeToggleIcon(next === 'dark');
   // 다크모드 전환 시 Chart.js 인스턴스 색상 즉시 업데이트
   setTimeout(() => {
     const gridColor = next === 'dark' ? '#334155' : '#f1f5f9';
@@ -5339,8 +5349,7 @@ function toggleDarkMode() {
   const saved = localStorage.getItem('ltb-theme');
   if (saved === 'dark') document.body.setAttribute('data-theme', 'dark');
   document.addEventListener('DOMContentLoaded', function() {
-    const btn = document.getElementById('dark-toggle-btn');
-    if (btn && saved === 'dark') btn.textContent = '☀️';
+    setThemeToggleIcon(saved === 'dark');
   });
 })();
 
