@@ -1573,8 +1573,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
         </div>
         <!-- 로또 / 연금복권 탭 -->
         <div style="display:flex;gap:6px;margin-bottom:10px;">
-          <button id="res-tab-lotto" onclick="switchResultTab('lotto')" style="flex:1;padding:8px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>
-          <button id="res-tab-pension" onclick="switchResultTab('pension')" style="flex:1;padding:8px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>
+          <button id="res-tab-lotto" onclick="switchResultTab('lotto')" style="flex:1;padding:8px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">🎰 로또 6/45</button>
+          <button id="res-tab-pension" onclick="switchResultTab('pension')" style="flex:1;padding:8px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">🧧 연금복권 720+</button>
         </div>
         <!-- 로또 조회 UI -->
         <div id="res-lotto-ui">
@@ -1608,8 +1608,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           </select>
         </div>
         <div style="display:flex;gap:6px;margin-top:6px;">
-          <button onclick="penNavStep(1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">◀ 이전 회차</button>
-          <button onclick="penNavStep(-1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
+          <button id="pen-prev-btn" onclick="penNavStep(1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">◀ 이전 회차</button>
+          <button id="pen-next-btn" onclick="penNavStep(-1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
         </div>
         <div id="pen-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
           <div id="pen-round-header" style="padding:12px 16px;background:linear-gradient(135deg,#1a2e0a,#1d4e1a);color:#fff;display:none;">
@@ -2462,19 +2462,28 @@ function switchResultTab(type) {
 // 연금복권 회차 초기화
 let penRounds = [];
 let penCurrentIdx = 0;
-function initPensionTab() {
+async function initPensionTab() {
   const sel = $('pen-sel');
   if (!sel) return;
-  if (penRounds.length > 0) { loadPensionResult(); return; }
+  if (penRounds.length > 0) { _updatePenBtns(); loadPensionResult(); return; }
   // 연금복권 720+ 1회: 2020-05-07 (목요일) 기준 매주 목요일 추첨
   const base = new Date('2020-05-07');
   const now = new Date();
   const weeks = Math.floor((now - base) / (7 * 24 * 3600 * 1000));
-  const latest = weeks + 1;
+  let latest = weeks + 1;
+  // 실제 API로 최신 회차 검증 (최대 2회차 뒤로)
+  for (let r = latest; r >= latest - 2; r--) {
+    try {
+      const res = await fetch(`/api/pension?round=${r}`);
+      const d = await res.json();
+      if (d.returnValue === 'success') { latest = r; break; }
+    } catch(_) {}
+  }
   penRounds = [];
   for (let i = latest; i >= Math.max(1, latest - 99); i--) penRounds.push(i);
   penCurrentIdx = 0;
   sel.innerHTML = penRounds.map(r => `<option value="${r}">제 ${r}회차 결과 보기</option>`).join('');
+  _updatePenBtns();
   loadPensionResult();
 }
 
@@ -2485,7 +2494,13 @@ function penNavStep(dir) {
   if (newIdx < 0 || newIdx >= penRounds.length) return;
   penCurrentIdx = newIdx;
   sel.selectedIndex = penCurrentIdx;
+  _updatePenBtns();
   loadPensionResult();
+}
+function _updatePenBtns() {
+  const pb = $('pen-prev-btn'), nb = $('pen-next-btn');
+  if (pb) { pb.disabled = penCurrentIdx >= penRounds.length - 1; pb.style.opacity = pb.disabled ? '0.4' : '1'; pb.style.cursor = pb.disabled ? 'not-allowed' : 'pointer'; }
+  if (nb) { nb.disabled = penCurrentIdx <= 0; nb.style.opacity = nb.disabled ? '0.4' : '1'; nb.style.cursor = nb.disabled ? 'not-allowed' : 'pointer'; }
 }
 
 async function loadPensionResult() {
@@ -2497,7 +2512,7 @@ async function loadPensionResult() {
   const label = $('pen-round-label');
   const body = $('pen-result-body');
   if (header) header.style.display = '';
-  if (label) label.textContent = `제 ${round}회 연금복권 720+`;
+  if (label) label.textContent = `제 ${round}회차 연금복권 720+`;
   if (body) body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px 0;">불러오는 중...</div>`;
   try {
     const res = await fetch(`/api/pension?round=${round}`);
