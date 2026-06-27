@@ -2516,7 +2516,7 @@ async function loadPensionResult() {
   const label = $('pen-round-label');
   const body = $('pen-result-body');
   if (header) header.style.display = '';
-  if (label) label.textContent = `제 ${round}회차 연금복권 720+`;
+  if (label) label.textContent = `제 ${round}회차 · 조회 중...`;
   if (body) body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px 0;">불러오는 중...</div>`;
   try {
     const res = await fetch(`/api/pension?round=${round}`);
@@ -2543,6 +2543,8 @@ function renderPensionResult(d, container, round) {
   const wnStr = String(d.wnRnkVl || '');
   const bnsStr = String(d.bnsRnkVl || '');
   const dateStr = d.drwNoDate || '';
+  // 헤더 레이블 날짜 포함 업데이트
+  const _lbl = $('pen-round-label'); if (_lbl && dateStr) _lbl.textContent = `제 ${round}회차 · ${dateStr}`;
   const prizes = Array.isArray(d.prizes) ? d.prizes : [];
 
   const digitLabels = ['십만','만','천','백','십','일'];
@@ -2608,9 +2610,13 @@ function renderPensionResult(d, container, round) {
           if(!stores.length)return'';
           const rMap={};stores.forEach(s=>{const r=s.region||'기타';rMap[r]=(rMap[r]||0)+1;});
           const chips=Object.entries(rMap).sort((a,b)=>b[1]-a[1]).map(([r,c])=>`<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
-          const rows=stores.map(s=>`<tr><td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">${s.name}</a></td><td style="padding:4px 6px;font-size:10px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;">${s.addr}</td><td style="padding:4px 6px;font-size:11px;text-align:center;color:var(--text-muted);">${s.auto}</td></tr>`).join('');
+          const autoC=stores.filter(s=>s.auto==='자동').length;
+          const manC=stores.filter(s=>s.auto==='수동').length;
+          const semiC=stores.filter(s=>s.auto==='반자동').length;
+          const cntStr='자동 <b style="color:'+color+';">'+autoC+'</b> / 수동 <b>'+manC+'</b>'+(semiC>0?' / 반자동 <b>'+semiC+'</b>':'');
+          const rows=stores.map(s=>`<tr style="border-bottom:1px solid var(--border-dashed);"><td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">${s.name}</a></td><td style="padding:4px 6px;font-size:10px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td><td style="padding:4px 6px;font-size:11px;text-align:center;color:var(--text-muted);white-space:nowrap;">${s.auto||'—'}</td></tr>`).join('');
           uid++;
-          return `<div style="margin-bottom:8px;border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;"><div onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none'" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-light);cursor:pointer;"><div style="font-size:12px;font-weight:700;color:${color};">${emoji} ${title} (${stores.length}곳)</div><span style="font-size:10px;color:var(--text-muted);">▲</span></div><div><div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-light);"><th style="padding:4px 6px;text-align:left;font-size:10px;font-weight:600;color:var(--text-muted);">판매점</th><th style="padding:4px 6px;text-align:left;font-size:10px;font-weight:600;color:var(--text-muted);">주소</th><th style="padding:4px 6px;text-align:center;font-size:10px;font-weight:600;color:var(--text-muted);">구분</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+          return `<div style="margin-bottom:8px;border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;"><div onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none'" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-light);cursor:pointer;user-select:none;"><div><div style="font-size:12px;font-weight:700;color:${color};white-space:nowrap;">${emoji} ${title} (${stores.length}곳)</div><div style="font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;">${cntStr}</div></div><span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">▲</span></div><div><div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;"><colgroup><col style="width:32%"><col style="width:46%"><col style="width:22%"></colgroup><thead><tr style="background:var(--bg-light);"><th style="padding:4px 6px;text-align:left;font-size:10px;font-weight:600;color:var(--text-muted);">판매점</th><th style="padding:4px 6px;text-align:left;font-size:10px;font-weight:600;color:var(--text-muted);">주소</th><th style="padding:4px 6px;text-align:center;font-size:10px;font-weight:600;color:var(--text-muted);">구분</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
         }
         _sd.innerHTML='<div style="margin-top:10px;padding-top:8px;border-top:2px solid var(--border-dashed);">'+_pStore(s1,'#16a34a','🏆','1등 당첨 판매점')+_pStore(s2,'#2563eb','🥈','2등 당첨 판매점')+'</div>';
       }).catch(()=>{_sd.innerHTML='';}); 
