@@ -65,7 +65,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-floor); col
 
 header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
 .nav-container { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 64px; }
-.logo-title { font-size: 26px; font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; }
+.logo-title { font-size: 30px; font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; }
 .logo-title span { font-size: 11px; color: var(--text-muted); font-weight: 500; }
 .menu-tabs { display: flex; height: 100%; gap: 2px; }
 .menu-btn { height: 64px; padding: 0 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); border: none; background: none; cursor: pointer; display: flex; align-items: center; position: relative; white-space: nowrap; transition: color .15s ease; }
@@ -384,7 +384,7 @@ main.chat-hidden .chat-panel { display: none; }
   .btn-login { padding:5px 10px; font-size:12px; }
   .user-profile { font-size:12px; }
   .nav-container { height:56px; padding:0 14px; }
-  .logo-title { font-size:18px; }
+  .logo-title { font-size:22px; }
   .logo-title span { display:none; }
   main { display:flex !important; flex-direction:column; margin: 16px 12px 80px; padding: 0; height: auto; min-height: unset; gap: 12px; }
   .panel:last-child { display:none; }
@@ -1076,7 +1076,8 @@ input:focus-visible { outline:none; }
 /* == Task #121: Typography + global polish == */
 header { background:#ffffff!important; border-bottom:3px solid var(--lotto-red)!important; box-shadow:0 1px 6px rgba(0,0,0,.08)!important; }
 [data-theme='dark'] header { background:#1e293b!important; border-bottom-color:var(--lotto-red)!important; }
-.logo-title { font-size:26px!important; letter-spacing:-0.8px!important; }
+.logo-title { font-size:30px!important; letter-spacing:-0.8px!important; }
+@media(max-width:700px){.logo-title{font-size:22px!important;}}
 .tab-nav { border-bottom:1px solid rgba(255,255,255,.06)!important; }
 .tab-btn { font-size:12px!important; font-weight:700!important; letter-spacing:.2px!important; opacity:.6!important; transition:opacity .15s,border-color .15s!important; }
 .tab-btn.on, .tab-btn:hover { opacity:1!important; }
@@ -1236,9 +1237,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     <div class="menu-tabs">
       <button id="m-home" class="menu-btn" onclick="go('home')">홈</button>
       <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
-      <button id="m-fortune" class="menu-btn" onclick="go('fortune')">당첨 인증 피드</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
-      <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
       <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;color:#dc2626;">관리자</button>
     </div>
     <div class="auth-zone">
@@ -1278,7 +1277,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
             </div>
           </div>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('ticket')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증</button>
-          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('fortune')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 당첨 인증 피드</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('stats')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('badge')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg> 뱃지</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('profile')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필</button>
@@ -1301,9 +1299,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   </div>
   <button class="mob-menu-item" onclick="go('home');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 홈</button>
   <button class="mob-menu-item" onclick="go('result');closeMobMenu()">회차 조회</button>
-  <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 당첨 인증 피드</button>
   <button class="mob-menu-item" onclick="go('rank');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> 랭킹</button>
-  <button class="mob-menu-item" onclick="go('community');closeMobMenu()">커뮤니티</button>
   <div id="mob-auth-section" style="display:none;border-top:2px solid var(--border-dashed);margin-top:4px;">
     <div style="padding:10px 4px 4px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.5px;">내 계정</div>
     <button class="mob-menu-item" onclick="go('ticket');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증</button>
@@ -1320,7 +1316,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   <button class="mob-nav-btn" id="mob-btn-result" onclick="go('result')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>회차조회</button>
   <button class="mob-nav-btn" id="mob-btn-ticket" onclick="go('ticket')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg></span>QR인증</button>
   <button class="mob-nav-btn" id="mob-btn-stats" onclick="go('stats')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>전적</button>
-  <button class="mob-nav-btn" id="mob-btn-fortune" onclick="go('fortune')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>인증피드</button>
+  <button class="mob-nav-btn" id="mob-btn-rank" onclick="go('rank')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></span>랭킹</button>
   <button class="mob-nav-btn" id="mob-btn-more" onclick="openMobMenu()"><span class="mob-nav-icon">☰</span>더보기</button>
 </nav>
 
@@ -1478,15 +1474,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           </div>
           <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 0;font-size:12px;font-weight:900;cursor:pointer;width:100%;letter-spacing:.3px;">무료로 시작하기</button>
         </div>
-        <div id="left-lucky-card" class="left-dashboard-card" style="margin-bottom:10px;background:var(--paper-white);border:1px solid var(--border-dashed);">
-  <div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px;">오늘의 행운 점수</div>
-  <div id="lucky-score-display" style="font-size:32px;font-weight:900;color:var(--lotto-red);margin-bottom:4px;">-</div>
-  <div id="lucky-score-bar" style="height:4px;background:var(--border-dashed);border-radius:2px;margin-bottom:8px;">
-    <div id="lucky-bar-fill" style="height:100%;background:var(--lotto-red);border-radius:2px;width:0%;transition:width 1s ease;"></div>
-  </div>
-  <div id="lucky-score-msg" style="font-size:10px;color:var(--text-muted);margin-bottom:8px;"></div>
-  <div id="lucky-nums-today" style="display:flex;gap:4px;justify-content:flex-start;flex-wrap:wrap;"></div>
-</div>
 <div id="left-hot-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:10px 12px;">
           <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -1861,9 +1848,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 <footer class="site-footer">
   <div class="site-footer-inner">
     <div class="footer-links">
-      <a href="javascript:void(0)" onclick="go('community')">커뮤니티</a>
+      <a href="javascript:void(0)" onclick="go('home')">실시간 피드</a>
       <a href="javascript:void(0)" onclick="go('rank')">랭킹</a>
-      <a href="javascript:void(0)" onclick="go('fortune')">당첨 인증 피드</a>
       <span style="color:var(--border-dashed);">|</span>
       <a href="https://dhlottery.co.kr" target="_blank" rel="noopener">동행복권</a>
     </div>
@@ -2210,6 +2196,20 @@ function renderLatestOnLeft(data) {
 }
 
 function renderHomeLive() {
+  $('home-live').innerHTML = `
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border-dashed);">
+        <div>
+          <div style="font-size:14px;font-weight:900;color:var(--text-dark);">실시간 피드</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">QR 등록, 당첨 인증, 뱃지와 랭킹 소식을 최신순으로 보여드립니다.</div>
+        </div>
+        <span style="font-size:10px;font-weight:800;color:#16a34a;">LIVE</span>
+      </div>
+      <div id="feed-list" style="min-height:220px;"></div>
+    </div>
+  `;
+  renderFeed();
+  return;
   const d = latestData;
   if (!d) { $('home-live').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px;">데이터 로딩 중...</div>'; return; }
   const a = analyzeNumbers(d.nums);
@@ -2502,6 +2502,20 @@ async function loadPensionResult() {
   }
 }
 
+function filterStoreRegion(blockId, region, button) {
+  const block = document.getElementById(blockId);
+  if (!block) return;
+  block.querySelectorAll('tbody tr[data-store-region]').forEach(row => {
+    row.style.display = region === '전체' || row.dataset.storeRegion === region ? '' : 'none';
+  });
+  block.querySelectorAll('[data-region-filter]').forEach(chip => {
+    const active = chip.dataset.regionFilter === region;
+    chip.setAttribute('aria-pressed', active ? 'true' : 'false');
+    chip.style.fontWeight = active ? '900' : '700';
+    chip.style.boxShadow = active ? '0 0 0 2px currentColor inset' : 'none';
+  });
+}
+
 function renderPensionResult(d, container, round) {
   if (!container) return;
   // d: { returnValue, drwNo, drwNoDate, wnBndNo, wnRnkVl(6자리), bnsRnkVl(6자리), prizes[] }
@@ -2510,7 +2524,7 @@ function renderPensionResult(d, container, round) {
   const bnsStr = String(d.bnsRnkVl || '');
   const dateStr = d.drwNoDate || '';
   // 헤더 레이블 날짜 포함 업데이트
-  const _lbl = $('pen-round-label'); if (_lbl && dateStr) _lbl.textContent = `제 ${round}회차 · ${dateStr}`;
+  const _lbl = $('pen-round-label'); if (_lbl && dateStr) _lbl.innerHTML = `제 <span style="color:#fbbf24;font-size:20px;">${round}</span>회 &nbsp;·&nbsp; ${dateStr}`;
   const prizes = Array.isArray(d.prizes) ? d.prizes : [];
 
   const digitLabels = ['십만','만','천','백','십','일'];
@@ -2565,7 +2579,7 @@ function renderPensionResult(d, container, round) {
   // 연금복권 판매점 조회 시도
   try {
     const _sd = document.createElement('div');
-    _sd.style.cssText = 'margin-top:10px;';
+    _sd.style.cssText = 'margin-top:10px;text-align:left;';
     _sd.innerHTML = '<div style="font-size:11px;color:#94a3b8;padding:4px 0;">판매소 조회 중...</div>';
     container.appendChild(_sd);
     fetch('/api/lotto-region?round='+round+'&type=pension',{cache:'no-cache'})
@@ -2588,10 +2602,10 @@ function renderPensionResult(d, container, round) {
           const semiC=stores.filter(s=>s.auto==='반자동').length;
           const summary=autoC||manC||semiC ? '자동 <b style="color:'+color+';">'+autoC+'</b> / 수동 <b>'+manC+'</b>'+(semiC>0?' / 반자동 <b>'+semiC+'</b>':'') : '판매소 <b style="color:'+color+';">'+stores.length+'</b>';
           const rMap={};stores.forEach(s=>{const r=s.region||'기타';rMap[r]=(rMap[r]||0)+1;});
-          const chips=Object.entries(rMap).sort((a,b)=>b[1]-a[1]).map(([r,c])=>`<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
-          const rows=stores.map(s=>`<tr style="border-bottom:1px solid var(--border-dashed);"><td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;" title="${s.name}">${s.name} ${_mapSvg}</a></td><td style="padding:4px 6px;font-size:10px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td><td style="padding:4px 6px;font-size:11px;text-align:center;color:var(--text-muted);white-space:nowrap;">${s.auto||'—'}</td></tr>`).join('');
           const sid='psb-'+(pUid++);
-          return `<div style="margin-bottom:8px;border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;"><div onclick="(function(el){var b=document.getElementById('${sid}');var arr=el.querySelector('.sarr');if(b.style.display==='none'){b.style.display='';arr.textContent='▲';}else{b.style.display='none';arr.textContent='▼';}})(this)" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-light);cursor:pointer;user-select:none;gap:6px;"><div style="min-width:0;flex:1;"><div style="font-size:12px;font-weight:700;color:${color};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${emoji} ${title} (${stores.length}곳)</div><div style="font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;">${summary}</div></div><span class="sarr" style="font-size:10px;color:var(--text-muted);flex-shrink:0;">▲</span></div><div id="${sid}"><div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div><table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;"><colgroup><col style="width:32%"><col style="width:46%"><col style="width:22%"></colgroup><thead><tr style="background:var(--bg-light);"><th style="padding:4px 6px;text-align:left;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">판매점</th><th style="padding:4px 6px;text-align:left;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">주소</th><th style="padding:4px 6px;text-align:center;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">구분</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+          const chips=`<button data-region-filter="전체" aria-pressed="true" onclick="filterStoreRegion('${sid}','전체',this)" style="background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:900;margin:2px 3px 2px 0;cursor:pointer;">전체 ${stores.length}</button>`+Object.entries(rMap).sort((a,b)=>b[1]-a[1]).map(([r,c])=>`<button data-region-filter="${r}" aria-pressed="false" onclick="filterStoreRegion('${sid}','${r}',this)" style="background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;cursor:pointer;">${r} ${c}</button>`).join('');
+          const rows=stores.map(s=>`<tr data-store-region="${s.region||'기타'}" style="border-bottom:1px solid var(--border-dashed);"><td style="padding:4px 6px;font-size:11px;font-weight:600;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;" title="${s.name}">${s.name} ${_mapSvg}</a></td><td style="padding:4px 6px;font-size:10px;text-align:left;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td><td style="padding:4px 6px;font-size:11px;text-align:center;color:var(--text-muted);white-space:nowrap;">${s.auto||'—'}</td></tr>`).join('');
+          return `<div style="margin-bottom:8px;border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;text-align:left;"><div onclick="(function(el){var b=document.getElementById('${sid}');var arr=el.querySelector('.sarr');if(b.style.display==='none'){b.style.display='';arr.textContent='▲';}else{b.style.display='none';arr.textContent='▼';}})(this)" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-light);cursor:pointer;user-select:none;gap:6px;text-align:left;"><div style="min-width:0;flex:1;"><div style="font-size:12px;font-weight:700;color:${color};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${emoji} ${title} (${stores.length}곳)</div><div style="font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;">${summary}</div></div><span class="sarr" style="font-size:10px;color:var(--text-muted);flex-shrink:0;">▲</span></div><div id="${sid}"><div style="padding:6px 10px 4px;line-height:2.2;">${chips}</div><table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;"><colgroup><col style="width:32%"><col style="width:46%"><col style="width:22%"></colgroup><thead><tr style="background:var(--bg-light);"><th style="padding:4px 6px;text-align:left;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">판매점</th><th style="padding:4px 6px;text-align:left;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">주소</th><th style="padding:4px 6px;text-align:center;border-top:1px solid var(--border-dashed);border-bottom:1px solid var(--border-dashed);font-weight:600;color:var(--text-muted);">구분</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
         }
         const _svg1='<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M2 19h20"/><path d="m2 9 5 5 5-8 5 8 5-5"/></svg>';
         const _svg2='<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg>';
@@ -2824,9 +2838,10 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
         const semiC = stores.filter(s => s.auto === '반자동').length;
         const regionMap = {};
         stores.forEach(s => { const r = s.region || '기타'; regionMap[r] = (regionMap[r] || 0) + 1; });
-        const chips = Object.entries(regionMap).sort((a,b) => b[1]-a[1])
-          .map(([r,c]) => `<span style="display:inline-block;background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;">${r} ${c}</span>`).join('');
-        const rows = stores.map(s => `<tr style="border-bottom:1px solid var(--border-dashed);">
+        const chips = `<button data-region-filter="전체" aria-pressed="true" onclick="filterStoreRegion('sb-${uid}','전체',this)" style="background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:900;margin:2px 3px 2px 0;cursor:pointer;">전체 ${stores.length}</button>` +
+          Object.entries(regionMap).sort((a,b) => b[1]-a[1])
+          .map(([r,c]) => `<button data-region-filter="${r}" aria-pressed="false" onclick="filterStoreRegion('sb-${uid}','${r}',this)" style="background:${color}18;color:${color};border:1px solid ${color}44;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;cursor:pointer;">${r} ${c}</button>`).join('');
+        const rows = stores.map(s => `<tr data-store-region="${s.region||'기타'}" style="border-bottom:1px solid var(--border-dashed);">
               <td style="padding:4px 6px;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="https://map.kakao.com/link/search/${s.name}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;" title="${s.name}">${s.name} <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a></td>
               <td style="padding:4px 6px;font-size:10px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.addr}">${s.addr}</td>
               <td style="padding:4px 6px;font-size:11px;text-align:center;color:var(--text-muted);white-space:nowrap;">${s.auto}</td>
@@ -3077,7 +3092,7 @@ const rBgs   = _isDm2 ? { 1:'#2a0f0f', 2:'#1e0a3e', 3:'#0a1f10', 4:'#0a1628', 5:
   // 저장 처리
   const gameResults = parsed.games.map(nums => checkWinRank(nums, winData.nums, winData.bonus));
   if (bestRank <= 3) {
-    myVerifiedTitle = `${parsed.round}회 ${bestLabel}`;
+    myVerifiedTitle = `${parsed.round}회차 ${bestLabel}`;
     updateBadgeUI();
   }
   usedQrKeys.push(parsed.key);
@@ -3620,9 +3635,9 @@ let chatChannel = null;
 
 function getChatBadgeHtml(verifiedTitle) {
   if (!verifiedTitle) return `<span class="badge b-guest">일반</span>`;
-  if (verifiedTitle.includes('1등')) return `<span class="badge b-real-1">${verifiedTitle}</span>`;
-  if (verifiedTitle.includes('2등')) return `<span class="badge b-real-2">${verifiedTitle}</span>`;
-  return `<span class="badge b-real-3">${verifiedTitle}</span>`;
+  if (verifiedTitle.includes('1등')) return `<span class="badge b-real-1">[${verifiedTitle}]</span>`;
+  if (verifiedTitle.includes('2등')) return `<span class="badge b-real-2">[${verifiedTitle}]</span>`;
+  return `<span class="badge b-real-3">[${verifiedTitle}]</span>`;
 }
 
 function appendChatRow(msg) {
@@ -3734,7 +3749,7 @@ async function loadUserDataFromDB() {
         winTickets.sort((a, b) => a.prize_rank - b.prize_rank);
         const best = winTickets[0];
         const rankLabels = {1:'1등',2:'2등',3:'3등',4:'4등',5:'5등'};
-        const title = `${best.round_no}회 ${rankLabels[best.prize_rank]}`;
+        const title = `${best.round_no}회차 ${rankLabels[best.prize_rank]}`;
         if (!myVerifiedTitle || myVerifiedTitle !== title) { myVerifiedTitle = title; saveStorage(); }
       }
     }
@@ -4035,6 +4050,7 @@ async function upsertUserStats(gameCount, gameResults, totalPrize = 0, winData =
 // 탭 전환
 // =====================================================
 function go(id) {
+  if (id === 'fortune' || id === 'community') id = 'home';
   // 페이지 이동 시 상단으로 스크롤
   const mc = document.getElementById('main-content');
   if (mc) mc.scrollTop = 0;
@@ -4057,7 +4073,7 @@ function go(id) {
     if (btn) btn.classList.toggle('on', k === id);
   });
   const titles = {
-    home:      '최신 당첨 정보',
+    home:      '실시간 피드',
     result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증 & 번호 저장',
     fortune:   '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 실시간 당첨 인증 피드',
@@ -4070,7 +4086,7 @@ function go(id) {
   };
   $('mid-title').innerHTML = titles[id] || '';
   // 페이지 타이틀 동적 업데이트
-  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', fortune:'실시간 당첨 인증 피드', stats:'나의 전적', badge:'획득 뱃지', rank:'전체 랭킹', community:'커뮤니티', admin:'관리자 패널', profile:'내 프로필', home:'최신 당첨 정보' };
+  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', badge:'획득 뱃지', rank:'전체 랭킹', admin:'관리자 패널', profile:'내 프로필', home:'실시간 피드' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
@@ -5382,6 +5398,45 @@ function scheduleDrawNotification() {
 // =====================================================
 // 초기화
 // =====================================================
+function startDashboardCountdown() {
+  if (window._dashboardCountdownTimer) clearInterval(window._dashboardCountdownTimer);
+  const update = () => {
+    const now = new Date();
+    const fill = (prefix, target) => {
+      const diff = Math.max(0, target - now);
+      const values = [
+        Math.floor(diff / 86400000),
+        Math.floor((diff % 86400000) / 3600000),
+        Math.floor((diff % 3600000) / 60000),
+        Math.floor((diff % 60000) / 1000),
+      ];
+      ['d','h','m','s'].forEach((part, index) => {
+        const el = $(`${prefix}${part}`);
+        if (el) el.textContent = String(values[index]).padStart(2, '0');
+      });
+    };
+    const nextSat = new Date(now);
+    nextSat.setDate(now.getDate() + ((6 - now.getDay() + 7) % 7));
+    nextSat.setHours(20, 35, 0, 0);
+    if (nextSat <= now) nextSat.setDate(nextSat.getDate() + 7);
+    const nextThu = new Date(now);
+    nextThu.setDate(now.getDate() + ((4 - now.getDay() + 7) % 7));
+    nextThu.setHours(10, 0, 0, 0);
+    if (nextThu <= now) nextThu.setDate(nextThu.getDate() + 7);
+    fill('cd-', nextSat);
+    fill('pen-cd-', nextThu);
+    const lottoRound = $('next-round-label');
+    if (lottoRound) lottoRound.textContent = latestRound ? latestRound + 1 : '-';
+    const pensionRound = $('pen-next-round-label');
+    if (pensionRound) {
+      const base = new Date('2020-05-07T10:00:00+09:00');
+      pensionRound.textContent = Math.floor((nextThu - base) / (7 * 86400000)) + 1;
+    }
+  };
+  update();
+  window._dashboardCountdownTimer = setInterval(update, 1000);
+}
+
 // 키보드 단축키 (Alt+1~8, Esc)
 document.addEventListener('keydown', function(e) {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
@@ -5398,6 +5453,7 @@ document.addEventListener('keydown', function(e) {
 
 async function init() {
   go('home');
+  startDashboardCountdown();
   initAuth();
   subscribeFeed();
   renderFeed();
@@ -5417,6 +5473,7 @@ async function init() {
     latestData = await fetchLotto(r);
     if (latestData) { latestRound = r; break; }
   }
+  startDashboardCountdown();
   // 실패시 5초 후 재시도
   if (!latestData) {
     setTimeout(async () => {
@@ -6381,14 +6438,10 @@ async function renderBadge() {
 // 랭킹 페이지
 // =====================================================
 const RANK_CATS = [
-  { id: 'buy_count',   label: '구매 게임수', unit: '게임' },
-  { id: 'total_prize', label: '총 당첨금', unit: ''   },
-  { id: 'roi',         label: '수익률',    unit: '%'  },
-  { id: 'rank1',       label: '1등 인증',  unit: '회' },
-  { id: 'rank2',       label: '2등 최다',  unit: '회' },
-  { id: 'rank3',       label: '3등 최다',  unit: '회' },
-  { id: 'rank4',       label: '4등 최다',  unit: '회' },
-  { id: 'rank5',       label: '5등 최다',  unit: '회' },
+  { id: 'buy_count', label: '구매왕', unit: '원' },
+  { id: 'seller', label: '판매왕', unit: '게임' },
+  { id: 'rank1', label: '회차 1등', unit: '회' },
+  { id: 'rank2', label: '회차 2등', unit: '회' },
 ];
 let curRankCat = 'buy_count';
 
@@ -6460,7 +6513,8 @@ async function renderRank(catId) {
       stats = Object.values(agg);
     } else {
       // 전체기간: user_stats
-      const orderCol = catId === 'total_prize' ? 'total_prize' :
+      const orderCol = catId === 'seller' ? 'total_tickets' :
+                        catId === 'total_prize' ? 'total_prize' :
                         catId === 'roi' ? 'total_tickets' :
                         catId === 'rank1' ? 'rank_1_count' :
                         catId === 'rank2' ? 'rank_2_count' :
@@ -6490,7 +6544,8 @@ async function renderRank(catId) {
 
     // 카테고리별 정렬
     const COL_MAP = {
-      buy_count:   { field: s => s.total_tickets || 0, unit: '게임', label: '구매 게임수' },
+      buy_count:   { field: s => s.total_spent || 0, unit: '', label: '총 구매액', fmt: v => fmtMFull(v) },
+      seller:      { field: s => s.total_tickets || 0, unit: '게임', label: 'QR 인증량' },
       roi:         { field: s => s.total_spent > 0 ? ((s.total_prize - s.total_spent) / s.total_spent * 100) : -100, unit: '%', label: '수익률', fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%' },
       total_prize: { field: s => s.total_prize || 0,   unit: '',   label: '총 당첨금', fmt: v => fmtMFull(v) },
       rank1:       { field: s => s.rank_1_count || 0,  unit: '회', label: '1등 인증' },
@@ -6551,7 +6606,7 @@ async function renderRank(catId) {
         <td class="rank-no-cell">${medals[i] || (i+1)}</td>
         <td class="rank-name-cell" style="position:relative;">
           <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${barColor};opacity:.07;border-radius:4px;pointer-events:none;"></div>
-          ${isMe ? '▶ ' : ''}${nick}${isMe ? ' <span style="font-size:10px;color:var(--lotto-red);">(나)</span>' : ''}
+          ${i===0?`<span class="badge ${catId==='rank1'?'b-real-1':catId==='rank2'?'b-real-2':'b-system'}">[${cat.label}]</span>`:''}${isMe ? '▶ ' : ''}${nick}${isMe ? ' <span style="font-size:10px;color:var(--lotto-red);">(나)</span>' : ''}
         </td>
         <td style="text-align:right;" class="rank-val-cell">${display}</td>
       </tr>`;
@@ -7049,33 +7104,15 @@ function selectPostTag(btn, tag) {
   btn.classList.add('on');
 }
 
-// QR 당첨 후 커뮤니티 인증게시판으로 이동하여 글쓰기 폼을 자동으로 열어주는 함수
+// QR 당첨 결과를 채팅 입력창에 연결하는 함수
 function openCommunityShare(rankLabel, roundStr) {
   if (!isLoggedIn) { showAuthModal(); return; }
-  // 커뮤니티 탭으로 이동
-  go('community');
-  // 인증 탭 선택 (verify)
-  setTimeout(() => {
-    const verifyTab = $('ct-verify');
-    if (verifyTab) verifyTab.click();
-    setTimeout(() => {
-      // 글쓰기 폼 열기
-      expandPostForm();
-      // 제목 자동 입력
-      const titleInp = $('post-input-title');
-      if (titleInp) {
-        titleInp.value = `${roundStr} ${rankLabel} 인증합니다 🎉`;
-        const c = $('post-title-count');
-        if (c) { c.textContent = titleInp.value.length + '/100'; }
-        titleInp.focus();
-      }
-      // 태그 자동 선택 (당첨)
-      const dangjBtn = document.querySelector('.post-tag-btn[onclick*="당첨"]');
-      if (dangjBtn) { _selectedPostTag = '당첨'; document.querySelectorAll('.post-tag-btn').forEach(b => b.classList.remove('on')); dangjBtn.classList.add('on'); }
-    }, 150);
-  }, 200);
+  const input = $('chat-input');
+  if (!input) return;
+  input.value = `[${roundStr} ${rankLabel}] 당첨 인증을 완료했습니다.`;
+  input.focus();
+  toast('채팅 메시지를 확인한 뒤 전송하세요.');
 }
-
 function expandPostForm() {
   if (!isLoggedIn) { showAuthModal(); return; }
   const bar = $('post-write-bar-collapsed');
