@@ -1630,8 +1630,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           </select>
         </div>
         <div style="display:flex;gap:6px;margin-top:6px;">
-          <button onclick="penNavStep(-1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">◀ 이전 회차</button>
-          <button onclick="penNavStep(1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
+          <button onclick="penNavStep(1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">◀ 이전 회차</button>
+          <button onclick="penNavStep(-1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
         </div>
         <div id="pen-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
           <div id="pen-round-header" style="padding:12px 16px;background:linear-gradient(135deg,#1a2e0a,#1d4e1a);color:#fff;display:none;">
@@ -3538,6 +3538,12 @@ function applyLoginUI(user) {
   const mn = $('my-numbers-section'); if(mn) mn.style.display = '';
   $('chat-input').disabled = false;
   $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
+  // 로그인 시 채팅 닉네임 미리 로드
+  if (!window._profileNickname) {
+    sb.from('profiles').select('nickname').eq('id', currentUser.id).single().then(({data}) => {
+      if (data?.nickname) window._profileNickname = data.nickname;
+    }).catch(()=>{});
+  }
   const adminBtn = $('m-admin');
   if (adminBtn) adminBtn.style.display = user.email === ADMIN_EMAIL ? '' : 'none';
   updateBadgeUI();
@@ -4070,6 +4076,9 @@ function go(id) {
   // 페이지 타이틀 동적 업데이트
   const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', fortune:'번호분석 & 로또 DNA', stats:'나의 전적', badge:'획득 뱃지', rank:'전체 랭킹', community:'커뮤니티', admin:'관리자 패널', profile:'내 프로필', home:'내 번호 보관함' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
+  // 번호분석 탭에서는 헤더 카운트다운 칩 숨김
+  const _chip = $('header-countdown-chip');
+  if (_chip) _chip.style.display = id === 'fortune' ? 'none' : (window._cdActive ? 'flex' : 'none');
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(); }
   if (id === 'ticket')    { chgMode(); renderQRHistory(); }
@@ -4845,6 +4854,7 @@ function genRecommended() {
     const chip = $('header-countdown-chip');
     const chipTxt = $('header-cd-text');
     if (chip && chipTxt) {
+      window._cdActive = true;
       chip.style.display = 'flex';
       chipTxt.textContent = d>0 ? `추첨까지 ${d}일 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `추첨까지 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     }
