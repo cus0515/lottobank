@@ -2474,7 +2474,7 @@ function initPensionTab() {
   penRounds = [];
   for (let i = latest; i >= Math.max(1, latest - 99); i--) penRounds.push(i);
   penCurrentIdx = 0;
-  sel.innerHTML = penRounds.map(r => `<option value="${r}">제 ${r}회 결과 보기</option>`).join('');
+  sel.innerHTML = penRounds.map(r => `<option value="${r}">제 ${r}회차 결과 보기</option>`).join('');
   loadPensionResult();
 }
 
@@ -2571,7 +2571,6 @@ function renderPensionResult(d, container, round) {
       </table>
     </div>` : `<div style="border-top:1px solid var(--border-dashed);padding-top:8px;text-align:center;"><div style="font-size:10px;color:var(--text-muted);">1등: 월 700만원 × 20년 · 보너스: 월 100만원 × 10년</div></div>`}
   `;
-  container.innerHTML = html;
   // 연금복권 판매점 조회 시도
   try {
     const _sd = document.createElement('div');
@@ -4086,7 +4085,7 @@ function go(id) {
   const _chip = $('header-countdown-chip');
   if (_chip) _chip.style.display = id === 'fortune' ? 'none' : (window._cdActive ? 'flex' : 'none');
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
-  if (id === 'result')    { initRoundSelector(); }
+  if (id === 'result')    { initRoundSelector(latestRound); }
   if (id === 'ticket')    { chgMode(); renderQRHistory(); }
   if (id === 'fortune')   { ensureRecentData().then(() => renderFortune()); }
   if (id === 'stats') {
