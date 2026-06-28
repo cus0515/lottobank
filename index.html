@@ -3651,11 +3651,20 @@ let chatChannel = null;
 
 function getChatBadgeHtml(verifiedTitle) {
   if (!verifiedTitle) return `<span class="badge b-guest">일반</span>`;
-  const isLotto   = verifiedTitle.includes('로또') || (!verifiedTitle.includes('연금') && (verifiedTitle.includes('1등')||verifiedTitle.includes('2등')||verifiedTitle.includes('3등')));
-  const isBoth    = verifiedTitle.includes('로또') && verifiedTitle.includes('연금');
-  const isBothCombined = verifiedTitle.includes('+') || isBoth;
-  const cls = isBothCombined ? 'b-real-both' : verifiedTitle.includes('1등') ? 'b-real-1' : verifiedTitle.includes('2등') ? 'b-real-2' : 'b-real-3';
-  return `<span class="badge ${cls}">[${verifiedTitle}]</span>`;
+  // 등수 추출
+  const rankMatch = verifiedTitle.match(/([1-5])등/);
+  const rank = rankMatch ? parseInt(rankMatch[1]) : 0;
+  // 복권 종류 판별
+  const hasPension = verifiedTitle.includes('연금');
+  const hasLotto   = verifiedTitle.includes('로또') || (!hasPension);
+  const isBoth     = verifiedTitle.includes('+') || (hasLotto && hasPension);
+  // 표시 텍스트 (회차 제거, 단순 형식)
+  let label;
+  if (isBoth)          label = `로또+연금 ${rank}등`;
+  else if (hasPension) label = `연금 ${rank}등`;
+  else                 label = `로또 ${rank}등`;
+  const cls = isBoth ? 'b-real-both' : rank === 1 ? 'b-real-1' : rank === 2 ? 'b-real-2' : 'b-real-3';
+  return `<span class="badge ${cls}">[${label}]</span>`;
 }
 
 function appendChatRow(msg) {
@@ -3721,22 +3730,19 @@ async function sendChat() {
 
 function computeBestTitle(titles) {
   if (!titles || !titles.length) return null;
-  // 로또 best, 연금 best 각각 구함 (prize_rank 낮을수록 높은 등수)
   const lotto   = titles.filter(t => t.lottery_type !== 'pension').sort((a,b)=>(a.prize_rank||9)-(b.prize_rank||9));
   const pension = titles.filter(t => t.lottery_type === 'pension').sort((a,b)=>(a.prize_rank||9)-(b.prize_rank||9));
   const bestL = lotto[0]   || null;
   const bestP = pension[0] || null;
   if (!bestL && !bestP) return null;
-  if (bestL && !bestP) return bestL.title;
-  if (!bestL && bestP) return bestP.title;
-  // 둘 다 있을 때
-  const rl = bestL.prize_rank || 9;
-  const rp = bestP.prize_rank || 9;
-  if (rl < rp) return bestL.title;           // 로또가 더 높은 등수
-  if (rp < rl) return bestP.title;           // 연금이 더 높은 등수
-  // 같은 등수 → 병합 표시 (예: "1230회차 로또+연금 1등")
-  const rank = rl;
-  return `로또+연금 ${rank}등`;
+  const rl = bestL?.prize_rank || 9;
+  const rp = bestP?.prize_rank || 9;
+  // 회차 없이 단순 형식: "로또 1등", "연금 1등", "로또+연금 1등"
+  if (bestL && !bestP) return `로또 ${rl}등`;
+  if (!bestL && bestP) return `연금 ${rp}등`;
+  if (rl < rp)  return `로또 ${rl}등`;
+  if (rp < rl)  return `연금 ${rp}등`;
+  return `로또+연금 ${rl}등`;   // 같은 등수 → 병합
 }
 
 async function syncDailyVisitAndSystemTitle() {
