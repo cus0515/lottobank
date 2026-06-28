@@ -289,6 +289,18 @@ main.chat-hidden .chat-panel { display: none; }
 /* ===== 랭킹 페이지 ===== */
 .rank-tab-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
 .rank-tab-row::-webkit-scrollbar { display: none; }
+.rank-view-tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:12px; }
+.rank-view-btn { padding:9px 12px; border:1px solid var(--border-dashed); background:var(--paper-white); color:var(--text-muted); border-radius:7px; font:700 12px inherit; cursor:pointer; }
+.rank-view-btn.on { background:var(--text-dark); color:var(--paper-white); border-color:var(--text-dark); }
+.ranking-category-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; margin-bottom:12px; }
+.ranking-category-btn { min-height:54px; padding:7px 4px; border:1px solid var(--border-dashed); border-radius:7px; background:var(--paper-white); color:var(--text-muted); font:700 10px inherit; cursor:pointer; }
+.ranking-category-btn strong { display:block; font-size:17px; margin-bottom:2px; }
+.ranking-category-btn.on { border-color:var(--lotto-red); color:var(--lotto-red); background:rgba(225,29,72,.05); }
+.hall-card { padding:13px; border-radius:8px; background:var(--paper-white); margin-bottom:9px; display:flex; align-items:center; gap:10px; }
+.hall-card.gold { border:1px solid #fbbf24; box-shadow:0 0 9px rgba(251,191,36,.35), inset 0 0 8px rgba(251,191,36,.08); }
+.hall-card.silver { border:1px solid #cbd5e1; box-shadow:0 0 8px rgba(148,163,184,.3), inset 0 0 8px rgba(148,163,184,.08); }
+.map-frame { width:100%; height:320px; border:0; display:block; background:var(--bg-light); }
+@media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}}
 .rank-tab-pill { display:inline-block;padding:5px 14px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;margin-right:4px;white-space:nowrap; }
 .rank-tab-pill.on { background:var(--lotto-red);color:#fff;border-color:var(--lotto-red);box-shadow:0 2px 8px rgba(225,29,72,.3); }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
@@ -1238,6 +1250,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     <div class="menu-tabs">
       <button id="m-home" class="menu-btn" onclick="go('home')">홈</button>
       <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
+      <button id="m-map" class="menu-btn" onclick="go('map')">지도</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;color:#dc2626;">관리자</button>
     </div>
@@ -1300,6 +1313,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   </div>
   <button class="mob-menu-item" onclick="go('home');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 홈</button>
   <button class="mob-menu-item" onclick="go('result');closeMobMenu()">회차 조회</button>
+  <button class="mob-menu-item" onclick="go('map');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 지도</button>
   <button class="mob-menu-item" onclick="go('rank');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> 랭킹</button>
   <div id="mob-auth-section" style="display:none;border-top:2px solid var(--border-dashed);margin-top:4px;">
     <div style="padding:10px 4px 4px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.5px;">내 계정</div>
@@ -1731,9 +1745,18 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <div style="font-size:16px;font-weight:900;margin-bottom:2px;">🏆 전국 로또 랭킹</div>
           <div style="font-size:11px;opacity:.5;">QR 인증 데이터 기반 실시간 순위</div>
         </div>
+        <div class="rank-view-tabs">
+          <button id="rank-view-ranking" class="rank-view-btn on" onclick="setRankView('ranking')">랭킹</button>
+          <button id="rank-view-hall" class="rank-view-btn" onclick="setRankView('hall')">명예의 전당</button>
+        </div>
         <div id="my-rank-banner" style="margin-bottom:10px;"></div>
         <div class="rank-tab-row" id="rank-tab-row" style="overflow-x:auto;padding-bottom:2px;flex-wrap:nowrap;white-space:nowrap;"></div>
         <div id="rank-content"></div>
+      </div>
+
+      <!-- 7-2. 판매점 지도 -->
+      <div id="pg-map" class="page-content" style="display:none;">
+        <div id="map-content"></div>
       </div>
 
       <!-- 8. 커뮤니티 -->
@@ -2197,18 +2220,7 @@ function renderLatestOnLeft(data) {
 }
 
 function renderHomeLive() {
-  $('home-live').innerHTML = `
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border-dashed);">
-        <div>
-          <div style="font-size:14px;font-weight:900;color:var(--text-dark);">실시간 피드</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">QR 등록, 당첨 인증, 뱃지와 랭킹 소식을 최신순으로 보여드립니다.</div>
-        </div>
-        <span style="font-size:10px;font-weight:800;color:#16a34a;">LIVE</span>
-      </div>
-      <div id="feed-list" style="min-height:220px;"></div>
-    </div>
-  `;
+  $('home-live').innerHTML = '<div id="feed-list" style="min-height:220px;"></div>';
   renderFeed();
   return;
   const d = latestData;
@@ -3692,13 +3704,36 @@ async function sendChat() {
     await sb.from('chat_messages').insert({
       user_id: currentUser.id,
       nickname: nick,
-      verified_title: myVerifiedTitle || null,
+      verified_title: myVerifiedTitle || window._systemRankTitle || null,
       message: msg
     });
   } catch(e) {
     toast('❌ 메시지 전송 실패');
     inp.value = msg;
     console.warn('sendChat:', e.message);
+  }
+}
+
+async function syncDailyVisitAndSystemTitle() {
+  if (!sb || !currentUser || isAdminTestMode) return;
+  try {
+    const visitDate = new Intl.DateTimeFormat('en-CA', {
+      timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit'
+    }).format(new Date());
+    await sb.from('user_daily_visits').upsert({
+      user_id: currentUser.id,
+      visit_date: visitDate,
+      last_visited_at: new Date().toISOString(),
+    }, { onConflict:'user_id,visit_date' });
+    const { data } = await sb.from('user_system_titles')
+      .select('title,title_type,expires_at')
+      .eq('user_id', currentUser.id)
+      .eq('active', true)
+      .order('awarded_at', { ascending:false })
+      .limit(1);
+    window._systemRankTitle = data?.[0]?.title || null;
+  } catch (_) {
+    window._systemRankTitle = null;
   }
 }
 
@@ -3760,6 +3795,7 @@ async function loadUserDataFromDB() {
     updateHeaderUser(nick2, myVerifiedTitle || '');
     updateBadgeUI();
     updateDropdownStats();
+    await syncDailyVisitAndSystemTitle();
   } catch (e) {
     console.warn('loadUserDataFromDB:', e.message);
   }
@@ -4069,7 +4105,7 @@ function go(id) {
   pg.classList.add('page-fade');
   const mBtn = $('m-' + id);
   if (mBtn) mBtn.classList.add('on');
-  ['home','result','ticket','stats','badge','fortune','rank','community'].forEach(k => {
+  ['home','result','ticket','stats','badge','fortune','rank','map','community'].forEach(k => {
     const btn = $('mob-btn-' + k);
     if (btn) btn.classList.toggle('on', k === id);
   });
@@ -4081,13 +4117,14 @@ function go(id) {
     stats:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적',
     badge:     '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><circle cx="12" cy="14" r="6"/><path d="M12 8V2"/><path d="M8.56 2h6.88L17 8H7z"/></svg> 획득 뱃지',
     rank:      '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg> 전체 랭킹',
+    map:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 내 주변 판매점',
     community: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 커뮤니티',
     admin:     '🔐 관리자 패널',
     profile:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필',
   };
   $('mid-title').innerHTML = titles[id] || '';
   // 페이지 타이틀 동적 업데이트
-  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', badge:'획득 뱃지', rank:'전체 랭킹', admin:'관리자 패널', profile:'내 프로필', home:'실시간 피드' };
+  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', badge:'획득 뱃지', rank:'랭킹', map:'내 주변 판매점', admin:'관리자 패널', profile:'내 프로필', home:'실시간 피드' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
@@ -4106,6 +4143,7 @@ function go(id) {
   // Note: periodBtns is inserted after actual render below
     renderRank();
   }
+  if (id === 'map') renderMap();
   if (id === 'community') {
     if (!commPosts.free || !commPosts.free.length) {
       $('community-content').innerHTML = '<div class="skel-card"><div class="skel skel-row w80"></div><div class="skel skel-row w60"></div></div><div class="skel-card"><div class="skel skel-row w80"></div><div class="skel skel-row w40"></div></div>';
@@ -6447,6 +6485,178 @@ async function renderBadge() {
 // =====================================================
 // 랭킹 페이지
 // =====================================================
+const MONTHLY_RANKINGS = [
+  { id:'purchase', icon:'👑', label:'구매', desc:'월 구매 금액' },
+  { id:'accuracy', icon:'🎯', label:'저격', desc:'번호 적중률' },
+  { id:'efficiency', icon:'💸', label:'수익', desc:'투자 대비 당첨 효율' },
+  { id:'miss', icon:'💩', label:'똥손', desc:'0개 적중 게임' },
+  { id:'pioneer', icon:'🗺️', label:'개척', desc:'서로 다른 판매점' },
+];
+const ALL_TIME_RANKINGS = [
+  { id:'donor', icon:'🎁', label:'기부왕', desc:'구매금액-당첨금' },
+  { id:'attendance', icon:'📅', label:'출석왕', desc:'누적 접속일' },
+  { id:'streak', icon:'🔥', label:'개근왕', desc:'최장 연속 접속일' },
+  { id:'rank3', icon:'🥉', label:'3등 콜렉터', desc:'누적 3등' },
+  { id:'rank4', icon:'🎯', label:'4등 콜렉터', desc:'누적 4등' },
+  { id:'rank5', icon:'✅', label:'5등 콜렉터', desc:'누적 5등' },
+  { id:'scan', icon:'📱', label:'스캔왕', desc:'QR 인증량' },
+  { id:'auto', icon:'⚙️', label:'자동왕', desc:'자동 구매량' },
+  { id:'manual', icon:'✍️', label:'수동왕', desc:'수동 구매량' },
+];
+let rankViewMode = 'ranking';
+let rankingScope = 'monthly';
+let rankingCategory = 'purchase';
+
+function setRankView(view) {
+  rankViewMode = view;
+  $('rank-view-ranking')?.classList.toggle('on', view === 'ranking');
+  $('rank-view-hall')?.classList.toggle('on', view === 'hall');
+  $('my-rank-banner').style.display = view === 'ranking' ? '' : 'none';
+  renderRankingHub();
+}
+
+function setRankingScope(scope) {
+  rankingScope = scope;
+  rankingCategory = (scope === 'monthly' ? MONTHLY_RANKINGS : ALL_TIME_RANKINGS)[0].id;
+  renderRankingHub();
+}
+
+function setRankingCategory(category) {
+  rankingCategory = category;
+  renderRankingHub();
+}
+
+async function renderRankingHub() {
+  if (rankViewMode === 'hall') return renderHallOfFame();
+  const categories = rankingScope === 'monthly' ? MONTHLY_RANKINGS : ALL_TIME_RANKINGS;
+  if (!categories.some(c => c.id === rankingCategory)) rankingCategory = categories[0].id;
+  const selected = categories.find(c => c.id === rankingCategory);
+  $('rank-tab-row').innerHTML = `
+    <button class="rank-tab-pill ${rankingScope==='monthly'?'on':''}" onclick="setRankingScope('monthly')">월간 랭킹</button>
+    <button class="rank-tab-pill ${rankingScope==='all'?'on':''}" onclick="setRankingScope('all')">전체 기간</button>`;
+  $('rank-content').innerHTML = `
+    <div class="ranking-category-grid">
+      ${categories.map(c=>`<button class="ranking-category-btn ${c.id===rankingCategory?'on':''}" onclick="setRankingCategory('${c.id}')"><strong>${c.icon}</strong>${c.label}</button>`).join('')}
+    </div>
+    <div id="ranking-hub-list" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border-dashed);">
+        <div style="font-size:13px;font-weight:900;color:var(--text-dark);">${selected.icon} ${selected.label}</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${selected.desc} · ${rankingScope==='monthly'?'매월 1일 자동 초기화':'누적 기록'}</div>
+      </div>
+      <div style="padding:22px;text-align:center;color:var(--text-muted);font-size:11px;">집계 데이터 확인 중...</div>
+    </div>`;
+  const list = $('ranking-hub-list');
+  if (!sb || !list) return;
+  try {
+    const periodKey = rankingScope === 'monthly'
+      ? new Date().toISOString().slice(0,7)
+      : 'all';
+    const { data, error } = await sb.from('ranking_snapshots')
+      .select('rank,score,title,badge_icon,border_color,user_id,profiles:user_id(nickname)')
+      .eq('period_key', periodKey)
+      .eq('ranking_type', rankingCategory)
+      .order('rank', { ascending:true })
+      .limit(50);
+    if (error) throw error;
+    const rows = data || [];
+    list.innerHTML = list.innerHTML.split('<div style="padding:22px')[0] + (rows.length
+      ? `<div>${rows.map(r=>`<div style="display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-dashed);">
+          <b style="text-align:center;color:${r.rank===1?'#f59e0b':'var(--text-muted)'};">${r.rank}</b>
+          <div style="min-width:0;"><span class="badge ${r.rank===1?'b-system':'b-guest'}">[${r.title}]</span><b style="font-size:12px;">${r.profiles?.nickname||'익명'}</b></div>
+          <strong style="font-size:12px;color:var(--lotto-red);">${Number(r.score).toLocaleString()}</strong>
+        </div>`).join('')}</div>`
+      : `<div style="padding:26px 14px;text-align:center;color:var(--text-muted);font-size:11px;">아직 집계된 순위가 없습니다.<br>QR 데이터가 쌓이면 시스템이 자동으로 칭호를 부여합니다.</div>`);
+  } catch (_) {
+    list.innerHTML += `<div style="padding:18px 14px;text-align:center;color:var(--text-muted);font-size:11px;">랭킹 확장 스키마 적용 전입니다.<br><code>ranking_map_setup.sql</code> 적용 후 자동 집계할 수 있습니다.</div>`;
+  }
+}
+
+async function renderHallOfFame() {
+  $('rank-tab-row').innerHTML = `
+    <button id="hall-lotto-btn" class="rank-tab-pill on" onclick="renderHallOfFame('lotto')">로또 6/45</button>
+    <button id="hall-pension-btn" class="rank-tab-pill" onclick="renderHallOfFame('pension')">연금복권 720+</button>`;
+  const type = arguments[0] || 'lotto';
+  $('hall-lotto-btn')?.classList.toggle('on', type === 'lotto');
+  $('hall-pension-btn')?.classList.toggle('on', type === 'pension');
+  $('rank-content').innerHTML = `<div id="hall-list"><div style="padding:30px;text-align:center;color:var(--text-muted);font-size:11px;">명예 기록 확인 중...</div></div>`;
+  if (!sb) return;
+  try {
+    const { data, error } = await sb.from('tickets')
+      .select('user_id,round_no,prize_rank,lottery_type,profiles:user_id(nickname)')
+      .eq('lottery_type', type)
+      .in('prize_rank', [1,2])
+      .order('round_no', { ascending:false });
+    if (error) throw error;
+    const rows = data || [];
+    $('hall-list').innerHTML = rows.length ? rows.map(r=>`
+      <div class="hall-card ${r.prize_rank===1?'gold':'silver'}">
+        <div style="font-size:24px;">${r.prize_rank===1?'🏆':'🥈'}</div>
+        <div style="min-width:0;flex:1;">
+          <div style="font-size:12px;font-weight:900;color:var(--text-dark);">[${r.round_no}회차 ${r.prize_rank}등] ${r.profiles?.nickname||'익명'}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${type==='lotto'?'로또 6/45':'연금복권 720+'} QR 인증</div>
+        </div>
+      </div>`).join('') : `<div style="padding:30px;text-align:center;color:var(--text-muted);font-size:11px;">아직 등록된 ${type==='lotto'?'로또':'연금복권'} 1·2등 인증자가 없습니다.</div>`;
+  } catch (_) {
+    $('hall-list').innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:11px;">명예의 전당 스키마 적용 후 복권 종류별 기록이 표시됩니다.</div>`;
+  }
+}
+
+function renderMap() {
+  const defaultLat = 37.5665, defaultLng = 126.9780;
+  $('map-content').innerHTML = `
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;">
+      <iframe id="store-map-frame" class="map-frame" title="내 주변 복권 판매점 지도" loading="lazy"
+        src="https://www.openstreetmap.org/export/embed.html?bbox=126.94%2C37.54%2C127.02%2C37.59&amp;layer=mapnik&amp;marker=${defaultLat}%2C${defaultLng}"></iframe>
+      <div style="padding:12px;">
+        <button onclick="findNearbyLottoStores()" style="width:100%;padding:10px;border:0;border-radius:7px;background:var(--lotto-red);color:#fff;font-size:12px;font-weight:800;cursor:pointer;">내 주변 판매점 찾기</button>
+        <div id="map-location-status" style="font-size:10px;color:var(--text-muted);margin-top:7px;text-align:center;">위치 권한을 허용하면 가까운 순서로 판매점을 찾습니다.</div>
+        <a id="kakao-nearby-link" href="https://map.kakao.com/?q=%EB%A1%9C%EB%98%90%20%ED%8C%90%EB%A7%A4%EC%A0%90" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:8px;font-size:11px;font-weight:700;color:#2563eb;">카카오 지도에서 로또 판매점 보기</a>
+      </div>
+    </div>
+    <div id="nearby-store-list" style="margin-top:10px;"></div>`;
+}
+
+function distanceKm(lat1, lng1, lat2, lng2) {
+  const toRad = n => n * Math.PI / 180;
+  const dLat = toRad(lat2-lat1), dLng = toRad(lng2-lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function findNearbyLottoStores() {
+  const status = $('map-location-status');
+  if (!navigator.geolocation) {
+    if (status) status.textContent = '현재 브라우저에서 위치 기능을 지원하지 않습니다.';
+    return;
+  }
+  if (status) status.textContent = '현재 위치를 확인하고 있습니다...';
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const lat = pos.coords.latitude, lng = pos.coords.longitude;
+    const delta = 0.025;
+    const frame = $('store-map-frame');
+    if (frame) frame.src = `https://www.openstreetmap.org/export/embed.html?bbox=${lng-delta}%2C${lat-delta}%2C${lng+delta}%2C${lat+delta}&layer=mapnik&marker=${lat}%2C${lng}`;
+    const kakao = $('kakao-nearby-link');
+    if (kakao) kakao.href = `https://map.kakao.com/link/search/로또 판매점,${lat},${lng}`;
+    if (status) status.textContent = `현재 위치 확인 완료 · 정확도 약 ${Math.round(pos.coords.accuracy)}m`;
+    const list = $('nearby-store-list');
+    if (!list || !sb) return;
+    try {
+      const { data, error } = await sb.from('lottery_stores').select('id,name,address,lat,lng,scan_count').not('lat','is',null).not('lng','is',null);
+      if (error) throw error;
+      const stores = (data||[]).map(s=>({...s,distance:distanceKm(lat,lng,s.lat,s.lng)})).sort((a,b)=>a.distance-b.distance).slice(0,10);
+      list.innerHTML = stores.length ? `<div style="font-size:11px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">가까운 판매점</div>${stores.map(s=>`
+        <a href="https://map.kakao.com/link/map/${encodeURIComponent(s.name)},${s.lat},${s.lng}" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;gap:8px;padding:10px 11px;margin-bottom:6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:7px;text-decoration:none;color:inherit;">
+          <span style="min-width:0;"><b style="display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.name}</b><span style="font-size:10px;color:var(--text-muted);">${s.address}</span></span>
+          <b style="font-size:11px;color:var(--lotto-red);white-space:nowrap;">${s.distance.toFixed(1)}km</b>
+        </a>`).join('')}` : `<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-muted);">아직 좌표가 등록된 판매점이 없습니다.<br>QR 등록 시 판매점 데이터가 누적됩니다.</div>`;
+    } catch (_) {
+      list.innerHTML = `<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-muted);">판매점 지도 스키마 적용 후 거리순 목록이 표시됩니다.</div>`;
+    }
+  }, err => {
+    if (status) status.textContent = err.code === 1 ? '위치 권한이 필요합니다.' : '현재 위치를 확인할 수 없습니다.';
+  }, { enableHighAccuracy:true, timeout:10000, maximumAge:300000 });
+}
+
 const RANK_CATS = [
   { id: 'buy_count', label: '구매왕', unit: '원' },
   { id: 'seller', label: '판매왕', unit: '게임' },
@@ -6461,6 +6671,7 @@ function setRankPeriod(period) {
 }
 
 async function renderRank(catId) {
+  return renderRankingHub();
   catId = catId || curRankCat;
   curRankCat = catId;
   const cat = RANK_CATS.find(c => c.id === catId);
