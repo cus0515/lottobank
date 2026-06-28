@@ -2,6 +2,7 @@
 
 alter table public.tickets
   add column if not exists lottery_type text default 'lotto',
+  add column if not exists purchase_channel text default 'retail',
   add column if not exists purchase_mode text,
   add column if not exists matched_count integer,
   add column if not exists total_number_count integer default 6,

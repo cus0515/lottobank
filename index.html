@@ -26,6 +26,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Courier+New&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root {
@@ -300,7 +301,7 @@ main.chat-hidden .chat-panel { display: none; }
 .hall-card.gold { border:1px solid #fbbf24; box-shadow:0 0 9px rgba(251,191,36,.35), inset 0 0 8px rgba(251,191,36,.08); }
 .hall-card.silver { border:1px solid #cbd5e1; box-shadow:0 0 8px rgba(148,163,184,.3), inset 0 0 8px rgba(148,163,184,.08); }
 .map-frame { width:100%; height:320px; border:0; display:block; background:var(--bg-light); }
-@media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}}
+@media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}#qr-purchase-meta,#qr-store-fields{grid-template-columns:1fr!important;}}
 .rank-tab-pill { display:inline-block;padding:5px 14px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;margin-right:4px;white-space:nowrap; }
 .rank-tab-pill.on { background:var(--lotto-red);color:#fff;border-color:var(--lotto-red);box-shadow:0 2px 8px rgba(225,29,72,.3); }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
@@ -1201,6 +1202,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -1252,7 +1254,9 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-map" class="menu-btn" onclick="go('map')">지도</button>
-      <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;color:#dc2626;">관리자</button>
+      <span id="auth-menu-separator" style="display:none;color:#cbd5e1;font-size:12px;">|</span>
+      <button id="m-ticket" class="menu-btn" onclick="go('ticket')" style="display:none;">QR 인증</button>
+      <button id="m-stats" class="menu-btn" onclick="go('stats')" style="display:none;">나의 전적</button>
     </div>
     <div class="auth-zone">
       <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크 모드로 전환" style="width:34px;height:30px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-dashed);border-radius:6px;padding:0;cursor:pointer;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="다크 모드로 전환"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
@@ -1329,8 +1333,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 <nav class="mob-bottom-nav" role="navigation" aria-label="하단 메뉴">
   <button class="mob-nav-btn on" id="mob-btn-home" onclick="go('home')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>홈</button>
   <button class="mob-nav-btn" id="mob-btn-result" onclick="go('result')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>회차조회</button>
-  <button class="mob-nav-btn" id="mob-btn-ticket" onclick="go('ticket')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg></span>QR인증</button>
-  <button class="mob-nav-btn" id="mob-btn-stats" onclick="go('stats')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>전적</button>
+  <button class="mob-nav-btn" id="mob-btn-ticket" onclick="go('ticket')" style="display:none;"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg></span>QR인증</button>
+  <button class="mob-nav-btn" id="mob-btn-stats" onclick="go('stats')" style="display:none;"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>전적</button>
   <button class="mob-nav-btn" id="mob-btn-rank" onclick="go('rank')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></span>랭킹</button>
   <button class="mob-nav-btn" id="mob-btn-more" onclick="openMobMenu()"><span class="mob-nav-icon">☰</span>더보기</button>
 </nav>
@@ -1380,13 +1384,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     <div class="auth-divider">계정이 없으신가요?</div>
     <div style="text-align:center">
       <button class="auth-switch" id="auth-switch" onclick="toggleAuthMode()">회원가입</button>
-    </div>
-    <div id="admin-test-btn-wrap" style="display:none;margin-top:16px;padding-top:14px;border-top:1px dashed var(--border-dashed);">
-      <div style="font-size:11px;color:#94a3b8;text-align:center;margin-bottom:8px;">관리자 전용</div>
-      <button onclick="adminTestLogin()" style="width:100%;padding:10px;background:#1e293b;color:#fff;font-size:13px;font-weight:700;border:none;border-radius:7px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        관리자 계정으로 검증 모드 시작
-      </button>
     </div>
   </div>
 </div>
@@ -1663,6 +1660,38 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
             <button onclick="navigator.clipboard.readText().then(t=>{if($('qr-url-input')){$('qr-url-input').value=t;qrInputPreview(t);}}).catch(()=>{})" title="클립보드에서 붙여넣기" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:var(--lotto-red);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">붙여넣기</button>
           </div>
           <div id="qr-input-hint" style="min-height:18px;margin-top:4px;font-size:11px;"></div>
+          <div id="qr-purchase-meta" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;">
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">구매 경로</label>
+              <select id="qr-purchase-channel" class="select-custom" onchange="toggleQrStoreFields()" style="margin:0;width:100%;">
+                <option value="retail">오프라인 판매점</option>
+                <option value="online">동행복권 인터넷</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">구매 방식</label>
+              <select id="qr-purchase-mode" class="select-custom" style="margin:0;width:100%;">
+                <option value="">확인 불가</option>
+                <option value="auto">자동</option>
+                <option value="manual">수동</option>
+                <option value="semi-auto">반자동</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">구매일</label>
+              <input id="qr-purchase-date" type="date" class="input-custom" style="margin:0;width:100%;">
+            </div>
+          </div>
+          <div id="qr-store-fields" style="display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin-top:8px;">
+            <input id="qr-store-name" class="input-custom" placeholder="판매점명 직접 입력" oninput="qrSelectedStore=null">
+            <input id="qr-store-address" class="input-custom" placeholder="판매점 주소 직접 입력" oninput="qrSelectedStore=null">
+            <div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;">
+              <input id="qr-store-search" class="input-custom" placeholder="등록된 판매점명 또는 주소 검색" style="margin:0;flex:1;">
+              <button type="button" onclick="searchQrStores()" style="border:1px solid var(--border-dashed);border-radius:6px;background:var(--bg-light);color:var(--text-dark);padding:7px 10px;font-size:10px;font-weight:700;cursor:pointer;">판매점 검색</button>
+            </div>
+            <div id="qr-store-search-results" style="grid-column:1/-1;"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:5px;">인터넷 구매도 공식 QR URL이 있을 때만 인증됩니다.</div>
           <div style="display:flex;gap:8px;margin-top:8px;">
             <button class="btn-action" onclick="verifyRealQR()" style="background:var(--lotto-red);flex:1;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 당첨 인증하기</button>
             <button class="btn-action" id="cam-btn" onclick="toggleCameraQR()" style="background:#3b82f6;min-width:44px;padding:0 12px;" title="카메라로 QR 스캔"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
@@ -1726,6 +1755,15 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <div style="font-size:11px;opacity:.5;">QR 인증 기반 실제 투자 · 당첨 기록</div>
         </div>
         <div id="stats-content"></div>
+        <div style="margin-top:10px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px;">
+          <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:3px;">내 번호 저장</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">개인 보관용이며 QR 인증 전적과 랭킹에는 반영되지 않습니다.</div>
+          <div style="display:flex;gap:6px;">
+            <input id="stats-save-numbers" class="input-custom" placeholder="예: 3, 8, 14, 22, 31, 42" style="margin:0;flex:1;">
+            <button onclick="saveStatsNumberSet()" style="border:0;border-radius:6px;background:var(--lotto-red);color:#fff;padding:0 14px;font-size:11px;font-weight:800;cursor:pointer;">저장</button>
+          </div>
+          <div id="stats-saved-number-list" style="margin-top:8px;"></div>
+        </div>
       </div>
 
       <!-- 6. 뱃지 -->
@@ -1803,40 +1841,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       </div>
 
       <!-- 9. 프로필 -->
-      <!-- 관리자 페이지 -->
-      <div id="pg-admin" class="page-content" style="display:none;">
-        <div id="admin-gate">
-          <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <div style="font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:8px;">관리자 전용 영역</div>
-            <div style="font-size:12px;">관리자 계정으로 로그인해야 접근 가능합니다</div>
-          </div>
-        </div>
-        <div id="admin-content" style="display:none;">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
-            <div class="kpi-box hl" id="adm-total-users"><div class="kpi-label">총 회원수</div><div class="kpi-value blue" id="adm-kpi-users">-</div></div>
-            <div class="kpi-box" id="adm-total-tickets"><div class="kpi-label">총 티켓</div><div class="kpi-value" id="adm-kpi-tickets">-</div></div>
-            <div class="kpi-box" id="adm-total-posts"><div class="kpi-label">총 게시글</div><div class="kpi-value" id="adm-kpi-posts">-</div></div>
-            <div class="kpi-box" id="adm-total-prize"><div class="kpi-label">총 당첨금</div><div class="kpi-value red" id="adm-kpi-prize">-</div></div>
-          </div>
-          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-            <button class="rank-tab-pill on" onclick="adminTab('users',this)">회원 목록</button>
-            <button class="rank-tab-pill" onclick="adminTab('tickets',this)">티켓 목록</button>
-            <button class="rank-tab-pill" onclick="adminTab('posts',this)">게시글 목록</button>
-            <button class="rank-tab-pill" onclick="adminTab('stats',this)">전적 현황</button>
-            <button class="rank-tab-pill" onclick="adminTab('insert',this)" style="background:#fef3c7;color:#92400e;border-color:#fde68a;">데이터 삽입</button>
-          </div>
-          <div id="admin-table-wrap"></div>
-        </div>
-      </div>
       <div id="pg-profile" class="page-content" style="display:none;">
         <div id="profile-content"></div>
-        <!-- 내 번호 보관함 (로그인 후) -->
-        <div id="my-numbers-section" style="margin-top:14px;display:none;">
-          <div style="font-size:13px;font-weight:900;color:var(--lotto-red);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;"><span><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> 내 번호 보관함</span><span id="tl-count" style="font-size:11px;font-weight:600;color:#94a3b8;"></span></div>
-          <div id="ticket-feedback"></div>
-          <div id="tl"></div>
-        </div>
       </div>
 
     </div>
@@ -2084,12 +2090,70 @@ function makeRecommendedNums() {
 function checkWinRank(myNums, winNums, bonus) {
   const matched = myNums.filter(n => winNums.includes(n)).length;
   const hasBonus = myNums.includes(bonus);
-  if (matched === 6) return { rank: 1, label: '1등 당첨!', badge: '1등' };
-  if (matched === 5 && hasBonus) return { rank: 2, label: '2등 당첨!', badge: '2등' };
-  if (matched === 5) return { rank: 3, label: '3등 당첨!', badge: '3등' };
-  if (matched === 4) return { rank: 4, label: '4등 당첨', badge: null };
-  if (matched === 3) return { rank: 5, label: '5등 당첨', badge: null };
-  return { rank: 6, label: '낙첨', badge: null };
+  if (matched === 6) return { rank: 1, label: '1등 당첨!', badge: '1등', matched, hasBonus };
+  if (matched === 5 && hasBonus) return { rank: 2, label: '2등 당첨!', badge: '2등', matched, hasBonus };
+  if (matched === 5) return { rank: 3, label: '3등 당첨!', badge: '3등', matched, hasBonus };
+  if (matched === 4) return { rank: 4, label: '4등 당첨', badge: null, matched, hasBonus };
+  if (matched === 3) return { rank: 5, label: '5등 당첨', badge: null, matched, hasBonus };
+  return { rank: 6, label: '낙첨', badge: null, matched, hasBonus };
+}
+
+function toggleQrStoreFields() {
+  const online = $('qr-purchase-channel')?.value === 'online';
+  const fields = $('qr-store-fields');
+  if (fields) fields.style.display = online ? 'none' : 'grid';
+}
+
+let qrSelectedStore = null;
+
+function qrSafeText(value) {
+  return String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+async function searchQrStores() {
+  const query = ($('qr-store-search')?.value || '').trim();
+  const results = $('qr-store-search-results');
+  if (!results || !query) return;
+  results.innerHTML = '<span style="font-size:10px;color:var(--text-muted);">검색 중...</span>';
+  try {
+    const safeQuery = query.replace(/[%_,()]/g, ' ');
+    const { data, error } = await sb.from('lottery_stores')
+      .select('id,name,address,lat,lng')
+      .or(`name.ilike.%${safeQuery}%,address.ilike.%${safeQuery}%`)
+      .limit(8);
+    if (error) throw error;
+    window._qrStoreResults = data || [];
+    results.innerHTML = window._qrStoreResults.length ? window._qrStoreResults.map((store,index)=>`
+      <button type="button" onclick="selectQrStore(${index})" style="display:block;width:100%;text-align:left;padding:7px 9px;margin-top:4px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--paper-white);color:var(--text-dark);font-size:10px;cursor:pointer;"><b>${qrSafeText(store.name)}</b><br><span style="color:var(--text-muted);">${qrSafeText(store.address)}</span></button>`).join('') : '<span style="font-size:10px;color:var(--text-muted);">검색 결과가 없습니다. 판매점명과 주소를 직접 입력하세요.</span>';
+  } catch (_) {
+    results.innerHTML = '<span style="font-size:10px;color:var(--text-muted);">판매점명과 주소를 직접 입력하세요.</span>';
+  }
+}
+
+function selectQrStore(index) {
+  const store = window._qrStoreResults?.[index];
+  if (!store) return;
+  qrSelectedStore = store;
+  $('qr-store-name').value = store.name;
+  $('qr-store-address').value = store.address;
+  $('qr-store-search-results').innerHTML = `<span style="font-size:10px;color:#16a34a;font-weight:700;">${qrSafeText(store.name)} 선택됨</span>`;
+}
+
+function getQrPurchaseMeta() {
+  const channel = $('qr-purchase-channel')?.value || 'retail';
+  const online = channel === 'online';
+  const storeName = online ? '동행복권 인터넷 구매' : ($('qr-store-name')?.value || '').trim();
+  const storeAddress = online ? '온라인' : ($('qr-store-address')?.value || '').trim();
+  return {
+    channel,
+    mode: $('qr-purchase-mode')?.value || null,
+    purchaseDate: $('qr-purchase-date')?.value || null,
+    storeName,
+    storeAddress,
+    storeId: online ? 'online:dhlottery' : (qrSelectedStore?.id || (storeName ? `retail:${storeName}|${storeAddress}`.toLowerCase() : null)),
+    lat: online ? null : qrSelectedStore?.lat || null,
+    lng: online ? null : qrSelectedStore?.lng || null,
+  };
 }
 
 // QR URL 파싱 (동행복권 실제 포맷)
@@ -2112,7 +2176,7 @@ function parseQRUrl(url) {
         for (let i = 0; i < 12; i += 2) nums.push(parseInt(g.slice(i, i+2)));
         return nums.sort((a, b) => a - b);
       });
-      return { type: 'lotto', round, games, nums: games[0], key: v };
+      return { type: 'lotto', round, games, nums: games[0], serial: newFmt[4], key: v };
     }
 
     // 구 포맷: {4}q{12}
@@ -2122,7 +2186,7 @@ function parseQRUrl(url) {
       const nums = [];
       for (let i = 0; i < 12; i += 2) nums.push(parseInt(g.slice(i, i+2)));
       nums.sort((a, b) => a - b);
-      return { type: 'lotto', round: parseInt(oldFmt[1]), games: [nums], nums, key: v };
+      return { type: 'lotto', round: parseInt(oldFmt[1]), games: [nums], nums, serial: null, key: v };
     }
 
     // 연금복권 720+ 포맷: {4}j{2조}{6번호}
@@ -2344,6 +2408,7 @@ function rList() {
   const cntEl = $('tl-count');
   if (cntEl) cntEl.textContent = MY.length + '개';
   const w = $('tl');
+  if (!w) return;
   if (MY.length === 0) {
     w.innerHTML = `<div style="text-align:center;padding:30px 16px;color:var(--text-muted);">
       <div style="font-size:40px;margin-bottom:12px;">🎱</div>
@@ -3011,6 +3076,13 @@ async function verifyRealQR() {
   if (!url) { toast('⚠️ QR URL을 입력해 주세요'); return; }
 
   const parsed = parseQRUrl(url);
+  if (parsed) {
+    parsed.purchaseMeta = getQrPurchaseMeta();
+    if (parsed.purchaseMeta.channel === 'retail' && !parsed.purchaseMeta.storeName) {
+      $('qr-result-display').innerHTML = '<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div><div class="qr-warn-title">판매점명을 입력해주세요</div><div class="qr-warn-body">오프라인 구매는 판매점 정보가 랭킹과 판매점 지도에 사용됩니다.</div></div></div>';
+      return;
+    }
+  }
   // 연금복권 처리
   if (parsed && parsed.type === 'pension') {
     const rd = $('qr-result-display');
@@ -3027,16 +3099,33 @@ async function verifyRealQR() {
       // DB 저장 (pension 타입)
       if (isLoggedIn && currentUser && sb) {
         try {
-          await sb.from('tickets').upsert({
+          const meta = parsed.purchaseMeta || getQrPurchaseMeta();
+          const pensionBase = {
             user_id: currentUser.id,
             qr_url: parsed.key,
             round_no: parsed.round || 0,
             numbers: [],
             game_count: 0,
+            purchase_date: meta.purchaseDate,
             result: 'pension',
             prize_rank: null,
             prize_amount: 0,
-          }, { onConflict: 'qr_url' });
+          };
+          let { error } = await sb.from('tickets').upsert({
+            ...pensionBase,
+            lottery_type:'pension',
+            purchase_channel:meta.channel,
+            purchase_mode:meta.mode,
+            store_id:meta.storeId,
+            store_name:meta.storeName || null,
+            store_address:meta.storeAddress || null,
+            store_lat:meta.lat,
+            store_lng:meta.lng,
+          }, { onConflict:'qr_url' });
+          if (error && /column|schema cache/i.test(error.message || '')) {
+            ({ error } = await sb.from('tickets').upsert(pensionBase, { onConflict:'qr_url' }));
+          }
+          if (error) throw error;
           insertActivity('qr_register', { round: parsed.round, games: 1, type: 'pension' });
           // 뱃지 체크
           await checkAndAwardBadges();
@@ -3214,12 +3303,6 @@ function updateBadgeUI() {
 let authMode = 'login';
 
 function showAuthModal() {
-  // 관리자만 테스트 버튼 표시
-  const adminWrap = $('admin-test-btn-wrap');
-  if (adminWrap) {
-    const curEmail = currentUser?.email || '';
-    adminWrap.style.display = (curEmail === ADMIN_EMAIL || location.search.includes('admin=1')) ? 'block' : 'none';
-  }
   if (isLoggedIn) {
     sb.auth.signOut();
     return;
@@ -3504,42 +3587,6 @@ const ADMIN_EMAIL = 'jobdevil23@gmail.com';
 // ── 관리자 검증 모드 (Supabase 인증 우회, 기능 테스트용)
 let isAdminTestMode = false;
 
-function adminTestLogin() {
-  isAdminTestMode = true;
-  closeAuthModal();
-  // mock 관리자 유저 객체 생성
-  const mockUser = {
-    id: 'admin-test-00000000-0000-0000-0000-000000000000',
-    email: ADMIN_EMAIL,
-    user_metadata: { nickname: '관리자' },
-  };
-  // dbStats mock - 실제처럼 동작하도록
-  dbStats = {
-    total_tickets: 47,
-    total_spent: 47000,
-    total_prize: 15000,
-    total_wins: 3,
-    best_rank: 5,
-    rank_1_count: 0,
-    rank_2_count: 0,
-    rank_3_count: 0,
-    rank_4_count: 0,
-    rank_5_count: 3,
-  };
-  // mock QR 등록 이력
-  usedQrKeys = ['mock-qr-001', 'mock-qr-002', 'mock-qr-003'];
-  saveStorage();
-  applyLoginUI(mockUser);
-  // 헤더에 검증 모드 배지 표시
-  const badge = document.createElement('span');
-  badge.id = 'dev-mode-badge';
-  badge.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);background:#f59e0b;color:#000;font-size:11px;font-weight:900;padding:3px 12px;z-index:99999;border-radius:0 0 6px 6px;letter-spacing:0.3px;';
-  badge.textContent = '🔧 관리자 검증 모드';
-  document.body.appendChild(badge);
-  toast('🔧 관리자 검증 모드 시작. 모든 기능을 테스트할 수 있습니다');
-  go('admin');
-}
-
 function applyLoginUI(user) {
   isLoggedIn = true;
   const mp = document.getElementById('h-my-purchase');
@@ -3550,7 +3597,6 @@ function applyLoginUI(user) {
   $('btn-auth').style.display = 'none';
   $('user-profile').style.display = 'flex';
   const mobSec = $('mob-auth-section'); if (mobSec) mobSec.style.display = '';
-  const mn = $('my-numbers-section'); if(mn) mn.style.display = '';
   $('chat-input').disabled = false;
   $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
   // 로그인 시 채팅 닉네임 미리 로드
@@ -3559,8 +3605,10 @@ function applyLoginUI(user) {
       if (data?.nickname) window._profileNickname = data.nickname;
     }).catch(()=>{});
   }
-  const adminBtn = $('m-admin');
-  if (adminBtn) adminBtn.style.display = user.email === ADMIN_EMAIL ? '' : 'none';
+  ['auth-menu-separator','m-ticket','m-stats','mob-btn-ticket','mob-btn-stats'].forEach(id => {
+    const item = $(id);
+    if (item) item.style.display = '';
+  });
   updateBadgeUI();
   loadUserDataFromDB();
   const active = document.querySelector('.menu-btn.on');
@@ -3579,9 +3627,11 @@ function applyLogoutUI() {
   dbStats = null;
   $('btn-auth').style.display = '';
   $('user-profile').style.display = 'none';
-  const adminBtnL = $('m-admin'); if (adminBtnL) adminBtnL.style.display = 'none';
+  ['auth-menu-separator','m-ticket','m-stats','mob-btn-ticket','mob-btn-stats'].forEach(id => {
+    const item = $(id);
+    if (item) item.style.display = 'none';
+  });
   const mobSec2 = $('mob-auth-section'); if (mobSec2) mobSec2.style.display = 'none';
-  const mn2 = $('my-numbers-section'); if(mn2) mn2.style.display = 'none';
   $('chat-input').disabled = true;
   $('chat-input').placeholder = '로그인 후 대화에 참여해보세요.';
   // 좌측 패널 게스트 상태 복귀
@@ -3593,6 +3643,7 @@ function applyLogoutUI() {
   const active = document.querySelector('.menu-btn.on');
   if (active) {
     const id = active.id.replace('m-', '');
+    if (id === 'ticket' || id === 'stats') { go('home'); return; }
     if (id === 'community') renderCommunity();
     if (id === 'profile') renderProfile();
   }
@@ -3982,17 +4033,45 @@ async function saveTicketToDB(parsed, winData, gameResults) {
   try {
     const bestResult = gameResults.reduce((b, r) => r.rank < b.rank ? r : b, gameResults[0]);
     const totalPrize = gameResults.reduce((sum, r) => sum + calcPrizeAmount(r.rank, winData), 0);
-    await sb.from('tickets').upsert({
+    const meta = parsed.purchaseMeta || getQrPurchaseMeta();
+    const baseTicket = {
       user_id: currentUser.id,
       qr_url: parsed.key,
       round_no: parsed.round,
       numbers: parsed.games[0],
       game_count: parsed.games.length,
-      purchase_date: winData.date || null,
+      purchase_date: meta.purchaseDate,
       result: 'checked',
       prize_rank: bestResult.rank <= 5 ? bestResult.rank : null,
       prize_amount: totalPrize,
-    }, { onConflict: 'qr_url' });
+    };
+    const rankingFields = {
+      lottery_type: 'lotto',
+      purchase_channel: meta.channel,
+      purchase_mode: meta.mode,
+      matched_count: gameResults.reduce((sum,r)=>sum+r.matched,0),
+      total_number_count: parsed.games.length * 6,
+      store_id: meta.storeId,
+      store_name: meta.storeName || null,
+      store_address: meta.storeAddress || null,
+      store_lat: meta.lat,
+      store_lng: meta.lng,
+    };
+    let { error: ticketError } = await sb.from('tickets').upsert({ ...baseTicket, ...rankingFields }, { onConflict:'qr_url' });
+    if (ticketError && /column|schema cache/i.test(ticketError.message || '')) {
+      ({ error: ticketError } = await sb.from('tickets').upsert(baseTicket, { onConflict:'qr_url' }));
+    }
+    if (ticketError) throw ticketError;
+    if (meta.channel === 'retail' && meta.storeId && meta.storeName) {
+      sb.from('lottery_stores').upsert({
+        id:meta.storeId,
+        name:meta.storeName,
+        address:meta.storeAddress || '주소 미입력',
+        lat:meta.lat,
+        lng:meta.lng,
+        first_scanned_by:currentUser.id,
+      }, { onConflict:'id' }).then(()=>{},()=>{});
+    }
 
     await upsertUserStats(parsed.games.length, gameResults, totalPrize, winData);
     await loadUserDataFromDB();
@@ -4110,12 +4189,11 @@ function go(id) {
     rank:      '<div class="rank-view-tabs" style="width:100%;margin-bottom:0;"><button id="rank-view-ranking" class="rank-view-btn on" onclick="setRankView(\'ranking\')">랭킹</button><button id="rank-view-hall" class="rank-view-btn" onclick="setRankView(\'hall\')">명예의 전당</button></div>',
     map:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 내 주변 판매점',
     community: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 커뮤니티',
-    admin:     '🔐 관리자 패널',
     profile:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필',
   };
   $('mid-title').innerHTML = titles[id] || '';
   // 페이지 타이틀 동적 업데이트
-  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', badge:'획득 뱃지', rank:'랭킹', map:'내 주변 판매점', admin:'관리자 패널', profile:'내 프로필', home:'실시간 피드' };
+  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', badge:'획득 뱃지', rank:'랭킹', map:'내 주변 판매점', profile:'내 프로필', home:'실시간 피드' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
@@ -4124,6 +4202,7 @@ function go(id) {
   if (id === 'stats') {
     $('stats-content').innerHTML = '<div class="skel-card"><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div></div></div>';
     renderStats();
+    renderStatsSavedNumbers();
   }
   if (id === 'badge') {
     $('badge-content').innerHTML = '<div class="skel-card"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"><div class="skel" style="height:70px;border-radius:8px;"></div><div class="skel" style="height:70px;border-radius:8px;"></div><div class="skel" style="height:70px;border-radius:8px;"></div></div></div>';
@@ -4141,8 +4220,7 @@ function go(id) {
     }
     renderCommunity();
   }
-  if (id === 'admin')     { renderAdmin(); }
-  if (id === 'profile')   { renderProfile(); rList(); const ms = $('my-numbers-section'); if(ms && isLoggedIn) ms.style.display=''; if(isLoggedIn && !window._ltbTickets) loadProfileRecentTickets(); }
+  if (id === 'profile')   { renderProfile(); if(isLoggedIn && !window._ltbTickets) loadProfileRecentTickets(); }
 }
 
 // =====================================================
@@ -4266,7 +4344,9 @@ function qrInputPreview(val) {
     hint.innerHTML = `<span style="color:#7c3aed;font-weight:700;font-size:10px;">🏦 연금복권 720+${detail}</span>`;
   } else {
     const gc = parsed.games ? parsed.games.length : 0;
-    hint.innerHTML = `<span style="color:#16a34a;font-weight:700;font-size:10px;">✅ 로또 6/45 · ${parsed.round}회차 · ${gc}게임 인식됨</span>`;
+    const gameText = parsed.games.map((nums,i)=>`${String.fromCharCode(65+i)}. ${nums.join(', ')}`).join(' / ');
+    const serialText = parsed.serial ? ` · 식별값 끝 ${parsed.serial.slice(-8)}` : '';
+    hint.innerHTML = `<div style="color:#16a34a;font-weight:700;font-size:10px;">로또 6/45 · ${parsed.round}회차 · ${gc}게임${serialText}</div><div style="color:var(--text-muted);font-size:10px;line-height:1.6;margin-top:2px;">${gameText}</div>`;
   }
 }
 
@@ -5657,6 +5737,27 @@ function updateGoalCard() {
   `;
 }
 
+function saveStatsNumberSet() {
+  const input = $('stats-save-numbers');
+  const nums = (input?.value || '').split(',').map(v=>Number(v.trim())).filter(Number.isInteger);
+  if (nums.length !== 6 || new Set(nums).size !== 6 || nums.some(n=>n<1||n>45)) {
+    toast('중복 없는 1~45 번호 6개를 입력하세요.');
+    return;
+  }
+  MY.unshift({ drw:latestRound, nums:nums.sort((a,b)=>a-b), type:'manual-plan', date:new Date().toLocaleDateString('ko-KR') });
+  saveStorage();
+  input.value = '';
+  renderStatsSavedNumbers();
+  toast('내 번호에 저장했습니다.');
+}
+
+function renderStatsSavedNumbers() {
+  const wrap = $('stats-saved-number-list');
+  if (!wrap) return;
+  const saved = MY.filter(item=>item.type==='manual-plan').slice(0,5);
+  wrap.innerHTML = saved.length ? saved.map(item=>`<div style="display:flex;gap:4px;align-items:center;margin-top:5px;">${item.nums.map(n=>bH(n)).join('')}<span style="margin-left:auto;font-size:9px;color:var(--text-muted);">${item.date}</span></div>`).join('') : '<span style="font-size:10px;color:var(--text-muted);">저장된 번호가 없습니다.</span>';
+}
+
 function renderStats() {
   let totalBuy, totalInvest, totalPrize, winCount, bestRank, rankCounts, isMock;
 
@@ -6593,19 +6694,34 @@ async function renderHallOfFame() {
   }
 }
 
+let storeMapInstance = null;
+let storeLocationLayer = null;
+
 function renderMap() {
   const defaultLat = 37.5665, defaultLng = 126.9780;
   $('map-content').innerHTML = `
     <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;">
-      <iframe id="store-map-frame" class="map-frame" title="내 주변 복권 판매점 지도" loading="lazy"
-        src="https://www.openstreetmap.org/export/embed.html?bbox=126.94%2C37.54%2C127.02%2C37.59&amp;layer=mapnik&amp;marker=${defaultLat}%2C${defaultLng}"></iframe>
+      <div id="store-map-frame" class="map-frame" role="img" aria-label="내 주변 복권 판매점 지도"></div>
       <div style="padding:12px;">
         <button onclick="findNearbyLottoStores()" style="width:100%;padding:10px;border:0;border-radius:7px;background:var(--lotto-red);color:#fff;font-size:12px;font-weight:800;cursor:pointer;">내 주변 판매점 찾기</button>
-        <div id="map-location-status" style="font-size:10px;color:var(--text-muted);margin-top:7px;text-align:center;">위치 권한을 허용하면 가까운 순서로 판매점을 찾습니다.</div>
+        <div id="map-location-status" style="font-size:10px;color:var(--text-muted);margin-top:7px;text-align:center;">위치 권한을 허용하면 반경 1km 판매점을 찾습니다.</div>
         <a id="kakao-nearby-link" href="https://map.kakao.com/?q=%EB%A1%9C%EB%98%90%20%ED%8C%90%EB%A7%A4%EC%A0%90" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:8px;font-size:11px;font-weight:700;color:#2563eb;">카카오 지도에서 로또 판매점 보기</a>
       </div>
     </div>
-    <div id="nearby-store-list" style="margin-top:10px;"></div>`;
+    <div style="margin-top:10px;">
+      <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:7px;">반경 1km 로또 판매점</div>
+      <div id="nearby-store-list" style="min-height:150px;padding:20px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;text-align:center;font-size:11px;color:var(--text-muted);">내 주변 판매점 찾기를 눌러주세요.</div>
+    </div>`;
+  if (storeMapInstance) storeMapInstance.remove();
+  if (!window.L) return;
+  storeMapInstance = L.map('store-map-frame', { zoomControl:true, attributionControl:true }).setView([defaultLat, defaultLng], 13);
+  storeMapInstance.attributionControl.setPrefix(false);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom:19,
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
+  }).addTo(storeMapInstance);
+  storeLocationLayer = L.layerGroup().addTo(storeMapInstance);
+  setTimeout(() => storeMapInstance?.invalidateSize(), 0);
 }
 
 function distanceKm(lat1, lng1, lat2, lng2) {
@@ -6624,25 +6740,31 @@ function findNearbyLottoStores() {
   if (status) status.textContent = '현재 위치를 확인하고 있습니다...';
   navigator.geolocation.getCurrentPosition(async pos => {
     const lat = pos.coords.latitude, lng = pos.coords.longitude;
-    const delta = 0.025;
-    const frame = $('store-map-frame');
-    if (frame) frame.src = `https://www.openstreetmap.org/export/embed.html?bbox=${lng-delta}%2C${lat-delta}%2C${lng+delta}%2C${lat+delta}&layer=mapnik&marker=${lat}%2C${lng}`;
+    if (storeMapInstance && storeLocationLayer) {
+      storeLocationLayer.clearLayers();
+      L.marker([lat,lng]).bindPopup('현재 위치').addTo(storeLocationLayer);
+      L.circle([lat,lng], { radius:1000, color:'#e11d48', weight:2, fillColor:'#e11d48', fillOpacity:.06 }).addTo(storeLocationLayer);
+      storeMapInstance.setView([lat,lng], 15);
+    }
     const kakao = $('kakao-nearby-link');
     if (kakao) kakao.href = `https://map.kakao.com/link/search/로또 판매점,${lat},${lng}`;
-    if (status) status.textContent = `현재 위치 확인 완료 · 정확도 약 ${Math.round(pos.coords.accuracy)}m`;
+    if (status) status.textContent = `현재 위치 확인 완료 · 반경 1km · 정확도 약 ${Math.round(pos.coords.accuracy)}m`;
     const list = $('nearby-store-list');
     if (!list || !sb) return;
     try {
       const { data, error } = await sb.from('lottery_stores').select('id,name,address,lat,lng,scan_count').not('lat','is',null).not('lng','is',null);
       if (error) throw error;
-      const stores = (data||[]).map(s=>({...s,distance:distanceKm(lat,lng,s.lat,s.lng)})).sort((a,b)=>a.distance-b.distance).slice(0,10);
-      list.innerHTML = stores.length ? `<div style="font-size:11px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">가까운 판매점</div>${stores.map(s=>`
+      const stores = (data||[]).map(s=>({...s,distance:distanceKm(lat,lng,s.lat,s.lng)})).filter(s=>s.distance<=1).sort((a,b)=>a.distance-b.distance);
+      stores.forEach(s => L.marker([s.lat,s.lng]).addTo(storeLocationLayer));
+      list.style.padding = stores.length ? '0' : '20px';
+      list.style.textAlign = stores.length ? 'left' : 'center';
+      list.innerHTML = stores.length ? stores.map(s=>`
         <a href="https://map.kakao.com/link/map/${encodeURIComponent(s.name)},${s.lat},${s.lng}" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;gap:8px;padding:10px 11px;margin-bottom:6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:7px;text-decoration:none;color:inherit;">
-          <span style="min-width:0;"><b style="display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.name}</b><span style="font-size:10px;color:var(--text-muted);">${s.address}</span></span>
-          <b style="font-size:11px;color:var(--lotto-red);white-space:nowrap;">${s.distance.toFixed(1)}km</b>
-        </a>`).join('')}` : `<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-muted);">아직 좌표가 등록된 판매점이 없습니다.<br>QR 등록 시 판매점 데이터가 누적됩니다.</div>`;
+          <span style="min-width:0;"><b style="display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${qrSafeText(s.name)}</b><span style="font-size:10px;color:var(--text-muted);">${qrSafeText(s.address)}</span></span>
+          <b style="font-size:11px;color:var(--lotto-red);white-space:nowrap;">${Math.round(s.distance*1000)}m</b>
+        </a>`).join('') : `반경 1km 안에 등록된 판매점이 없습니다.<br>QR 등록 시 판매점 데이터가 누적됩니다.`;
     } catch (_) {
-      list.innerHTML = `<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-muted);">판매점 지도 스키마 적용 후 거리순 목록이 표시됩니다.</div>`;
+      list.innerHTML = `판매점 지도 스키마 적용 후 거리순 목록이 표시됩니다.`;
     }
   }, err => {
     if (status) status.textContent = err.code === 1 ? '위치 권한이 필요합니다.' : '현재 위치를 확인할 수 없습니다.';
