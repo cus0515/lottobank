@@ -174,6 +174,7 @@ main.chat-hidden .chat-panel { display: none; }
 .badge.b-real-1 { background: linear-gradient(135deg, #ff2d2d, #b91c1c); box-shadow: 0 0 10px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.3); animation: neonRed 1.4s ease-in-out infinite alternate; }
 .badge.b-real-2 { background: linear-gradient(135deg, #a855f7, #6b21a8); box-shadow: 0 0 8px rgba(168,85,247,0.6); animation: neonPurple 1.8s ease-in-out infinite alternate; }
 .badge.b-real-3 { background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 0 5px rgba(16,185,129,0.4); }
+.badge.b-real-both { background: linear-gradient(135deg, #ff2d2d, #7c3aed); box-shadow: 0 0 12px rgba(239,68,68,0.5), 0 0 12px rgba(124,58,237,0.4); animation: neonRed 1.4s ease-in-out infinite alternate; }
 .badge.b-guest { background: #94a3b8; color: #fff; font-weight: 500; }
 .badge.b-system { background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; font-weight:900; animation: neonGold 2s ease-in-out infinite alternate; }
 .emoji-gap { margin-right: 6px; }
@@ -3245,9 +3246,9 @@ const summaryBg    = bestRank <= 2 ? (_isDmS?'#0a1f10':'#dcfce7') : bestRank <= 
 // =====================================================
 function getMyBadgeHtml() {
   if (!myVerifiedTitle) return `<span class="badge b-guest">일반</span>`;
-  if (myVerifiedTitle.includes('1등')) return `<span class="badge b-real-1">${myVerifiedTitle}</span>`;
-  if (myVerifiedTitle.includes('2등')) return `<span class="badge b-real-2">${myVerifiedTitle}</span>`;
-  return `<span class="badge b-real-3">${myVerifiedTitle}</span>`;
+  const _isBoth = myVerifiedTitle.includes('+') || (myVerifiedTitle.includes('로또') && myVerifiedTitle.includes('연금'));
+  const _cls = _isBoth ? 'b-real-both' : myVerifiedTitle.includes('1등') ? 'b-real-1' : myVerifiedTitle.includes('2등') ? 'b-real-2' : 'b-real-3';
+  return `<span class="badge ${_cls}">${myVerifiedTitle}</span>`;
 }
 
 function updateBadgeUI() {
@@ -3650,9 +3651,11 @@ let chatChannel = null;
 
 function getChatBadgeHtml(verifiedTitle) {
   if (!verifiedTitle) return `<span class="badge b-guest">일반</span>`;
-  if (verifiedTitle.includes('1등')) return `<span class="badge b-real-1">[${verifiedTitle}]</span>`;
-  if (verifiedTitle.includes('2등')) return `<span class="badge b-real-2">[${verifiedTitle}]</span>`;
-  return `<span class="badge b-real-3">[${verifiedTitle}]</span>`;
+  const isLotto   = verifiedTitle.includes('로또') || (!verifiedTitle.includes('연금') && (verifiedTitle.includes('1등')||verifiedTitle.includes('2등')||verifiedTitle.includes('3등')));
+  const isBoth    = verifiedTitle.includes('로또') && verifiedTitle.includes('연금');
+  const isBothCombined = verifiedTitle.includes('+') || isBoth;
+  const cls = isBothCombined ? 'b-real-both' : verifiedTitle.includes('1등') ? 'b-real-1' : verifiedTitle.includes('2등') ? 'b-real-2' : 'b-real-3';
+  return `<span class="badge ${cls}">[${verifiedTitle}]</span>`;
 }
 
 function appendChatRow(msg) {
@@ -3716,6 +3719,26 @@ async function sendChat() {
   }
 }
 
+function computeBestTitle(titles) {
+  if (!titles || !titles.length) return null;
+  // 로또 best, 연금 best 각각 구함 (prize_rank 낮을수록 높은 등수)
+  const lotto   = titles.filter(t => t.lottery_type !== 'pension').sort((a,b)=>(a.prize_rank||9)-(b.prize_rank||9));
+  const pension = titles.filter(t => t.lottery_type === 'pension').sort((a,b)=>(a.prize_rank||9)-(b.prize_rank||9));
+  const bestL = lotto[0]   || null;
+  const bestP = pension[0] || null;
+  if (!bestL && !bestP) return null;
+  if (bestL && !bestP) return bestL.title;
+  if (!bestL && bestP) return bestP.title;
+  // 둘 다 있을 때
+  const rl = bestL.prize_rank || 9;
+  const rp = bestP.prize_rank || 9;
+  if (rl < rp) return bestL.title;           // 로또가 더 높은 등수
+  if (rp < rl) return bestP.title;           // 연금이 더 높은 등수
+  // 같은 등수 → 병합 표시 (예: "1230회차 로또+연금 1등")
+  const rank = rl;
+  return `로또+연금 ${rank}등`;
+}
+
 async function syncDailyVisitAndSystemTitle() {
   if (!sb || !currentUser || isAdminTestMode) return;
   try {
@@ -3728,12 +3751,13 @@ async function syncDailyVisitAndSystemTitle() {
       last_visited_at: new Date().toISOString(),
     }, { onConflict:'user_id,visit_date' });
     const { data } = await sb.from('user_system_titles')
-      .select('title,title_type,expires_at')
+      .select('title,title_type,lottery_type,prize_rank,expires_at')
       .eq('user_id', currentUser.id)
       .eq('active', true)
+      .order('prize_rank', { ascending:true })
       .order('awarded_at', { ascending:false })
-      .limit(1);
-    window._systemRankTitle = data?.[0]?.title || null;
+      .limit(10);
+    window._systemRankTitle = computeBestTitle(data || []);
   } catch (_) {
     window._systemRankTitle = null;
   }

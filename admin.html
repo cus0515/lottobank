@@ -714,6 +714,10 @@ async function createAdvancedVerificationData() {
     } else {
       result.style.color='var(--green)';
       result.textContent=`✅ ${selected.length}개 시나리오 생성 완료. 메인 검증 화면에서 확인하세요.`;
+      // 메인 창에 _systemRankTitle 즉시 재로드 요청
+      if (window.opener && window.opener.syncDailyVisitAndSystemTitle) {
+        window.opener.syncDailyVisitAndSystemTitle();
+      }
     }
   } catch (e) {
     result.style.color='var(--red)';
