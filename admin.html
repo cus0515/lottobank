@@ -130,6 +130,7 @@
       <button class="tab-btn" onclick="switchTab('chat')">🗨️ 채팅</button>
       <button class="tab-btn" onclick="switchTab('stats')">📊 전적</button>
       <button class="tab-btn" onclick="switchTab('insert')">직접 입력</button>
+      <button class="tab-btn" onclick="switchTab('verify')">기능 검증</button>
     </div>
 
     <div id="table-area"></div>
@@ -210,6 +211,10 @@ async function loadTab(tab) {
 
   if (tab === 'insert') {
     renderInsertForms();
+    return;
+  }
+  if (tab === 'verify') {
+    renderVerificationPanel();
     return;
   }
 
@@ -344,6 +349,137 @@ function renderInsertForms() {
       <div class="form-actions"><button class="btn-save" onclick="upsertStats()">전적 저장</button></div>
       <div class="form-result" id="ins-stat-result"></div>
     </div>`;
+}
+
+function renderVerificationPanel() {
+  document.getElementById('table-area').innerHTML = `
+    <div class="admin-form">
+      <div class="table-title">1등·칭호·랭킹·채팅 통합 검증</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-top:6px;">관리자 본인 계정에 테스트 티켓, 1등 칭호, 구매 랭킹 1위, 채팅 메시지와 활동 피드를 생성합니다.</div>
+      <div class="form-grid" style="margin-top:14px;">
+        <div><label class="form-label">테스트 회차</label><input class="form-input" id="verify-round" type="number" value="9999" min="1"></div>
+        <div><label class="form-label">테스트 당첨금</label><input class="form-input" id="verify-prize" type="number" value="1000000000" min="0"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="createVerificationData()">검증 데이터 생성</button>
+        <button class="btn-refresh" onclick="cleanupVerificationData()">테스트 데이터 정리</button>
+        <a href="/?admin-test=1" target="_blank" rel="noopener" class="btn-refresh" style="text-decoration:none;">메인 검증 화면</a>
+      </div>
+      <div class="form-result" id="verify-result"></div>
+    </div>
+    <div class="admin-form">
+      <div class="table-title" style="margin-bottom:10px;">확인 항목</div>
+      <div style="font-size:12px;line-height:2;color:var(--text);">
+        <div>1. 명예의 전당에 테스트 회차 1등 황금 테두리 표시.</div>
+        <div>2. 채팅에 [테스트 회차 1등] 관리자 닉네임 표시.</div>
+        <div>3. 메인 검증 화면 월간 구매 랭킹에 구매왕 뱃지 표시.</div>
+        <div>4. 실시간 피드에 관리자 검증 당첨 활동 표시.</div>
+      </div>
+    </div>`;
+}
+
+async function getAdminTestContext() {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session || session.user.email !== 'jobdevil23@gmail.com') throw new Error('관리자 로그인이 필요합니다.');
+  const { data:profile } = await sb.from('profiles').select('nickname').eq('id', session.user.id).maybeSingle();
+  return { user:session.user, nickname:profile?.nickname || '관리자' };
+}
+
+async function createVerificationData() {
+  const result = document.getElementById('verify-result');
+  result.style.color = 'var(--muted)';
+  result.textContent = '검증 데이터 생성 중...';
+  try {
+    const { user, nickname } = await getAdminTestContext();
+    const round = Number(document.getElementById('verify-round').value) || 9999;
+    const prize = Number(document.getElementById('verify-prize').value) || 0;
+    await cleanupVerificationData(false);
+    const title = `${round}회차 1등`;
+    const month = 'admin-test';
+    const rows = [
+      sb.from('tickets').insert({
+        user_id:user.id,
+        qr_url:`admin-test:ticket:${round}`,
+        round_no:round,
+        numbers:[1,2,3,4,5,6],
+        game_count:1,
+        result:'checked',
+        prize_rank:1,
+        prize_amount:prize,
+        lottery_type:'lotto',
+      }),
+      sb.from('user_system_titles').insert({
+        user_id:user.id,
+        title_type:'admin_test',
+        title,
+        lottery_type:'lotto',
+        round_no:round,
+        prize_rank:1,
+        period_key:month,
+        badge_icon:'🥇',
+        border_color:'#fbbf24',
+        active:true,
+      }),
+      sb.from('ranking_snapshots').insert({
+        period_key:month,
+        ranking_type:'purchase',
+        user_id:user.id,
+        rank:1,
+        score:1000000,
+        title:'구매왕',
+        badge_icon:'👑',
+        border_color:'#22c55e',
+      }),
+      sb.from('chat_messages').insert({
+        user_id:user.id,
+        nickname,
+        verified_title:title,
+        message:`[관리자 검증] ${round}회차 1등 채팅 연동`,
+      }),
+      sb.from('activity_feed').insert({
+        user_id:user.id,
+        nick:nickname,
+        type:'win',
+        data:{ admin_test:true, round, rank:1, prize },
+      }),
+    ];
+    const results = await Promise.all(rows);
+    const errors = results.map(r=>r.error?.message).filter(Boolean);
+    if (errors.length) throw new Error(errors.join(' / '));
+    result.style.color = 'var(--green)';
+    result.textContent = '검증 데이터 생성 완료. 메인 검증 화면에서 확인하세요.';
+  } catch (e) {
+    result.style.color = 'var(--red)';
+    result.textContent = e.message;
+  }
+}
+
+async function cleanupVerificationData(showResult = true) {
+  const result = document.getElementById('verify-result');
+  try {
+    const { user } = await getAdminTestContext();
+    const jobs = [
+      sb.from('tickets').delete().eq('user_id',user.id).like('qr_url','admin-test:%'),
+      sb.from('user_system_titles').delete().eq('user_id',user.id).eq('title_type','admin_test'),
+      sb.from('ranking_snapshots').delete().eq('user_id',user.id).eq('period_key','admin-test'),
+      sb.from('chat_messages').delete().eq('user_id',user.id).like('message','[관리자 검증]%'),
+      sb.from('activity_feed').delete().eq('user_id',user.id).contains('data',{ admin_test:true }),
+    ];
+    const results = await Promise.all(jobs);
+    const errors = results.map(r=>r.error?.message).filter(Boolean);
+    if (errors.length) throw new Error(errors.join(' / '));
+    if (showResult && result) {
+      result.style.color = 'var(--green)';
+      result.textContent = '테스트 데이터를 정리했습니다.';
+    }
+  } catch (e) {
+    if (showResult && result) {
+      result.style.color = 'var(--red)';
+      result.textContent = e.message;
+    } else {
+      throw e;
+    }
+  }
 }
 
 async function findUserId(nickname) {

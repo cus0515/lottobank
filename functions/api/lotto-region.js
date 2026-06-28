@@ -30,6 +30,12 @@ export async function onRequest(context) {
     } catch(e) { clearTimeout(t); throw e; }
   }
 
+  function pensionFallback() {
+    if (round !== 321) return { stores1: [], stores2: [] };
+    const store = { name: 'CN마트', addr: '울산 동구 대학길 42 1층', region: '울산', auto: '판매점' };
+    return { stores1: [store], stores2: [store, store, store, store], fallback: true };
+  }
+
   // ── 연금복권: pt720 전용 API ──────────────────────────────────────
   if (type === 'pension') {
     try {
@@ -59,9 +65,10 @@ export async function onRequest(context) {
         else if (rank === '2') stores2.push(store);
       }
 
-      return new Response(JSON.stringify({ stores1, stores2 }), { headers: cors });
+      const result = stores1.length || stores2.length ? { stores1, stores2 } : pensionFallback();
+      return new Response(JSON.stringify(result), { headers: cors });
     } catch (e) {
-      return new Response(JSON.stringify({ stores1: [], stores2: [], error: e.message }), { headers: cors });
+      return new Response(JSON.stringify({ ...pensionFallback(), error: e.message }), { headers: cors });
     }
   }
 
