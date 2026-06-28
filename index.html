@@ -171,12 +171,12 @@ main.chat-hidden .chat-panel { display: none; }
 .prize-row b { color: var(--lotto-red); }
 
 .badge { display: inline-flex; align-items: center; padding: 3px 6px; font-size: 11px; font-weight: 900; color: #fff; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
-.badge.b-real-1      { background: linear-gradient(135deg, #ff2d2d, #b91c1c); box-shadow: 0 0 10px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.3); animation: neonRed 1.4s ease-in-out infinite alternate; }
-.badge.b-real-pen-1  { background: linear-gradient(135deg, #86efac, #16a34a); box-shadow: 0 0 10px rgba(134,239,172,0.7), 0 0 20px rgba(22,163,74,0.3); animation: neonGreen 1.4s ease-in-out infinite alternate; }
-.badge.b-real-both   { background: linear-gradient(135deg, #ef4444 0%, #dc2626 42%, #86efac 58%, #16a34a 100%); box-shadow: 0 0 10px rgba(239,68,68,.45), 0 0 14px rgba(34,197,94,.4); animation: neonBoth 1.5s ease-in-out infinite alternate; }
+.badge.b-real-1      { background:#dc3f52; box-shadow:0 0 9px rgba(220,63,82,.58); animation:neonRed 1.4s ease-in-out infinite alternate; }
+.badge.b-real-pen-1  { background:#35a968; box-shadow:0 0 9px rgba(53,169,104,.58); animation:neonGreen 1.4s ease-in-out infinite alternate; }
+.badge.b-real-both   { background:#aeb5bf; color:#172033 !important; border:1px solid #e2e8f0; box-shadow:0 0 9px rgba(226,232,240,.8),0 0 18px rgba(148,163,184,.55); animation:neonSilver 1.5s ease-in-out infinite alternate; }
 .badge.b-real-2,
-.badge.b-real-pen-2,
-.badge.b-real-both-2 { background: linear-gradient(135deg,#f8fafc 0%,#94a3b8 38%,#e2e8f0 66%,#64748b 100%); color:#1f2937 !important; border:1px solid #cbd5e1; box-shadow:none !important; animation:none !important; }
+.badge.b-real-pen-2  { background:#b8bec7; color:#1f2937 !important; border:1px solid #9ca3af; box-shadow:none !important; animation:none !important; }
+.badge.b-real-both-2 { background:#aeb5bf; color:#172033 !important; border:1px solid #e2e8f0; box-shadow:0 0 9px rgba(226,232,240,.8),0 0 18px rgba(148,163,184,.55); animation:neonSilver 1.5s ease-in-out infinite alternate; }
 .badge.b-real-3      { background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 0 5px rgba(16,185,129,0.4); }
 .badge.b-guest { background: #94a3b8; color: #fff; font-weight: 500; }
 .badge.b-system { background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; font-weight:900; animation: neonGold 2s ease-in-out infinite alternate; }
@@ -193,7 +193,7 @@ main.chat-hidden .chat-panel { display: none; }
   to   { box-shadow: 0 0 14px rgba(134,239,172,0.9), 0 0 28px rgba(22,163,74,0.5); }
 }
 @keyframes neonRed { 0% { box-shadow: 0 0 6px rgba(239,68,68,0.6), 0 0 12px rgba(239,68,68,0.2); } 100% { box-shadow: 0 0 14px rgba(239,68,68,0.9), 0 0 28px rgba(239,68,68,0.5); } }
-@keyframes neonBoth { from { box-shadow:0 0 7px rgba(239,68,68,.5),0 0 10px rgba(34,197,94,.28); } to { box-shadow:0 0 12px rgba(239,68,68,.72),0 0 18px rgba(34,197,94,.55); } }
+@keyframes neonSilver { from { box-shadow:0 0 6px rgba(226,232,240,.65),0 0 12px rgba(148,163,184,.35); } to { box-shadow:0 0 13px rgba(248,250,252,.95),0 0 24px rgba(148,163,184,.7); } }
 @keyframes neonPurple { 0% { box-shadow: 0 0 5px rgba(168,85,247,0.4); } 100% { box-shadow: 0 0 12px rgba(168,85,247,0.8), 0 0 22px rgba(168,85,247,0.4); } }
 @keyframes neonGold { 0% { box-shadow: 0 0 4px rgba(245,158,11,0.5); } 100% { box-shadow: 0 0 10px rgba(245,158,11,0.9); } }
 @keyframes roiCountUp { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
@@ -3675,7 +3675,7 @@ function getChatBadgeHtml(verifiedTitle) {
   const hasPension = Boolean(pensionRank);
   const rank = isBoth ? lottoRank : lottoRank && pensionRank ? Math.min(lottoRank, pensionRank) : lottoRank || pensionRank;
   let label;
-  if (isBoth)          label = `로또+연금 ${rank}등`;
+  if (isBoth)          label = `로또·연금 ${rank}등`;
   else if (hasPension) label = `연금 ${rank}등`;
   else                 label = `로또 ${rank}등`;
   let cls;
@@ -3756,12 +3756,12 @@ function computeBestTitle(titles) {
   if (!bestL && !bestP) return null;
   const rl = bestL?.prize_rank || 9;
   const rp = bestP?.prize_rank || 9;
-  // 회차 없이 단순 형식: "로또 1등", "연금 1등", "로또+연금 1등"
+  // 회차 없이 단순 형식: "로또 1등", "연금 1등", "로또·연금 1등"
   if (bestL && !bestP) return `로또 ${rl}등`;
   if (!bestL && bestP) return `연금 ${rp}등`;
   if (rl < rp)  return `로또 ${rl}등`;
   if (rp < rl)  return `연금 ${rp}등`;
-  return `로또+연금 ${rl}등`;   // 같은 등수 → 병합
+  return `로또·연금 ${rl}등`;   // 같은 등수 → 병합
 }
 
 async function syncDailyVisitAndSystemTitle() {

@@ -485,8 +485,8 @@ const VERIFY_SCENARIOS = [
   { id:'pension_3', label:'연금 3등', icon:'🥉', type:'pension', rank:3, prize:1000000,
     badges:['first_win','pension_first'], title:null, chat:false, hall:false, rankSnap:false,
     desc:'연금 3등 피드 검증' },
-  { id:'both_1', label:'로또+연금 동시 1등', icon:'👑', type:'both', rank:1, prize:3680000000,
-    badges:['first_win','rank1','pension_first'], title:'N회차 로또+연금 1등', chat:true, hall:true, rankSnap:true,
+  { id:'both_1', label:'로또·연금 동시 1등', icon:'👑', type:'both', rank:1, prize:3680000000,
+    badges:['first_win','rank1','pension_first'], title:'로또·연금 1등', chat:true, hall:true, rankSnap:true,
     desc:'중복 칭호·뱃지 동시 처리 검증' },
   { id:'badges_all', label:'뱃지 풀세트', icon:'🏅', type:'lotto', rank:1, prize:1000000,
     badges:['first_reg','first_win','reg_10','rank5','rank4','rank3','rank2','rank1','roi_pos','big_spender','pension_first','pension_5'],
@@ -546,7 +546,7 @@ function renderVerificationPanel() {
         <div>✅ <b>실시간 피드</b> — 당첨 타입·회차·금액·랭킹 진입 표시</div>
         <div>✅ <b>월간 랭킹</b> — 메인 검증 화면(/?admin-test=1)에서 구매왕 1위 표시</div>
         <div>✅ <b>뱃지 탭</b> — 선택 시나리오 뱃지가 획득 상태로 표시</div>
-        <div>✅ <b>중복 칭호</b> — 로또+연금 동시 1등 시 두 칭호 모두 채팅에 표시</div>
+        <div>✅ <b>중복 칭호</b> — 로또·연금 동시 1등 시 결합 칭호로 채팅에 표시</div>
         <div>✅ <b>연금 명예의 전당</b> — 명예의 전당 탭 전환 시 연금 1·2등 별도 표시</div>
       </div>
     </div>`;
