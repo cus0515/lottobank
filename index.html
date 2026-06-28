@@ -1647,35 +1647,12 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
             </div>
           </div>
           <div style="position:relative;">
-            <input type="text" id="qr-url-input" class="input-custom" placeholder="로또 6/45 · 연금복권 720+ QR URL 붙여넣기" onkeyup="if(event.key==='Enter')verifyRealQR();qrInputPreview(this.value)" oninput="qrInputPreview(this.value)" style="padding-right:72px;">
-            <button onclick="navigator.clipboard.readText().then(t=>{if($('qr-url-input')){$('qr-url-input').value=t;qrInputPreview(t);}}).catch(()=>{})" title="클립보드에서 붙여넣기" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:var(--lotto-red);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">붙여넣기</button>
+            <input type="text" id="qr-url-input" class="input-custom" placeholder="로또 QR URL 붙여넣기" onkeyup="if(event.key==='Enter')lookupQrTicket()" oninput="qrInputPreview(this.value)" style="padding-right:72px;">
+            <button onclick="navigator.clipboard.readText().then(t=>{if($('qr-url-input')){$('qr-url-input').value=t;lookupQrTicket();}}).catch(()=>{})" title="클립보드에서 붙여넣기" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:var(--lotto-red);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">붙여넣기</button>
           </div>
           <div id="qr-input-hint" style="min-height:18px;margin-top:4px;font-size:11px;"></div>
-          <div id="qr-purchase-meta" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;">
-            <div>
-              <label style="display:block;font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">구매 경로</label>
-              <select id="qr-purchase-channel" class="select-custom" style="margin:0;width:100%;">
-                <option value="retail">오프라인 판매점</option>
-                <option value="online">동행복권 인터넷</option>
-              </select>
-            </div>
-            <div>
-              <label style="display:block;font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">구매 방식</label>
-              <select id="qr-purchase-mode" class="select-custom" style="margin:0;width:100%;">
-                <option value="">확인 불가</option>
-                <option value="auto">자동</option>
-                <option value="manual">수동</option>
-                <option value="semi-auto">반자동</option>
-              </select>
-            </div>
-            <div>
-              <label style="display:block;font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">구매일</label>
-              <input id="qr-purchase-date" type="date" class="input-custom" style="margin:0;width:100%;">
-            </div>
-          </div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:5px;">인터넷 구매도 공식 QR URL이 있을 때만 인증됩니다.</div>
           <div class="qr-action-row">
-            <button class="btn-action" onclick="verifyRealQR()" style="background:var(--lotto-red);flex:1;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> 당첨 인증하기</button>
+            <button class="btn-action" onclick="lookupQrTicket()" style="background:var(--lotto-red);flex:1;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> QR 조회</button>
             <button class="btn-action qr-camera-btn" id="cam-btn" onclick="toggleCameraQR()" title="카메라로 QR 스캔"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
           </div>
           <!-- 카메라 QR 스캔 UI -->
@@ -2081,16 +2058,14 @@ function checkWinRank(myNums, winNums, bonus) {
 }
 
 function getQrPurchaseMeta() {
-  const channel = $('qr-purchase-channel')?.value || 'retail';
-  const online = channel === 'online';
   return {
-    channel,
-    mode: $('qr-purchase-mode')?.value || null,
-    purchaseDate: $('qr-purchase-date')?.value || null,
-    storeName: online ? '동행복권 인터넷 구매' : null,
-    storeAddress: online ? '온라인' : null,
+    channel: 'unknown',
+    mode: null,
+    purchaseDate: null,
+    storeName: null,
+    storeAddress: null,
     userStoreId: null,
-    storeId: online ? 'online:dhlottery' : null,
+    storeId: null,
     lat: null,
     lng: null,
   };
@@ -2958,11 +2933,7 @@ async function renderQRHistory() {
       .order('created_at', { ascending: false })
       .limit(5);
     if (!tks || !tks.length) {
-      wrap.innerHTML = `<div style="text-align:center;padding:24px 16px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;margin-top:8px;">
-        <div style="font-size:32px;margin-bottom:10px;">🔖</div>
-        <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">아직 등록된 QR이 없습니다</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">동행복권 앱에서 구매 내역 QR을 복사해<br>위 입력창에 붙여넣기 하세요.</div>
-      </div>`;
+      wrap.innerHTML = '';
       return;
     }
     window._ltbTickets = tks;
@@ -3007,6 +2978,50 @@ async function renderQRHistory() {
   } catch(e) { wrap.innerHTML = ''; }
 }
 
+async function lookupQrTicket() {
+  if (!isLoggedIn) { toast('먼저 로그인해 주세요.'); return; }
+  const input = $('qr-url-input');
+  const url = input?.value.trim() || '';
+  const parsed = parseQRUrl(url);
+  const display = $('qr-result-display');
+  if (!parsed) {
+    display.innerHTML = '<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div><div class="qr-warn-title">QR을 인식할 수 없습니다</div><div class="qr-warn-body">동행복권 로또 QR URL인지 확인해주세요.</div></div></div>';
+    return;
+  }
+  if (usedQrKeys.includes(parsed.key)) {
+    display.innerHTML = '<div class="qr-dup-card"><span class="qr-err-icon">↻</span><div><div class="qr-dup-title">이미 등록된 QR입니다</div><div class="qr-dup-body">같은 복권은 중복 등록할 수 없습니다.</div></div></div>';
+    return;
+  }
+  if (sb && currentUser) {
+    const { data } = await sb.from('tickets').select('id').eq('qr_url', parsed.key).maybeSingle();
+    if (data) {
+      display.innerHTML = '<div class="qr-dup-card"><span class="qr-err-icon">↻</span><div><div class="qr-dup-title">이미 등록된 QR입니다</div><div class="qr-dup-body">DB에 등록된 구매 내역입니다.</div></div></div>';
+      return;
+    }
+  }
+  window._pendingQr = parsed;
+  const games = parsed.type === 'lotto' ? parsed.games : [];
+  const gameRows = games.map((nums, index) => `
+    <div style="display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:center;padding:5px 0;border-bottom:1px dashed #cbd5e1;">
+      <b style="font-size:13px;color:#111827;">${String.fromCharCode(65 + index)}</b>
+      <div style="display:flex;justify-content:space-between;gap:5px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:14px;font-weight:800;color:#111827;">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>
+    </div>`).join('');
+  const ticketBody = parsed.type === 'lotto' ? `
+    <div style="display:flex;justify-content:space-between;align-items:end;border-bottom:2px solid #111827;padding-bottom:8px;margin-bottom:6px;">
+      <div><div style="font-size:22px;font-weight:950;color:#111827;">Lotto <span style="font-size:14px;">6/45</span></div><div style="font-size:11px;color:#475569;">제 ${parsed.round}회</div></div>
+      <div style="font-size:11px;color:#475569;text-align:right;">${games.length}게임<br><b style="font-size:15px;color:#111827;">${(games.length * 1000).toLocaleString()}원</b></div>
+    </div>
+    ${gameRows}` : `
+    <div style="font-size:20px;font-weight:900;color:#111827;border-bottom:2px solid #111827;padding-bottom:8px;">연금복권 720+</div>
+    <div style="padding:14px 0;font-size:14px;font-weight:800;color:#111827;">${parsed.round||'-'}회 · ${parsed.jo||'-'}조 · ${String(parsed.no||0).padStart(6,'0')}번</div>`;
+  display.innerHTML = `
+    <div style="max-width:420px;margin:10px auto 0;background:#fffef8;border:1px solid #d6d3d1;border-radius:4px;padding:18px 20px;box-shadow:0 5px 16px rgba(15,23,42,.1);">
+      ${ticketBody}
+      <div style="font-size:10px;color:#64748b;text-align:center;margin-top:12px;">QR 조회 완료 · 등록 전 내용을 확인하세요.</div>
+    </div>
+    <button type="button" onclick="verifyRealQR()" style="width:100%;margin-top:10px;border:0;border-radius:7px;background:var(--lotto-red);color:#fff;padding:11px;font-size:13px;font-weight:900;cursor:pointer;">이 복권 등록하기</button>`;
+}
+
 // QR 실제 인증 (동행복권 API 대조)
 // =====================================================
 async function verifyRealQR() {
@@ -3015,6 +3030,10 @@ async function verifyRealQR() {
   if (!url) { toast('⚠️ QR URL을 입력해 주세요'); return; }
 
   const parsed = parseQRUrl(url);
+  if (!window._pendingQr || window._pendingQr.key !== parsed?.key) {
+    await lookupQrTicket();
+    return;
+  }
   if (parsed) {
     parsed.purchaseMeta = getQrPurchaseMeta();
   }
@@ -4004,8 +4023,9 @@ async function saveTicketToDB(parsed, winData, gameResults) {
       ({ error: ticketError } = await sb.from('tickets').upsert(baseTicket, { onConflict:'qr_url' }));
     }
     if (ticketError) throw ticketError;
-    await upsertUserStats(parsed.games.length, gameResults, totalPrize, winData);
-    await loadUserDataFromDB();
+    try {
+      await upsertUserStats(parsed.games.length, gameResults, totalPrize, winData);
+      await loadUserDataFromDB();
     // 활동 피드 삽입
     insertActivity('qr_register', { round: parsed.round, games: parsed.games.length });
     if (bestResult.rank <= 5) {
@@ -4044,7 +4064,10 @@ async function saveTicketToDB(parsed, winData, gameResults) {
         if (bd) insertActivity('badge', { badge_id: id, badge_name: bd.name, icon: bd.icon, rank_pos: rankPos });
       });
     }
-    window._prevBadgeIds = nowEarned;
+      window._prevBadgeIds = nowEarned;
+    } catch (derivedError) {
+      console.warn('ticket derived data:', derivedError.message);
+    }
     return true;
   } catch (e) {
     console.warn('saveTicketToDB:', e.message);
@@ -4265,6 +4288,8 @@ async function loadMyNumberStats() {
 function qrInputPreview(val) {
   const hint = $('qr-input-hint');
   if (!hint) return;
+  window._pendingQr = null;
+  if ($('qr-result-display')) $('qr-result-display').innerHTML = '';
   const v = (val || '').trim();
   if (!v) { hint.innerHTML = ''; return; }
   const parsed = parseQRUrl(v);
@@ -4273,13 +4298,9 @@ function qrInputPreview(val) {
     return;
   }
   if (parsed.type === 'pension') {
-    const detail = parsed.round ? ` · ${parsed.round}회차 ${parsed.jo||'?'}조 ${String(parsed.no||0).padStart(6,'0')}번` : '';
-    hint.innerHTML = `<span style="color:#7c3aed;font-weight:700;font-size:10px;">🏦 연금복권 720+${detail}</span>`;
+    hint.innerHTML = '<span style="color:#7c3aed;font-weight:700;font-size:10px;">연금복권 QR을 확인했습니다. QR 조회를 눌러주세요.</span>';
   } else {
-    const gc = parsed.games ? parsed.games.length : 0;
-    const gameText = parsed.games.map((nums,i)=>`${String.fromCharCode(65+i)}. ${nums.join(', ')}`).join(' / ');
-    const serialText = parsed.serial ? ` · 식별값 끝 ${parsed.serial.slice(-8)}` : '';
-    hint.innerHTML = `<div style="color:#16a34a;font-weight:700;font-size:10px;">로또 6/45 · ${parsed.round}회차 · ${gc}게임${serialText}</div><div style="color:var(--text-muted);font-size:10px;line-height:1.6;margin-top:2px;">${gameText}</div>`;
+    hint.innerHTML = '<span style="color:#16a34a;font-weight:700;font-size:10px;">로또 QR을 확인했습니다. QR 조회를 눌러주세요.</span>';
   }
 }
 
@@ -6268,9 +6289,9 @@ async function scanCameraLoop() {
       const input = document.getElementById('qr-url-input');
       input.value = url;
       qrInputPreview(url);
-      input.focus();
-      input.scrollIntoView({ behavior:'smooth', block:'center' });
-      toast('QR URL을 인식했습니다. 구매 정보를 확인한 뒤 인증하세요.');
+      await lookupQrTicket();
+      $('qr-result-display')?.scrollIntoView({ behavior:'smooth', block:'center' });
+      toast('QR을 인식했습니다. 내용을 확인한 뒤 등록하세요.');
       return;
     }
   }
@@ -6336,8 +6357,9 @@ function feedItemHtml(a, isNew) {
       const re = rankEmoji[d.rank]||'';
       const rankStr = `<span style="color:${rc};font-weight:900;">${re} ${d.rank}등 당첨!</span>`;
       const prizeStr = d.prize ? ` ${fmtMFull(d.prize)}` : '';
+      const roundStr = d.round ? ` · <span style="color:var(--text-muted);font-size:10px;">${d.round}회차</span>` : '';
       const rankPos = d.rank_pos ? ` · <span style="color:#3b82f6;">랭킹 ${d.rank_pos}위 진입</span>` : '';
-      return `${rankStr}${prizeStr}${rankPos}`;
+      return `${rankStr}${prizeStr}${roundStr}${rankPos}`;
     },
     badge: d => {
       const icon2 = d.icon ? `${d.icon} ` : '🏅 ';
@@ -6607,18 +6629,25 @@ async function renderRankingHub() {
     const periodKey = adminPreview
       ? 'admin-test'
       : rankingScope === 'monthly' ? new Date().toISOString().slice(0,7) : 'all';
-    const { data, error } = await sb.from('ranking_snapshots')
-      .select('rank,score,title,badge_icon,border_color,user_id,profiles:user_id(nickname)')
+    const { data: rdata, error } = await sb.from('ranking_snapshots')
+      .select('rank,score,title,badge_icon,border_color,user_id')
       .eq('period_key', periodKey)
       .eq('ranking_type', rankingCategory)
       .order('rank', { ascending:true })
       .limit(50);
     if (error) throw error;
-    const rows = data || [];
+    const rows = rdata || [];
+    // 닉네임 별도 조회
+    const ruids = [...new Set(rows.map(r=>r.user_id))];
+    let rnickMap = {};
+    if (ruids.length) {
+      const { data: rpdata } = await sb.from('profiles').select('id,nickname').in('id', ruids);
+      (rpdata||[]).forEach(p => { rnickMap[p.id] = p.nickname; });
+    }
     list.innerHTML = list.innerHTML.split('<div style="padding:22px')[0] + (rows.length
       ? `<div>${rows.map(r=>`<div style="display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-dashed);">
           <b style="text-align:center;color:${r.rank===1?'#f59e0b':'var(--text-muted)'};">${r.rank}</b>
-          <div style="min-width:0;"><span class="badge ${r.rank===1?'b-system':'b-guest'}">[${r.title}]</span><b style="font-size:12px;">${r.profiles?.nickname||'익명'}</b></div>
+          <div style="min-width:0;"><span class="badge ${r.rank===1?'b-system':'b-guest'}">[${r.title}]</span><b style="font-size:12px;">${rnickMap[r.user_id]||'익명'}</b></div>
           <strong style="font-size:12px;color:var(--lotto-red);">${Number(r.score).toLocaleString()}</strong>
         </div>`).join('')}</div>`
       : `<div style="padding:26px 14px;text-align:center;color:var(--text-muted);font-size:11px;">아직 집계된 순위가 없습니다.<br>QR 데이터가 쌓이면 시스템이 자동으로 칭호를 부여합니다.</div>`);
@@ -6637,18 +6666,25 @@ async function renderHallOfFame() {
   $('rank-content').innerHTML = `<div id="hall-list"><div style="padding:30px;text-align:center;color:var(--text-muted);font-size:11px;">명예 기록 확인 중...</div></div>`;
   if (!sb) return;
   try {
-    const { data, error } = await sb.from('tickets')
-      .select('user_id,round_no,prize_rank,lottery_type,profiles:user_id(nickname)')
+    const { data: tdata, error } = await sb.from('tickets')
+      .select('user_id,round_no,prize_rank,lottery_type')
       .eq('lottery_type', type)
       .in('prize_rank', [1,2])
       .order('round_no', { ascending:false });
     if (error) throw error;
-    const rows = data || [];
+    const rows = tdata || [];
+    // 닉네임 별도 조회
+    const uids = [...new Set(rows.map(r=>r.user_id))];
+    let nickMap = {};
+    if (uids.length) {
+      const { data: pdata } = await sb.from('profiles').select('id,nickname').in('id', uids);
+      (pdata||[]).forEach(p => { nickMap[p.id] = p.nickname; });
+    }
     $('hall-list').innerHTML = rows.length ? rows.map(r=>`
       <div class="hall-card ${r.prize_rank===1?'gold':'silver'}">
         <div style="font-size:24px;">${r.prize_rank===1?'🏆':'🥈'}</div>
         <div style="min-width:0;flex:1;">
-          <div style="font-size:12px;font-weight:900;color:var(--text-dark);">[${r.round_no}회차 ${r.prize_rank}등] ${r.profiles?.nickname||'익명'}</div>
+          <div style="font-size:12px;font-weight:900;color:var(--text-dark);">[${r.round_no}회차 ${r.prize_rank}등] ${nickMap[r.user_id]||'익명'}</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${type==='lotto'?'로또 6/45':'연금복권 720+'} QR 인증</div>
         </div>
       </div>`).join('') : `<div style="padding:30px;text-align:center;color:var(--text-muted);font-size:11px;">아직 등록된 ${type==='lotto'?'로또':'연금복권'} 1·2등 인증자가 없습니다.</div>`;
