@@ -173,10 +173,10 @@ main.chat-hidden .chat-panel { display: none; }
 .badge { display: inline-flex; align-items: center; padding: 3px 6px; font-size: 11px; font-weight: 900; color: #fff; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
 .badge.b-real-1      { background:#dc3f52; box-shadow:0 0 9px rgba(220,63,82,.58); animation:neonRed 1.4s ease-in-out infinite alternate; }
 .badge.b-real-pen-1  { background:#35a968; box-shadow:0 0 9px rgba(53,169,104,.58); animation:neonGreen 1.4s ease-in-out infinite alternate; }
-.badge.b-real-both   { background:#aeb5bf; color:#172033 !important; border:1px solid #e2e8f0; box-shadow:0 0 9px rgba(226,232,240,.8),0 0 18px rgba(148,163,184,.55); animation:neonSilver 1.5s ease-in-out infinite alternate; }
+.badge.b-real-both   { background:linear-gradient(120deg,#cf4058 0%,#e96876 40%,#dce9dc 50%,#68bd84 60%,#2f9d63 100%); color:#fff !important; border:1px solid rgba(255,255,255,.55); text-shadow:0 1px 2px rgba(15,23,42,.28); box-shadow:0 0 9px rgba(207,64,88,.38),0 0 13px rgba(47,157,99,.34); animation:neonBoth 1.5s ease-in-out infinite alternate; }
 .badge.b-real-2,
-.badge.b-real-pen-2  { background:#b8bec7; color:#1f2937 !important; border:1px solid #9ca3af; box-shadow:none !important; animation:none !important; }
-.badge.b-real-both-2 { background:#aeb5bf; color:#172033 !important; border:1px solid #e2e8f0; box-shadow:0 0 9px rgba(226,232,240,.8),0 0 18px rgba(148,163,184,.55); animation:neonSilver 1.5s ease-in-out infinite alternate; }
+.badge.b-real-pen-2,
+.badge.b-real-both-2 { background:#dbe7f0; color:#40566b !important; border:1px solid #b9cad8; box-shadow:0 1px 3px rgba(64,86,107,.15) !important; animation:none !important; }
 .badge.b-real-3      { background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 0 5px rgba(16,185,129,0.4); }
 .badge.b-guest { background: #94a3b8; color: #fff; font-weight: 500; }
 .badge.b-system { background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; font-weight:900; animation: neonGold 2s ease-in-out infinite alternate; }
@@ -193,7 +193,7 @@ main.chat-hidden .chat-panel { display: none; }
   to   { box-shadow: 0 0 14px rgba(134,239,172,0.9), 0 0 28px rgba(22,163,74,0.5); }
 }
 @keyframes neonRed { 0% { box-shadow: 0 0 6px rgba(239,68,68,0.6), 0 0 12px rgba(239,68,68,0.2); } 100% { box-shadow: 0 0 14px rgba(239,68,68,0.9), 0 0 28px rgba(239,68,68,0.5); } }
-@keyframes neonSilver { from { box-shadow:0 0 6px rgba(226,232,240,.65),0 0 12px rgba(148,163,184,.35); } to { box-shadow:0 0 13px rgba(248,250,252,.95),0 0 24px rgba(148,163,184,.7); } }
+@keyframes neonBoth { from { box-shadow:0 0 7px rgba(207,64,88,.35),0 0 10px rgba(47,157,99,.25); } to { box-shadow:0 0 12px rgba(207,64,88,.58),0 0 18px rgba(47,157,99,.48); } }
 @keyframes neonPurple { 0% { box-shadow: 0 0 5px rgba(168,85,247,0.4); } 100% { box-shadow: 0 0 12px rgba(168,85,247,0.8), 0 0 22px rgba(168,85,247,0.4); } }
 @keyframes neonGold { 0% { box-shadow: 0 0 4px rgba(245,158,11,0.5); } 100% { box-shadow: 0 0 10px rgba(245,158,11,0.9); } }
 @keyframes roiCountUp { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
