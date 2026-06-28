@@ -171,10 +171,13 @@ main.chat-hidden .chat-panel { display: none; }
 .prize-row b { color: var(--lotto-red); }
 
 .badge { display: inline-flex; align-items: center; padding: 3px 6px; font-size: 11px; font-weight: 900; color: #fff; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
-.badge.b-real-1 { background: linear-gradient(135deg, #ff2d2d, #b91c1c); box-shadow: 0 0 10px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.3); animation: neonRed 1.4s ease-in-out infinite alternate; }
-.badge.b-real-2 { background: linear-gradient(135deg, #a855f7, #6b21a8); box-shadow: 0 0 8px rgba(168,85,247,0.6); animation: neonPurple 1.8s ease-in-out infinite alternate; }
-.badge.b-real-3 { background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 0 5px rgba(16,185,129,0.4); }
-.badge.b-real-both { background: linear-gradient(135deg, #ff2d2d, #7c3aed); box-shadow: 0 0 12px rgba(239,68,68,0.5), 0 0 12px rgba(124,58,237,0.4); animation: neonRed 1.4s ease-in-out infinite alternate; }
+.badge.b-real-1      { background: linear-gradient(135deg, #ff2d2d, #b91c1c); box-shadow: 0 0 10px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.3); animation: neonRed 1.4s ease-in-out infinite alternate; }
+.badge.b-real-pen-1  { background: linear-gradient(135deg, #86efac, #16a34a); box-shadow: 0 0 10px rgba(134,239,172,0.7), 0 0 20px rgba(22,163,74,0.3); animation: neonGreen 1.4s ease-in-out infinite alternate; }
+.badge.b-real-both   { background: linear-gradient(135deg, #ef4444 0%, #dc2626 42%, #86efac 58%, #16a34a 100%); box-shadow: 0 0 10px rgba(239,68,68,.45), 0 0 14px rgba(34,197,94,.4); animation: neonBoth 1.5s ease-in-out infinite alternate; }
+.badge.b-real-2,
+.badge.b-real-pen-2,
+.badge.b-real-both-2 { background: linear-gradient(135deg,#f8fafc 0%,#94a3b8 38%,#e2e8f0 66%,#64748b 100%); color:#1f2937 !important; border:1px solid #cbd5e1; box-shadow:none !important; animation:none !important; }
+.badge.b-real-3      { background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 0 5px rgba(16,185,129,0.4); }
 .badge.b-guest { background: #94a3b8; color: #fff; font-weight: 500; }
 .badge.b-system { background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; font-weight:900; animation: neonGold 2s ease-in-out infinite alternate; }
 .emoji-gap { margin-right: 6px; }
@@ -185,7 +188,12 @@ main.chat-hidden .chat-panel { display: none; }
 .adm-save-btn { padding:3px 10px; background:#16a34a; color:#fff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; }
 .adm-cancel-btn { padding:3px 8px; background:var(--bg-light); color:var(--text-muted); border:none; border-radius:4px; font-size:11px; cursor:pointer; margin-left:4px; }
 @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
+@keyframes neonGreen {
+  from { box-shadow: 0 0 8px rgba(134,239,172,0.5), 0 0 16px rgba(22,163,74,0.2); }
+  to   { box-shadow: 0 0 14px rgba(134,239,172,0.9), 0 0 28px rgba(22,163,74,0.5); }
+}
 @keyframes neonRed { 0% { box-shadow: 0 0 6px rgba(239,68,68,0.6), 0 0 12px rgba(239,68,68,0.2); } 100% { box-shadow: 0 0 14px rgba(239,68,68,0.9), 0 0 28px rgba(239,68,68,0.5); } }
+@keyframes neonBoth { from { box-shadow:0 0 7px rgba(239,68,68,.5),0 0 10px rgba(34,197,94,.28); } to { box-shadow:0 0 12px rgba(239,68,68,.72),0 0 18px rgba(34,197,94,.55); } }
 @keyframes neonPurple { 0% { box-shadow: 0 0 5px rgba(168,85,247,0.4); } 100% { box-shadow: 0 0 12px rgba(168,85,247,0.8), 0 0 22px rgba(168,85,247,0.4); } }
 @keyframes neonGold { 0% { box-shadow: 0 0 4px rgba(245,158,11,0.5); } 100% { box-shadow: 0 0 10px rgba(245,158,11,0.9); } }
 @keyframes roiCountUp { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
@@ -200,8 +208,8 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .chat-system-row { background:linear-gradient(90deg,#1a0f00,#0f172a) !important; border-left-color:#d97706 !important; }
 [data-theme="dark"] .chat-system-row span:last-child { color:#fbbf24 !important; }
 
-.chat-messages { flex:1; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:8px; scroll-behavior:smooth; }
-.chat-row { font-size: 13px; line-height: 1.4; }
+.chat-messages { flex:1; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:14px; scroll-behavior:smooth; }
+.chat-row { font-size:13px; line-height:1.5; padding:2px 0; }
 .chat-user { font-weight: 700; color: #334155; }
 [data-theme="dark"] .chat-user { color:#94a3b8; }
 .chat-text { color: #0f172a; background:var(--paper-white); padding: 6px 10px; border-radius: 6px; display: inline-block; max-width: 85%; margin-top: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
@@ -1815,8 +1823,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     </div>
     <div style="display:flex; flex-direction:column; height:calc(100% - 49px);">
       <div class="chat-messages" id="chat-box">
-        <div class="chat-row"><span class="badge b-system">공지</span><span class="chat-user">LottoBank:</span><br><span class="chat-text">로또 6/45 · 연금복권 720+ QR 코드로 구매를 인증하고 전적을 자동 기록하세요 🎱</span></div>
-        <div class="chat-row"><span class="badge b-guest">팁</span><span class="chat-user">번호수집가:</span><br><span class="chat-text">동행복권 앱 → QR 조회 → URL 복사 → LottoBank QR 탭 붙여넣기 👍</span></div>
+        <div class="chat-row"><span class="badge b-system">공지</span><span class="chat-user">LottoBank</span><br><span class="chat-text">로또 6/45 · 연금복권 720+ QR 코드로 구매를 인증하고 전적을 자동 기록하세요 🎱</span></div>
+        <div class="chat-row"><span class="badge b-guest">팁</span><span class="chat-user">번호수집가</span><br><span class="chat-text">동행복권 앱 → QR 조회 → URL 복사 → LottoBank QR 탭 붙여넣기 👍</span></div>
       </div>
       <div class="chat-input-area">
         <input type="text" id="chat-input" class="chat-input" placeholder="로그인 후 실시간 대화에 참여해보세요." maxlength="200" onkeyup="if(event.key==='Enter')sendChat()" disabled>
@@ -3246,8 +3254,15 @@ const summaryBg    = bestRank <= 2 ? (_isDmS?'#0a1f10':'#dcfce7') : bestRank <= 
 // =====================================================
 function getMyBadgeHtml() {
   if (!myVerifiedTitle) return `<span class="badge b-guest">일반</span>`;
-  const _isBoth = myVerifiedTitle.includes('+') || (myVerifiedTitle.includes('로또') && myVerifiedTitle.includes('연금'));
-  const _cls = _isBoth ? 'b-real-both' : myVerifiedTitle.includes('1등') ? 'b-real-1' : myVerifiedTitle.includes('2등') ? 'b-real-2' : 'b-real-3';
+  const _rM = myVerifiedTitle.match(/([1-5])등/);
+  const _r  = _rM ? parseInt(_rM[1]) : 0;
+  const _hp = myVerifiedTitle.includes('연금');
+  const _hl = myVerifiedTitle.includes('로또') || (!_hp);
+  const _ib = myVerifiedTitle.includes('+') || (_hl && _hp);
+  let _cls;
+  if (_ib)       _cls = _r === 1 ? 'b-real-both'  : 'b-real-both-2';
+  else if (_hp)  _cls = _r === 1 ? 'b-real-pen-1' : _r === 2 ? 'b-real-pen-2' : 'b-real-3';
+  else           _cls = _r === 1 ? 'b-real-1'      : _r === 2 ? 'b-real-2'     : 'b-real-3';
   return `<span class="badge ${_cls}">${myVerifiedTitle}</span>`;
 }
 
@@ -3651,19 +3666,22 @@ let chatChannel = null;
 
 function getChatBadgeHtml(verifiedTitle) {
   if (!verifiedTitle) return `<span class="badge b-guest">일반</span>`;
-  // 등수 추출
-  const rankMatch = verifiedTitle.match(/([1-5])등/);
-  const rank = rankMatch ? parseInt(rankMatch[1]) : 0;
-  // 복권 종류 판별
-  const hasPension = verifiedTitle.includes('연금');
-  const hasLotto   = verifiedTitle.includes('로또') || (!hasPension);
-  const isBoth     = verifiedTitle.includes('+') || (hasLotto && hasPension);
-  // 표시 텍스트 (회차 제거, 단순 형식)
+  const parts = verifiedTitle.split(/\s*\/\s*/);
+  const pensionPart = parts.find(part => part.includes('연금'));
+  const lottoPart = parts.find(part => part.includes('로또') || !part.includes('연금'));
+  const pensionRank = Number(pensionPart?.match(/([1-5])등/)?.[1] || 0);
+  const lottoRank = Number(lottoPart?.match(/([1-5])등/)?.[1] || 0);
+  const isBoth = Boolean(lottoRank && pensionRank && lottoRank === pensionRank);
+  const hasPension = Boolean(pensionRank);
+  const rank = isBoth ? lottoRank : lottoRank && pensionRank ? Math.min(lottoRank, pensionRank) : lottoRank || pensionRank;
   let label;
   if (isBoth)          label = `로또+연금 ${rank}등`;
   else if (hasPension) label = `연금 ${rank}등`;
   else                 label = `로또 ${rank}등`;
-  const cls = isBoth ? 'b-real-both' : rank === 1 ? 'b-real-1' : rank === 2 ? 'b-real-2' : 'b-real-3';
+  let cls;
+  if (isBoth)          cls = rank === 1 ? 'b-real-both'   : 'b-real-both-2';
+  else if (hasPension) cls = rank === 1 ? 'b-real-pen-1'  : rank === 2 ? 'b-real-pen-2' : 'b-real-3';
+  else                 cls = rank === 1 ? 'b-real-1'       : rank === 2 ? 'b-real-2'     : 'b-real-3';
   return `<span class="badge ${cls}">[${label}]</span>`;
 }
 
@@ -3676,7 +3694,7 @@ function appendChatRow(msg) {
     row.innerHTML = `<span class="badge b-system"> 시스템</span><span style="font-size:12px;color:#92400e;font-weight:700;" class="chat-sys-text">${esc(msg.message)}</span>`;
   } else {
     row.className = 'chat-row';
-    row.innerHTML = `${getChatBadgeHtml(msg.verified_title)}<span class="chat-user">${esc(msg.nickname)}:</span><br><span class="chat-text">${esc(msg.message)}</span>`;
+    row.innerHTML = `${getChatBadgeHtml(msg.verified_title)}<span class="chat-user">${esc(msg.nickname)}</span><br><span class="chat-text">${esc(msg.message)}</span>`;
   }
   box.appendChild(row);
   box.scrollTop = box.scrollHeight;
@@ -3684,7 +3702,7 @@ function appendChatRow(msg) {
 
 async function loadRecentChats() {
   const box = $('chat-box');
-  box.innerHTML = `<div class="chat-row"><span class="badge b-guest">공지</span><span class="chat-user">LottoBank:</span><br><span class="chat-text">실제 구매 QR 코드로 당첨 여부를 인증하고 전적을 기록하세요.</span></div>`;
+  box.innerHTML = `<div class="chat-row"><span class="badge b-guest">공지</span><span class="chat-user">LottoBank</span><br><span class="chat-text">실제 구매 QR 코드로 당첨 여부를 인증하고 전적을 기록하세요.</span></div>`;
   try {
     const { data } = await sb.from('chat_messages')
       .select('*')
@@ -3715,10 +3733,11 @@ async function sendChat() {
       const { data: prof } = await sb.from('profiles').select('nickname').eq('id', currentUser.id).single();
       if (prof?.nickname) { nick = prof.nickname; window._profileNickname = nick; }
     }
+    await syncDailyVisitAndSystemTitle();
     await sb.from('chat_messages').insert({
       user_id: currentUser.id,
       nickname: nick,
-      verified_title: myVerifiedTitle || window._systemRankTitle || null,
+      verified_title: window._systemRankTitle || myVerifiedTitle || null,
       message: msg
     });
   } catch(e) {

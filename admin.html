@@ -542,7 +542,7 @@ function renderVerificationPanel() {
       <div class="table-title" style="margin-bottom:10px;">검증 항목 체크리스트</div>
       <div style="font-size:11px;line-height:2.2;color:var(--text);">
         <div>✅ <b>명예의 전당</b> — 1등·2등 티켓 보유 시 랭킹 탭 → 명예의 전당에 표시</div>
-        <div>✅ <b>채팅 칭호 뱃지</b> — 1등·2등 칭호 보유 시 채팅 메시지 옆에 [N회차 N등] 뱃지</div>
+        <div>✅ <b>채팅 칭호 뱃지</b> — 1등·2등 칭호 보유 시 채팅 메시지 옆에 [로또/연금 N등] 뱃지</div>
         <div>✅ <b>실시간 피드</b> — 당첨 타입·회차·금액·랭킹 진입 표시</div>
         <div>✅ <b>월간 랭킹</b> — 메인 검증 화면(/?admin-test=1)에서 구매왕 1위 표시</div>
         <div>✅ <b>뱃지 탭</b> — 선택 시나리오 뱃지가 획득 상태로 표시</div>
@@ -607,7 +607,7 @@ async function createAdvancedVerificationData() {
 
       // 칭호 삽입 (1·2등만)
       if (sc.title && isLotto && sc.rank <= 2) {
-        const t = `${lRound}회차 ${sc.rank}등`;
+        const t = `로또 ${sc.rank}등`;
         chatTitles.push(t);
         jobs.push(sb.from('user_system_titles').insert({
           user_id:user.id, title_type:'admin_test', title:t,
@@ -617,7 +617,7 @@ async function createAdvancedVerificationData() {
         }));
       }
       if (sc.title && isPension && sc.rank <= 2) {
-        const t = `${pRound}회차 연금 ${sc.rank}등`;
+        const t = `연금 ${sc.rank}등`;
         chatTitles.push(t);
         jobs.push(sb.from('user_system_titles').insert({
           user_id:user.id, title_type:'admin_test', title:t,
@@ -629,11 +629,11 @@ async function createAdvancedVerificationData() {
 
       // 랭킹 스냅샷 (1등만)
       if (sc.rankSnap && isLotto) {
-        jobs.push(sb.from('ranking_snapshots').insert({
+        jobs.push(sb.from('ranking_snapshots').upsert({
           period_key:month, ranking_type:'purchase',
           user_id:user.id, rank:1, score:1000000 + sc.prize,
           title:'구매왕', badge_icon:'👑', border_color:'#22c55e',
-        }));
+        }, { onConflict:'period_key,ranking_type,user_id' }));
       }
 
       // 피드
@@ -684,7 +684,7 @@ async function createAdvancedVerificationData() {
     }
 
     // 채팅 (선택된 칭호 중 대표 하나)
-    const chatTitle = chatTitles.length ? chatTitles.join(' / ') : null;
+    const chatTitle = chatTitles.length ? [...new Set(chatTitles)].join(' / ') : null;
     if (chatTitle) {
       jobs.push(sb.from('chat_messages').insert({
         user_id:user.id, nickname, verified_title:chatTitle,
@@ -701,7 +701,7 @@ async function createAdvancedVerificationData() {
 
     // 뱃지
     const badgeRows = [...allBadges].map(b => ({ user_id:user.id, badge_id:b }));
-    jobs.push(sb.from('user_badges').insert(badgeRows, { onConflict:'user_id,badge_id', ignoreDuplicates:true }));
+    jobs.push(sb.from('user_badges').upsert(badgeRows, { onConflict:'user_id,badge_id', ignoreDuplicates:true }));
 
     // 방문
     jobs.push(sb.from('user_daily_visits').insert({ user_id:user.id, visit_date:'2099-12-31' }));
