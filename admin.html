@@ -129,6 +129,7 @@
       <button class="tab-btn" onclick="switchTab('comments')">💬 댓글</button>
       <button class="tab-btn" onclick="switchTab('chat')">🗨️ 채팅</button>
       <button class="tab-btn" onclick="switchTab('stats')">📊 전적</button>
+      <button class="tab-btn" onclick="switchTab('data')">전체 데이터</button>
       <button class="tab-btn" onclick="switchTab('insert')">직접 입력</button>
       <button class="tab-btn" onclick="switchTab('verify')">기능 검증</button>
     </div>
@@ -155,6 +156,11 @@ let currentTab = 'users';
 let currentPage = 1;
 const PAGE_SIZE = 30;
 let searchQuery = '';
+const ADMIN_TABLES = [
+  'profiles','tickets','user_stats','user_badges','activity_feed','chat_messages',
+  'posts','comments','post_likes','ranking_snapshots','user_system_titles',
+  'user_daily_visits','lottery_stores','user_lottery_stores'
+];
 
 // ── 로그인 ──────────────────────────────────────────
 async function doLogin() {
@@ -213,6 +219,10 @@ async function loadTab(tab) {
     renderInsertForms();
     return;
   }
+  if (tab === 'data') {
+    renderDataManager();
+    return;
+  }
   if (tab === 'verify') {
     renderVerificationPanel();
     return;
@@ -235,6 +245,104 @@ async function loadTab(tab) {
     renderTable(cfg, data || [], count || 0);
   } catch(e) {
     area.innerHTML = `<div class="loading" style="color:#dc2626;">오류: ${e.message}</div>`;
+  }
+}
+
+function renderDataManager() {
+  document.getElementById('table-area').innerHTML = `
+    <div class="admin-form">
+      <div class="table-title">전체 기능 데이터 관리</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">테이블을 선택하고 JSON으로 직접 입력·수정·삭제할 수 있습니다.</div>
+      <div class="form-grid" style="margin-top:14px;">
+        <div>
+          <label class="form-label">테이블</label>
+          <select class="form-input" id="data-table" onchange="loadDataManagerRows()">${ADMIN_TABLES.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+        </div>
+        <div>
+          <label class="form-label">조건 JSON</label>
+          <input class="form-input" id="data-filter" placeholder='{"id":"UUID"}'>
+        </div>
+      </div>
+      <label class="form-label" style="margin-top:10px;">입력 또는 수정 데이터 JSON</label>
+      <textarea class="form-input" id="data-payload" rows="8" style="resize:vertical;font-family:Consolas,monospace;" placeholder='{"user_id":"UUID","field":"value"}'></textarea>
+      <div class="form-actions">
+        <button class="btn-save" onclick="runDataAction('insert')">입력</button>
+        <button class="btn-refresh" onclick="runDataAction('update')">수정</button>
+        <button class="btn-del" onclick="runDataAction('delete')">삭제</button>
+        <button class="btn-refresh" onclick="loadDataManagerRows()">조회</button>
+        <button class="btn-refresh" onclick="checkAdminDatabase()">DB 연결 점검</button>
+      </div>
+      <div class="form-result" id="data-result"></div>
+    </div>
+    <div class="table-wrap"><div class="table-header"><span class="table-title">최근 데이터 50건</span></div><pre id="data-rows" style="padding:14px;margin:0;overflow:auto;max-height:520px;font-size:11px;line-height:1.6;">불러오는 중...</pre></div>`;
+  loadDataManagerRows();
+}
+
+async function checkAdminDatabase() {
+  const result = document.getElementById('data-result');
+  result.style.color = 'var(--muted)';
+  result.textContent = '전체 테이블 확인 중...';
+  const checks = await Promise.all(ADMIN_TABLES.map(async table => {
+    const { error } = await sb.from(table).select('*', { count:'exact', head:true });
+    return { table, error:error?.message || null };
+  }));
+  const failed = checks.filter(item=>item.error);
+  result.style.color = failed.length ? 'var(--red)' : 'var(--green)';
+  result.textContent = failed.length
+    ? `연결 실패 ${failed.length}개: ${failed.map(item=>`${item.table}(${item.error})`).join(' / ')}`
+    : `전체 ${checks.length}개 테이블 연결 정상`;
+}
+
+function readAdminJson(id, required = false) {
+  const value = document.getElementById(id).value.trim();
+  if (!value) {
+    if (required) throw new Error('JSON을 입력하세요.');
+    return {};
+  }
+  const parsed = JSON.parse(value);
+  if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') throw new Error('JSON 객체 형식이어야 합니다.');
+  return parsed;
+}
+
+function applyAdminFilters(query, filters) {
+  Object.entries(filters).forEach(([key,value]) => { query = query.eq(key, value); });
+  return query;
+}
+
+async function loadDataManagerRows() {
+  const table = document.getElementById('data-table')?.value;
+  const rows = document.getElementById('data-rows');
+  if (!table || !rows) return;
+  rows.textContent = '불러오는 중...';
+  try {
+    const { data, error } = await sb.from(table).select('*').limit(50);
+    if (error) throw error;
+    rows.textContent = JSON.stringify(data || [], null, 2);
+  } catch (e) {
+    rows.textContent = `오류: ${e.message}`;
+  }
+}
+
+async function runDataAction(action) {
+  const table = document.getElementById('data-table').value;
+  const result = document.getElementById('data-result');
+  try {
+    const filters = readAdminJson('data-filter', action !== 'insert');
+    const payload = action === 'delete' ? null : readAdminJson('data-payload', true);
+    let response;
+    if (action === 'insert') response = await sb.from(table).insert(payload).select();
+    if (action === 'update') response = await applyAdminFilters(sb.from(table).update(payload), filters).select();
+    if (action === 'delete') {
+      if (!confirm(`${table} 조건 데이터를 삭제하시겠습니까?`)) return;
+      response = await applyAdminFilters(sb.from(table).delete(), filters).select();
+    }
+    if (response.error) throw response.error;
+    result.style.color = 'var(--green)';
+    result.textContent = `${action} 완료 · ${response.data?.length || 0}건`;
+    await loadDataManagerRows();
+  } catch (e) {
+    result.style.color = 'var(--red)';
+    result.textContent = e.message;
   }
 }
 
@@ -351,29 +459,95 @@ function renderInsertForms() {
     </div>`;
 }
 
+// ── 시나리오 정의 ──────────────────────────────────────────────
+const VERIFY_SCENARIOS = [
+  { id:'lotto_1', label:'로또 1등', icon:'🥇', type:'lotto', rank:1, prize:2000000000,
+    badges:['first_win','rank1'], title:'N회차 1등', chat:true, hall:true, rankSnap:true,
+    desc:'칭호·명예의전당·채팅뱃지·랭킹 검증' },
+  { id:'lotto_2', label:'로또 2등', icon:'🥈', type:'lotto', rank:2, prize:52000000,
+    badges:['first_win','rank2'], title:'N회차 2등', chat:true, hall:true, rankSnap:false,
+    desc:'2등 칭호·명예의전당·채팅뱃지 검증' },
+  { id:'lotto_3', label:'로또 3등', icon:'🥉', type:'lotto', rank:3, prize:1500000,
+    badges:['first_win','rank3'], title:null, chat:false, hall:false, rankSnap:false,
+    desc:'3등 뱃지 획득 검증' },
+  { id:'lotto_4', label:'로또 4등', icon:'🎯', type:'lotto', rank:4, prize:50000,
+    badges:['first_win'], title:null, chat:false, hall:false, rankSnap:false,
+    desc:'4등 당첨 피드 검증' },
+  { id:'lotto_5', label:'로또 5등', icon:'✅', type:'lotto', rank:5, prize:5000,
+    badges:['first_win'], title:null, chat:false, hall:false, rankSnap:false,
+    desc:'5등 당첨 피드 검증' },
+  { id:'pension_1', label:'연금 1등', icon:'🏆', type:'pension', rank:1, prize:1680000000,
+    badges:['first_win','pension_first'], title:'N회차 연금 1등', chat:true, hall:true, rankSnap:true,
+    desc:'연금 1등 칭호·명예의전당 검증' },
+  { id:'pension_2', label:'연금 2등', icon:'🥈', type:'pension', rank:2, prize:5000000,
+    badges:['first_win','pension_first'], title:'N회차 연금 2등', chat:true, hall:true, rankSnap:false,
+    desc:'연금 2등 명예의전당 검증' },
+  { id:'pension_3', label:'연금 3등', icon:'🥉', type:'pension', rank:3, prize:1000000,
+    badges:['first_win','pension_first'], title:null, chat:false, hall:false, rankSnap:false,
+    desc:'연금 3등 피드 검증' },
+  { id:'both_1', label:'로또+연금 동시 1등', icon:'👑', type:'both', rank:1, prize:3680000000,
+    badges:['first_win','rank1','pension_first'], title:'N회차 로또+연금 1등', chat:true, hall:true, rankSnap:true,
+    desc:'중복 칭호·뱃지 동시 처리 검증' },
+  { id:'badges_all', label:'뱃지 풀세트', icon:'🏅', type:'lotto', rank:1, prize:1000000,
+    badges:['first_reg','first_win','reg_10','rank5','rank4','rank3','rank2','rank1','roi_pos','big_spender','pension_first','pension_5'],
+    title:'뱃지 검증', chat:false, hall:false, rankSnap:false,
+    desc:'모든 뱃지 조건 한번에 검증' },
+];
+
+const BADGE_LABELS = {
+  first_reg:'🎟️ 첫 등록', first_win:'⭐ 첫 당첨', reg_10:'📱 인증 10회',
+  rank5:'✅ 5등 헌터', rank4:'🎯 4등 헌터', rank3:'🥉 3등 수집가',
+  rank2:'🥈 2등 인증자', rank1:'🥇 1등 인증자', roi_pos:'📈 ROI 플러스',
+  big_spender:'💰 큰 손', pension_first:'🏦 연금복권 입문', pension_5:'🎰 연금복권 5회',
+};
+
 function renderVerificationPanel() {
+  const scenarioHtml = VERIFY_SCENARIOS.map(s => `
+    <label style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--bg);">
+      <input type="checkbox" id="sc-${s.id}" style="margin-top:2px;accent-color:#dc2626;">
+      <div style="min-width:0;">
+        <div style="font-size:12px;font-weight:900;">${s.icon} ${s.label}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;">${s.desc}</div>
+        <div style="font-size:10px;color:#6366f1;margin-top:3px;">${s.badges.map(b=>BADGE_LABELS[b]||b).join(' · ')}</div>
+      </div>
+    </label>`).join('');
+
   document.getElementById('table-area').innerHTML = `
     <div class="admin-form">
-      <div class="table-title">1등·칭호·랭킹·채팅 통합 검증</div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-top:6px;">관리자 본인 계정에 테스트 티켓, 1등 칭호, 구매 랭킹 1위, 채팅 메시지와 활동 피드를 생성합니다.</div>
-      <div class="form-grid" style="margin-top:14px;">
-        <div><label class="form-label">테스트 회차</label><input class="form-input" id="verify-round" type="number" value="9999" min="1"></div>
-        <div><label class="form-label">테스트 당첨금</label><input class="form-input" id="verify-prize" type="number" value="1000000000" min="0"></div>
+      <div class="table-title">통합 시나리오 검증</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6;">검증할 시나리오를 선택하고 생성하세요. 각 시나리오는 티켓·칭호·피드·채팅·뱃지를 자동으로 구성합니다.</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;">
+        ${scenarioHtml}
       </div>
-      <div class="form-actions">
-        <button class="btn-save" onclick="createVerificationData()">검증 데이터 생성</button>
-        <button class="btn-refresh" onclick="cleanupVerificationData()">테스트 데이터 정리</button>
-        <a href="/?admin-test=1" target="_blank" rel="noopener" class="btn-refresh" style="text-decoration:none;">메인 검증 화면</a>
+
+      <div style="display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+        <label style="font-size:11px;font-weight:700;">기준 회차</label>
+        <input class="form-input" id="verify-round" type="number" value="9999" min="1" style="width:100px;margin:0;">
+        <label style="font-size:11px;font-weight:700;margin-left:8px;">연금 회차</label>
+        <input class="form-input" id="verify-pen-round" type="number" value="321" min="1" style="width:100px;margin:0;">
+        <button onclick="VERIFY_SCENARIOS.forEach(s=>document.getElementById('sc-'+s.id).checked=true)" style="margin-left:auto;padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);font-size:11px;cursor:pointer;">전체 선택</button>
+        <button onclick="VERIFY_SCENARIOS.forEach(s=>document.getElementById('sc-'+s.id).checked=false)" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);font-size:11px;cursor:pointer;">전체 해제</button>
+      </div>
+
+      <div class="form-actions" style="margin-top:10px;">
+        <button class="btn-save" onclick="createAdvancedVerificationData()">선택 시나리오 생성</button>
+        <button class="btn-refresh" onclick="cleanupVerificationData()">전체 테스트 데이터 정리</button>
+        <a href="/?admin-test=1" target="_blank" rel="noopener" class="btn-refresh" style="text-decoration:none;">메인 검증 화면 열기</a>
       </div>
       <div class="form-result" id="verify-result"></div>
     </div>
+
     <div class="admin-form">
-      <div class="table-title" style="margin-bottom:10px;">확인 항목</div>
-      <div style="font-size:12px;line-height:2;color:var(--text);">
-        <div>1. 명예의 전당에 테스트 회차 1등 황금 테두리 표시.</div>
-        <div>2. 채팅에 [테스트 회차 1등] 관리자 닉네임 표시.</div>
-        <div>3. 메인 검증 화면 월간 구매 랭킹에 구매왕 뱃지 표시.</div>
-        <div>4. 실시간 피드에 관리자 검증 당첨 활동 표시.</div>
+      <div class="table-title" style="margin-bottom:10px;">검증 항목 체크리스트</div>
+      <div style="font-size:11px;line-height:2.2;color:var(--text);">
+        <div>✅ <b>명예의 전당</b> — 1등·2등 티켓 보유 시 랭킹 탭 → 명예의 전당에 표시</div>
+        <div>✅ <b>채팅 칭호 뱃지</b> — 1등·2등 칭호 보유 시 채팅 메시지 옆에 [N회차 N등] 뱃지</div>
+        <div>✅ <b>실시간 피드</b> — 당첨 타입·회차·금액·랭킹 진입 표시</div>
+        <div>✅ <b>월간 랭킹</b> — 메인 검증 화면(/?admin-test=1)에서 구매왕 1위 표시</div>
+        <div>✅ <b>뱃지 탭</b> — 선택 시나리오 뱃지가 획득 상태로 표시</div>
+        <div>✅ <b>중복 칭호</b> — 로또+연금 동시 1등 시 두 칭호 모두 채팅에 표시</div>
+        <div>✅ <b>연금 명예의 전당</b> — 명예의 전당 탭 전환 시 연금 1·2등 별도 표시</div>
       </div>
     </div>`;
 }
@@ -385,74 +559,170 @@ async function getAdminTestContext() {
   return { user:session.user, nickname:profile?.nickname || '관리자' };
 }
 
-async function createVerificationData() {
+async function createAdvancedVerificationData() {
   const result = document.getElementById('verify-result');
   result.style.color = 'var(--muted)';
-  result.textContent = '검증 데이터 생성 중...';
+  result.textContent = '선택된 시나리오 생성 중...';
+
+  const selected = VERIFY_SCENARIOS.filter(s => document.getElementById('sc-'+s.id)?.checked);
+  if (!selected.length) { result.style.color='var(--red)'; result.textContent='시나리오를 하나 이상 선택하세요.'; return; }
+
   try {
     const { user, nickname } = await getAdminTestContext();
-    const round = Number(document.getElementById('verify-round').value) || 9999;
-    const prize = Number(document.getElementById('verify-prize').value) || 0;
+    const lottoRound = Number(document.getElementById('verify-round').value) || 9999;
+    const penRound   = Number(document.getElementById('verify-pen-round').value) || 321;
     await cleanupVerificationData(false);
-    const title = `${round}회차 1등`;
     const month = 'admin-test';
-    const rows = [
-      sb.from('tickets').insert({
-        user_id:user.id,
-        qr_url:`admin-test:ticket:${round}`,
-        round_no:round,
-        numbers:[1,2,3,4,5,6],
-        game_count:1,
-        result:'checked',
-        prize_rank:1,
-        prize_amount:prize,
-        lottery_type:'lotto',
-      }),
-      sb.from('user_system_titles').insert({
-        user_id:user.id,
-        title_type:'admin_test',
-        title,
-        lottery_type:'lotto',
-        round_no:round,
-        prize_rank:1,
-        period_key:month,
-        badge_icon:'🥇',
-        border_color:'#fbbf24',
-        active:true,
-      }),
-      sb.from('ranking_snapshots').insert({
-        period_key:month,
-        ranking_type:'purchase',
-        user_id:user.id,
-        rank:1,
-        score:1000000,
-        title:'구매왕',
-        badge_icon:'👑',
-        border_color:'#22c55e',
-      }),
-      sb.from('chat_messages').insert({
-        user_id:user.id,
-        nickname,
-        verified_title:title,
-        message:`[관리자 검증] ${round}회차 1등 채팅 연동`,
-      }),
-      sb.from('activity_feed').insert({
-        user_id:user.id,
-        nick:nickname,
-        type:'win',
-        data:{ admin_test:true, round, rank:1, prize },
-      }),
-    ];
-    const results = await Promise.all(rows);
-    const errors = results.map(r=>r.error?.message).filter(Boolean);
-    if (errors.length) throw new Error(errors.join(' / '));
-    result.style.color = 'var(--green)';
-    result.textContent = '검증 데이터 생성 완료. 메인 검증 화면에서 확인하세요.';
+
+    const jobs = [];
+    const allBadges = new Set(['admin_test']);
+    let chatTitles = [];
+    let feedItems  = [];
+    let ticketIdx  = 0;
+
+    for (const sc of selected) {
+      const isLotto   = sc.type === 'lotto'   || sc.type === 'both';
+      const isPension = sc.type === 'pension'  || sc.type === 'both';
+      const lRound = lottoRound + ticketIdx;
+      const pRound = penRound   + ticketIdx;
+      ticketIdx++;
+
+      // 티켓 삽입
+      if (isLotto) {
+        jobs.push(sb.from('tickets').insert({
+          user_id:user.id, qr_url:`admin-test:lotto:${lRound}:${sc.rank}`,
+          round_no:lRound, numbers:[1,2,3,4,5,6], game_count:1,
+          result:'checked', prize_rank:sc.rank, prize_amount:sc.prize,
+          lottery_type:'lotto',
+        }));
+      }
+      if (isPension) {
+        jobs.push(sb.from('tickets').insert({
+          user_id:user.id, qr_url:`admin-test:pension:${pRound}:${sc.rank}`,
+          round_no:pRound, numbers:[1,2,3,4,5,6], game_count:1,
+          result:'checked', prize_rank:sc.rank, prize_amount:sc.prize,
+          lottery_type:'pension',
+        }));
+      }
+
+      // 칭호 삽입 (1·2등만)
+      if (sc.title && isLotto && sc.rank <= 2) {
+        const t = `${lRound}회차 ${sc.rank}등`;
+        chatTitles.push(t);
+        jobs.push(sb.from('user_system_titles').insert({
+          user_id:user.id, title_type:'admin_test', title:t,
+          lottery_type:'lotto', round_no:lRound, prize_rank:sc.rank,
+          period_key:month, badge_icon:sc.rank===1?'🥇':'🥈',
+          border_color:sc.rank===1?'#fbbf24':'#c0c0c0', active:true,
+        }));
+      }
+      if (sc.title && isPension && sc.rank <= 2) {
+        const t = `${pRound}회차 연금 ${sc.rank}등`;
+        chatTitles.push(t);
+        jobs.push(sb.from('user_system_titles').insert({
+          user_id:user.id, title_type:'admin_test', title:t,
+          lottery_type:'pension', round_no:pRound, prize_rank:sc.rank,
+          period_key:month, badge_icon:sc.rank===1?'🏆':'🥈',
+          border_color:sc.rank===1?'#7c3aed':'#6366f1', active:true,
+        }));
+      }
+
+      // 랭킹 스냅샷 (1등만)
+      if (sc.rankSnap && isLotto) {
+        jobs.push(sb.from('ranking_snapshots').insert({
+          period_key:month, ranking_type:'purchase',
+          user_id:user.id, rank:1, score:1000000 + sc.prize,
+          title:'구매왕', badge_icon:'👑', border_color:'#22c55e',
+        }));
+      }
+
+      // 피드
+      if (isLotto) feedItems.push({ type:'win', data:{ admin_test:true, round:lRound, rank:sc.rank, prize:sc.prize } });
+      if (isPension) feedItems.push({ type:'win', data:{ admin_test:true, round:pRound, rank:sc.rank, prize:sc.prize } });
+
+      // 뱃지
+      sc.badges.forEach(b => allBadges.add(b));
+    }
+
+    // 뱃지 풀세트 추가 지원 (badges_all 시나리오)
+    if (selected.some(s => s.id === 'badges_all')) {
+      // 5등 헌터: 5회, 4등 헌터: 3회
+      for (let i = 0; i < 5; i++) {
+        jobs.push(sb.from('tickets').insert({
+          user_id:user.id, qr_url:`admin-test:rank5:${i}`, round_no:9000+i,
+          numbers:[1,2,3,4,5,6], game_count:1, result:'checked',
+          prize_rank:5, prize_amount:5000, lottery_type:'lotto',
+        }));
+      }
+      for (let i = 0; i < 3; i++) {
+        jobs.push(sb.from('tickets').insert({
+          user_id:user.id, qr_url:`admin-test:rank4:${i}`, round_no:8000+i,
+          numbers:[1,2,3,4,5,6], game_count:1, result:'checked',
+          prize_rank:4, prize_amount:50000, lottery_type:'lotto',
+        }));
+      }
+      for (let i = 0; i < 10; i++) {
+        jobs.push(sb.from('tickets').insert({
+          user_id:user.id, qr_url:`admin-test:reg:${i}`, round_no:7000+i,
+          numbers:[1,2,3,4,5,6], game_count:1, result:'pending',
+          prize_rank:null, prize_amount:0, lottery_type:'lotto',
+        }));
+      }
+      for (let i = 0; i < 5; i++) {
+        jobs.push(sb.from('tickets').insert({
+          user_id:user.id, qr_url:`admin-test:pen:${i}`, round_no:300+i,
+          numbers:[1,2,3,4,5,6], game_count:1, result:'pending',
+          prize_rank:null, prize_amount:0, lottery_type:'pension',
+        }));
+      }
+      // user_stats
+      jobs.push(sb.from('user_stats').upsert({
+        user_id:user.id, total_tickets:120, total_spent:1200000,
+        total_wins:20, total_prize:2100000000, best_rank:1,
+        rank_1_count:1, rank_2_count:1, rank_3_count:1, rank_4_count:3, rank_5_count:5,
+      }, { onConflict:'user_id' }));
+    }
+
+    // 채팅 (선택된 칭호 중 대표 하나)
+    const chatTitle = chatTitles.length ? chatTitles.join(' / ') : null;
+    if (chatTitle) {
+      jobs.push(sb.from('chat_messages').insert({
+        user_id:user.id, nickname, verified_title:chatTitle,
+        message:`[관리자 검증] ${chatTitle} 채팅 칭호 검증`,
+      }));
+    }
+
+    // 피드 (각 당첨 항목)
+    feedItems.forEach(f => {
+      jobs.push(sb.from('activity_feed').insert({
+        user_id:user.id, nick:nickname, type:f.type, data:f.data,
+      }));
+    });
+
+    // 뱃지
+    const badgeRows = [...allBadges].map(b => ({ user_id:user.id, badge_id:b }));
+    jobs.push(sb.from('user_badges').insert(badgeRows, { onConflict:'user_id,badge_id', ignoreDuplicates:true }));
+
+    // 방문
+    jobs.push(sb.from('user_daily_visits').insert({ user_id:user.id, visit_date:'2099-12-31' }));
+
+    const results = await Promise.allSettled(jobs);
+    const errors = results.filter(r=>r.status==='rejected'||r.value?.error).map(r=>r.reason?.message||r.value?.error?.message).filter(Boolean);
+    if (errors.length) {
+      result.style.color='var(--red)';
+      result.textContent='일부 오류: ' + errors.join(' / ');
+    } else {
+      result.style.color='var(--green)';
+      result.textContent=`✅ ${selected.length}개 시나리오 생성 완료. 메인 검증 화면에서 확인하세요.`;
+    }
   } catch (e) {
-    result.style.color = 'var(--red)';
-    result.textContent = e.message;
+    result.style.color='var(--red)';
+    result.textContent=e.message;
   }
 }
+
+// 기존 단일 생성 함수 유지 (하위 호환)
+async function createVerificationData() { return createAdvancedVerificationData(); }
 
 async function cleanupVerificationData(showResult = true) {
   const result = document.getElementById('verify-result');
@@ -464,13 +734,21 @@ async function cleanupVerificationData(showResult = true) {
       sb.from('ranking_snapshots').delete().eq('user_id',user.id).eq('period_key','admin-test'),
       sb.from('chat_messages').delete().eq('user_id',user.id).like('message','[관리자 검증]%'),
       sb.from('activity_feed').delete().eq('user_id',user.id).contains('data',{ admin_test:true }),
+      sb.from('user_badges').delete().eq('user_id',user.id).in('badge_id',
+        ['admin_test','first_reg','first_win','reg_10','rank5','rank4','rank3','rank2','rank1',
+         'roi_pos','big_spender','pension_first','pension_5']),
+      sb.from('user_daily_visits').delete().eq('user_id',user.id).eq('visit_date','2099-12-31'),
+      sb.from('user_stats').upsert({
+        user_id:user.id, total_tickets:0, total_spent:0, total_wins:0, total_prize:0,
+        best_rank:null, rank_1_count:0, rank_2_count:0, rank_3_count:0, rank_4_count:0, rank_5_count:0,
+      }, { onConflict:'user_id' }),
     ];
-    const results = await Promise.all(jobs);
-    const errors = results.map(r=>r.error?.message).filter(Boolean);
+    const results = await Promise.allSettled(jobs);
+    const errors = results.filter(r=>r.status==='rejected'||r.value?.error).map(r=>r.reason?.message||r.value?.error?.message).filter(Boolean);
     if (errors.length) throw new Error(errors.join(' / '));
     if (showResult && result) {
       result.style.color = 'var(--green)';
-      result.textContent = '테스트 데이터를 정리했습니다.';
+      result.textContent = '✅ 테스트 데이터 전체 정리 완료.';
     }
   } catch (e) {
     if (showResult && result) {
