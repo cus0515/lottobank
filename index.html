@@ -304,7 +304,7 @@ main.chat-hidden .chat-panel { display: none; }
 .hall-card.gold { border:1px solid #fbbf24; box-shadow:0 0 9px rgba(251,191,36,.35), inset 0 0 8px rgba(251,191,36,.08); }
 .hall-card.silver { border:1px solid #cbd5e1; box-shadow:0 0 8px rgba(148,163,184,.3), inset 0 0 8px rgba(148,163,184,.08); }
 .map-frame { width:100%; height:320px; border:0; display:block; background:var(--bg-light); }
-@media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}#qr-purchase-meta,#qr-new-store-grid{grid-template-columns:1fr!important;}}
+@media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}#qr-purchase-meta{grid-template-columns:1fr!important;}}
 .rank-tab-pill { display:inline-block;padding:5px 14px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;margin-right:4px;white-space:nowrap; }
 .rank-tab-pill.on { background:var(--lotto-red);color:#fff;border-color:var(--lotto-red);box-shadow:0 2px 8px rgba(225,29,72,.3); }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
@@ -597,8 +597,6 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] #my-match-section div[style*="background:#f8fafc"],[data-theme="dark"] #my-match-section div[style*="background:#f1f5f9"] { background:#263244 !important; }
 [data-theme="dark"] #auth-success-banner { background:#0f2a18 !important; border-color:#166534 !important; color:#86efac !important; }
 [data-theme="dark"] #left-cost-card { background:#2a0f0f !important; border-color:#991b1b !important; }
-[data-theme="dark"] #left-feed-section { border-top-color:#334155 !important; }
-[data-theme="dark"] #left-feed-section > div[style*="color:var(--text-muted)"] { color:#94a3b8 !important; }
 [data-theme="dark"] .badge-content,[data-theme="dark"] #badge-content > div[style*="background:var(--paper-white)"] { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #badge-content > div > div[style*="background:#f8fafc"] { background:#263244 !important; }
 [data-theme="dark"] .post-detail-wrap { background:#1e293b; border-color:#334155; }
@@ -622,10 +620,6 @@ button:active { transform: scale(0.97); }
 /* 헤더 메뉴 버튼 - 흰색 헤더 기준 붉은 강조 */
 .menu-btn:hover { color: var(--lotto-red) !important; background: rgba(225,29,72,.06) !important; border-radius: 6px; }
 .menu-btn.on { color: var(--lotto-red) !important; background: rgba(225,29,72,.08) !important; border-radius: 6px; }
-.menu-btn.auth-member-tab { color:#15803d!important; background:rgba(34,197,94,.1)!important; border-radius:6px; }
-.menu-btn.auth-member-tab:hover,.menu-btn.auth-member-tab.on { color:#fff!important; background:#22c55e!important; }
-.menu-btn.auth-member-tab.on::after { background:#15803d; }
-.mob-menu-item.auth-member-tab,.mob-nav-btn.auth-member-tab { color:#15803d; background:rgba(34,197,94,.1); }
 
 /* 좌측 패널 카드 호버 */
 .left-panel > * { transition: box-shadow .2s ease; }
@@ -1479,15 +1473,15 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <div style="margin:10px 0;display:flex;flex-direction:column;gap:5px;">
             <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/></svg>
-              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">QR 스캔 단 한 번에</div><div style="font-size:10px;color:var(--text-muted);">전적·ROI·뱃지 자동 집계</div></div>
+              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">QR 구매 내역 인증</div><div style="font-size:10px;color:var(--text-muted);">회차와 구매 번호 자동 인식</div></div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg>
-              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">실제 당첨 인증</div><div style="font-size:10px;color:var(--text-muted);">랭킹 진입·커뮤니티 공유</div></div>
+              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">나의 전적 자동 기록</div><div style="font-size:10px;color:var(--text-muted);">구매·당첨·ROI 통계 관리</div></div>
             </div>
-            <div onclick="go('fortune')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);cursor:pointer;">
+            <div onclick="go('rank')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);cursor:pointer;">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">실시간 당첨 인증</div><div style="font-size:10px;color:var(--text-muted);">회원들의 최신 인증 소식</div></div>
+              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">인증 기반 랭킹</div><div style="font-size:10px;color:var(--text-muted);">검증된 구매 이력으로 순위 반영</div></div>
             </div>
           </div>
           <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 0;font-size:12px;font-weight:900;cursor:pointer;width:100%;letter-spacing:.3px;">무료로 시작하기</button>
@@ -1550,14 +1544,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <div style="font-size:10px;font-weight:800;color:var(--text-muted);margin-bottom:8px;">투자금 vs 당첨금</div>
           <canvas id="roi-chart" height="110"></canvas>
         </div>
-      </div>
-
-      <!-- 실시간 활동 피드 (항상 표시) -->
-      <div id="left-feed-section" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border-dashed);">
-        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 실시간 활동 피드
-        </div>
-        <div id="feed-list-left" style="min-height:32px;"></div>
       </div>
 
       <!-- 숨김 참조 요소 (기존 코드 호환) -->
@@ -1668,7 +1654,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           <div id="qr-purchase-meta" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;">
             <div>
               <label style="display:block;font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">구매 경로</label>
-              <select id="qr-purchase-channel" class="select-custom" onchange="toggleQrStoreFields()" style="margin:0;width:100%;">
+              <select id="qr-purchase-channel" class="select-custom" style="margin:0;width:100%;">
                 <option value="retail">오프라인 판매점</option>
                 <option value="online">동행복권 인터넷</option>
               </select>
@@ -1686,23 +1672,6 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
               <label style="display:block;font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">구매일</label>
               <input id="qr-purchase-date" type="date" class="input-custom" style="margin:0;width:100%;">
             </div>
-          </div>
-          <div id="qr-store-fields" style="margin-top:8px;padding:10px;background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:7px;">
-            <div style="display:flex;gap:6px;align-items:end;">
-              <div style="flex:1;">
-                <label style="display:block;font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">내 판매지점</label>
-                <select id="qr-user-store-select" class="select-custom" onchange="selectUserStore()" style="margin:0;width:100%;"><option value="">판매지점을 선택하세요</option></select>
-              </div>
-              <button type="button" onclick="toggleUserStoreForm()" style="height:36px;border:1px solid #86efac;border-radius:6px;background:#f0fdf4;color:#15803d;padding:0 10px;font-size:10px;font-weight:800;cursor:pointer;">지점 추가</button>
-            </div>
-            <div id="qr-user-store-form" style="display:none;margin-top:8px;">
-              <div id="qr-new-store-grid" style="display:grid;grid-template-columns:1fr 1.5fr;gap:6px;">
-                <input id="qr-new-store-name" class="input-custom" placeholder="판매점명">
-                <input id="qr-new-store-address" class="input-custom" placeholder="판매점 주소">
-              </div>
-              <button type="button" onclick="addUserStore()" style="width:100%;margin-top:6px;border:0;border-radius:6px;background:#22c55e;color:#fff;padding:8px;font-size:10px;font-weight:800;cursor:pointer;">내 판매지점에 추가</button>
-            </div>
-            <div id="qr-user-store-status" style="font-size:10px;color:var(--text-muted);margin-top:5px;">사용자가 추가한 지점은 공개 지도에 자동 등록되지 않습니다.</div>
           </div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:5px;">인터넷 구매도 공식 QR URL이 있을 때만 인증됩니다.</div>
           <div class="qr-action-row">
@@ -2111,85 +2080,16 @@ function checkWinRank(myNums, winNums, bonus) {
   return { rank: 6, label: '낙첨', badge: null, matched, hasBonus };
 }
 
-function toggleQrStoreFields() {
-  const online = $('qr-purchase-channel')?.value === 'online';
-  const fields = $('qr-store-fields');
-  if (fields) fields.style.display = online ? 'none' : 'block';
-}
-
-let qrSelectedStore = null;
-
-function qrSafeText(value) {
-  return String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-}
-
-async function loadUserStores() {
-  const select = $('qr-user-store-select');
-  if (!select || !currentUser) return;
-  try {
-    const { data, error } = await sb.from('user_lottery_stores')
-      .select('id,name,address')
-      .eq('user_id', currentUser.id)
-      .order('created_at', { ascending:false });
-    if (error) throw error;
-    window._qrUserStores = data || [];
-    select.innerHTML = '<option value="">판매지점을 선택하세요</option>' + window._qrUserStores.map(store =>
-      `<option value="${store.id}">${qrSafeText(store.name)} · ${qrSafeText(store.address)}</option>`
-    ).join('');
-  } catch (_) {
-    select.innerHTML = '<option value="">DB 스키마 적용 후 사용할 수 있습니다</option>';
-  }
-}
-
-function selectUserStore() {
-  const id = $('qr-user-store-select')?.value;
-  qrSelectedStore = window._qrUserStores?.find(store => store.id === id) || null;
-}
-
-function toggleUserStoreForm() {
-  const form = $('qr-user-store-form');
-  if (form) form.style.display = form.style.display === 'none' ? '' : 'none';
-}
-
-async function addUserStore() {
-  const status = $('qr-user-store-status');
-  const name = ($('qr-new-store-name')?.value || '').trim();
-  const address = ($('qr-new-store-address')?.value || '').trim();
-  if (!name || !address) {
-    if (status) status.textContent = '판매점명과 주소를 모두 입력하세요.';
-    return;
-  }
-  try {
-    const { data, error } = await sb.from('user_lottery_stores').insert({
-      user_id:currentUser.id,
-      name,
-      address,
-    }).select('id,name,address').single();
-    if (error) throw error;
-    await loadUserStores();
-    $('qr-user-store-select').value = data.id;
-    selectUserStore();
-    $('qr-user-store-form').style.display = 'none';
-    $('qr-new-store-name').value = '';
-    $('qr-new-store-address').value = '';
-    if (status) status.textContent = `${name} 지점을 추가했습니다.`;
-  } catch (e) {
-    if (status) status.textContent = e.message;
-  }
-}
-
 function getQrPurchaseMeta() {
   const channel = $('qr-purchase-channel')?.value || 'retail';
   const online = channel === 'online';
-  const storeName = online ? '동행복권 인터넷 구매' : qrSelectedStore?.name || '';
-  const storeAddress = online ? '온라인' : qrSelectedStore?.address || '';
   return {
     channel,
     mode: $('qr-purchase-mode')?.value || null,
     purchaseDate: $('qr-purchase-date')?.value || null,
-    storeName,
-    storeAddress,
-    userStoreId: online ? null : qrSelectedStore?.id || null,
+    storeName: online ? '동행복권 인터넷 구매' : null,
+    storeAddress: online ? '온라인' : null,
+    userStoreId: null,
     storeId: online ? 'online:dhlottery' : null,
     lat: null,
     lng: null,
@@ -3062,7 +2962,6 @@ async function renderQRHistory() {
         <div style="font-size:32px;margin-bottom:10px;">🔖</div>
         <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">아직 등록된 QR이 없습니다</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">동행복권 앱에서 구매 내역 QR을 복사해<br>위 입력창에 붙여넣기 하세요.</div>
-        <button onclick="go('ticket')" style="padding:8px 20px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,.3);">📱 QR 등록하기</button>
       </div>`;
       return;
     }
@@ -3118,10 +3017,6 @@ async function verifyRealQR() {
   const parsed = parseQRUrl(url);
   if (parsed) {
     parsed.purchaseMeta = getQrPurchaseMeta();
-    if (parsed.purchaseMeta.channel === 'retail' && !parsed.purchaseMeta.storeName) {
-      $('qr-result-display').innerHTML = '<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div><div class="qr-warn-title">내 판매지점을 선택해주세요</div><div class="qr-warn-body">새 지점은 먼저 내 판매지점에 추가할 수 있습니다.</div></div></div>';
-      return;
-    }
   }
   // 연금복권 처리
   if (parsed && parsed.type === 'pension') {
@@ -4235,7 +4130,7 @@ function go(id) {
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
-  if (id === 'ticket')    { chgMode(); loadUserStores(); renderQRHistory(); }
+  if (id === 'ticket')    { chgMode(); renderQRHistory(); }
   if (id === 'fortune')   { renderFortune(); }
   if (id === 'stats') {
     $('stats-content').innerHTML = '<div class="skel-card"><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div></div></div>';
@@ -6289,11 +6184,12 @@ function svgIcon(name, size=16, color='currentColor') {
 // =====================================================
 let _camStream = null;
 let _camLoopId = null;
+let _barcodeDetector = null;
 
 async function toggleCameraQR() {
   const area = document.getElementById('cam-area');
   if (_camStream) { stopCameraQR(); return; }
-  if (typeof jsQR === 'undefined') {
+  if (typeof jsQR === 'undefined' && typeof BarcodeDetector === 'undefined') {
     toast('QR 스캐너를 불러오지 못했습니다. URL 붙여넣기를 이용해주세요.');
     return;
   }
@@ -6311,6 +6207,9 @@ async function toggleCameraQR() {
     const video = document.getElementById('cam-video');
     video.srcObject = _camStream;
     await video.play();
+    if (typeof BarcodeDetector !== 'undefined') {
+      try { _barcodeDetector = new BarcodeDetector({ formats:['qr_code'] }); } catch (_) { _barcodeDetector = null; }
+    }
     _camLoopId = requestAnimationFrame(scanCameraLoop);
   } catch(e) {
     area.style.display = 'none';
@@ -6322,6 +6221,7 @@ async function toggleCameraQR() {
 function stopCameraQR() {
   if (_camLoopId) { cancelAnimationFrame(_camLoopId); _camLoopId = null; }
   if (_camStream) { _camStream.getTracks().forEach(t => t.stop()); _camStream = null; }
+  _barcodeDetector = null;
   const area = document.getElementById('cam-area');
   if (area) area.style.display = 'none';
   const btn = document.getElementById('cam-btn');
@@ -6336,7 +6236,7 @@ function normalizeScannedQr(data) {
   return value;
 }
 
-function scanCameraLoop() {
+async function scanCameraLoop() {
   if (!_camStream) return;
   const video = document.getElementById('cam-video');
   const canvas = document.getElementById('cam-canvas');
@@ -6348,10 +6248,19 @@ function scanCameraLoop() {
   canvas.height = video.videoHeight;
   const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0);
-  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const code = (typeof jsQR !== 'undefined') ? jsQR(imgData.data, imgData.width, imgData.height) : null;
-  if (code && code.data) {
-    const url = normalizeScannedQr(code.data);
+  let rawValue = '';
+  if (_barcodeDetector) {
+    try {
+      const detected = await _barcodeDetector.detect(video);
+      rawValue = detected[0]?.rawValue || '';
+    } catch (_) {}
+  }
+  if (!rawValue && typeof jsQR !== 'undefined') {
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    rawValue = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts:'attemptBoth' })?.data || '';
+  }
+  if (rawValue) {
+    const url = normalizeScannedQr(rawValue);
     const parsed = parseQRUrl(url);
     if (parsed) {
       document.getElementById('cam-status').textContent = '✅ QR 인식 완료!';
