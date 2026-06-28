@@ -392,7 +392,7 @@ function renderTable(cfg, rows, total) {
               return `<td>${val}</td>`;
             }).join('')}
             <td onclick="event.stopPropagation()">
-              <button class="btn-del" onclick="deleteRow('${cfg.table}','${cfg.key}','${row[cfg.key]}')">삭제</button>
+              <button class="btn-del" onclick="deleteRow('${cfg.table}','${cfg.key}','${row[cfg.key]}')">${cfg.table==='tickets'?'QR 삭제':'삭제'}</button>
             </td>
           </tr>`
           ).join('')}
@@ -418,7 +418,7 @@ function changePage(p) {
 }
 
 async function deleteRow(table, key, id) {
-  if (!confirm(`정말 삭제하시겠습니까?\n테이블: ${table}\n${key}: ${id}`)) return;
+  if (!confirm(`${table==='tickets'?'등록된 QR과 티켓 이력을':'데이터를'} 삭제하시겠습니까?\n테이블: ${table}\n${key}: ${id}`)) return;
   try {
     const { error } = await sb.from(table).delete().eq(key, id);
     if (error) throw error;
