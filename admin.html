@@ -52,6 +52,13 @@
   .search-input:focus { border-color:var(--red); }
   .btn-refresh { padding:7px 14px; background:var(--bg); border:1.5px solid var(--border); border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; }
   .btn-refresh:hover { border-color:var(--red); color:var(--red); }
+  .admin-form { background:var(--white); border-radius:12px; padding:18px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:16px; }
+  .form-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+  .form-grid .form-input { margin-bottom:0; }
+  .form-actions { display:flex; gap:8px; margin-top:14px; }
+  .btn-save { padding:10px 16px; border:0; border-radius:7px; background:var(--red); color:#fff; font-size:12px; font-weight:800; cursor:pointer; }
+  .form-result { margin-top:10px; font-size:12px; color:var(--muted); }
+  @media (max-width:700px) { .form-grid { grid-template-columns:1fr; } }
 
   table { width:100%; border-collapse:collapse; font-size:12px; }
   th { padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:var(--muted); border-bottom:1px solid var(--border); background:#f8fafc; white-space:nowrap; }
@@ -122,6 +129,7 @@
       <button class="tab-btn" onclick="switchTab('comments')">💬 댓글</button>
       <button class="tab-btn" onclick="switchTab('chat')">🗨️ 채팅</button>
       <button class="tab-btn" onclick="switchTab('stats')">📊 전적</button>
+      <button class="tab-btn" onclick="switchTab('insert')">직접 입력</button>
     </div>
 
     <div id="table-area"></div>
@@ -192,13 +200,18 @@ async function loadTab(tab) {
   area.innerHTML = '<div class="loading">불러오는 중...</div>';
 
   const configs = {
-    users: { table: 'profiles', cols: ['id','nickname','created_at'], label: '유저 목록', searchCol: 'nickname' },
-    tickets: { table: 'tickets', cols: ['id','user_id','round_no','prize_rank','numbers','created_at'], label: '티켓(QR 등록)', searchCol: 'round_no' },
-    posts: { table: 'posts', cols: ['id','nickname','tag','title','likes','comment_count','created_at'], label: '게시글', searchCol: 'title' },
-    comments: { table: 'comments', cols: ['id','post_id','nickname','body','created_at'], label: '댓글', searchCol: 'body' },
-    chat: { table: 'chat_messages', cols: ['id','nickname','message','created_at'], label: '채팅', searchCol: 'nickname' },
-    stats: { table: 'user_stats', cols: ['id','user_id','total_tickets','total_spent','total_prize','total_wins','best_rank','updated_at'], label: '전적 통계', searchCol: 'user_id' },
+    users: { table: 'profiles', key: 'id', cols: ['id','nickname','created_at'], label: '유저 목록', searchCol: 'nickname' },
+    tickets: { table: 'tickets', key: 'id', cols: ['id','user_id','round_no','prize_rank','numbers','created_at'], label: '티켓(QR 등록)', searchCol: 'round_no' },
+    posts: { table: 'posts', key: 'id', cols: ['id','nickname','tag','title','likes','comment_count','created_at'], label: '게시글', searchCol: 'title' },
+    comments: { table: 'comments', key: 'id', cols: ['id','post_id','nickname','body','created_at'], label: '댓글', searchCol: 'body' },
+    chat: { table: 'chat_messages', key: 'id', cols: ['id','nickname','message','created_at'], label: '채팅', searchCol: 'nickname' },
+    stats: { table: 'user_stats', key: 'user_id', order: 'updated_at', cols: ['user_id','total_tickets','total_spent','total_prize','total_wins','best_rank','updated_at'], label: '전적 통계', searchCol: 'user_id' },
   };
+
+  if (tab === 'insert') {
+    renderInsertForms();
+    return;
+  }
 
   const cfg = configs[tab];
   if (!cfg) return;
@@ -209,7 +222,7 @@ async function loadTab(tab) {
       query = query.ilike(cfg.searchCol, `%${searchQuery}%`);
     }
     const from = (currentPage - 1) * PAGE_SIZE;
-    query = query.order('created_at', { ascending: false }).range(from, from + PAGE_SIZE - 1);
+    query = query.order(cfg.order || 'created_at', { ascending: false }).range(from, from + PAGE_SIZE - 1);
 
     const { data, error, count } = await query;
     if (error) throw error;
@@ -266,7 +279,7 @@ function renderTable(cfg, rows, total) {
               return `<td>${val}</td>`;
             }).join('')}
             <td onclick="event.stopPropagation()">
-              <button class="btn-del" onclick="deleteRow('${cfg.table}','${rows[rows.indexOf(row)].id}')">삭제</button>
+              <button class="btn-del" onclick="deleteRow('${cfg.table}','${cfg.key}','${row[cfg.key]}')">삭제</button>
             </td>
           </tr>`
           ).join('')}
@@ -291,15 +304,109 @@ function changePage(p) {
   loadTab(currentTab);
 }
 
-async function deleteRow(table, id) {
-  if (!confirm(`정말 삭제하시겠습니까?\n테이블: ${table}\nID: ${id}`)) return;
+async function deleteRow(table, key, id) {
+  if (!confirm(`정말 삭제하시겠습니까?\n테이블: ${table}\n${key}: ${id}`)) return;
   try {
-    const { error } = await sb.from(table).delete().eq('id', id);
+    const { error } = await sb.from(table).delete().eq(key, id);
     if (error) throw error;
     alert('삭제되었습니다.');
     loadTab(currentTab);
   } catch(e) {
     alert('삭제 실패: ' + e.message);
+  }
+}
+
+function renderInsertForms() {
+  document.getElementById('table-area').innerHTML = `
+    <div class="admin-form">
+      <div class="table-title" style="margin-bottom:14px;">티켓 수동 입력</div>
+      <div class="form-grid">
+        <div><label class="form-label">회원 닉네임</label><input class="form-input" id="ins-ticket-nick" placeholder="닉네임"></div>
+        <div><label class="form-label">회차</label><input class="form-input" id="ins-ticket-round" type="number" min="1"></div>
+        <div><label class="form-label">번호 6개</label><input class="form-input" id="ins-ticket-numbers" placeholder="1, 2, 3, 4, 5, 6"></div>
+        <div><label class="form-label">당첨 등수</label><select class="form-input" id="ins-ticket-rank"><option value="">미당첨</option><option value="1">1등</option><option value="2">2등</option><option value="3">3등</option><option value="4">4등</option><option value="5">5등</option></select></div>
+        <div><label class="form-label">당첨금</label><input class="form-input" id="ins-ticket-prize" type="number" min="0" value="0"></div>
+        <div><label class="form-label">구매일</label><input class="form-input" id="ins-ticket-date" type="date"></div>
+      </div>
+      <div class="form-actions"><button class="btn-save" onclick="insertTicket()">티켓 저장</button></div>
+      <div class="form-result" id="ins-ticket-result"></div>
+    </div>
+    <div class="admin-form">
+      <div class="table-title" style="margin-bottom:14px;">전적 수동 입력</div>
+      <div class="form-grid">
+        <div><label class="form-label">회원 닉네임</label><input class="form-input" id="ins-stat-nick" placeholder="닉네임"></div>
+        <div><label class="form-label">총 게임</label><input class="form-input" id="ins-stat-tickets" type="number" min="0" value="0"></div>
+        <div><label class="form-label">총 구매금액</label><input class="form-input" id="ins-stat-spent" type="number" min="0" value="0"></div>
+        <div><label class="form-label">총 당첨금</label><input class="form-input" id="ins-stat-prize" type="number" min="0" value="0"></div>
+        <div><label class="form-label">당첨 횟수</label><input class="form-input" id="ins-stat-wins" type="number" min="0" value="0"></div>
+        <div><label class="form-label">최고 등수</label><input class="form-input" id="ins-stat-best" type="number" min="1" max="5"></div>
+      </div>
+      <div class="form-actions"><button class="btn-save" onclick="upsertStats()">전적 저장</button></div>
+      <div class="form-result" id="ins-stat-result"></div>
+    </div>`;
+}
+
+async function findUserId(nickname) {
+  const { data, error } = await sb.from('profiles').select('id').eq('nickname', nickname).maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('해당 닉네임의 회원을 찾을 수 없습니다.');
+  return data.id;
+}
+
+async function insertTicket() {
+  const result = document.getElementById('ins-ticket-result');
+  try {
+    const nickname = document.getElementById('ins-ticket-nick').value.trim();
+    const roundNo = Number(document.getElementById('ins-ticket-round').value);
+    const numbers = document.getElementById('ins-ticket-numbers').value.split(',').map(v=>Number(v.trim())).filter(Number.isInteger);
+    if (!nickname || !roundNo || numbers.length !== 6 || new Set(numbers).size !== 6 || numbers.some(n=>n<1||n>45)) {
+      throw new Error('닉네임, 회차, 중복 없는 번호 6개를 확인하세요.');
+    }
+    const rankValue = document.getElementById('ins-ticket-rank').value;
+    const userId = await findUserId(nickname);
+    const payload = {
+      user_id: userId,
+      qr_url: `admin://manual/${crypto.randomUUID()}`,
+      round_no: roundNo,
+      numbers: numbers.sort((a,b)=>a-b),
+      purchase_date: document.getElementById('ins-ticket-date').value || new Date().toISOString().slice(0,10),
+      result: 'checked',
+      prize_rank: rankValue ? Number(rankValue) : null,
+      prize_amount: Number(document.getElementById('ins-ticket-prize').value) || 0,
+    };
+    const { error } = await sb.from('tickets').insert(payload);
+    if (error) throw error;
+    result.style.color = 'var(--green)';
+    result.textContent = '티켓을 저장했습니다.';
+  } catch (e) {
+    result.style.color = 'var(--red)';
+    result.textContent = e.message;
+  }
+}
+
+async function upsertStats() {
+  const result = document.getElementById('ins-stat-result');
+  try {
+    const nickname = document.getElementById('ins-stat-nick').value.trim();
+    if (!nickname) throw new Error('닉네임을 입력하세요.');
+    const userId = await findUserId(nickname);
+    const bestRank = Number(document.getElementById('ins-stat-best').value);
+    const payload = {
+      user_id: userId,
+      total_tickets: Number(document.getElementById('ins-stat-tickets').value) || 0,
+      total_spent: Number(document.getElementById('ins-stat-spent').value) || 0,
+      total_prize: Number(document.getElementById('ins-stat-prize').value) || 0,
+      total_wins: Number(document.getElementById('ins-stat-wins').value) || 0,
+      best_rank: bestRank >= 1 && bestRank <= 5 ? bestRank : null,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await sb.from('user_stats').upsert(payload, { onConflict:'user_id' });
+    if (error) throw error;
+    result.style.color = 'var(--green)';
+    result.textContent = '전적을 저장했습니다.';
+  } catch (e) {
+    result.style.color = 'var(--red)';
+    result.textContent = e.message;
   }
 }
 
@@ -334,4 +441,5 @@ sb.auth.getSession().then(({ data: { session } }) => {
   }
 });
 </script>
-</body
+</body>
+</html>
