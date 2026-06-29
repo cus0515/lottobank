@@ -20,6 +20,32 @@ alter table public.tickets
 alter table public.chat_messages
   add column if not exists monthly_badges jsonb not null default '[]'::jsonb;
 
+create table if not exists public.saved_number_sets (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  lottery_type text not null check (lottery_type in ('lotto','pension')),
+  round_no integer not null,
+  numbers integer[] not null default '{}',
+  pension_group integer,
+  pension_number text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.saved_number_sets enable row level security;
+drop policy if exists "users manage own saved numbers" on public.saved_number_sets;
+create policy "users manage own saved numbers"
+  on public.saved_number_sets for all to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create index if not exists idx_saved_number_sets_user_round
+  on public.saved_number_sets (user_id, lottery_type, round_no desc);
+
+drop policy if exists "admin deletes activity feed" on public.activity_feed;
+create policy "admin deletes activity feed"
+  on public.activity_feed for delete to authenticated
+  using ((select auth.jwt() ->> 'email') = 'jobdevil23@gmail.com' or auth.uid() = user_id);
+
 create table if not exists public.lottery_stores (
   id text primary key,
   name text not null,
