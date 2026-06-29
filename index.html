@@ -177,6 +177,12 @@ main.chat-hidden .chat-panel { display: none; }
 .badge.b-real-2,
 .badge.b-real-pen-2,
 .badge.b-real-both-2 { background:#dbe7f0; color:#40566b !important; border:1px solid #b9cad8; box-shadow:0 0 7px rgba(147,197,253,.48),0 0 13px rgba(96,165,250,.28) !important; animation:neonBlue 1.8s ease-in-out infinite alternate !important; }
+.badge-combo { display:inline-flex; align-items:center; gap:3px; margin-right:5px; vertical-align:middle; }
+.badge-combo .badge { margin-right:0; }
+.badge-combo-dot { color:var(--text-muted); font-size:12px; font-weight:900; }
+.badge-combo.combo-first { filter:drop-shadow(0 0 5px rgba(220,63,82,.28)) drop-shadow(0 0 5px rgba(53,169,104,.26)); }
+.badge-combo.combo-second { filter:drop-shadow(0 0 4px rgba(148,163,184,.3)); }
+.badge-combo.combo-second .badge { background:#e4e9ee; color:#475569 !important; border:1px solid #bac4cf; box-shadow:0 0 5px rgba(148,163,184,.32) !important; animation:neonSilver 2s ease-in-out infinite alternate !important; }
 .badge.b-real-3      { background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 0 5px rgba(16,185,129,0.4); }
 .badge.b-guest { background: #94a3b8; color: #fff; font-weight: 500; }
 .badge.b-system { background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; font-weight:900; animation: neonGold 2s ease-in-out infinite alternate; }
@@ -195,6 +201,7 @@ main.chat-hidden .chat-panel { display: none; }
 @keyframes neonRed { 0% { box-shadow: 0 0 6px rgba(239,68,68,0.6), 0 0 12px rgba(239,68,68,0.2); } 100% { box-shadow: 0 0 14px rgba(239,68,68,0.9), 0 0 28px rgba(239,68,68,0.5); } }
 @keyframes neonBoth { from { box-shadow:0 0 7px rgba(207,64,88,.35),0 0 10px rgba(47,157,99,.25); } to { box-shadow:0 0 12px rgba(207,64,88,.58),0 0 18px rgba(47,157,99,.48); } }
 @keyframes neonBlue { from { box-shadow:0 0 5px rgba(147,197,253,.35),0 0 9px rgba(96,165,250,.18); } to { box-shadow:0 0 9px rgba(191,219,254,.62),0 0 16px rgba(96,165,250,.4); } }
+@keyframes neonSilver { from { box-shadow:0 0 3px rgba(148,163,184,.25); } to { box-shadow:0 0 7px rgba(203,213,225,.55); } }
 @keyframes neonPurple { 0% { box-shadow: 0 0 5px rgba(168,85,247,0.4); } 100% { box-shadow: 0 0 12px rgba(168,85,247,0.8), 0 0 22px rgba(168,85,247,0.4); } }
 @keyframes neonGold { 0% { box-shadow: 0 0 4px rgba(245,158,11,0.5); } 100% { box-shadow: 0 0 10px rgba(245,158,11,0.9); } }
 @keyframes roiCountUp { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
@@ -3672,6 +3679,12 @@ function getChatBadgeHtml(verifiedTitle) {
   const isBoth = Boolean(lottoRank && pensionRank && lottoRank === pensionRank);
   const hasPension = Boolean(pensionRank);
   const rank = isBoth ? lottoRank : lottoRank && pensionRank ? Math.min(lottoRank, pensionRank) : lottoRank || pensionRank;
+  if (isBoth && (rank === 1 || rank === 2)) {
+    const comboClass = rank === 1 ? 'combo-first' : 'combo-second';
+    const lottoClass = rank === 1 ? 'b-real-1' : 'b-real-2';
+    const pensionClass = rank === 1 ? 'b-real-pen-1' : 'b-real-pen-2';
+    return `<span class="badge-combo ${comboClass}"><span class="badge ${lottoClass}">[로또 ${rank}등]</span><span class="badge-combo-dot">·</span><span class="badge ${pensionClass}">[연금 ${rank}등]</span></span>`;
+  }
   let label;
   if (isBoth)          label = `로또·연금 ${rank}등`;
   else if (hasPension) label = `연금 ${rank}등`;
