@@ -10,7 +10,15 @@ alter table public.tickets
   add column if not exists store_name text,
   add column if not exists store_address text,
   add column if not exists store_lat double precision,
-  add column if not exists store_lng double precision;
+  add column if not exists store_lng double precision,
+  add column if not exists game_numbers jsonb not null default '[]'::jsonb,
+  add column if not exists qr_payload text,
+  add column if not exists pension_group integer,
+  add column if not exists pension_number text,
+  add column if not exists serial_meta text;
+
+alter table public.chat_messages
+  add column if not exists monthly_badges jsonb not null default '[]'::jsonb;
 
 create table if not exists public.lottery_stores (
   id text primary key,
@@ -95,3 +103,95 @@ create policy "users manage own daily visits"
   on public.user_daily_visits for all
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+create or replace function public.refresh_monthly_rankings()
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  current_period text := to_char(timezone('Asia/Seoul', now()), 'YYYY-MM');
+begin
+  delete from public.ranking_snapshots
+  where period_key = current_period
+    and ranking_type in ('purchase','accuracy','efficiency','miss','pioneer');
+
+  insert into public.ranking_snapshots
+    (period_key, ranking_type, user_id, rank, score, title, badge_icon, border_color)
+  with ticket_base as (
+    select
+      user_id,
+      sum(greatest(coalesce(game_count, 1), 1) * 1000)::numeric as spent,
+      sum(coalesce(prize_amount, 0))::numeric as prize,
+      sum(coalesce(matched_count, 0))::numeric as matches,
+      sum(greatest(coalesce(total_number_count, 6), 1))::numeric as number_count,
+      sum(case when coalesce(matched_count, 0) = 0 then greatest(coalesce(game_count, 1), 1) else 0 end)::numeric as misses,
+      count(distinct coalesce(store_id, user_store_id::text))::numeric as stores
+    from public.tickets
+    where to_char(coalesce(purchase_date, (created_at at time zone 'Asia/Seoul')::date), 'YYYY-MM') = current_period
+    group by user_id
+  ),
+  scores as (
+    select user_id, metric.ranking_type, metric.score
+    from ticket_base
+    cross join lateral (values
+      ('purchase', spent),
+      ('accuracy', case when number_count > 0 then round(matches * 100 / number_count, 4) else 0 end),
+      ('efficiency', case when spent > 0 then round(prize * 100 / spent, 4) else 0 end),
+      ('miss', misses),
+      ('pioneer', stores)
+    ) as metric(ranking_type, score)
+    where metric.score > 0
+  ),
+  ranked as (
+    select
+      user_id,
+      ranking_type,
+      score,
+      dense_rank() over (partition by ranking_type order by score desc)::integer as rank
+    from scores
+  )
+  select
+    current_period,
+    ranking_type,
+    user_id,
+    rank,
+    score,
+    case ranking_type
+      when 'purchase' then '구매'
+      when 'accuracy' then '저격'
+      when 'efficiency' then '수익'
+      when 'miss' then '똥손'
+      else '개척'
+    end,
+    case ranking_type
+      when 'purchase' then '👑'
+      when 'accuracy' then '🎯'
+      when 'efficiency' then '💸'
+      when 'miss' then '💩'
+      else '🗺️'
+    end,
+    '#f5c451'
+  from ranked;
+end;
+$$;
+
+create or replace function public.refresh_monthly_rankings_after_ticket()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  perform public.refresh_monthly_rankings();
+  return null;
+end;
+$$;
+
+drop trigger if exists refresh_monthly_rankings_on_ticket on public.tickets;
+create trigger refresh_monthly_rankings_on_ticket
+  after insert or update or delete on public.tickets
+  for each statement execute function public.refresh_monthly_rankings_after_ticket();
+
+grant execute on function public.refresh_monthly_rankings() to authenticated;
