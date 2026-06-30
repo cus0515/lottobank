@@ -171,9 +171,9 @@ main.chat-hidden .chat-panel { display: none; }
 .prize-row b { color: var(--lotto-red); }
 
 .badge { display: inline-flex; align-items: center; min-height:22px; box-sizing:border-box; padding: 3px 7px; font-size: 11px; line-height:1; font-weight: 900; color: #fff; border-radius: 4px; margin-right: 7px; vertical-align: middle; }
-.badge.b-real-1      { background:linear-gradient(110deg,#fff0a6 0%,#d6a928 46%,#f8df79 100%); color:#513d00!important; border:1px solid #d3aa32; text-shadow:0 1px 0 rgba(255,255,255,.55); box-shadow:0 0 8px rgba(212,175,55,.48); animation:neonGoldPair 1.6s ease-in-out infinite alternate; }
-.badge.b-real-pen-1  { background:linear-gradient(110deg,#9ce6b5 0%,#27a85b 48%,#6fd096 100%); color:#073d21!important; border:1px solid #35a968; text-shadow:0 1px 0 rgba(255,255,255,.35); box-shadow:0 0 8px rgba(53,169,104,.48); animation:neonGreen 1.6s ease-in-out infinite alternate; }
-.badge.b-real-both   { background:linear-gradient(110deg,#cf4058 0%,#dc596c 30%,#b88172 50%,#72ad78 70%,#36a269 100%); color:#fff !important; border:1px solid rgba(255,255,255,.48); text-shadow:0 1px 2px rgba(15,23,42,.3); box-shadow:0 0 9px rgba(207,64,88,.38),0 0 13px rgba(54,162,105,.34); animation:neonBoth 1.5s ease-in-out infinite alternate; }
+.badge.b-real-1      { background:linear-gradient(105deg,#fff6c9 0%,#d5a625 35%,#fff0a3 50%,#d5a625 65%,#fff6c9 100%); background-size:220% 100%; color:#513d00!important; border:1px solid #d3aa32; outline:2px double rgba(245,214,103,.75); outline-offset:2px; text-shadow:0 1px 0 rgba(255,255,255,.55); box-shadow:0 0 8px rgba(212,175,55,.55),0 0 18px rgba(245,222,143,.38); animation:goldSweep1 3.2s ease-in-out infinite; }
+.badge.b-real-pen-1  { background:linear-gradient(105deg,#d4f5e2 0%,#27a85b 35%,#a3e6c0 50%,#27a85b 65%,#d4f5e2 100%); background-size:220% 100%; color:#073d21!important; border:1px solid #35a968; outline:2px double rgba(103,208,150,.75); outline-offset:2px; text-shadow:0 1px 0 rgba(255,255,255,.35); box-shadow:0 0 8px rgba(53,169,104,.55),0 0 18px rgba(111,208,150,.38); animation:greenSweep1 3.4s ease-in-out infinite; }
+.badge.b-real-both   { background:linear-gradient(110deg,#cf4058 0%,#dc596c 30%,#b88172 50%,#72ad78 70%,#36a269 100%); color:#fff !important; border:1px solid rgba(255,255,255,.48); text-shadow:0 1px 2px rgba(15,23,42,.3); box-shadow:0 0 9px rgba(207,64,88,.38),0 0 13px rgba(54,162,105,.34); animation:neonBoth 3.0s ease-in-out infinite alternate; }
 .badge.b-real-2,
 .badge.b-real-pen-2,
 .badge.b-real-both-2 { background:linear-gradient(110deg,#f7f8fa 0%,#b7c0cb 48%,#e4e8ed 100%); color:#364152 !important; border:1px solid #9da8b5; text-shadow:0 1px 0 rgba(255,255,255,.65); box-shadow:0 0 7px rgba(148,163,184,.42),0 0 12px rgba(203,213,225,.25) !important; animation:neonSilverPair 1.6s ease-in-out infinite alternate !important; }
@@ -182,8 +182,8 @@ main.chat-hidden .chat-panel { display: none; }
 .badge-combo { display:inline-flex; position:relative; align-items:center; gap:2px; min-height:24px; box-sizing:border-box; margin-right:12px; padding:1px 6px; border-radius:5px; vertical-align:middle; overflow:visible; }
 .badge-combo .badge { min-height:20px; margin:0; padding:1px 2px; border:0!important; border-radius:0; background:transparent!important; color:inherit!important; box-shadow:none!important; animation:none!important; }
 .badge-combo-dot { color:inherit; font-size:11px; font-weight:900; }
-.badge-combo.combo-first { color:#523d00; border:1px solid #d1a72d; outline:2px double rgba(245,214,103,.82); outline-offset:2px; background:linear-gradient(105deg,#fff6c9 0%,#d5a625 35%,#fff0a3 50%,#d5a625 65%,#fff6c9 100%); background-size:220% 100%; text-shadow:0 1px 0 rgba(255,255,255,.6); box-shadow:0 0 8px rgba(212,175,55,.55),0 0 18px rgba(245,222,143,.4); animation:comboGoldSweep 2.2s ease-in-out infinite; }
-.badge-combo.combo-second { color:#364152; border:1px solid #929eab; outline:2px double rgba(218,225,233,.85); outline-offset:2px; background:linear-gradient(105deg,#f8fafc 0%,#aeb8c4 35%,#eef2f6 50%,#aeb8c4 65%,#f8fafc 100%); background-size:220% 100%; text-shadow:0 1px 0 rgba(255,255,255,.75); box-shadow:0 0 7px rgba(148,163,184,.48),0 0 15px rgba(203,213,225,.34); animation:comboSilverSweep 2.4s ease-in-out infinite; }
+.badge-combo.combo-first { color:#523d00; border:1px solid #d1a72d; outline:2px double rgba(245,214,103,.82); outline-offset:2px; background:linear-gradient(105deg,#fff6c9 0%,#d5a625 35%,#fff0a3 50%,#d5a625 65%,#fff6c9 100%); background-size:220% 100%; text-shadow:0 1px 0 rgba(255,255,255,.6); box-shadow:0 0 8px rgba(212,175,55,.55),0 0 18px rgba(245,222,143,.4); animation:comboGoldSweep 3.8s ease-in-out infinite; }
+.badge-combo.combo-second { color:#364152; border:1px solid #929eab; outline:2px double rgba(218,225,233,.85); outline-offset:2px; background:linear-gradient(105deg,#f8fafc 0%,#aeb8c4 35%,#eef2f6 50%,#aeb8c4 65%,#f8fafc 100%); background-size:220% 100%; text-shadow:0 1px 0 rgba(255,255,255,.75); box-shadow:0 0 7px rgba(148,163,184,.48),0 0 15px rgba(203,213,225,.34); animation:comboSilverSweep 4.2s ease-in-out infinite; }
 .monthly-rank-badges { display:inline-flex; align-items:center; gap:3px; margin-right:5px; vertical-align:middle; }
 .monthly-rank-badge { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 4px; border:1px solid #f5c451; border-radius:4px; background:#fff8db; color:#8a5a00; font-size:11px; line-height:1; box-shadow:0 0 6px rgba(245,196,81,.28); }
 .profile-featured-badges { min-height:46px; display:inline-flex; align-items:center; justify-content:center; gap:7px; margin:2px auto 10px; padding:7px 12px; border:1px dashed rgba(245,196,81,.7); border-radius:8px; background:rgba(255,248,219,.62); cursor:pointer; }
@@ -236,6 +236,8 @@ main.chat-hidden .chat-panel { display: none; }
 @keyframes neonPurpleSoft { from { box-shadow:0 0 4px rgba(155,123,197,.3); } to { box-shadow:0 0 8px rgba(196,167,234,.5),0 0 12px rgba(155,123,197,.22); } }
 @keyframes neonGoldPair { from { box-shadow:0 0 6px rgba(225,190,82,.4),0 0 10px rgba(245,222,143,.24); } to { box-shadow:0 0 11px rgba(225,190,82,.7),0 0 22px rgba(245,222,143,.45); } }
 @keyframes neonSilverPair { from { box-shadow:0 0 4px rgba(148,163,184,.3),inset 0 0 0 rgba(255,255,255,0); } to { box-shadow:0 0 10px rgba(148,163,184,.58),0 0 16px rgba(226,232,240,.42),inset 0 0 5px rgba(255,255,255,.55); } }
+@keyframes goldSweep1 { 0%,100% { background-position:0% 50%; box-shadow:0 0 7px rgba(212,175,55,.45),0 0 13px rgba(245,222,143,.28); } 50% { background-position:100% 50%; box-shadow:0 0 13px rgba(212,175,55,.8),0 0 26px rgba(245,222,143,.55); } }
+@keyframes greenSweep1 { 0%,100% { background-position:0% 50%; box-shadow:0 0 7px rgba(53,169,104,.45),0 0 13px rgba(111,208,150,.28); } 50% { background-position:100% 50%; box-shadow:0 0 13px rgba(53,169,104,.8),0 0 26px rgba(111,208,150,.55); } }
 @keyframes comboGoldSweep { 0%,100% { background-position:0% 50%; box-shadow:0 0 7px rgba(212,175,55,.45),0 0 13px rgba(245,222,143,.28); } 50% { background-position:100% 50%; box-shadow:0 0 12px rgba(212,175,55,.78),0 0 25px rgba(245,222,143,.55); } }
 @keyframes comboSilverSweep { 0%,100% { background-position:0% 50%; box-shadow:0 0 5px rgba(148,163,184,.35),0 0 10px rgba(203,213,225,.24); } 50% { background-position:100% 50%; box-shadow:0 0 10px rgba(148,163,184,.62),0 0 20px rgba(226,232,240,.5); } }
 @keyframes neonPurple { 0% { box-shadow: 0 0 5px rgba(168,85,247,0.4); } 100% { box-shadow: 0 0 12px rgba(168,85,247,0.8), 0 0 22px rgba(168,85,247,0.4); } }
@@ -1312,8 +1314,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-map" class="menu-btn" onclick="go('map')">지도</button>
-      <button id="m-ticket" class="menu-btn auth-member-tab" onclick="go('ticket')" style="display:none;">QR 인증</button>
       <button id="m-stats" class="menu-btn auth-member-tab" onclick="go('stats')" style="display:none;">나의 전적</button>
+      <button id="m-ticket" class="menu-btn auth-member-tab" onclick="go('ticket')" style="display:none;">QR 인증</button>
     </div>
     <div class="auth-zone">
       <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크 모드로 전환" style="width:34px;height:30px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-dashed);border-radius:6px;padding:0;cursor:pointer;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="다크 모드로 전환"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
@@ -1350,8 +1352,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
               </div>
             </div>
           </div>
-          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('ticket')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('stats')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적</button>
+          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('ticket')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('profile')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필</button>
           <button class="dd-item dd-logout" onclick="event.stopPropagation();doLogout()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> 로그아웃</button>
         </div>
@@ -1376,8 +1378,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   <button class="mob-menu-item" onclick="go('map');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 지도</button>
   <div id="mob-auth-section" style="display:none;border-top:2px solid var(--border-dashed);margin-top:4px;">
     <div style="padding:10px 4px 4px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.5px;">내 계정</div>
-    <button class="mob-menu-item auth-member-tab" onclick="go('ticket');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증</button>
     <button class="mob-menu-item auth-member-tab" onclick="go('stats');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적</button>
+    <button class="mob-menu-item auth-member-tab" onclick="go('ticket');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증</button>
     <button class="mob-menu-item" onclick="go('profile');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필</button>
     <button class="mob-menu-item" style="color:#dc2626;" onclick="doLogout();closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> 로그아웃</button>
   </div>
@@ -3130,7 +3132,7 @@ function renderTicketSlip(ticket) {
   if (isPension) {
     const round = ticket.round ?? ticket.round_no ?? '-';
     const group = ticket.jo ?? ticket.pension_group ?? '-';
-    const number = String(ticket.no ?? ticket.pension_number ?? '').padStart(6, '0');
+    const rawNo = ticket.no ?? ticket.pension_number ?? ''; const number = rawNo ? String(rawNo).padStart(6, '0') : null;
     return `<div class="ticket-slip pension">
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2f8550;padding-bottom:8px;">
         <div><div style="font-size:20px;font-weight:950;">연금복권 <span style="color:#28a35b;">720+</span></div><div style="font-size:10px;color:#64748b;">복권기금은 건전한 복권문화를 지원합니다.</div></div>
@@ -3140,10 +3142,15 @@ function renderTicketSlip(ticket) {
         <div style="font-size:11px;color:#64748b;margin-bottom:7px;">제 ${round}회</div>
         <div style="display:flex;justify-content:center;align-items:center;gap:7px;">
           <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${group}조</span>
-          ${number.split('').map(n=>`<span style="width:27px;height:34px;border:1px solid #9ad5ae;border-radius:5px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;">${n}</span>`).join('')}
+          ${number ? number.split('').map(n=>`<span style="width:27px;height:34px;border:1px solid #9ad5ae;border-radius:5px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:12px;color:#64748b;padding:0 8px;">번호 미등록</span>'}
         </div>
       </div>
-      <div style="border-top:1px dashed #86b998;padding-top:7px;font-size:10px;color:#64748b;display:flex;justify-content:space-between;"><span>QR 인증 번호</span><span>${ticket.serialMeta || ticket.serial_meta || '-'}</span></div>
+      <div style="border-top:1px dashed #86b998;padding-top:7px;font-size:10px;color:#64748b;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:${ticket.id?'5px':'0'};">
+          <span>QR 인증 번호</span><span>${ticket.serialMeta || ticket.serial_meta || '-'}</span>
+        </div>
+        ${ticket.id ? (() => { const pa = (ticket.storeAssignments||[]).find(r=>r.game_index===0); const ps = pa?.store_id||''; const pn = (ticket.storeOptions||[]).find(s=>s.id===ps)?.name||'판매점 지정'; return `<div style="text-align:right;"><button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',0,'${ps}')">${pn}</button></div>`; })() : ''}
+      </div>
     </div>`;
   }
   const round = ticket.round ?? ticket.round_no ?? '-';
@@ -3198,7 +3205,12 @@ function renderStorePickerList(stores) {
   if (!list) return;
   const target = window._storePickerTarget;
   if (!stores.length) {
-    list.innerHTML = '<div style="padding:24px 10px;text-align:center;color:var(--text-muted);font-size:12px;line-height:1.7;">등록된 판매점이 없습니다.<br>관리자에서 지도 판매점 목록을 먼저 등록해주세요.</div>';
+    list.innerHTML = `<div style="padding:24px 10px;text-align:center;color:var(--text-muted);font-size:12px;line-height:1.8;">
+      <div style="font-size:24px;margin-bottom:8px;">🏪</div>
+      <b style="color:var(--text-dark);">등록된 판매점이 없습니다</b><br>
+      <span>관리자 페이지에서 판매점을 먼저 등록해주세요.</span><br>
+      <button onclick="closeStorePicker();go('home')" style="margin-top:10px;background:none;border:1px solid var(--border-dashed);border-radius:5px;padding:5px 12px;font-size:11px;cursor:pointer;color:var(--text-muted);">닫기</button>
+    </div>`;
     return;
   }
   list.innerHTML = `<button class="store-picker-item" onclick="selectStorePicker('')"><b>지정 해제</b></button>` + stores.map(store => {
