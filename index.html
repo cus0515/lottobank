@@ -3146,16 +3146,16 @@ async function renderNumberHistory() {
       }
     });
 
-    return `<div class="ticket-slip${isPension ? ' pension' : ''}">
-      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid ${topColor};padding-bottom:8px;margin-bottom:10px;">
+    return `<section style="background:var(--paper-white);border:1px solid var(--border-dashed);border-top:5px solid ${topColor};border-radius:8px;padding:12px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <div>
-          <div style="font-size:18px;font-weight:950;">${isPension ? '연금복권 <span style="color:#28a35b;">720+</span>' : '로또 <span style="color:var(--lotto-red);">6/45</span>'}</div>
-          <div style="font-size:10px;color:#64748b;">제 ${first.round_no}회 · ${totalGames}게임</div>
+          <div style="font-size:13px;font-weight:900;color:var(--text-dark);">${typeLbl}</div>
+          <div style="font-size:10px;color:var(--text-muted);">제 ${first.round_no}회</div>
         </div>
-        <b style="font-size:13px;">₩${(totalGames*1000).toLocaleString()}</b>
+        <span style="font-size:11px;font-weight:700;color:var(--text-muted);">${totalGames}게임</span>
       </div>
       <div class="ticket-slip-games">${allGameRows.join('')}</div>
-    </div>`;
+    </section>`;
   }).join('');
 }
 
