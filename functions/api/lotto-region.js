@@ -50,17 +50,18 @@ export async function onRequest(context) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
 
       const json = await r.json();
-      const list = json?.data?.list ?? [];
+      const list = json?.data?.list ?? json?.data?.contents ?? json?.list ?? [];
       const stores1 = [], stores2 = [];
 
       for (const item of list) {
-        const rank = String(item.wnShpRnk ?? '');
+        const rank = String(item.wnShpRnk ?? item.rank ?? item.rnk ?? '').replace(/[^0-9]/g, '');
         const store = {
-          name: item.shpNm || '',
-          addr: (item.shpAddr || '').trim(),
-          region: (item.region || '').trim(),
+          name: item.shpNm || item.storeNm || item.saleStoreNm || '',
+          addr: String(item.shpAddr || item.addr || item.saleStoreAddr || '').trim(),
+          region: String(item.region || item.tm1ShpLctnAddr || item.sido || '').trim(),
           auto: item.atmtPsvYnTxt || '판매점',
         };
+        if (!store.name && !store.addr) continue;
         if (rank === '1') stores1.push(store);
         else if (rank === '2') stores2.push(store);
       }

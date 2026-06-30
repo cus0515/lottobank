@@ -124,7 +124,7 @@ main.chat-hidden .chat-panel { display: none; }
 @media (max-width: 1200px) { main { grid-template-columns: 1fr; height: auto; } }
 
 .panel { background: var(--paper-white); border-radius: 14px; border:1px solid rgba(226,232,240,.7); display: flex; flex-direction: column; height: 100%; overflow: hidden; box-shadow: 0 2px 4px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06); }
-.panel-header { padding: 14px 20px; border-bottom: 1px solid var(--border-dashed); font-size: 14px; font-weight: 800; color: var(--text-dark); display: flex; justify-content: space-between; align-items: center; background:var(--paper-white); letter-spacing:-.2px; }
+.panel-header { height:50px; box-sizing:border-box; padding: 9px 20px; border-bottom: 1px solid var(--border-dashed); font-size: 14px; font-weight: 800; color: var(--text-dark); display: flex; justify-content: space-between; align-items: center; background:var(--paper-white); letter-spacing:-.2px; flex-shrink:0; }
 .panel-body { padding: 16px 18px; overflow-y: auto; flex: 1; scroll-behavior:smooth; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .page-fade { animation: pageFadeIn 0.2s ease; }
@@ -171,17 +171,17 @@ main.chat-hidden .chat-panel { display: none; }
 .prize-row b { color: var(--lotto-red); }
 
 .badge { display: inline-flex; align-items: center; padding: 3px 6px; font-size: 11px; font-weight: 900; color: #fff; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
-.badge.b-real-1      { background:#dc3f52; box-shadow:0 0 9px rgba(220,63,82,.58); animation:neonRed 1.4s ease-in-out infinite alternate; }
-.badge.b-real-pen-1  { background:#35a968; box-shadow:0 0 9px rgba(53,169,104,.58); animation:neonGreen 1.4s ease-in-out infinite alternate; }
+.badge.b-real-1      { background:#d4af37; color:#4a3800!important; border:1px solid #efd979; box-shadow:0 0 8px rgba(212,175,55,.5); animation:neonGoldPair 1.6s ease-in-out infinite alternate; }
+.badge.b-real-pen-1  { background:#35a968; box-shadow:0 0 9px rgba(53,169,104,.58); animation:neonGreen 1.6s ease-in-out infinite alternate; }
 .badge.b-real-both   { background:linear-gradient(110deg,#cf4058 0%,#dc596c 30%,#b88172 50%,#72ad78 70%,#36a269 100%); color:#fff !important; border:1px solid rgba(255,255,255,.48); text-shadow:0 1px 2px rgba(15,23,42,.3); box-shadow:0 0 9px rgba(207,64,88,.38),0 0 13px rgba(54,162,105,.34); animation:neonBoth 1.5s ease-in-out infinite alternate; }
 .badge.b-real-2,
 .badge.b-real-pen-2,
-.badge.b-real-both-2 { background:#dbe7f0; color:#40566b !important; border:1px solid #b9cad8; box-shadow:0 0 7px rgba(147,197,253,.48),0 0 13px rgba(96,165,250,.28) !important; animation:neonBlue 1.8s ease-in-out infinite alternate !important; }
+.badge.b-real-both-2 { background:#d9dee5; color:#3f4b59 !important; border:1px solid #aeb8c4; box-shadow:0 0 7px rgba(148,163,184,.45),0 0 13px rgba(203,213,225,.28) !important; animation:neonSilverPair 1.6s ease-in-out infinite alternate !important; }
 .badge-combo { display:inline-flex; align-items:center; gap:2px; margin-right:10px; padding:2px 5px; border-radius:4px; vertical-align:middle; overflow:visible; }
 .badge-combo .badge { margin:0; padding:1px 2px; border:0!important; border-radius:0; background:transparent!important; color:inherit!important; box-shadow:none!important; animation:none!important; }
 .badge-combo-dot { color:inherit; font-size:11px; font-weight:900; }
-.badge-combo.combo-first { color:#5f4708; border:1px solid #d7bd68; background:linear-gradient(100deg,#f8edbd,#e8cf78 52%,#f4e4a5); text-shadow:0 1px 0 rgba(255,255,255,.55); box-shadow:0 0 7px rgba(225,190,82,.5),0 0 15px rgba(245,222,143,.34); animation:neonGoldPair 1.55s ease-in-out infinite alternate; }
-.badge-combo.combo-second { color:#475569; border:1px solid #b9c2cc; background:linear-gradient(100deg,#f3f5f7,#cfd6dd 52%,#e7ebef); text-shadow:0 1px 0 rgba(255,255,255,.7); box-shadow:0 0 6px rgba(148,163,184,.4),0 0 12px rgba(203,213,225,.3); animation:neonSilverPair 2.1s ease-in-out infinite alternate; }
+.badge-combo.combo-first { color:#5f4708; border:1px solid #d4af37; outline:1px solid rgba(239,217,121,.65); outline-offset:2px; background:linear-gradient(100deg,#fff4c7,#dfbd50 52%,#f8e9aa); text-shadow:0 1px 0 rgba(255,255,255,.55); box-shadow:0 0 7px rgba(212,175,55,.5),0 0 15px rgba(245,222,143,.34); animation:neonGoldPair 1.6s ease-in-out infinite alternate; }
+.badge-combo.combo-second { color:#3f4b59; border:1px solid #9ca7b4; outline:1px solid rgba(226,232,240,.7); outline-offset:2px; background:linear-gradient(100deg,#f7f8fa,#c8d0d9 52%,#edf0f3); text-shadow:0 1px 0 rgba(255,255,255,.7); box-shadow:0 0 6px rgba(148,163,184,.4),0 0 12px rgba(203,213,225,.3); animation:neonSilverPair 1.6s ease-in-out infinite alternate; }
 .monthly-rank-badges { display:inline-flex; align-items:center; gap:3px; margin-right:5px; vertical-align:middle; }
 .monthly-rank-badge { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 4px; border:1px solid #f5c451; border-radius:4px; background:#fff8db; color:#8a5a00; font-size:11px; line-height:1; box-shadow:0 0 6px rgba(245,196,81,.28); }
 .identity-line { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px; }
@@ -196,6 +196,14 @@ main.chat-hidden .chat-panel { display: none; }
 .ticket-slip-game { display:grid; grid-template-columns:24px 1fr; gap:8px; align-items:center; padding:5px 0; border-bottom:1px dashed #cbd5e1; }
 .ticket-slip-nums { display:flex; justify-content:space-between; gap:4px; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; }
 .ticket-history-filter { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
+.store-picker-backdrop { position:fixed; inset:0; z-index:1200; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(15,23,42,.58); }
+.store-picker { width:min(520px,100%); max-height:min(620px,85vh); display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--border-dashed); border-radius:10px; background:var(--paper-white); box-shadow:0 18px 55px rgba(15,23,42,.28); }
+.store-picker-head { height:50px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 16px; border-bottom:1px solid var(--border-dashed); font-size:14px; font-weight:900; }
+.store-picker-search { margin:12px; width:calc(100% - 24px); box-sizing:border-box; padding:10px 12px; border:1px solid var(--border-dashed); border-radius:7px; background:var(--bg-light); color:var(--text-dark); font:12px inherit; outline:none; }
+.store-picker-list { overflow-y:auto; padding:0 12px 12px; }
+.store-picker-item { width:100%; display:block; padding:10px 12px; border:0; border-bottom:1px solid var(--border-dashed); background:transparent; color:var(--text-dark); text-align:left; cursor:pointer; font-family:inherit; }
+.store-picker-item:hover { background:var(--bg-light); }
+.store-picker-trigger { min-width:112px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid #cbd5e1; border-radius:5px; background:#f8fafc; color:#475569; padding:5px 8px; font:700 10px inherit; cursor:pointer; }
 .saved-number-form { display:grid; grid-template-columns:100px 90px 1fr auto; gap:6px; }
 [data-theme="dark"] .monthly-rank-badge { background:#3a2d08; border-color:#9a741d; color:#fde68a; }
 .badge.b-real-3      { background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 0 5px rgba(16,185,129,0.4); }
@@ -1135,7 +1143,8 @@ header { background:#ffffff!important; border-bottom:3px solid var(--lotto-red)!
 .tab-btn { font-size:12px!important; font-weight:700!important; letter-spacing:.2px!important; opacity:.6!important; transition:opacity .15s,border-color .15s!important; }
 .tab-btn.on, .tab-btn:hover { opacity:1!important; }
 .tab-btn.on { border-bottom:2px solid var(--lotto-red)!important; color:var(--lotto-red)!important; opacity:1!important; }
-#pg-stats > div:first-child, #pg-badge > div:first-child, #pg-community > div:first-child { box-shadow:0 4px 20px rgba(0,0,0,.4)!important; }
+#pg-badge > div:first-child, #pg-community > div:first-child { box-shadow:0 4px 20px rgba(0,0,0,.4)!important; }
+#stats-content { box-shadow:none!important; background:transparent!important; }
 body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 ::-webkit-scrollbar { width:6px; height:6px; }
 ::-webkit-scrollbar-track { background:var(--bg-light); }
@@ -3056,7 +3065,8 @@ async function renderNumberHistory() {
       ? parseQRUrl(ticket.qr_url) : null;
     return { ...ticket, lottery_type:ticketLotteryType(ticket), game_numbers:restored?.games || ticket.game_numbers || [] };
   });
-  const { data: stores } = await sb.from('lottery_stores').select('id,name,address').order('name').limit(5000);
+  const { data: stores } = await sb.from('lottery_stores').select('id,name,address,region').eq('approved',true).order('name').limit(5000);
+  window._lotteryStoreOptions = stores || [];
   const ticketIds = qrTickets.map(ticket => ticket.id).filter(Boolean);
   const { data: assignments } = ticketIds.length
     ? await sb.from('ticket_game_stores').select('ticket_id,game_index,store_id').in('ticket_id', ticketIds)
@@ -3135,24 +3145,84 @@ function renderTicketSlip(ticket) {
       <div style="font-size:11px;color:#475569;text-align:right;">${games.length}게임<br><b style="font-size:15px;color:#111827;">${(games.length * 1000).toLocaleString()}원</b></div>
     </div>
     <div class="ticket-slip-games">${games.map((nums,index)=>{
-      const selectedStore = ticket.storeAssignments?.find(row => row.game_index === index)?.store_id || '';
-      const storeSelect = ticket.id && ticket.storeOptions ? `<select onchange="saveTicketGameStore('${ticket.id}',${index},this.value)" style="width:130px;border:1px solid #d6d3d1;border-radius:4px;background:#fff;color:#475569;padding:4px;font-size:10px;"><option value="">판매점 지정</option>${ticket.storeOptions.map(store=>`<option value="${store.id}" ${store.id===selectedStore?'selected':''}>${store.name}</option>`).join('')}</select>` : '';
-      return `<div class="ticket-slip-game" style="grid-template-columns:24px minmax(0,1fr) auto;"><b>${String.fromCharCode(65+index)}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeSelect}</div>`;
+      const assignment = ticket.storeAssignments?.find(row => row.game_index === index);
+      const selectedStore = assignment?.store_id || '';
+      const storeName = ticket.storeOptions?.find(store => store.id === selectedStore)?.name || '판매점 지정';
+      const storeButton = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${index},'${selectedStore}')">${storeName}</button>` : '';
+      return `<div class="ticket-slip-game" style="grid-template-columns:24px minmax(0,1fr) auto;"><b>${String.fromCharCode(65+index)}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeButton}</div>`;
     }).join('')}</div>
   </div>`;
 }
 
-async function saveTicketGameStore(ticketId, gameIndex, storeId) {
-  if (!ticketId) return;
-  if (!storeId) {
-    await sb.from('ticket_game_stores').delete().eq('ticket_id',ticketId).eq('game_index',gameIndex);
-  } else {
-    const { error } = await sb.from('ticket_game_stores').upsert({
-      ticket_id:ticketId, game_index:gameIndex, store_id:storeId, user_id:currentUser.id
-    }, { onConflict:'ticket_id,game_index' });
-    if (error) { toast('판매점 저장에 실패했습니다.'); return; }
+function openStorePicker(ticketId, gameIndex, selectedStoreId) {
+  const stores = window._lotteryStoreOptions || [];
+  const old = $('store-picker-backdrop');
+  if (old) old.remove();
+  const modal = document.createElement('div');
+  modal.id = 'store-picker-backdrop';
+  modal.className = 'store-picker-backdrop';
+  modal.onclick = event => { if (event.target === modal) closeStorePicker(); };
+  modal.innerHTML = `<div class="store-picker" role="dialog" aria-modal="true" aria-label="판매점 선택">
+    <div class="store-picker-head"><span>판매점 선택</span><button onclick="closeStorePicker()" aria-label="닫기" style="border:0;background:none;color:var(--text-muted);font-size:20px;cursor:pointer;">×</button></div>
+    <input id="store-picker-search" class="store-picker-search" placeholder="판매점명 또는 주소 검색" oninput="filterStorePicker(this.value)">
+    <div id="store-picker-list" class="store-picker-list"></div>
+  </div>`;
+  document.body.appendChild(modal);
+  window._storePickerTarget = { ticketId, gameIndex, selectedStoreId };
+  renderStorePickerList(stores);
+  setTimeout(() => $('store-picker-search')?.focus(), 0);
+}
+
+function closeStorePicker() {
+  $('store-picker-backdrop')?.remove();
+  window._storePickerTarget = null;
+}
+
+function filterStorePicker(value) {
+  const query = String(value || '').trim().toLowerCase();
+  renderStorePickerList((window._lotteryStoreOptions || []).filter(store =>
+    `${store.name} ${store.address} ${store.region || ''}`.toLowerCase().includes(query)
+  ));
+}
+
+function renderStorePickerList(stores) {
+  const list = $('store-picker-list');
+  if (!list) return;
+  const target = window._storePickerTarget;
+  if (!stores.length) {
+    list.innerHTML = '<div style="padding:24px 10px;text-align:center;color:var(--text-muted);font-size:12px;line-height:1.7;">등록된 승인 판매점이 없습니다.<br>관리자에서 판매점 목록을 먼저 등록해주세요.</div>';
+    return;
   }
-  toast('판매점을 저장했습니다.');
+  list.innerHTML = `<button class="store-picker-item" onclick="selectStorePicker('')"><b>지정 해제</b></button>` + stores.map(store =>
+    `<button class="store-picker-item" onclick="selectStorePicker('${store.id}')">
+      <div style="font-size:12px;font-weight:900;">${store.name}${target?.selectedStoreId===store.id?' · 선택됨':''}</div>
+      <div style="margin-top:3px;font-size:10px;color:var(--text-muted);">${store.address}${store.region?' · '+store.region:''}</div>
+    </button>`
+  ).join('');
+}
+
+async function selectStorePicker(storeId) {
+  const target = window._storePickerTarget;
+  if (!target) return;
+  const saved = await saveTicketGameStore(target.ticketId, target.gameIndex, storeId);
+  if (!saved) return;
+  closeStorePicker();
+  renderNumberHistory();
+}
+
+async function saveTicketGameStore(ticketId, gameIndex, storeId) {
+  if (!ticketId) return false;
+  let error = null;
+  if (!storeId) {
+    ({ error } = await sb.from('ticket_game_stores').delete().eq('ticket_id',ticketId).eq('game_index',gameIndex));
+  } else {
+    ({ error } = await sb.from('ticket_game_stores').upsert({
+      ticket_id:ticketId, game_index:gameIndex, store_id:storeId, user_id:currentUser.id
+    }, { onConflict:'ticket_id,game_index' }));
+  }
+  if (error) { toast('판매점 저장에 실패했습니다. 관리자에게 DB 설정을 확인해주세요.'); return false; }
+  toast(storeId ? '판매점을 저장했습니다.' : '판매점 지정을 해제했습니다.');
+  return true;
 }
 
 async function lookupQrTicket() {
@@ -3633,6 +3703,9 @@ async function doAuth() {
     } else {
       const lastSignup = Number(localStorage.getItem('ltb_last_signup_mail') || 0);
       if (Date.now() - lastSignup < 60000) throw new Error('인증 메일은 1분 후 다시 요청할 수 있습니다.');
+      const { data: duplicateNick, error: nickError } = await sb.from('profiles').select('id').eq('nickname', nick).maybeSingle();
+      if (nickError) throw nickError;
+      if (duplicateNick) throw new Error('nickname already registered');
       const { error } = await sb.auth.signUp({
         email, password: pass,
         options: { data: { nickname: nick } }
@@ -3658,6 +3731,8 @@ async function doAuth() {
       $('auth-err').textContent = '이메일 또는 비밀번호가 올바르지 않습니다';
     else if (msg.includes('already registered') || msg.includes('user already'))
       $('auth-err').textContent = '이미 가입된 이메일입니다';
+    else if (msg.includes('nickname') || msg.includes('profiles_nickname'))
+      $('auth-err').textContent = '이미 사용 중인 닉네임입니다';
     else if (msg.includes('password should') || msg.includes('password must'))
       $('auth-err').textContent = '비밀번호는 8자리 이상이어야 합니다';
     else if (msg.includes('invalid email') || msg.includes('email is invalid') || msg.includes('validate email') || msg.includes('valid email'))
@@ -4404,7 +4479,7 @@ function go(id) {
     result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="qr-tab-register" class="qr-inner-tab on" onclick="switchQrView(\'register\')">QR 인증</button><button id="qr-tab-history" class="qr-inner-tab" onclick="switchQrView(\'history\')">번호 이력</button></div>',
     fortune:   '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 실시간 당첨 인증 피드',
-    stats:     '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="stats-tab-all" class="qr-inner-tab on" onclick="setStatsLotteryMode(\'all\')">토탈</button><button id="stats-tab-lotto" class="qr-inner-tab" onclick="setStatsLotteryMode(\'lotto\')">로또</button><button id="stats-tab-pension" class="qr-inner-tab" onclick="setStatsLotteryMode(\'pension\')">연금</button></div>',
+    stats:     '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="stats-tab-all" class="qr-inner-tab on" onclick="setStatsLotteryMode(\'all\')">Total</button><button id="stats-tab-lotto" class="qr-inner-tab" onclick="setStatsLotteryMode(\'lotto\')">로또</button><button id="stats-tab-pension" class="qr-inner-tab" onclick="setStatsLotteryMode(\'pension\')">연금</button></div>',
     rank:      '<div class="rank-view-tabs" style="width:100%;margin-bottom:0;"><button id="rank-view-ranking" class="rank-view-btn on" onclick="setRankView(\'ranking\')">랭킹</button><button id="rank-view-hall" class="rank-view-btn" onclick="setRankView(\'hall\')">명예의 전당</button></div>',
     map:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 내 주변 판매점',
     community: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 커뮤니티',
