@@ -3130,9 +3130,16 @@ async function renderNumberHistory() {
         const rawNo = ticket.no ?? ticket.pension_number ?? '';
         const number = rawNo ? String(rawNo).padStart(6, '0') : null;
         const jo = ticket.jo ?? ticket.pension_group ?? '-';
-        allGameRows.push(`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px dashed #e2e8f0;">
-          <span style="background:#2fa85e;color:#fff;border-radius:4px;padding:4px 7px;font-size:13px;font-weight:900;">${jo}조</span>
-          ${number ? number.split('').map(n=>`<span style="width:24px;height:30px;border:1px solid #9ad5ae;border-radius:4px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:11px;color:#64748b;">번호 미등록</span>'}
+        const pAssign = ticketAssign.find(r => r.game_index === 0);
+        const pStoreId = pAssign?.store_id || '';
+        const pStoreName = ticketStores.find(s => s.id === pStoreId)?.name || '판매점 지정';
+        const pStoreBtn = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',0,'${pStoreId}')">${pStoreName}</button>` : '';
+        allGameRows.push(`<div class="ticket-slip-game">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="background:#2fa85e;color:#fff;border-radius:4px;padding:3px 7px;font-size:13px;font-weight:900;white-space:nowrap;">${jo}조</span>
+            <div class="ticket-slip-nums">${number ? number.split('').map(n=>`<span>${n}</span>`).join('') : '<span style="font-size:11px;color:#64748b;">번호 미등록</span>'}</div>
+          </div>
+          ${pStoreBtn}
         </div>`);
       } else {
         const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
