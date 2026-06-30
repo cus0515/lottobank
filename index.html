@@ -199,7 +199,7 @@ main.chat-hidden .chat-panel { display: none; }
 .ticket-slip { max-width:440px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
 .ticket-slip-games { display:grid; gap:0; }
-.ticket-slip-game { display:grid; grid-template-columns:24px 1fr; gap:8px; align-items:center; padding:5px 0; border-bottom:1px dashed #cbd5e1; }
+.ticket-slip-game { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; padding:5px 0; border-bottom:1px dashed #cbd5e1; }
 .ticket-slip-nums { display:flex; justify-content:space-between; gap:4px; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; }
 .ticket-history-filter { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
 .store-picker-backdrop { position:fixed; inset:0; z-index:1200; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(15,23,42,.58); }
@@ -3115,16 +3115,46 @@ async function renderNumberHistory() {
     const first = group[0];
     const isPension = ticketLotteryType(first) === 'pension';
     const typeLbl = isPension ? '연금복권 720+' : '로또 6/45';
-    return `<section style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-        <b style="font-size:12px;color:var(--text-dark);">${typeLbl} · 제 ${first.round_no}회</b>
-        <span style="font-size:10px;color:var(--text-muted);">${group.length}장</span>
+    const topColor = isPension ? '#2f8550' : '#111827';
+    const totalGames = group.reduce((s, t) => {
+      const g = t.game_numbers?.length ? t.game_numbers : (t.numbers?.length ? [t.numbers] : []);
+      return s + (isPension ? 1 : g.length);
+    }, 0);
+
+    // 모든 게임을 하나의 평탄한 리스트로 합치기
+    const allGameRows = [];
+    group.forEach(ticket => {
+      const ticketStores = stores || [];
+      const ticketAssign = (assignments || []).filter(r => r.ticket_id === ticket.id);
+      if (isPension) {
+        const rawNo = ticket.no ?? ticket.pension_number ?? '';
+        const number = rawNo ? String(rawNo).padStart(6, '0') : null;
+        const jo = ticket.jo ?? ticket.pension_group ?? '-';
+        allGameRows.push(`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px dashed #e2e8f0;">
+          <span style="background:#2fa85e;color:#fff;border-radius:4px;padding:4px 7px;font-size:13px;font-weight:900;">${jo}조</span>
+          ${number ? number.split('').map(n=>`<span style="width:24px;height:30px;border:1px solid #9ad5ae;border-radius:4px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:11px;color:#64748b;">번호 미등록</span>'}
+        </div>`);
+      } else {
+        const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
+        games.forEach((nums, gi) => {
+          const assign = ticketAssign.find(r => r.game_index === gi);
+          const storeId = assign?.store_id || '';
+          const storeName = ticketStores.find(s => s.id === storeId)?.name || '판매점 지정';
+          const storeBtn = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${gi},'${storeId}')">${storeName}</button>` : '';
+          allGameRows.push(`<div class="ticket-slip-game"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeBtn}</div>`);
+        });
+      }
+    });
+
+    return `<section style="background:var(--paper-white);border:1px solid var(--border-dashed);border-top:5px solid ${topColor};border-radius:8px;padding:12px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div>
+          <div style="font-size:13px;font-weight:900;color:var(--text-dark);">${typeLbl}</div>
+          <div style="font-size:10px;color:var(--text-muted);">제 ${first.round_no}회</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:var(--text-muted);">${totalGames}게임</span>
       </div>
-      ${group.map(ticket => renderTicketSlip({
-        ...ticket,
-        storeOptions: stores || [],
-        storeAssignments: (assignments || []).filter(row => row.ticket_id === ticket.id),
-      })).join('')}
+      <div class="ticket-slip-games">${allGameRows.join('')}</div>
     </section>`;
   }).join('');
 }
@@ -3167,7 +3197,7 @@ function renderTicketSlip(ticket) {
       const selectedStore = assignment?.store_id || '';
       const storeName = ticket.storeOptions?.find(store => store.id === selectedStore)?.name || '판매점 지정';
       const storeButton = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${index},'${selectedStore}')">${storeName}</button>` : '';
-      return `<div class="ticket-slip-game" style="grid-template-columns:24px minmax(0,1fr) auto;"><b>${String.fromCharCode(65+index)}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeButton}</div>`;
+      return `<div class="ticket-slip-game" style="grid-template-columns:minmax(0,1fr) auto;"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeButton}</div>`;
     }).join('')}</div>
   </div>`;
 }
