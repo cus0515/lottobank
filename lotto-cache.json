@@ -1,6 +1,5 @@
 {
   "returnValue": "success",
-  "_source": "cache",
   "drwNo": 1230,
   "drwNoDate": "2026-06-27",
   "drwtNo1": 3,
@@ -12,17 +11,6 @@
   "bnusNo": 45,
   "firstWinamnt": 1771357196,
   "firstPrzwnerCo": 16,
-  "rnk2WnAmt": 52484658,
-  "rnk2WnNope": 90,
-  "rnk3WnNope": 3336,
-  "rnk4WnNope": 168902,
-  "rnk5WnNope": 2770957,
-  "rnk1AutoNope": 0,
-  "rnk1ManualNope": 0,
-  "rnk2AutoNope": 0,
-  "rnk2ManualNope": 0,
-  "rnk3WnAmt": 1415953,
-  "rnk4WnAmt": 50000,
-  "rnk5WnAmt": 5000,
-  "totSellamnt": 60088838564
+  "_cachedAt": "2026-06-30T14:19:13Z",
+  "regions": []
 }
