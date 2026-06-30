@@ -1377,6 +1377,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   <button class="mob-menu-item" onclick="go('result');closeMobMenu()">회차 조회</button>
   <button class="mob-menu-item" onclick="go('rank');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> 랭킹</button>
   <button class="mob-menu-item" onclick="go('map');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 지도</button>
+  <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()">🔮 번호운세</button>
   <div id="mob-auth-section" style="display:none;border-top:2px solid var(--border-dashed);margin-top:4px;">
     <div style="padding:10px 4px 4px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.5px;">내 계정</div>
     <button class="mob-menu-item auth-member-tab" onclick="go('stats');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적</button>
@@ -3127,17 +3128,22 @@ async function renderNumberHistory() {
         const rawNo = ticket.no ?? ticket.pension_number ?? '';
         const number = rawNo ? String(rawNo).padStart(6, '0') : null;
         const jo = ticket.jo ?? ticket.pension_group ?? '-';
-        return `<div style="padding:10px 0;text-align:center;border-bottom:1px dashed #86b998;">
+        const ticketAssign = (assignments||[]).filter(r=>r.ticket_id===ticket.id);
+        const pa = ticketAssign.find(r=>r.game_index===0);
+        const ps = pa?.store_id||''; const pn=(stores||[]).find(s=>s.id===ps)?.name||'판매점 지정';
+        const pBtn = ticket.id?`<div style="text-align:right;margin-top:6px;"><button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',0,'${ps}')">${pn}</button></div>`:'';
+        return `<div style="padding:10px 0;border-bottom:1px dashed #86b998;">
           <div style="display:flex;justify-content:center;align-items:center;gap:7px;">
             <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${jo}조</span>
             ${number ? number.split('').map(n=>`<span style="width:27px;height:34px;border:1px solid #9ad5ae;border-radius:5px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:12px;color:#64748b;padding:0 8px;">번호 미등록</span>'}
           </div>
+          ${pBtn}
         </div>`;
       }).join('');
       return `<div class="ticket-slip pension">
         <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2f8550;padding-bottom:8px;">
           <div><div style="font-size:20px;font-weight:950;">연금복권 <span style="color:#28a35b;">720+</span></div><div style="font-size:10px;color:#64748b;">복권기금은 건전한 복권문화를 지원합니다.</div></div>
-          <b style="font-size:14px;">${(totalGames * 1000).toLocaleString()}원</b>
+          <b style="font-size:14px;">${(totalGames*1000).toLocaleString()}원</b>
         </div>
         <div style="font-size:11px;color:#64748b;text-align:center;padding:8px 0 4px;">제 ${first.round_no}회 · ${totalGames}게임</div>
         ${pensionRows}
@@ -3147,9 +3153,14 @@ async function renderNumberHistory() {
     // 로또
     const lottoRows = [];
     group.forEach(ticket => {
+      const ticketAssign = (assignments||[]).filter(r=>r.ticket_id===ticket.id);
       const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
-      games.forEach(nums => {
-        lottoRows.push(`<div class="ticket-slip-game" style="grid-template-columns:1fr;"><div class="ticket-slip-nums" style="justify-content:center;">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div></div>`);
+      games.forEach((nums,gi) => {
+        const assign = ticketAssign.find(r=>r.game_index===gi);
+        const storeId = assign?.store_id||'';
+        const storeName = (stores||[]).find(s=>s.id===storeId)?.name||'판매점 지정';
+        const storeBtn = ticket.id?`<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${gi},'${storeId}')">${storeName}</button>`:'';
+        lottoRows.push(`<div class="ticket-slip-game"><div class="ticket-slip-nums" style="justify-content:center;">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeBtn}</div>`);
       });
     });
     return `<div class="ticket-slip">
@@ -3463,6 +3474,7 @@ async function verifyRealQR() {
     }
     if (rd) rd.innerHTML = `${renderTicketSlip(parsed)}<div style="background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;border-radius:7px;padding:10px;text-align:center;font-size:12px;font-weight:800;">연금복권 720+ 등록 완료</div>`;
     toast('🏦 연금복권이 등록되었습니다!');
+    checkAndAwardBadges();
     return;
   }
   if (!parsed) {
@@ -3594,6 +3606,7 @@ const summaryBg    = bestRank <= 2 ? (_isDmS?'#0a1f10':'#dcfce7') : bestRank <= 
 
   $('qr-url-input').value = '';
   renderQRHistory();
+  checkAndAwardBadges();
   // 당첨시 confetti
   if (bestRank === 1) { setTimeout(miniConfetti, 200); setTimeout(miniConfetti, 700); setTimeout(miniConfetti, 1200); }
   else if (bestRank === 2) { setTimeout(miniConfetti, 200); setTimeout(miniConfetti, 800); }
@@ -4296,6 +4309,7 @@ async function loadUserDataFromDB() {
     window._profileNickname = nick2;
     updateHeaderUser(nick2, myVerifiedTitle || '');
     updateBadgeUI();
+    checkAndAwardBadges();
     updateDropdownStats();
     await syncDailyVisitAndSystemTitle();
     const { data: visitRows } = await sb.from('user_daily_visits').select('visit_date').eq('user_id',uid).order('visit_date',{ascending:false});
@@ -4612,7 +4626,7 @@ async function upsertUserStats(gameCount, gameResults, totalPrize = 0, winData =
 // 탭 전환
 // =====================================================
 function go(id) {
-  if (id === 'fortune' || id === 'community') id = 'home';
+  if (id === 'community') id = 'community'; // 커뮤니티 직접 접근 허용
   if (id === 'badge') id = 'profile';
   // 페이지 이동 시 상단으로 스크롤
   const mc = document.getElementById('main-content');
@@ -8776,12 +8790,18 @@ function renderProfile() {
 </script>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   .</div>
+                                                                                                                                                                                    .</div>
+      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cu.</div>
+      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그.</div>
       <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
     </div>
     `}
- .</div>
-      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
+  `;
+}
+</script>
+</body>
+</html>
+8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
     </div>
     `}
   `;
