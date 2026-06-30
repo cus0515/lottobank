@@ -172,7 +172,7 @@ main.chat-hidden .chat-panel { display: none; }
 
 .badge { display: inline-flex; align-items: center; min-height:22px; box-sizing:border-box; padding: 3px 7px; font-size: 11px; line-height:1; font-weight: 900; color: #fff; border-radius: 4px; margin-right: 7px; vertical-align: middle; }
 .badge.b-real-1      { background:linear-gradient(105deg,#fff6c9 0%,#d5a625 35%,#fff0a3 50%,#d5a625 65%,#fff6c9 100%); background-size:220% 100%; color:#513d00!important; border:1px solid #d3aa32; outline:2px double rgba(245,214,103,.75); outline-offset:2px; text-shadow:0 1px 0 rgba(255,255,255,.55); box-shadow:0 0 8px rgba(212,175,55,.55),0 0 18px rgba(245,222,143,.38); animation:goldSweep1 3.2s ease-in-out infinite; }
-.badge.b-real-pen-1  { background:linear-gradient(105deg,#d4f5e2 0%,#27a85b 35%,#a3e6c0 50%,#27a85b 65%,#d4f5e2 100%); background-size:220% 100%; color:#073d21!important; border:1px solid #35a968; outline:2px double rgba(103,208,150,.75); outline-offset:2px; text-shadow:0 1px 0 rgba(255,255,255,.35); box-shadow:0 0 8px rgba(53,169,104,.55),0 0 18px rgba(111,208,150,.38); animation:greenSweep1 3.4s ease-in-out infinite; }
+.badge.b-real-pen-1  { background:linear-gradient(105deg,#fff6c9 0%,#d5a625 35%,#fff0a3 50%,#d5a625 65%,#fff6c9 100%); background-size:220% 100%; color:#513d00!important; border:1px solid #d3aa32; outline:2px double rgba(245,214,103,.75); outline-offset:2px; text-shadow:0 1px 0 rgba(255,255,255,.55); box-shadow:0 0 8px rgba(212,175,55,.55),0 0 18px rgba(245,222,143,.38); animation:goldSweep1 3.4s ease-in-out infinite; }
 .badge.b-real-both   { background:linear-gradient(110deg,#cf4058 0%,#dc596c 30%,#b88172 50%,#72ad78 70%,#36a269 100%); color:#fff !important; border:1px solid rgba(255,255,255,.48); text-shadow:0 1px 2px rgba(15,23,42,.3); box-shadow:0 0 9px rgba(207,64,88,.38),0 0 13px rgba(54,162,105,.34); animation:neonBoth 3.0s ease-in-out infinite alternate; }
 .badge.b-real-2,
 .badge.b-real-pen-2,
@@ -191,8 +191,8 @@ main.chat-hidden .chat-panel { display: none; }
 .profile-badge-choice { min-width:70px; padding:8px 10px; border:1px solid var(--border-dashed); border-radius:6px; background:var(--paper-white); color:var(--text-dark); font:700 11px inherit; cursor:pointer; }
 .profile-badge-choice.on { border-color:#e3b42f; background:#fff8db; color:#7c5700; box-shadow:0 0 7px rgba(245,196,81,.3); }
 .identity-line { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px; }
-.header-user-meta { display:flex; flex-direction:column; align-items:flex-start; gap:1px; max-width:280px; }
-#user-name { display:flex; align-items:center; max-width:280px; overflow:hidden; white-space:nowrap; }
+.header-user-meta { display:flex; flex-direction:column; align-items:flex-start; gap:1px; max-width:280px; overflow:visible; padding:3px 0; }
+#user-name { display:flex; align-items:center; max-width:280px; overflow:visible; white-space:nowrap; }
 .qr-inner-tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
 .qr-inner-tab { border:1px solid var(--border-dashed); border-radius:6px; background:var(--paper-white); color:var(--text-muted); padding:8px; font:800 12px inherit; cursor:pointer; }
 .qr-inner-tab.on { border-color:var(--lotto-red); background:var(--lotto-red); color:#fff; }
@@ -255,10 +255,11 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .chat-system-row span:last-child { color:#fbbf24 !important; }
 
 .chat-messages { flex:1; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:14px; scroll-behavior:smooth; }
-.chat-row { font-size:13px; line-height:1.5; padding:2px 0; }
+.chat-row { font-size:13px; line-height:1.5; padding:4px 0; display:flex; flex-direction:column; gap:5px; }
+.chat-identity { display:flex; align-items:center; flex-wrap:wrap; gap:4px; }
 .chat-user { font-weight: 700; color: #334155; }
 [data-theme="dark"] .chat-user { color:#94a3b8; }
-.chat-text { color: #0f172a; background:var(--paper-white); padding: 6px 10px; border-radius: 6px; display: inline-block; max-width: 85%; margin-top: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.chat-text { color: #0f172a; background:var(--paper-white); padding: 6px 10px; border-radius: 6px; display: block; max-width: 85%; margin-top: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 [data-theme="dark"] .chat-text { color:#e2e8f0; }
 .chat-input-area { padding: 12px; background:var(--paper-white); display: flex; gap: 6px; }
 .chat-input { flex: 1; padding: 9px 12px; border: 1.5px solid var(--border-dashed); border-radius: 10px; font-size: 13px; outline: none; background:var(--bg-light); color:var(--text-dark); transition:border-color .15s; }
@@ -1854,8 +1855,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     </div>
     <div style="display:flex; flex-direction:column; height:calc(100% - 49px);">
       <div class="chat-messages" id="chat-box">
-        <div class="chat-row"><span class="badge b-system">공지</span><span class="chat-user">LottoBank</span><br><span class="chat-text">로또 6/45 · 연금복권 720+ QR 코드로 구매를 인증하고 전적을 자동 기록하세요 🎱</span></div>
-        <div class="chat-row"><span class="badge b-guest">팁</span><span class="chat-user">번호수집가</span><br><span class="chat-text">동행복권 앱 → QR 조회 → URL 복사 → LottoBank QR 탭 붙여넣기 👍</span></div>
+        <div class="chat-row"><div class="chat-identity"><span class="badge b-system">공지</span><span class="chat-user">LottoBank</span></div><span class="chat-text">로또 6/45 · 연금복권 720+ QR 코드로 구매를 인증하고 전적을 자동 기록하세요 🎱</span></div>
+        <div class="chat-row"><div class="chat-identity"><span class="badge b-guest">팁</span><span class="chat-user">번호수집가</span></div><span class="chat-text">동행복권 앱 → QR 조회 → URL 복사 → LottoBank QR 탭 붙여넣기 👍</span></div>
       </div>
       <div class="chat-input-area">
         <input type="text" id="chat-input" class="chat-input" placeholder="로그인 후 실시간 대화에 참여해보세요." maxlength="200" onkeyup="if(event.key==='Enter')sendChat()" disabled>
@@ -2624,7 +2625,7 @@ function renderPensionResult(d, container, round) {
     _sd.style.cssText = 'margin-top:10px;text-align:left;';
     _sd.innerHTML = '<div style="font-size:11px;color:#94a3b8;padding:4px 0;">판매소 조회 중...</div>';
     container.appendChild(_sd);
-    fetch('/api/lotto-region?round='+round+'&type=pension',{cache:'no-cache'})
+    fetch('/api/lotto-region?round='+round+'&type=pension&_='+Date.now(),{cache:'no-store'})
       .then(r=>r.json()).then(j=>{
         const s1=j.stores1||[],s2=j.stores2||[];
         if(!s1.length&&!s2.length){
@@ -3170,7 +3171,6 @@ function renderTicketSlip(ticket) {
 }
 
 function openStorePicker(ticketId, gameIndex, selectedStoreId) {
-  const stores = window._lotteryStoreOptions || [];
   const old = $('store-picker-backdrop');
   if (old) old.remove();
   const modal = document.createElement('div');
@@ -3178,13 +3178,25 @@ function openStorePicker(ticketId, gameIndex, selectedStoreId) {
   modal.className = 'store-picker-backdrop';
   modal.onclick = event => { if (event.target === modal) closeStorePicker(); };
   modal.innerHTML = `<div class="store-picker" role="dialog" aria-modal="true" aria-label="판매점 선택">
-    <div class="store-picker-head"><span>판매점 선택</span><button onclick="closeStorePicker()" aria-label="닫기" style="border:0;background:none;color:var(--text-muted);font-size:20px;cursor:pointer;">×</button></div>
-    <input id="store-picker-search" class="store-picker-search" placeholder="판매점명 또는 주소 검색" oninput="filterStorePicker(this.value)">
+    <div class="store-picker-head"><span>판매점 검색</span><button onclick="closeStorePicker()" aria-label="닫기" style="border:0;background:none;color:var(--text-muted);font-size:20px;cursor:pointer;">×</button></div>
+    <div style="padding:10px 12px 0;">
+      <div style="display:flex;gap:6px;">
+        <input id="store-picker-search" class="store-picker-search" placeholder="판매점명 검색 (예: GS25, 편의점)" style="flex:1;margin:0;" onkeydown="if(event.key==='Enter')searchStorePicker()">
+        <button onclick="searchStorePicker()" style="padding:0 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">검색</button>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:5px;">동행복권 판매점 데이터 기반 검색 · Enter키로 검색</div>
+    </div>
     <div id="store-picker-list" class="store-picker-list"></div>
   </div>`;
   document.body.appendChild(modal);
   window._storePickerTarget = { ticketId, gameIndex, selectedStoreId };
-  renderStorePickerList(stores);
+  // 기존 선택 판매점 표시
+  const curStore = (window._lotteryStoreOptions||[]).find(s=>s.id===selectedStoreId);
+  if (curStore) {
+    renderStorePickerList([curStore], true);
+  } else {
+    $('store-picker-list').innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;">판매점명을 검색하세요.<br><span style="font-size:10px;color:#94a3b8;">예: GS25, 세븐일레븐, CU, 이마트</span></div>';
+  }
   setTimeout(() => $('store-picker-search')?.focus(), 0);
 }
 
@@ -3193,11 +3205,32 @@ function closeStorePicker() {
   window._storePickerTarget = null;
 }
 
+let _storeSearchTimer = null;
+async function searchStorePicker() {
+  const query = ($('store-picker-search')?.value || '').trim();
+  if (query.length < 2) {
+    $('store-picker-list').innerHTML = '<div style="padding:16px 10px;text-align:center;color:var(--text-muted);font-size:12px;">2자 이상 입력하세요.</div>';
+    return;
+  }
+  $('store-picker-list').innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;">검색 중...</div>';
+  try {
+    const res = await fetch(`/api/store-search?q=${encodeURIComponent(query)}`);
+    const data = await res.json();
+    const stores = data.stores || [];
+    // 검색 결과를 내부 옵션에 병합
+    stores.forEach(s => {
+      if (s.id && !(window._lotteryStoreOptions||[]).find(x=>x.id===s.id)) {
+        (window._lotteryStoreOptions = window._lotteryStoreOptions||[]).push(s);
+      }
+    });
+    renderStorePickerList(stores);
+  } catch(e) {
+    $('store-picker-list').innerHTML = `<div style="padding:16px 10px;text-align:center;color:var(--text-muted);font-size:12px;">검색 실패: ${e.message}</div>`;
+  }
+}
+
 function filterStorePicker(value) {
-  const query = String(value || '').trim().toLowerCase();
-  renderStorePickerList((window._lotteryStoreOptions || []).filter(store =>
-    `${store.name} ${store.address} ${store.region || ''}`.toLowerCase().includes(query)
-  ));
+  // 타이핑 시 Enter 유도 (자동검색 없음)
 }
 
 function renderStorePickerList(stores) {
@@ -3205,11 +3238,9 @@ function renderStorePickerList(stores) {
   if (!list) return;
   const target = window._storePickerTarget;
   if (!stores.length) {
-    list.innerHTML = `<div style="padding:24px 10px;text-align:center;color:var(--text-muted);font-size:12px;line-height:1.8;">
-      <div style="font-size:24px;margin-bottom:8px;">🏪</div>
-      <b style="color:var(--text-dark);">등록된 판매점이 없습니다</b><br>
-      <span>관리자 페이지에서 판매점을 먼저 등록해주세요.</span><br>
-      <button onclick="closeStorePicker();go('home')" style="margin-top:10px;background:none;border:1px solid var(--border-dashed);border-radius:5px;padding:5px 12px;font-size:11px;cursor:pointer;color:var(--text-muted);">닫기</button>
+    list.innerHTML = `<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;line-height:1.8;">
+      <div style="font-size:20px;margin-bottom:6px;">🔍</div>
+      검색 결과가 없습니다.<br>다른 검색어를 시도해보세요.
     </div>`;
     return;
   }
@@ -3232,6 +3263,22 @@ function renderStorePickerList(stores) {
 async function selectStorePicker(storeId) {
   const target = window._storePickerTarget;
   if (!target) return;
+  // 선택한 판매점을 lottery_stores에 자동 upsert (없으면 등록)
+  if (storeId && isLoggedIn) {
+    const store = (window._lotteryStoreOptions||[]).find(s=>s.id===storeId);
+    if (store) {
+      try {
+        await sb.from('lottery_stores').upsert({
+          id: String(store.id),
+          name: store.name,
+          address: store.address || '',
+          region: store.region || '',
+          lat: store.lat || null,
+          lng: store.lng || null,
+        }, { onConflict: 'id', ignoreDuplicates: true });
+      } catch(e) { console.warn('lottery_stores upsert:', e.message); }
+    }
+  }
   const saved = await saveTicketGameStore(target.ticketId, target.gameIndex, storeId);
   if (!saved) return;
   closeStorePicker();
@@ -4001,7 +4048,7 @@ function appendChatRow(msg) {
     row.innerHTML = `<span class="badge b-system"> 시스템</span><span style="font-size:12px;color:#92400e;font-weight:700;" class="chat-sys-text">${esc(msg.message)}</span>`;
   } else {
     row.className = 'chat-row';
-    row.innerHTML = `${getIdentityHtml(msg.verified_title, msg.monthly_badges, msg.nickname)}<br><span class="chat-text">${esc(msg.message)}</span>`;
+    row.innerHTML = `<div class="chat-identity">${getIdentityHtml(msg.verified_title, msg.monthly_badges, msg.nickname)}</div><span class="chat-text">${esc(msg.message)}</span>`;
   }
   box.appendChild(row);
   box.scrollTop = box.scrollHeight;
@@ -4009,7 +4056,7 @@ function appendChatRow(msg) {
 
 async function loadRecentChats() {
   const box = $('chat-box');
-  box.innerHTML = `<div class="chat-row"><span class="badge b-guest">공지</span><span class="chat-user">LottoBank</span><br><span class="chat-text">실제 구매 QR 코드로 당첨 여부를 인증하고 전적을 기록하세요.</span></div>`;
+  box.innerHTML = `<div class="chat-row"><div class="chat-identity"><span class="badge b-guest">공지</span><span class="chat-user">LottoBank</span></div><span class="chat-text">실제 구매 QR 코드로 당첨 여부를 인증하고 전적을 기록하세요.</span></div>`;
   try {
     const { data } = await sb.from('chat_messages')
       .select('*')

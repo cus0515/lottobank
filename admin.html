@@ -433,14 +433,45 @@ function renderInsertForms() {
   document.getElementById('table-area').innerHTML = `
     <div class="admin-form">
       <div class="table-title" style="margin-bottom:14px;">티켓 수동 입력</div>
+
+      <!-- 복권 종류 선택 탭 -->
+      <div style="display:flex;gap:6px;margin-bottom:14px;">
+        <button id="ins-type-lotto" onclick="switchInsertType('lotto')" style="flex:1;padding:7px;border-radius:7px;border:2px solid #dc2626;background:#dc2626;color:#fff;font-size:12px;font-weight:800;cursor:pointer;">로또 6/45</button>
+        <button id="ins-type-pension" onclick="switchInsertType('pension')" style="flex:1;padding:7px;border-radius:7px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">연금복권 720+</button>
+      </div>
+
+      <!-- 공통 필드 -->
       <div class="form-grid">
         <div><label class="form-label">회원 닉네임</label><input class="form-input" id="ins-ticket-nick" placeholder="닉네임"></div>
         <div><label class="form-label">회차</label><input class="form-input" id="ins-ticket-round" type="number" min="1"></div>
-        <div><label class="form-label">번호 6개</label><input class="form-input" id="ins-ticket-numbers" placeholder="1, 2, 3, 4, 5, 6"></div>
         <div><label class="form-label">당첨 등수</label><select class="form-input" id="ins-ticket-rank"><option value="">미당첨</option><option value="1">1등</option><option value="2">2등</option><option value="3">3등</option><option value="4">4등</option><option value="5">5등</option></select></div>
         <div><label class="form-label">당첨금</label><input class="form-input" id="ins-ticket-prize" type="number" min="0" value="0"></div>
         <div><label class="form-label">구매일</label><input class="form-input" id="ins-ticket-date" type="date"></div>
       </div>
+
+      <!-- 로또 전용: 다중 게임 -->
+      <div id="ins-lotto-section">
+        <div style="display:flex;align-items:center;gap:8px;margin:10px 0 6px;">
+          <span style="font-size:11px;font-weight:800;">번호 입력 (게임당 6개, 1~45)</span>
+          <button onclick="addLottoGameRow()" style="padding:3px 10px;border-radius:5px;border:1px solid #dc2626;background:none;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;">+ 게임 추가</button>
+        </div>
+        <div id="ins-lotto-games">
+          <div class="ins-game-row" style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+            <span style="font-size:11px;font-weight:700;width:16px;color:var(--muted);">A</span>
+            <input class="form-input" placeholder="1, 7, 12, 23, 34, 45" style="flex:1;margin:0;">
+            <button onclick="this.parentElement.remove()" style="border:none;background:none;color:#94a3b8;font-size:16px;cursor:pointer;padding:0 4px;">×</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 연금복권 전용 필드 -->
+      <div id="ins-pension-section" style="display:none;">
+        <div class="form-grid" style="margin-top:10px;">
+          <div><label class="form-label">조 (1~5)</label><input class="form-input" id="ins-pension-jo" type="number" min="1" max="5" placeholder="예: 2"></div>
+          <div><label class="form-label">번호 (6자리)</label><input class="form-input" id="ins-pension-no" placeholder="예: 034521" maxlength="6"></div>
+        </div>
+      </div>
+
       <div class="form-actions"><button class="btn-save" onclick="insertTicket()">티켓 저장</button></div>
       <div class="form-result" id="ins-ticket-result"></div>
     </div>
@@ -771,31 +802,101 @@ async function findUserId(nickname) {
   return data.id;
 }
 
+let _insType = 'lotto';
+function switchInsertType(t) {
+  _insType = t;
+  document.getElementById('ins-lotto-section').style.display = t==='lotto' ? '' : 'none';
+  document.getElementById('ins-pension-section').style.display = t==='pension' ? '' : 'none';
+  document.getElementById('ins-type-lotto').style.cssText = t==='lotto'
+    ? 'flex:1;padding:7px;border-radius:7px;border:2px solid #dc2626;background:#dc2626;color:#fff;font-size:12px;font-weight:800;cursor:pointer;'
+    : 'flex:1;padding:7px;border-radius:7px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;';
+  document.getElementById('ins-type-pension').style.cssText = t==='pension'
+    ? 'flex:1;padding:7px;border-radius:7px;border:2px solid #16a34a;background:#16a34a;color:#fff;font-size:12px;font-weight:800;cursor:pointer;'
+    : 'flex:1;padding:7px;border-radius:7px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;';
+  const rankSel = document.getElementById('ins-ticket-rank');
+  if (t === 'pension') {
+    rankSel.innerHTML = '<option value="">미당첨</option><option value="1">1등</option><option value="2">2등</option><option value="3">3등</option><option value="4">4등</option><option value="5">5등</option><option value="6">6등</option><option value="7">7등</option>';
+  } else {
+    rankSel.innerHTML = '<option value="">미당첨</option><option value="1">1등</option><option value="2">2등</option><option value="3">3등</option><option value="4">4등</option><option value="5">5등</option>';
+  }
+}
+const _gameLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+function addLottoGameRow() {
+  const box = document.getElementById('ins-lotto-games');
+  const idx = box.children.length;
+  if (idx >= 10) { alert('최대 10게임까지 입력할 수 있습니다.'); return; }
+  const row = document.createElement('div');
+  row.className = 'ins-game-row';
+  row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:5px;';
+  row.innerHTML = `<span style="font-size:11px;font-weight:700;width:16px;color:var(--muted);">${_gameLabels[idx]}</span>
+    <input class="form-input" placeholder="1, 7, 12, 23, 34, 45" style="flex:1;margin:0;">
+    <button onclick="this.parentElement.remove()" style="border:none;background:none;color:#94a3b8;font-size:16px;cursor:pointer;padding:0 4px;">×</button>`;
+  box.appendChild(row);
+}
 async function insertTicket() {
   const result = document.getElementById('ins-ticket-result');
+  result.textContent = '저장 중...'; result.style.color = 'var(--muted)';
   try {
     const nickname = document.getElementById('ins-ticket-nick').value.trim();
     const roundNo = Number(document.getElementById('ins-ticket-round').value);
-    const numbers = document.getElementById('ins-ticket-numbers').value.split(',').map(v=>Number(v.trim())).filter(Number.isInteger);
-    if (!nickname || !roundNo || numbers.length !== 6 || new Set(numbers).size !== 6 || numbers.some(n=>n<1||n>45)) {
-      throw new Error('닉네임, 회차, 중복 없는 번호 6개를 확인하세요.');
-    }
+    if (!nickname || !roundNo) throw new Error('닉네임과 회차를 입력하세요.');
     const rankValue = document.getElementById('ins-ticket-rank').value;
     const userId = await findUserId(nickname);
-    const payload = {
-      user_id: userId,
-      qr_url: `admin://manual/${crypto.randomUUID()}`,
-      round_no: roundNo,
-      numbers: numbers.sort((a,b)=>a-b),
-      purchase_date: document.getElementById('ins-ticket-date').value || new Date().toISOString().slice(0,10),
-      result: 'checked',
-      prize_rank: rankValue ? Number(rankValue) : null,
-      prize_amount: Number(document.getElementById('ins-ticket-prize').value) || 0,
-    };
-    const { error } = await sb.from('tickets').insert(payload);
-    if (error) throw error;
-    result.style.color = 'var(--green)';
-    result.textContent = '티켓을 저장했습니다.';
+    const purchaseDate = document.getElementById('ins-ticket-date').value || new Date().toISOString().slice(0,10);
+    const prizeAmt = Number(document.getElementById('ins-ticket-prize').value) || 0;
+
+    if (_insType === 'pension') {
+      // 연금복권 단건 저장
+      const jo = Number(document.getElementById('ins-pension-jo').value);
+      const no = document.getElementById('ins-pension-no').value.trim();
+      if (!jo || jo < 1 || jo > 5) throw new Error('조는 1~5 사이 숫자를 입력하세요.');
+      if (!/^\d{6}$/.test(no)) throw new Error('번호는 6자리 숫자를 입력하세요.');
+      const payload = {
+        user_id: userId,
+        qr_url: `admin://pension/${roundNo}/${jo}/${no}/${crypto.randomUUID().slice(0,8)}`,
+        round_no: roundNo,
+        lottery_type: 'pension',
+        pension_group: jo,
+        pension_number: no,
+        numbers: [],
+        game_numbers: [],
+        purchase_date: purchaseDate,
+        result: 'checked',
+        prize_rank: rankValue ? Number(rankValue) : null,
+        prize_amount: prizeAmt,
+      };
+      const { error } = await sb.from('tickets').insert(payload);
+      if (error) throw error;
+      result.style.color='var(--green)'; result.textContent='연금복권 티켓 저장 완료.';
+    } else {
+      // 로또: 다중 게임 저장
+      const rows = document.querySelectorAll('#ins-lotto-games .ins-game-row');
+      const allGames = [];
+      for (const row of rows) {
+        const inp = row.querySelector('input');
+        if (!inp.value.trim()) continue;
+        const nums = inp.value.split(',').map(v=>Number(v.trim())).filter(n=>Number.isInteger(n)&&n>=1&&n<=45);
+        if (nums.length !== 6 || new Set(nums).size !== 6) throw new Error(`번호가 잘못되었습니다: "${inp.value}" (중복없는 6개, 1~45)`);
+        allGames.push(nums.sort((a,b)=>a-b));
+      }
+      if (!allGames.length) throw new Error('번호를 최소 1게임 입력하세요.');
+      const payload = {
+        user_id: userId,
+        qr_url: `admin://manual/${crypto.randomUUID()}`,
+        round_no: roundNo,
+        lottery_type: 'lotto',
+        numbers: allGames[0],
+        game_numbers: allGames,
+        game_count: allGames.length,
+        purchase_date: purchaseDate,
+        result: 'checked',
+        prize_rank: rankValue ? Number(rankValue) : null,
+        prize_amount: prizeAmt,
+      };
+      const { error } = await sb.from('tickets').insert(payload);
+      if (error) throw error;
+      result.style.color='var(--green)'; result.textContent=`로또 티켓 ${allGames.length}게임 저장 완료.`;
+    }
   } catch (e) {
     result.style.color = 'var(--red)';
     result.textContent = e.message;
