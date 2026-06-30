@@ -3121,34 +3121,43 @@ async function renderNumberHistory() {
       return s + (isPension ? 1 : g.length);
     }, 0);
 
-    // 게임 행 생성 (숫자만, 판매점 버튼 제거)
-    const allGameRows = [];
-    group.forEach(ticket => {
-      if (isPension) {
+    // renderTicketSlip() 디자인 그대로 사용, 동일 회차 누적
+    if (isPension) {
+      const pensionRows = group.map(ticket => {
         const rawNo = ticket.no ?? ticket.pension_number ?? '';
         const number = rawNo ? String(rawNo).padStart(6, '0') : null;
         const jo = ticket.jo ?? ticket.pension_group ?? '-';
-        allGameRows.push(`<div class="ticket-slip-game" style="grid-template-columns:1fr;">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="background:#2fa85e;color:#fff;border-radius:4px;padding:3px 7px;font-size:13px;font-weight:900;white-space:nowrap;">${jo}조</span>
-            <div style="display:flex;gap:3px;">${number ? number.split('').map(n=>`<span style="width:22px;height:28px;border:1px solid #9ad5ae;border-radius:4px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:11px;color:#64748b;">번호 미등록</span>'}</div>
+        return `<div style="padding:10px 0;text-align:center;border-bottom:1px dashed #86b998;">
+          <div style="display:flex;justify-content:center;align-items:center;gap:7px;">
+            <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${jo}조</span>
+            ${number ? number.split('').map(n=>`<span style="width:27px;height:34px;border:1px solid #9ad5ae;border-radius:5px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:12px;color:#64748b;padding:0 8px;">번호 미등록</span>'}
           </div>
-        </div>`);
-      } else {
-        const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
-        games.forEach((nums) => {
-          allGameRows.push(`<div class="ticket-slip-game" style="grid-template-columns:1fr;"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div></div>`);
-        });
-      }
-    });
+        </div>`;
+      }).join('');
+      return `<div class="ticket-slip pension">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2f8550;padding-bottom:8px;">
+          <div><div style="font-size:20px;font-weight:950;">연금복권 <span style="color:#28a35b;">720+</span></div><div style="font-size:10px;color:#64748b;">복권기금은 건전한 복권문화를 지원합니다.</div></div>
+          <b style="font-size:14px;">${(totalGames * 1000).toLocaleString()}원</b>
+        </div>
+        <div style="font-size:11px;color:#64748b;text-align:center;padding:8px 0 4px;">제 ${first.round_no}회 · ${totalGames}게임</div>
+        ${pensionRows}
+      </div>`;
+    }
 
-    return `<div class="ticket-slip${isPension ? ' pension' : ''}">
-      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid ${topColor};padding-bottom:8px;margin-bottom:6px;">
-        <div style="font-size:20px;font-weight:950;">${isPension ? '연금복권 <span style="color:#28a35b;">720+</span>' : '로또 <span style="color:var(--lotto-red);">6/45</span>'}</div>
-        <b style="font-size:13px;">₩${(totalGames * 1000).toLocaleString()}</b>
+    // 로또
+    const lottoRows = [];
+    group.forEach(ticket => {
+      const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
+      games.forEach(nums => {
+        lottoRows.push(`<div class="ticket-slip-game" style="grid-template-columns:1fr;"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div></div>`);
+      });
+    });
+    return `<div class="ticket-slip">
+      <div style="display:flex;justify-content:space-between;align-items:end;border-bottom:2px solid #111827;padding-bottom:8px;margin-bottom:6px;">
+        <div><div style="font-size:22px;font-weight:950;">Lotto <span style="font-size:14px;">6/45</span></div><div style="font-size:11px;color:#475569;">제 ${first.round_no}회</div></div>
+        <div style="font-size:11px;color:#475569;text-align:right;">${totalGames}게임<br><b style="font-size:15px;color:#111827;">${(totalGames*1000).toLocaleString()}원</b></div>
       </div>
-      <div style="font-size:10px;color:#64748b;margin-bottom:6px;">제 ${first.round_no}회 · ${totalGames}게임</div>
-      <div class="ticket-slip-games">${allGameRows.join('')}</div>
+      <div class="ticket-slip-games">${lottoRows.join('')}</div>
     </div>`;
   }).join('');
 }
@@ -8767,7 +8776,16 @@ function renderProfile() {
 </script>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .</div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   .</div>
+      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
+    </div>
+    `}
+  `;
+}
+</script>
+</body>
+</html>
+                                                                                        .</div>
       <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
     </div>
     `}
