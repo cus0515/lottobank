@@ -3121,34 +3121,23 @@ async function renderNumberHistory() {
       return s + (isPension ? 1 : g.length);
     }, 0);
 
-    // 게임 행 생성 (숫자 + 판매점 버튼 우측 정렬)
+    // 게임 행 생성 (숫자만, 판매점 버튼 제거)
     const allGameRows = [];
     group.forEach(ticket => {
-      const ticketStores = stores || [];
-      const ticketAssign = (assignments || []).filter(r => r.ticket_id === ticket.id);
       if (isPension) {
         const rawNo = ticket.no ?? ticket.pension_number ?? '';
         const number = rawNo ? String(rawNo).padStart(6, '0') : null;
         const jo = ticket.jo ?? ticket.pension_group ?? '-';
-        const pAssign = ticketAssign.find(r => r.game_index === 0);
-        const pStoreId = pAssign?.store_id || '';
-        const pStoreName = ticketStores.find(s => s.id === pStoreId)?.name || '판매점 지정';
-        const pStoreBtn = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',0,'${pStoreId}')">${pStoreName}</button>` : '';
-        allGameRows.push(`<div class="ticket-slip-game">
+        allGameRows.push(`<div class="ticket-slip-game" style="grid-template-columns:1fr;">
           <div style="display:flex;align-items:center;gap:6px;">
             <span style="background:#2fa85e;color:#fff;border-radius:4px;padding:3px 7px;font-size:13px;font-weight:900;white-space:nowrap;">${jo}조</span>
             <div style="display:flex;gap:3px;">${number ? number.split('').map(n=>`<span style="width:22px;height:28px;border:1px solid #9ad5ae;border-radius:4px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:11px;color:#64748b;">번호 미등록</span>'}</div>
           </div>
-          ${pStoreBtn}
         </div>`);
       } else {
         const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
-        games.forEach((nums, gi) => {
-          const assign = ticketAssign.find(r => r.game_index === gi);
-          const storeId = assign?.store_id || '';
-          const storeName = ticketStores.find(s => s.id === storeId)?.name || '판매점 지정';
-          const storeBtn = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${gi},'${storeId}')">${storeName}</button>` : '';
-          allGameRows.push(`<div class="ticket-slip-game"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeBtn}</div>`);
+        games.forEach((nums) => {
+          allGameRows.push(`<div class="ticket-slip-game" style="grid-template-columns:1fr;"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div></div>`);
         });
       }
     });
@@ -8770,6 +8759,15 @@ function renderProfile() {
 </body>
 </html>
                                                                                                     .</div>
+      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
+    </div>
+    `}
+  `;
+}
+</script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .</div>
       <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
     </div>
     `}
