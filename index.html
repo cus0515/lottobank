@@ -3121,9 +3121,8 @@ async function renderNumberHistory() {
       return s + (isPension ? 1 : g.length);
     }, 0);
 
-    // 게임 행(숫자만)과 판매점 버튼을 분리
+    // 게임 행 생성 (숫자 + 판매점 버튼 우측 정렬)
     const allGameRows = [];
-    const allStoreBtns = [];
     group.forEach(ticket => {
       const ticketStores = stores || [];
       const ticketAssign = (assignments || []).filter(r => r.ticket_id === ticket.id);
@@ -3134,39 +3133,33 @@ async function renderNumberHistory() {
         const pAssign = ticketAssign.find(r => r.game_index === 0);
         const pStoreId = pAssign?.store_id || '';
         const pStoreName = ticketStores.find(s => s.id === pStoreId)?.name || '판매점 지정';
-        allGameRows.push(`<div class="ticket-slip-game" style="grid-template-columns:1fr;">
+        const pStoreBtn = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',0,'${pStoreId}')">${pStoreName}</button>` : '';
+        allGameRows.push(`<div class="ticket-slip-game">
           <div style="display:flex;align-items:center;gap:6px;">
             <span style="background:#2fa85e;color:#fff;border-radius:4px;padding:3px 7px;font-size:13px;font-weight:900;white-space:nowrap;">${jo}조</span>
-            <div style="display:flex;gap:3px;">${number ? number.split('').map(n=>`<span style="width:24px;height:30px;border:1px solid #9ad5ae;border-radius:4px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:11px;color:#64748b;">번호 미등록</span>'}</div>
+            <div style="display:flex;gap:3px;">${number ? number.split('').map(n=>`<span style="width:22px;height:28px;border:1px solid #9ad5ae;border-radius:4px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:11px;color:#64748b;">번호 미등록</span>'}</div>
           </div>
+          ${pStoreBtn}
         </div>`);
-        allStoreBtns.push(ticket.id ? `<button class="store-picker-trigger" style="height:41px;" onclick="openStorePicker('${ticket.id}',0,'${pStoreId}')">${pStoreName}</button>` : '<span></span>');
       } else {
         const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
         games.forEach((nums, gi) => {
           const assign = ticketAssign.find(r => r.game_index === gi);
           const storeId = assign?.store_id || '';
           const storeName = ticketStores.find(s => s.id === storeId)?.name || '판매점 지정';
-          allGameRows.push(`<div class="ticket-slip-game" style="grid-template-columns:1fr;"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div></div>`);
-          allStoreBtns.push(ticket.id ? `<button class="store-picker-trigger" style="height:29px;" onclick="openStorePicker('${ticket.id}',${gi},'${storeId}')">${storeName}</button>` : '<span></span>');
+          const storeBtn = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${gi},'${storeId}')">${storeName}</button>` : '';
+          allGameRows.push(`<div class="ticket-slip-game"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeBtn}</div>`);
         });
       }
     });
 
-    const headerHtml = `<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid ${topColor};padding-bottom:8px;margin-bottom:6px;">
+    return `<div class="ticket-slip${isPension ? ' pension' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid ${topColor};padding-bottom:8px;margin-bottom:6px;">
         <div style="font-size:20px;font-weight:950;">${isPension ? '연금복권 <span style="color:#28a35b;">720+</span>' : '로또 <span style="color:var(--lotto-red);">6/45</span>'}</div>
         <b style="font-size:13px;">₩${(totalGames * 1000).toLocaleString()}</b>
       </div>
-      <div style="font-size:10px;color:#64748b;margin-bottom:6px;">제 ${first.round_no}회 · ${totalGames}게임</div>`;
-
-    return `<div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:10px;">
-      <div class="ticket-slip${isPension ? ' pension' : ''}" style="flex:1;min-width:0;">
-        ${headerHtml}
-        <div class="ticket-slip-games">${allGameRows.join('')}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:0;padding-top:${isPension ? 62 : 62}px;">
-        ${allStoreBtns.join('')}
-      </div>
+      <div style="font-size:10px;color:#64748b;margin-bottom:6px;">제 ${first.round_no}회 · ${totalGames}게임</div>
+      <div class="ticket-slip-games">${allGameRows.join('')}</div>
     </div>`;
   }).join('');
 }
@@ -8767,7 +8760,16 @@ function renderProfile() {
 </script>
 </body>
 </html>
-��필을 보려면 먼저 로그인하세요.</div>
+��필을 보려면 먼저 로그인하세요.</div>
+      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
+    </div>
+    `}
+  `;
+}
+</script>
+</body>
+</html>
+                                                                                                    .</div>
       <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
     </div>
     `}
