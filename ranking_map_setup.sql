@@ -21,6 +21,9 @@ alter table public.tickets
 alter table public.chat_messages
   add column if not exists monthly_badges jsonb not null default '[]'::jsonb;
 
+alter table public.profiles
+  add column if not exists selected_rank_badges jsonb not null default '[]'::jsonb;
+
 create table if not exists public.saved_number_sets (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
