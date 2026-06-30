@@ -3149,7 +3149,7 @@ async function renderNumberHistory() {
     group.forEach(ticket => {
       const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
       games.forEach(nums => {
-        lottoRows.push(`<div class="ticket-slip-game" style="grid-template-columns:1fr;"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div></div>`);
+        lottoRows.push(`<div class="ticket-slip-game" style="grid-template-columns:1fr;"><div class="ticket-slip-nums" style="justify-content:center;">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div></div>`);
       });
     });
     return `<div class="ticket-slip">
@@ -8780,13 +8780,16 @@ function renderProfile() {
       <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
     </div>
     `}
+ .</div>
+      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
+    </div>
+    `}
   `;
 }
 </script>
 </body>
 </html>
-                                                                                        .</div>
-      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
+rsor:pointer;font-family:inherit;">로그인 / 회원가입</button>
     </div>
     `}
   `;
