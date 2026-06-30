@@ -194,12 +194,12 @@ main.chat-hidden .chat-panel { display: none; }
 .header-user-meta { display:flex; flex-direction:column; align-items:flex-start; gap:1px; max-width:280px; overflow:visible; padding:3px 0; }
 #user-name { display:flex; align-items:center; max-width:280px; overflow:visible; white-space:nowrap; }
 .qr-inner-tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
-.qr-inner-tab { border:1px solid var(--border-dashed); border-radius:6px; background:var(--paper-white); color:var(--text-muted); padding:8px; font:800 12px inherit; cursor:pointer; }
+.qr-inner-tab { border:1.5px solid var(--border-dashed); border-radius:8px; background:var(--paper-white); color:var(--text-muted); padding:6px 0; font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; }
 .qr-inner-tab.on { border-color:var(--lotto-red); background:var(--lotto-red); color:#fff; }
 .ticket-slip { max-width:440px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
 .ticket-slip-games { display:grid; gap:0; }
-.ticket-slip-game { display:grid; grid-template-columns:24px 1fr; gap:8px; align-items:center; padding:5px 0; border-bottom:1px dashed #cbd5e1; }
+.ticket-slip-game { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; padding:5px 0; border-bottom:1px dashed #cbd5e1; }
 .ticket-slip-nums { display:flex; justify-content:space-between; gap:4px; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; }
 .ticket-history-filter { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
 .store-picker-backdrop { position:fixed; inset:0; z-index:1200; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(15,23,42,.58); }
@@ -350,7 +350,7 @@ main.chat-hidden .chat-panel { display: none; }
 .rank-tab-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
 .rank-tab-row::-webkit-scrollbar { display: none; }
 .rank-view-tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:12px; }
-.rank-view-btn { padding:9px 12px; border:1px solid var(--border-dashed); background:var(--paper-white); color:var(--text-muted); border-radius:7px; font:700 12px inherit; cursor:pointer; }
+.rank-view-btn { padding:6px 0; border:1.5px solid var(--border-dashed); background:var(--paper-white); color:var(--text-muted); border-radius:8px; font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; }
 .rank-view-btn.on { background:var(--text-dark); color:var(--paper-white); border-color:var(--text-dark); }
 .ranking-category-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; margin-bottom:12px; }
 .ranking-category-btn { min-height:54px; padding:7px 4px; border:1px solid var(--border-dashed); border-radius:7px; background:var(--paper-white); color:var(--text-muted); font:700 10px inherit; cursor:pointer; }
@@ -3105,6 +3105,7 @@ async function renderNumberHistory() {
     wrap.innerHTML = '<div style="padding:34px;text-align:center;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;color:var(--text-muted);font-size:12px;">저장된 번호가 없습니다.</div>';
     return;
   }
+  // 동일 복권종류 + 동일 회차 기준으로 묶기
   const grouped = filtered.reduce((map, ticket) => {
     const key = `${ticketLotteryType(ticket)}-${ticket.round_no || 0}`;
     (map[key] ||= []).push(ticket);
@@ -3113,17 +3114,48 @@ async function renderNumberHistory() {
   wrap.innerHTML = Object.values(grouped).map(group => {
     const first = group[0];
     const isPension = ticketLotteryType(first) === 'pension';
-    return `<section style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-        <b style="font-size:12px;color:var(--text-dark);">${isPension?'연금복권 720+':'로또 6/45'} · 제 ${first.round_no}회</b>
-        <span style="font-size:10px;color:var(--text-muted);">${group.length}장</span>
+    const typeLbl = isPension ? '연금복권 720+' : '로또 6/45';
+    const topColor = isPension ? '#2f8550' : '#111827';
+    const totalGames = group.reduce((s, t) => {
+      const g = t.game_numbers?.length ? t.game_numbers : (t.numbers?.length ? [t.numbers] : []);
+      return s + (isPension ? 1 : g.length);
+    }, 0);
+
+    // 모든 게임을 하나의 평탄한 리스트로 합치기
+    const allGameRows = [];
+    group.forEach(ticket => {
+      const ticketStores = stores || [];
+      const ticketAssign = (assignments || []).filter(r => r.ticket_id === ticket.id);
+      if (isPension) {
+        const rawNo = ticket.no ?? ticket.pension_number ?? '';
+        const number = rawNo ? String(rawNo).padStart(6, '0') : null;
+        const jo = ticket.jo ?? ticket.pension_group ?? '-';
+        allGameRows.push(`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px dashed #e2e8f0;">
+          <span style="background:#2fa85e;color:#fff;border-radius:4px;padding:4px 7px;font-size:13px;font-weight:900;">${jo}조</span>
+          ${number ? number.split('').map(n=>`<span style="width:24px;height:30px;border:1px solid #9ad5ae;border-radius:4px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:11px;color:#64748b;">번호 미등록</span>'}
+        </div>`);
+      } else {
+        const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
+        games.forEach((nums, gi) => {
+          const assign = ticketAssign.find(r => r.game_index === gi);
+          const storeId = assign?.store_id || '';
+          const storeName = ticketStores.find(s => s.id === storeId)?.name || '판매점 지정';
+          const storeBtn = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${gi},'${storeId}')">${storeName}</button>` : '';
+          allGameRows.push(`<div class="ticket-slip-game"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeBtn}</div>`);
+        });
+      }
+    });
+
+    return `<div class="ticket-slip${isPension ? ' pension' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid ${topColor};padding-bottom:8px;margin-bottom:10px;">
+        <div>
+          <div style="font-size:18px;font-weight:950;">${isPension ? '연금복권 <span style="color:#28a35b;">720+</span>' : '로또 <span style="color:var(--lotto-red);">6/45</span>'}</div>
+          <div style="font-size:10px;color:#64748b;">제 ${first.round_no}회 · ${totalGames}게임</div>
+        </div>
+        <b style="font-size:13px;">₩${(totalGames*1000).toLocaleString()}</b>
       </div>
-      ${group.map(ticket => renderTicketSlip({
-        ...ticket,
-        storeOptions:stores || [],
-        storeAssignments:(assignments || []).filter(row => row.ticket_id === ticket.id),
-      })).join('')}
-    </section>`;
+      <div class="ticket-slip-games">${allGameRows.join('')}</div>
+    </div>`;
   }).join('');
 }
 
@@ -3165,7 +3197,7 @@ function renderTicketSlip(ticket) {
       const selectedStore = assignment?.store_id || '';
       const storeName = ticket.storeOptions?.find(store => store.id === selectedStore)?.name || '판매점 지정';
       const storeButton = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${index},'${selectedStore}')">${storeName}</button>` : '';
-      return `<div class="ticket-slip-game" style="grid-template-columns:24px minmax(0,1fr) auto;"><b>${String.fromCharCode(65+index)}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeButton}</div>`;
+      return `<div class="ticket-slip-game" style="grid-template-columns:minmax(0,1fr) auto;"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeButton}</div>`;
     }).join('')}</div>
   </div>`;
 }
@@ -4602,7 +4634,7 @@ function go(id) {
   });
   const titles = {
     home:      '실시간 피드',
-    result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font:800 12px inherit;cursor:pointer;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font:800 12px inherit;cursor:pointer;transition:all .15s;">연금복권 720+</button>' + '</div>',
+    result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="qr-tab-register" class="qr-inner-tab on" onclick="switchQrView(\'register\')">QR 인증</button><button id="qr-tab-history" class="qr-inner-tab" onclick="switchQrView(\'history\')">번호 이력</button></div>',
     fortune:   '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 실시간 당첨 인증 피드',
     stats:     '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="stats-tab-all" class="qr-inner-tab on" onclick="setStatsLotteryMode(\'all\')">Total</button><button id="stats-tab-lotto" class="qr-inner-tab" onclick="setStatsLotteryMode(\'lotto\')">로또</button><button id="stats-tab-pension" class="qr-inner-tab" onclick="setStatsLotteryMode(\'pension\')">연금</button></div>',
@@ -8723,6 +8755,4 @@ function renderProfile() {
     `}
   `;
 }
-</script>
-</body>
-</html>
+</

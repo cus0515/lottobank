@@ -177,6 +177,8 @@ alter table public.tickets
   add column if not exists store_address text,
   add column if not exists store_lat double precision,
   add column if not exists store_lng double precision;
+
+alter table public.tickets alter column purchase_channel set default 'unknown';
 alter table public.chat_messages add column if not exists verified_title text;
 
 create index if not exists idx_tickets_user_round on public.tickets (user_id, round_no desc);

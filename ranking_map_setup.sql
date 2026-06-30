@@ -246,6 +246,4 @@ $$;
 drop trigger if exists refresh_monthly_rankings_on_ticket on public.tickets;
 create trigger refresh_monthly_rankings_on_ticket
   after insert or update or delete on public.tickets
-  for each statement execute function public.refresh_monthly_rankings_after_ticket();
-
-grant execute on function public.refresh_monthly_rankings() to authenticated;
+  for each statement execute function public.refresh
