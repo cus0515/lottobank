@@ -125,13 +125,10 @@
     <div class="tabs">
       <button class="tab-btn on" onclick="switchTab('users')">👤 유저</button>
       <button class="tab-btn" onclick="switchTab('tickets')">🎫 티켓</button>
-      <button class="tab-btn" onclick="switchTab('posts')">📝 게시글</button>
-      <button class="tab-btn" onclick="switchTab('comments')">💬 댓글</button>
       <button class="tab-btn" onclick="switchTab('chat')">🗨️ 채팅</button>
       <button class="tab-btn" onclick="switchTab('stats')">📊 전적</button>
-      <button class="tab-btn" onclick="switchTab('data')">전체 데이터</button>
-      <button class="tab-btn" onclick="switchTab('insert')">직접 입력</button>
-      <button class="tab-btn" onclick="switchTab('verify')">기능 검증</button>
+      <button class="tab-btn" onclick="switchTab('insert')">✏️ 직접 입력</button>
+      <button class="tab-btn" onclick="switchTab('verify')">🔬 기능 검증</button>
     </div>
 
     <div id="table-area"></div>
@@ -451,14 +448,16 @@ function renderInsertForms() {
 
       <!-- 로또 전용: 다중 게임 -->
       <div id="ins-lotto-section">
-        <div style="display:flex;align-items:center;gap:8px;margin:10px 0 6px;">
-          <span style="font-size:11px;font-weight:800;">번호 입력 (게임당 6개, 1~45)</span>
+        <div style="display:flex;align-items:center;gap:8px;margin:10px 0 6px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:800;">번호 입력 (비워두면 자동 랜덤)</span>
           <button onclick="addLottoGameRow()" style="padding:3px 10px;border-radius:5px;border:1px solid #dc2626;background:none;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;">+ 게임 추가</button>
+          <button onclick="fillAllRandom()" style="padding:3px 10px;border-radius:5px;border:1px solid #6366f1;background:#6366f1;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">🎲 전체 랜덤</button>
         </div>
         <div id="ins-lotto-games">
           <div class="ins-game-row" style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
             <span style="font-size:11px;font-weight:700;width:16px;color:var(--muted);">A</span>
-            <input class="form-input" placeholder="1, 7, 12, 23, 34, 45" style="flex:1;margin:0;">
+            <input class="form-input" placeholder="비우면 랜덤 자동 입력" style="flex:1;margin:0;">
+            <button onclick="fillRowRandom(this)" title="랜덤" style="border:none;background:#6366f1;color:#fff;border-radius:4px;padding:3px 7px;font-size:11px;cursor:pointer;">🎲</button>
             <button onclick="this.parentElement.remove()" style="border:none;background:none;color:#94a3b8;font-size:16px;cursor:pointer;padding:0 4px;">×</button>
           </div>
         </div>
@@ -466,29 +465,20 @@ function renderInsertForms() {
 
       <!-- 연금복권 전용 필드 -->
       <div id="ins-pension-section" style="display:none;">
-        <div class="form-grid" style="margin-top:10px;">
-          <div><label class="form-label">조 (1~5)</label><input class="form-input" id="ins-pension-jo" type="number" min="1" max="5" placeholder="예: 2"></div>
-          <div><label class="form-label">번호 (6자리)</label><input class="form-input" id="ins-pension-no" placeholder="예: 034521" maxlength="6"></div>
+        <div style="display:flex;align-items:center;gap:8px;margin:10px 0 6px;">
+          <span style="font-size:11px;font-weight:800;">조/번호 (비워두면 랜덤)</span>
+          <button onclick="fillPensionRandom()" style="padding:3px 10px;border-radius:5px;border:1px solid #6366f1;background:#6366f1;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">🎲 랜덤</button>
+        </div>
+        <div class="form-grid">
+          <div><label class="form-label">조 (1~5, 빈칸=랜덤)</label><input class="form-input" id="ins-pension-jo" type="number" min="1" max="5" placeholder="랜덤"></div>
+          <div><label class="form-label">번호 6자리 (빈칸=랜덤)</label><input class="form-input" id="ins-pension-no" placeholder="랜덤" maxlength="6"></div>
         </div>
       </div>
 
       <div class="form-actions"><button class="btn-save" onclick="insertTicket()">티켓 저장</button></div>
       <div class="form-result" id="ins-ticket-result"></div>
     </div>
-    <div class="admin-form">
-      <div class="table-title" style="margin-bottom:14px;">전적 수동 입력</div>
-      <div class="form-grid">
-        <div><label class="form-label">회원 닉네임</label><input class="form-input" id="ins-stat-nick" placeholder="닉네임"></div>
-        <div><label class="form-label">총 게임</label><input class="form-input" id="ins-stat-tickets" type="number" min="0" value="0"></div>
-        <div><label class="form-label">총 구매금액</label><input class="form-input" id="ins-stat-spent" type="number" min="0" value="0"></div>
-        <div><label class="form-label">총 당첨금</label><input class="form-input" id="ins-stat-prize" type="number" min="0" value="0"></div>
-        <div><label class="form-label">당첨 횟수</label><input class="form-input" id="ins-stat-wins" type="number" min="0" value="0"></div>
-        <div><label class="form-label">최고 등수</label><input class="form-input" id="ins-stat-best" type="number" min="1" max="5"></div>
-      </div>
-      <div class="form-actions"><button class="btn-save" onclick="upsertStats()">전적 저장</button></div>
-      <div class="form-result" id="ins-stat-result"></div>
-    </div>`;
-}
+    
 
 // ── 시나리오 정의 ──────────────────────────────────────────────
 const VERIFY_SCENARIOS = [
@@ -821,6 +811,27 @@ function switchInsertType(t) {
   }
 }
 const _gameLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+function _randLotto() {
+  const pool = Array.from({length:45},(_,i)=>i+1);
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  return pool.slice(0,6).sort((a,b)=>a-b).join(', ');
+}
+function fillRowRandom(btn) {
+  const inp = btn.parentElement.querySelector('input');
+  if (inp) inp.value = _randLotto();
+}
+function fillAllRandom() {
+  document.querySelectorAll('#ins-lotto-games .ins-game-row input').forEach(inp => { inp.value = _randLotto(); });
+}
+function fillPensionRandom() {
+  const jo = Math.floor(Math.random()*5)+1;
+  const no = String(Math.floor(Math.random()*1000000)).padStart(6,'0');
+  const joEl = document.getElementById('ins-pension-jo');
+  const noEl = document.getElementById('ins-pension-no');
+  if(joEl) joEl.value = jo;
+  if(noEl) noEl.value = no;
+}
 function addLottoGameRow() {
   const box = document.getElementById('ins-lotto-games');
   const idx = box.children.length;
@@ -829,7 +840,8 @@ function addLottoGameRow() {
   row.className = 'ins-game-row';
   row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:5px;';
   row.innerHTML = `<span style="font-size:11px;font-weight:700;width:16px;color:var(--muted);">${_gameLabels[idx]}</span>
-    <input class="form-input" placeholder="1, 7, 12, 23, 34, 45" style="flex:1;margin:0;">
+    <input class="form-input" placeholder="비우면 랜덤 자동 입력" style="flex:1;margin:0;">
+    <button onclick="fillRowRandom(this)" title="랜덤" style="border:none;background:#6366f1;color:#fff;border-radius:4px;padding:3px 7px;font-size:11px;cursor:pointer;">🎲</button>
     <button onclick="this.parentElement.remove()" style="border:none;background:none;color:#94a3b8;font-size:16px;cursor:pointer;padding:0 4px;">×</button>`;
   box.appendChild(row);
 }
@@ -847,9 +859,11 @@ async function insertTicket() {
 
     if (_insType === 'pension') {
       // 연금복권 단건 저장
-      const jo = Number(document.getElementById('ins-pension-jo').value);
-      const no = document.getElementById('ins-pension-no').value.trim();
-      if (!jo || jo < 1 || jo > 5) throw new Error('조는 1~5 사이 숫자를 입력하세요.');
+      const joRaw = document.getElementById('ins-pension-jo').value.trim();
+      const noRaw = document.getElementById('ins-pension-no').value.trim();
+      const jo = joRaw ? Number(joRaw) : Math.floor(Math.random()*5)+1;
+      const no = noRaw || String(Math.floor(Math.random()*1000000)).padStart(6,'0');
+      if (jo < 1 || jo > 5) throw new Error('조는 1~5 사이 숫자를 입력하세요.');
       if (!/^\d{6}$/.test(no)) throw new Error('번호는 6자리 숫자를 입력하세요.');
       const payload = {
         user_id: userId,
@@ -869,17 +883,23 @@ async function insertTicket() {
       if (error) throw error;
       result.style.color='var(--green)'; result.textContent='연금복권 티켓 저장 완료.';
     } else {
-      // 로또: 다중 게임 저장
+      // 로또: 다중 게임 저장 (빈칸 → 랜덤)
       const rows = document.querySelectorAll('#ins-lotto-games .ins-game-row');
       const allGames = [];
       for (const row of rows) {
         const inp = row.querySelector('input');
-        if (!inp.value.trim()) continue;
-        const nums = inp.value.split(',').map(v=>Number(v.trim())).filter(n=>Number.isInteger(n)&&n>=1&&n<=45);
-        if (nums.length !== 6 || new Set(nums).size !== 6) throw new Error(`번호가 잘못되었습니다: "${inp.value}" (중복없는 6개, 1~45)`);
-        allGames.push(nums.sort((a,b)=>a-b));
+        if (!inp.value.trim()) {
+          // 빈칸이면 랜덤 생성
+          const pool = Array.from({length:45},(_,i)=>i+1);
+          for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+          allGames.push(pool.slice(0,6).sort((a,b)=>a-b));
+        } else {
+          const nums = inp.value.split(',').map(v=>Number(v.trim())).filter(n=>Number.isInteger(n)&&n>=1&&n<=45);
+          if (nums.length !== 6 || new Set(nums).size !== 6) throw new Error(`번호가 잘못되었습니다: "${inp.value}" (중복없는 6개, 1~45)`);
+          allGames.push(nums.sort((a,b)=>a-b));
+        }
       }
-      if (!allGames.length) throw new Error('번호를 최소 1게임 입력하세요.');
+      if (!allGames.length) throw new Error('게임 행을 최소 1개 추가하세요.');
       const payload = {
         user_id: userId,
         qr_url: `admin://manual/${crypto.randomUUID()}`,

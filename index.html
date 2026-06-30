@@ -3212,21 +3212,48 @@ async function searchStorePicker() {
     $('store-picker-list').innerHTML = '<div style="padding:16px 10px;text-align:center;color:var(--text-muted);font-size:12px;">2자 이상 입력하세요.</div>';
     return;
   }
-  $('store-picker-list').innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;">검색 중...</div>';
+  $('store-picker-list').innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;">🔍 검색 중...</div>';
   try {
     const res = await fetch(`/api/store-search?q=${encodeURIComponent(query)}`);
     const data = await res.json();
     const stores = data.stores || [];
-    // 검색 결과를 내부 옵션에 병합
-    stores.forEach(s => {
-      if (s.id && !(window._lotteryStoreOptions||[]).find(x=>x.id===s.id)) {
-        (window._lotteryStoreOptions = window._lotteryStoreOptions||[]).push(s);
-      }
-    });
-    renderStorePickerList(stores);
+    if (stores.length) {
+      stores.forEach(s => {
+        if (s.id && !(window._lotteryStoreOptions||[]).find(x=>x.id===s.id))
+          (window._lotteryStoreOptions = window._lotteryStoreOptions||[]).push(s);
+      });
+      renderStorePickerList(stores);
+    } else {
+      // API 결과 없으면 수동 입력 UI 제공
+      showStoreManualEntry(query);
+    }
   } catch(e) {
-    $('store-picker-list').innerHTML = `<div style="padding:16px 10px;text-align:center;color:var(--text-muted);font-size:12px;">검색 실패: ${e.message}</div>`;
+    showStoreManualEntry(query);
   }
+}
+
+function showStoreManualEntry(prefill) {
+  const list = $('store-picker-list');
+  if (!list) return;
+  list.innerHTML = `
+    <div style="padding:12px;border-bottom:1px solid var(--border-dashed);">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">검색 결과가 없습니다. 판매점 정보를 직접 입력하세요.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <input id="manual-store-name" class="store-picker-search" placeholder="판매점명 (예: GS25 강남점)" style="margin:0;" value="${prefill||''}">
+        <input id="manual-store-addr" class="store-picker-search" placeholder="주소 (예: 서울 강남구 테헤란로 123)" style="margin:0;">
+        <button onclick="addManualStore()" style="padding:8px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">이 판매점으로 지정</button>
+      </div>
+    </div>`;
+}
+
+async function addManualStore() {
+  const name = ($('manual-store-name')?.value || '').trim();
+  const addr = ($('manual-store-addr')?.value || '').trim();
+  if (!name) { toast('판매점명을 입력하세요.'); return; }
+  const id = 'manual_' + Date.now();
+  const store = { id, name, address: addr, region: '', lat: null, lng: null };
+  (window._lotteryStoreOptions = window._lotteryStoreOptions||[]).push(store);
+  await selectStorePicker(id);
 }
 
 function filterStorePicker(value) {
@@ -8539,7 +8566,21 @@ async function toggleProfileRankBadge(id) {
     const { error: chatBadgeError } = await sb.from('chat_messages')
       .update({ monthly_badges:selected })
       .eq('user_id', currentUser.id);
-    if (!chatBadgeError) loadRecentChats();
+    if (!chatBadgeError) {
+      // 채팅 전체 리로드 대신 현재 유저 행만 DOM 업데이트
+      const chatBox = $('chat-box');
+      if (chatBox && currentUser) {
+        chatBox.querySelectorAll('.chat-row').forEach(row => {
+          const identDiv = row.querySelector('.chat-identity');
+          if (identDiv && identDiv.textContent.includes(currentNickname())) {
+            const newBadgeHtml = window._systemRankTitle ? getChatBadgeHtml(window._systemRankTitle) : '';
+            const monthlyHtml = getMonthlyRankBadgesHtml(selected);
+            const nickEl = identDiv.querySelector('.chat-user');
+            if (nickEl) identDiv.innerHTML = newBadgeHtml + monthlyHtml + nickEl.outerHTML;
+          }
+        });
+      }
+    }
   }
   window._rankBadgePickerOpen = true;
   updateHeaderUser(currentNickname(), window._systemRankTitle || myVerifiedTitle || '');
