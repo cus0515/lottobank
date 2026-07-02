@@ -199,9 +199,9 @@ main.chat-hidden .chat-panel { display: none; }
 .ticket-slip { max-width:440px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
 .ticket-slip-games { display:grid; gap:0; }
-.ticket-slip-game { display:grid; grid-template-columns:20px minmax(0,1fr) 88px; gap:8px; align-items:center; padding:5px 0; border-bottom:1px dashed #cbd5e1; }
+.ticket-slip-game { display:grid; grid-template-columns:20px minmax(0,1fr) 84px; gap:10px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
 .ticket-game-label { font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace; color:#111827; text-align:left; }
-.ticket-slip-nums { display:flex; justify-content:space-between; gap:4px; min-width:0; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ticket-slip-nums { display:grid; grid-template-columns:repeat(6,minmax(24px,1fr)); gap:7px; min-width:0; text-align:center; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; font-variant-numeric:tabular-nums; }
 .pension-ticket-row { display:grid; grid-template-columns:minmax(0,1fr) 88px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
 .pension-ticket-numbers { display:flex; justify-content:center; align-items:center; gap:7px; min-width:0; }
 .pension-number-ball { width:27px; height:34px; border:1px solid #9ad5ae; border-radius:5px; background:#e9f7ed; display:inline-flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; }
@@ -213,7 +213,7 @@ main.chat-hidden .chat-panel { display: none; }
 .store-picker-list { overflow-y:auto; padding:0 12px 12px; }
 .store-picker-item { width:100%; display:block; padding:10px 12px; border:0; border-bottom:1px solid var(--border-dashed); background:transparent; color:var(--text-dark); text-align:left; cursor:pointer; font-family:inherit; }
 .store-picker-item:hover { background:var(--bg-light); }
-.store-picker-trigger { width:88px; max-width:88px; min-height:24px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid #cbd5e1; border-radius:4px; background:#f8fafc; color:#475569; padding:3px 6px; font:700 9px inherit; cursor:pointer; }
+.store-picker-trigger { width:84px; max-width:84px; min-height:26px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid #cbd5e1; border-radius:4px; background:#f8fafc; color:#475569; padding:4px 6px; font:700 9px inherit; cursor:pointer; }
 .saved-number-form { display:grid; grid-template-columns:100px 90px 1fr auto; gap:6px; }
 [data-theme="dark"] .monthly-rank-badge { background:#3a2d08; border-color:#9a741d; color:#fde68a; }
 [data-theme="dark"] .profile-featured-badges { background:rgba(58,45,8,.55); border-color:#9a741d; }
@@ -366,7 +366,7 @@ main.chat-hidden .chat-panel { display: none; }
 .hall-card.silver { border:1px solid #cbd5e1; box-shadow:0 0 8px rgba(148,163,184,.3), inset 0 0 8px rgba(148,163,184,.08); }
 .map-frame { width:100%; height:320px; border:0; display:block; background:var(--bg-light); }
 @media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}#qr-purchase-meta{grid-template-columns:1fr!important;}}
-@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:16px minmax(0,1fr) 78px;gap:6px}.ticket-slip-nums,.ticket-game-label{font-size:11px}.store-picker-trigger{width:78px;max-width:78px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 78px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
+@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:16px minmax(0,1fr) 74px;gap:6px;min-height:36px;padding:6px 0}.ticket-slip-nums{grid-template-columns:repeat(6,minmax(20px,1fr));gap:3px}.ticket-slip-nums,.ticket-game-label{font-size:11px}.store-picker-trigger{width:74px;max-width:74px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 74px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
 .rank-tab-pill { display:inline-block;padding:5px 14px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;margin-right:4px;white-space:nowrap; }
 .rank-tab-pill.on { background:var(--lotto-red);color:#fff;border-color:var(--lotto-red);box-shadow:0 2px 8px rgba(225,29,72,.3); }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
