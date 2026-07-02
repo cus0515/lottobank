@@ -1,4 +1,4 @@
-// 판매점 검색: Kakao Local → 동행복권 → OpenStreetMap 순으로 시도
+// 판매점 검색을 Kakao Local과 동행복권 데이터로 제공한다.
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const query = (url.searchParams.get('q') || '').trim();
@@ -16,7 +16,8 @@ export async function onRequest(context) {
   const kakaoKey = context.env?.KAKAO_REST_API_KEY;
   if (kakaoKey) {
     try {
-      const kakaoUrl = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(query + ' 로또')}&size=15&sort=accuracy`;
+      const keyword = /로또|복권/.test(query) ? query : `${query} 복권`;
+      const kakaoUrl = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(keyword)}&size=15&sort=accuracy`;
       const r = await fetch(kakaoUrl, {
         headers: { Authorization: `KakaoAK ${kakaoKey}` },
         signal: AbortSignal.timeout(6000),
@@ -74,35 +75,6 @@ export async function onRequest(context) {
       }
     } catch (_) { /* try next */ }
   }
-
-  // ── 3. OpenStreetMap Nominatim (무료, 키 불필요) ──────────────
-  // 한국 로또 판매점은 OSM에 별도 태그가 없으므로
-  // 키워드를 그대로 검색해 지명/주소 기반 결과를 반환
-  try {
-    const osmQ = encodeURIComponent(query);
-    const osmUrl = `https://nominatim.openstreetmap.org/search?q=${osmQ}&format=json&countrycodes=kr&limit=10&addressdetails=1`;
-    const r = await fetch(osmUrl, {
-      headers: { 'User-Agent': 'LottoBankApp/1.0 (lottobank.pages.dev)', 'Accept-Language': 'ko' },
-      signal: AbortSignal.timeout(7000),
-    });
-    if (r.ok) {
-      const items = await r.json();
-      if (Array.isArray(items) && items.length > 0) {
-        const stores = items.map(item => {
-          const nameParts = item.display_name.split(',');
-          return {
-            id: 'osm_' + item.osm_id,
-            name: nameParts[0].trim(),
-            address: [item.address?.road, item.address?.quarter || item.address?.suburb, item.address?.city || item.address?.county].filter(Boolean).join(' '),
-            region: [item.address?.province || item.address?.state, item.address?.city || item.address?.county].filter(Boolean).join(' '),
-            lat: parseFloat(item.lat) || null,
-            lng: parseFloat(item.lon) || null,
-          };
-        }).filter(s => s.name);
-        return new Response(JSON.stringify({ stores, source: 'osm' }), { headers: cors });
-      }
-    }
-  } catch (_) { /* fall through */ }
 
   return new Response(JSON.stringify({ stores: [], source: 'none' }), { headers: cors });
 }
