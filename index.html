@@ -199,8 +199,12 @@ main.chat-hidden .chat-panel { display: none; }
 .ticket-slip { max-width:440px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
 .ticket-slip-games { display:grid; gap:0; }
-.ticket-slip-game { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; padding:5px 0; border-bottom:1px dashed #cbd5e1; }
-.ticket-slip-nums { display:flex; justify-content:space-between; gap:4px; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ticket-slip-game { display:grid; grid-template-columns:20px minmax(0,1fr) 88px; gap:8px; align-items:center; padding:5px 0; border-bottom:1px dashed #cbd5e1; }
+.ticket-game-label { font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace; color:#111827; text-align:left; }
+.ticket-slip-nums { display:flex; justify-content:space-between; gap:4px; min-width:0; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; }
+.pension-ticket-row { display:grid; grid-template-columns:minmax(0,1fr) 88px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
+.pension-ticket-numbers { display:flex; justify-content:center; align-items:center; gap:7px; min-width:0; }
+.pension-number-ball { width:27px; height:34px; border:1px solid #9ad5ae; border-radius:5px; background:#e9f7ed; display:inline-flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; }
 .ticket-history-filter { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
 .store-picker-backdrop { position:fixed; inset:0; z-index:1200; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(15,23,42,.58); }
 .store-picker { width:min(520px,100%); max-height:min(620px,85vh); display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--border-dashed); border-radius:10px; background:var(--paper-white); box-shadow:0 18px 55px rgba(15,23,42,.28); }
@@ -362,7 +366,7 @@ main.chat-hidden .chat-panel { display: none; }
 .hall-card.silver { border:1px solid #cbd5e1; box-shadow:0 0 8px rgba(148,163,184,.3), inset 0 0 8px rgba(148,163,184,.08); }
 .map-frame { width:100%; height:320px; border:0; display:block; background:var(--bg-light); }
 @media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}#qr-purchase-meta{grid-template-columns:1fr!important;}}
-@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-nums{font-size:12px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
+@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:16px minmax(0,1fr) 78px;gap:6px}.ticket-slip-nums,.ticket-game-label{font-size:11px}.store-picker-trigger{width:78px;max-width:78px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 78px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
 .rank-tab-pill { display:inline-block;padding:5px 14px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;margin-right:4px;white-space:nowrap; }
 .rank-tab-pill.on { background:var(--lotto-red);color:#fff;border-color:var(--lotto-red);box-shadow:0 2px 8px rgba(225,29,72,.3); }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
@@ -3131,11 +3135,11 @@ async function renderNumberHistory() {
         const ticketAssign = (assignments||[]).filter(r=>r.ticket_id===ticket.id);
         const pa = ticketAssign.find(r=>r.game_index===0);
         const ps = pa?.store_id||''; const pn=(stores||[]).find(s=>s.id===ps)?.name||'판매점 지정';
-        const pBtn = ticket.id?`<div style="text-align:right;margin-top:6px;"><button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',0,'${ps}')">${pn}</button></div>`:'';
-        return `<div style="padding:10px 0;border-bottom:1px dashed #86b998;">
-          <div style="display:flex;justify-content:center;align-items:center;gap:7px;">
+        const pBtn = ticket.id?`<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',0,'${ps}')">${pn}</button>`:'<span></span>';
+        return `<div class="pension-ticket-row">
+          <div class="pension-ticket-numbers">
             <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${jo}조</span>
-            ${number ? number.split('').map(n=>`<span style="width:27px;height:34px;border:1px solid #9ad5ae;border-radius:5px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:12px;color:#64748b;padding:0 8px;">번호 미등록</span>'}
+            ${number ? number.split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('') : '<span style="font-size:12px;color:#64748b;padding:0 8px;">번호 미등록</span>'}
           </div>
           ${pBtn}
         </div>`;
@@ -3152,6 +3156,7 @@ async function renderNumberHistory() {
 
     // 로또
     const lottoRows = [];
+    let lottoGameIndex = 0;
     group.forEach(ticket => {
       const ticketAssign = (assignments||[]).filter(r=>r.ticket_id===ticket.id);
       const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
@@ -3160,7 +3165,8 @@ async function renderNumberHistory() {
         const storeId = assign?.store_id||'';
         const storeName = (stores||[]).find(s=>s.id===storeId)?.name||'판매점 지정';
         const storeBtn = ticket.id?`<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${gi},'${storeId}')">${storeName}</button>`:'';
-        lottoRows.push(`<div class="ticket-slip-game"><div class="ticket-slip-nums" style="justify-content:center;">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeBtn}</div>`);
+        const gameLabel = String.fromCharCode(65 + (lottoGameIndex++ % 26));
+        lottoRows.push(`<div class="ticket-slip-game"><b class="ticket-game-label">${gameLabel}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeBtn}</div>`);
       });
     });
     return `<div class="ticket-slip">
@@ -3180,6 +3186,10 @@ function renderTicketSlip(ticket) {
     const round = ticket.round ?? ticket.round_no ?? '-';
     const group = ticket.jo ?? ticket.pension_group ?? '-';
     const rawNo = ticket.no ?? ticket.pension_number ?? ''; const number = rawNo ? String(rawNo).padStart(6, '0') : null;
+    const pensionAssignment = (ticket.storeAssignments||[]).find(row => row.game_index === 0);
+    const pensionStoreId = pensionAssignment?.store_id || '';
+    const pensionStoreName = (ticket.storeOptions||[]).find(store => store.id === pensionStoreId)?.name || '판매점 지정';
+    const pensionStoreButton = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',0,'${pensionStoreId}')">${pensionStoreName}</button>` : '<span></span>';
     return `<div class="ticket-slip pension">
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2f8550;padding-bottom:8px;">
         <div><div style="font-size:20px;font-weight:950;">연금복권 <span style="color:#28a35b;">720+</span></div><div style="font-size:10px;color:#64748b;">복권기금은 건전한 복권문화를 지원합니다.</div></div>
@@ -3187,16 +3197,18 @@ function renderTicketSlip(ticket) {
       </div>
       <div style="padding:16px 0;text-align:center;">
         <div style="font-size:11px;color:#64748b;margin-bottom:7px;">제 ${round}회</div>
-        <div style="display:flex;justify-content:center;align-items:center;gap:7px;">
-          <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${group}조</span>
-          ${number ? number.split('').map(n=>`<span style="width:27px;height:34px;border:1px solid #9ad5ae;border-radius:5px;background:#e9f7ed;display:inline-flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;">${n}</span>`).join('') : '<span style="font-size:12px;color:#64748b;padding:0 8px;">번호 미등록</span>'}
+        <div class="pension-ticket-row" style="border-bottom:0;padding:0;">
+          <div class="pension-ticket-numbers">
+            <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${group}조</span>
+            ${number ? number.split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('') : '<span style="font-size:12px;color:#64748b;padding:0 8px;">번호 미등록</span>'}
+          </div>
+          ${pensionStoreButton}
         </div>
       </div>
       <div style="border-top:1px dashed #86b998;padding-top:7px;font-size:10px;color:#64748b;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:${ticket.id?'5px':'0'};">
+        <div style="display:flex;justify-content:space-between;">
           <span>QR 인증 번호</span><span>${ticket.serialMeta || ticket.serial_meta || '-'}</span>
         </div>
-        ${ticket.id ? (() => { const pa = (ticket.storeAssignments||[]).find(r=>r.game_index===0); const ps = pa?.store_id||''; const pn = (ticket.storeOptions||[]).find(s=>s.id===ps)?.name||'판매점 지정'; return `<div style="text-align:right;"><button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',0,'${ps}')">${pn}</button></div>`; })() : ''}
       </div>
     </div>`;
   }
@@ -3211,7 +3223,7 @@ function renderTicketSlip(ticket) {
       const selectedStore = assignment?.store_id || '';
       const storeName = ticket.storeOptions?.find(store => store.id === selectedStore)?.name || '판매점 지정';
       const storeButton = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${index},'${selectedStore}')">${storeName}</button>` : '';
-      return `<div class="ticket-slip-game" style="grid-template-columns:minmax(0,1fr) auto;"><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeButton}</div>`;
+      return `<div class="ticket-slip-game"><b class="ticket-game-label">${String.fromCharCode(65+(index%26))}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeButton}</div>`;
     }).join('')}</div>
   </div>`;
 }
