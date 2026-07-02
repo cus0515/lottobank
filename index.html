@@ -382,7 +382,6 @@ main.chat-hidden .chat-panel { display: none; }
 @media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:16px minmax(0,1fr) 74px;gap:6px;min-height:36px;padding:6px 0}.ticket-slip-nums{grid-template-columns:repeat(6,minmax(20px,1fr));gap:3px}.ticket-slip-nums,.ticket-game-label{font-size:11px}.store-picker-trigger{width:74px;max-width:74px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 74px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
 @media(max-width:700px){.stats-login-notice{grid-template-columns:1fr auto}.stats-login-notice span{grid-column:1/-1;grid-row:2}.stats-share-btn span{display:none}.stats-share-btn{width:30px;justify-content:center;padding:5px}.stats-section-head{margin-top:2px}.stats-kpi-grid{grid-template-columns:1fr 1fr}}
 .rank-tab-pill { display:inline-block;padding:5px 14px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;margin-right:4px;white-space:nowrap; }
-.rank-tab-pill.on { background:var(--lotto-red);color:#fff;border-color:var(--lotto-red);box-shadow:0 2px 8px rgba(225,29,72,.3); }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
 .rank-tab-pill:hover:not(.on) { background:var(--bg-light); border-color:#cbd5e1; color:var(--text-dark); }
 .rank-board-table { width: 100%; border-collapse: collapse; background:var(--paper-white);border:1px solid var(--border-dashed); border-radius: 12px; overflow: hidden; box-shadow:var(--shadow-sm); }
@@ -3256,7 +3255,7 @@ function openStorePicker(ticketId, gameIndex, selectedStoreId) {
         <input id="store-picker-search" class="store-picker-search" type="search" placeholder="판매점명 또는 주소 검색" style="flex:1;margin:0;" oninput="filterStorePicker(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();searchStorePicker()}">
         <button onclick="searchStorePicker()" style="padding:0 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">검색</button>
       </div>
-      <div style="font-size:10px;color:var(--text-muted);margin-top:5px;">예: 천안시 서북구, 행운복권, GS25 역삼점</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:5px;">예: 행운복권, GS25 역삼점, 불당동</div>
     </div>
     <div id="store-picker-list" class="store-picker-list"></div>
   </div>`;
@@ -3273,6 +3272,7 @@ function openStorePicker(ticketId, gameIndex, selectedStoreId) {
 }
 
 function closeStorePicker() {
+  window._storeSearchRequest = (window._storeSearchRequest || 0) + 1;
   $('store-picker-backdrop')?.remove();
   window._storePickerTarget = null;
 }
@@ -3284,10 +3284,14 @@ async function searchStorePicker() {
     $('store-picker-list').innerHTML = '<div style="padding:16px 10px;text-align:center;color:var(--text-muted);font-size:12px;">2자 이상 입력하세요.</div>';
     return;
   }
-  $('store-picker-list').innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;">🔍 검색 중...</div>';
+  const requestId = (window._storeSearchRequest || 0) + 1;
+  window._storeSearchRequest = requestId;
+  $('store-picker-list').innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;">검색 중...</div>';
   try {
-    const res = await fetch(`/api/store-search?q=${encodeURIComponent(query)}`);
+    const res = await fetch(`/api/store-search?q=${encodeURIComponent(query)}&_=${Date.now()}`, { cache:'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
+    if (requestId !== window._storeSearchRequest) return;
     const stores = data.stores || [];
     if (stores.length) {
       stores.forEach(s => {
@@ -3299,6 +3303,7 @@ async function searchStorePicker() {
       renderStorePickerList([]);
     }
   } catch(e) {
+    if (requestId !== window._storeSearchRequest) return;
     $('store-picker-list').innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;">판매점 검색에 실패했습니다. 잠시 후 다시 시도해주세요.</div>';
   }
 }

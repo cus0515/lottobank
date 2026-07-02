@@ -1,5 +1,5 @@
 // LottoBank Service Worker - 오프라인 캐싱 지원
-const CACHE_NAME = 'lottobank-v3';
+const CACHE_NAME = 'lottobank-v4';
 const STATIC_ASSETS = [
   '/manifest.json',
 ];
@@ -22,7 +22,12 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  // API / Supabase / CDN 요청은 항상 네트워크 우선
+  // API 응답은 사용자별·시간별 데이터이므로 캐시하지 않는다.
+  if (url.pathname.startsWith('/api/')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
+  // Supabase / CDN 요청은 항상 네트워크 우선
   if (url.hostname !== location.hostname) {
     e.respondWith(fetch(e.request).catch(() => new Response('', { status: 503 })));
     return;
