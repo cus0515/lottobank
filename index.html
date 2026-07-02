@@ -1366,7 +1366,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
                 <div id="dd-stat-win" style="font-size:12px;font-weight:900;color:var(--b-green);">-</div>
               </div>
               <div style="text-align:center;padding:5px 0;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:5px;">
-                <div style="font-size:10px;color:#94a3b8;font-weight:600;">ROI</div>
+                <div style="font-size:10px;color:#94a3b8;font-weight:600;">수익률</div>
                 <div id="dd-stat-roi" style="font-size:12px;font-weight:900;color:var(--text-dark);">-</div>
               </div>
             </div>
@@ -1537,7 +1537,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
           </div>
           <div class="left-stat-row">
             <div class="left-stat-box">
-              <div class="left-stat-label">평균 ROI</div>
+              <div class="left-stat-label">평균 수익률</div>
               <div class="left-stat-val" id="gs-roi">-</div>
             </div>
             <div class="left-stat-box">
@@ -1553,7 +1553,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
             </div>
             <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg>
-              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">나의 전적 자동 기록</div><div style="font-size:10px;color:var(--text-muted);">구매·당첨·ROI 통계 관리</div></div>
+              <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">나의 전적 자동 기록</div><div style="font-size:10px;color:var(--text-muted);">구매·당첨·수익률 통계 관리</div></div>
             </div>
             <div onclick="go('rank')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);cursor:pointer;">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
@@ -2370,7 +2370,7 @@ function renderHomeLive() {
         </div>
         <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;">
           <div style="width:28px;height:28px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;">3</div>
-          <div><div style="font-size:12px;font-weight:700;">전적 자동 계산</div><div style="font-size:10px;opacity:.5;margin-top:1px;">ROI · 뱃지 · 전국 랭킹</div></div>
+          <div><div style="font-size:12px;font-weight:700;">전적 자동 계산</div><div style="font-size:10px;opacity:.5;margin-top:1px;">수익률 · 뱃지 · 전국 랭킹</div></div>
         </div>
       </div>
       <button onclick="showAuthModal()" style="width:100%;padding:12px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(220,38,38,.4);letter-spacing:.3px;">🚀 무료로 시작하기</button>
@@ -3352,14 +3352,25 @@ async function selectStorePicker(storeId) {
     const store = (window._lotteryStoreOptions||[]).find(s=>s.id===storeId);
     if (store) {
       try {
-        const { error: storeError } = await sb.from('lottery_stores').upsert({
+        let { error: storeError } = await sb.from('lottery_stores').upsert({
           id: String(store.id),
           name: store.name,
           address: store.address || '',
           region: store.region || '',
           lat: store.lat || null,
           lng: store.lng || null,
+          approved: true,
         }, { onConflict: 'id', ignoreDuplicates: true });
+        if (storeError && /column|schema cache/i.test(storeError.message || '')) {
+          ({ error: storeError } = await sb.from('lottery_stores').upsert({
+            id: String(store.id),
+            name: store.name,
+            address: store.address || '',
+            region: store.region || '',
+            lat: store.lat || null,
+            lng: store.lng || null,
+          }, { onConflict: 'id', ignoreDuplicates: true }));
+        }
         if (storeError) {
           toast('판매점 정보를 저장하지 못했습니다.');
           return;
@@ -4123,9 +4134,10 @@ function getMonthlyRankBadgesHtml(value) {
 }
 
 function getActiveMonthlyBadges() {
-  return Array.isArray(window._selectedMonthlyRankBadges)
+  const badges = Array.isArray(window._selectedMonthlyRankBadges)
     ? window._selectedMonthlyRankBadges
     : (window._monthlyRankBadges || []);
+  return badges.slice(0, 1);
 }
 
 function getIdentityHtml(title, monthlyBadges, nickname) {
@@ -4246,7 +4258,7 @@ async function syncDailyVisitAndSystemTitle() {
       .eq('period_key', periodKey)
       .eq('rank', 1);
     window._monthlyRankBadges = (monthlyRows || []).map(row => row.ranking_type);
-    window._selectedMonthlyRankBadges = [...window._monthlyRankBadges];
+    window._selectedMonthlyRankBadges = window._monthlyRankBadges.slice(0, 1);
     try {
       const localSelected = JSON.parse(localStorage.getItem(`ltb_rank_badges_${currentUser.id}`) || 'null');
       const { data: profileBadgeData, error: profileBadgeError } = await sb.from('profiles')
@@ -4256,11 +4268,11 @@ async function syncDailyVisitAndSystemTitle() {
       if (!profileBadgeError && Array.isArray(profileBadgeData?.selected_rank_badges)) {
         window._selectedMonthlyRankBadges = profileBadgeData.selected_rank_badges
           .filter(id => window._monthlyRankBadges.includes(id))
-          .slice(0, 3);
+          .slice(0, 1);
       } else if (Array.isArray(localSelected)) {
         window._selectedMonthlyRankBadges = localSelected
           .filter(id => window._monthlyRankBadges.includes(id))
-          .slice(0, 3);
+          .slice(0, 1);
       }
     } catch (_) {}
   } catch (_) {
@@ -5802,7 +5814,7 @@ function runSimulator() {
       <span>투자금</span><b>${(spent).toLocaleString()}원</b>
     </div>
     <div style="display:flex;justify-content:space-between;padding:5px 8px;background:${document.documentElement.getAttribute('data-theme')==='dark'?(parseFloat(roi)>-50?'#0a1f10':'#2a0f0f'):(parseFloat(roi)>-50?'#f0fdf4':'#fff5f5')};border-radius:4px;border:1px solid ${parseFloat(roi)>-50?'#86efac':'#fecaca'};">
-      <span>기대 ROI</span><b style="color:${parseFloat(roi)>-50?'#16a34a':'#dc2626'};">${roi}%</b>
+      <span>기대 수익률</span><b style="color:${parseFloat(roi)>-50?'#16a34a':'#dc2626'};">${roi}%</b>
     </div>
     <div style="font-size:10px;color:var(--text-muted);margin-top:4px;text-align:center;">※ 이론적 기대값 · 실제와 다를 수 있음</div>
   </div>`;
@@ -5964,7 +5976,7 @@ function toggleDarkMode() {
 
 // 전적 공유
 function shareMyStats(buy, prize, roi, wins) {
-  const text = `🎱 LottoBank 전적 공유\n구매: ${buy}게임 · 당첨: ${wins}회 · 총 당첨금: ${fmtMFull(prize)} · ROI: ${roi}%\nhttps://lottobank.pages.dev`;
+  const text = `🎱 LottoBank 전적 공유\n구매: ${buy}게임 · 당첨: ${wins}게임 · 총 당첨금: ${fmtMFull(prize)} · 수익률: ${roi}%\nhttps://lottobank.pages.dev`;
   if (navigator.share) {
     navigator.share({ title: 'LottoBank 전적', text }).catch(() => {});
   } else {
@@ -6301,11 +6313,18 @@ async function loadStatsView() {
   await loadSavedNumberSets();
   if (isLoggedIn && currentUser && sb) {
     try {
-      const { data, error } = await sb.from('tickets')
-        .select('round_no,prize_rank,prize_amount,purchase_date,game_count,qr_url,numbers,result,lottery_type')
+      let { data, error } = await sb.from('tickets')
+        .select('round_no,prize_rank,prize_amount,purchase_date,game_count,game_results,qr_url,numbers,result,lottery_type')
         .eq('user_id', currentUser.id)
         .order('created_at', { ascending:false })
         .limit(500);
+      if (error && /column|schema cache/i.test(error.message || '')) {
+        ({ data, error } = await sb.from('tickets')
+          .select('round_no,prize_rank,prize_amount,purchase_date,game_count,qr_url,numbers,result,lottery_type')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending:false })
+          .limit(500));
+      }
       if (error) throw error;
       window._ltbTickets = data || [];
     } catch (error) {
@@ -6329,8 +6348,17 @@ function renderStats() {
   const games = tickets.reduce((sum, ticket) => sum + (Number(ticket.game_count) || 1), 0);
   const spent = games * 1000;
   const prize = tickets.reduce((sum, ticket) => sum + (Number(ticket.prize_amount) || 0), 0);
-  const wins = tickets.filter(ticket => ticket.prize_rank >= 1 && ticket.prize_rank <= 5);
-  const bestTicket = wins.slice().sort((a, b) =>
+  const winGames = tickets.flatMap(ticket => {
+    const results = Array.isArray(ticket.game_results) ? ticket.game_results : [];
+    if (results.length) {
+      return results
+        .filter(result => result.rank >= 1 && result.rank <= 5)
+        .map(result => ({ ...ticket, prize_rank:result.rank }));
+    }
+    return ticket.prize_rank >= 1 && ticket.prize_rank <= 5 ? [ticket] : [];
+  });
+  const winningTickets = tickets.filter(ticket => ticket.prize_rank >= 1 && ticket.prize_rank <= 5);
+  const bestTicket = winningTickets.slice().sort((a, b) =>
     (a.prize_rank || 99) - (b.prize_rank || 99) || (b.prize_amount || 0) - (a.prize_amount || 0)
   )[0];
   const roi = spent > 0 ? ((prize - spent) / spent * 100) : 0;
@@ -6339,8 +6367,10 @@ function renderStats() {
     : ['6개 일치','5개+보너스','5개 일치','4개 일치','3개 일치'];
   const rankColors = {1:'var(--lotto-red)',2:'#8b5cf6',3:'var(--b-green)',4:'#3b82f6',5:'#64748b'};
   const rankRows = [1,2,3,4,5].map(rank => {
-    const rows = wins.filter(ticket => ticket.prize_rank === rank);
-    const amount = rows.reduce((sum, ticket) => sum + (Number(ticket.prize_amount) || 0), 0);
+    const rows = winGames.filter(game => game.prize_rank === rank);
+    const amount = tickets
+      .filter(ticket => ticket.prize_rank === rank)
+      .reduce((sum, ticket) => sum + (Number(ticket.prize_amount) || 0), 0);
     return `<tr>
       <td><b style="color:${rankColors[rank]};">${rank}등</b></td>
       <td>${rankConditions[rank - 1]}</td>
@@ -6348,14 +6378,14 @@ function renderStats() {
       <td style="text-align:right;font-weight:${amount ? '800' : '500'};">${amount ? fmtMFull(amount) : '-'}</td>
     </tr>`;
   }).join('');
-  const historyRows = wins.map(ticket => `<tr>
+  const historyRows = winningTickets.map(ticket => `<tr>
     <td>${ticketLotteryType(ticket) === 'pension' ? '연금복권 720+' : '로또 6/45'}</td>
     <td style="text-align:center;">${ticket.round_no || '-'}회</td>
     <td style="text-align:center;font-weight:800;color:${rankColors[ticket.prize_rank]};">${ticket.prize_rank}등</td>
     <td style="text-align:right;font-weight:800;">${fmtMFull(ticket.prize_amount || 0)}</td>
     <td style="text-align:right;color:var(--text-muted);">${ticket.purchase_date || '-'}</td>
   </tr>`).join('');
-  const shareButton = `<button onclick="shareMyStats(${games},${prize.toFixed(0)},${roi.toFixed(1)},${wins.length})" class="stats-share-btn" title="전적 공유" aria-label="전적 공유">
+  const shareButton = `<button onclick="shareMyStats(${games},${prize.toFixed(0)},${roi.toFixed(1)},${winGames.length})" class="stats-share-btn" title="전적 공유" aria-label="전적 공유">
     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
     <span>전적 공유</span>
   </button>`;
@@ -6365,8 +6395,8 @@ function renderStats() {
     <div class="stats-section-head"><div><b>전적 요약</b><span>${statsLotteryMode === 'all' ? '전체 복권' : statsLotteryMode === 'pension' ? '연금복권 720+' : '로또 6/45'}</span></div>${shareButton}</div>
     <div class="kpi-grid stats-kpi-grid">
       <div class="kpi-box"><div class="kpi-label">구매 게임</div><div class="kpi-value">${games}<span>게임</span></div><div class="kpi-sub">투자 ${fmtMFull(spent)}</div></div>
-      <div class="kpi-box"><div class="kpi-label">당첨 횟수</div><div class="kpi-value blue">${wins.length}<span>회</span></div><div class="kpi-sub">당첨률 ${games ? (wins.length / games * 100).toFixed(1) : '0.0'}%</div></div>
-      <div class="kpi-box"><div class="kpi-label">총 당첨금</div><div class="kpi-value red">${fmtMFull(prize)}</div><div class="kpi-sub">ROI ${roi > 0 ? '+' : ''}${roi.toFixed(1)}%</div></div>
+      <div class="kpi-box"><div class="kpi-label">당첨 게임</div><div class="kpi-value blue">${winGames.length}<span>게임</span></div><div class="kpi-sub">당첨률 ${games ? (winGames.length / games * 100).toFixed(1) : '0.0'}%</div></div>
+      <div class="kpi-box"><div class="kpi-label">총 당첨금</div><div class="kpi-value red">${fmtMFull(prize)}</div><div class="kpi-sub">수익률 ${roi > 0 ? '+' : ''}${roi.toFixed(1)}%</div></div>
       <div class="kpi-box"><div class="kpi-label">최고 기록</div><div class="kpi-value">${bestTicket ? bestTicket.prize_rank + '등' : '-'}</div><div class="kpi-sub">${bestTicket ? fmtMFull(bestTicket.prize_amount || 0) + ' · ' + bestTicket.round_no + '회' : '당첨 이력 없음'}</div></div>
     </div>
     <div class="stats-section-head"><div><b>등수별 기록</b><span>QR 인증 당첨 기준</span></div></div>
@@ -6374,7 +6404,7 @@ function renderStats() {
       <thead><tr><th>등수</th><th>당첨 조건</th><th style="text-align:center;">횟수</th><th style="text-align:right;">누적 당첨금</th></tr></thead>
       <tbody>${rankRows}</tbody>
     </table></div>
-    <div class="stats-section-head"><div><b>당첨 이력</b><span>${wins.length}건</span></div></div>
+    <div class="stats-section-head"><div><b>당첨 이력</b><span>${winningTickets.length}건</span></div></div>
     ${historyRows ? `<div class="stats-table-wrap"><table class="rank-history-table">
       <thead><tr><th>복권</th><th style="text-align:center;">회차</th><th style="text-align:center;">등수</th><th style="text-align:right;">당첨금</th><th style="text-align:right;">구매일</th></tr></thead>
       <tbody>${historyRows}</tbody>
@@ -6466,10 +6496,10 @@ function renderStatsLegacy() {
       <div class="kpi-box"><div class="kpi-label">총 당첨 횟수</div><div class="kpi-value blue">${winCount}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">당첨률 ${totalBuy > 0 ? (winCount/totalBuy*100).toFixed(1) : 0}%</div></div>
       <div class="kpi-box hl"><div class="kpi-label">총 당첨금</div><div class="kpi-value red">${fmtMFull(totalPrize)}</div><div class="kpi-sub">투자 대비 ${roi.toFixed(1)}%</div></div>
       <div class="kpi-box"><div class="kpi-label">최고 등수</div><div class="kpi-value">${bestLabel}</div><div class="kpi-sub">역대 최고 당첨 등수</div></div>
-      <div class="kpi-box hl"><div class="kpi-label">ROI</div><div class="kpi-value ${roiPos?'green':'red'}">${roiPos?'+':''}${roi.toFixed(1)}<span style="font-size:12px;font-weight:500;">%</span></div><div class="kpi-sub">투자 대비 수익률</div></div>
+      <div class="kpi-box hl"><div class="kpi-label">수익률</div><div class="kpi-value ${roiPos?'green':'red'}">${roiPos?'+':''}${roi.toFixed(1)}<span style="font-size:12px;font-weight:500;">%</span></div><div class="kpi-sub">투자 대비 수익률</div></div>
       <div class="kpi-box"><div class="kpi-label">최고 당첨금</div><div class="kpi-value red" id="kpi-best-prize" style="font-size:16px;">-</div><div class="kpi-sub" id="kpi-best-prize-rank">-</div></div>
     </div>
-    <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">ROI 분석</div>
+    <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">수익률 분석</div>
     <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:14px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <span style="font-size:12px;color:var(--text-muted);">수익률</span>
@@ -7159,7 +7189,7 @@ const BADGE_DEFS = [
     cond: () => (dbStats?.rank_2_count||0) >= 1 || (myVerifiedTitle||'').includes('2등') },
   { id: 'rank1',      icon: '🥇',  name: '1등 인증자', desc: 'QR로 1등 인증 완료 — 전설',
     cond: () => (dbStats?.rank_1_count||0) >= 1 || (myVerifiedTitle||'').includes('1등') },
-  { id: 'roi_pos',    icon: '📈',  name: 'ROI 플러스', desc: '수익률이 플러스를 기록했습니다',
+  { id: 'roi_pos',    icon: '📈',  name: '수익률 플러스', desc: '수익률이 플러스를 기록했습니다',
     cond: () => (dbStats?.total_spent||0) > 0 && (dbStats?.total_prize||0) > (dbStats?.total_spent||0) },
   { id: 'big_spender',icon: '💰',  name: '큰 손',      desc: '총 투자금 100만원 이상',
     cond: () => (dbStats?.total_spent||0) >= 1000000, progress: () => [dbStats?.total_spent||0, 1000000] },
@@ -8691,13 +8721,7 @@ function selectAvatar(emoji) {
 async function toggleProfileRankBadge(id) {
   const earned = window._monthlyRankBadges || [];
   if (!earned.includes(id)) return;
-  const selected = [...getActiveMonthlyBadges()];
-  const index = selected.indexOf(id);
-  if (index >= 0) selected.splice(index, 1);
-  else {
-    if (selected.length >= 3) { toast('대표 뱃지는 최대 3개까지 선택할 수 있습니다.'); return; }
-    selected.push(id);
-  }
+  const selected = getActiveMonthlyBadges().includes(id) ? [] : [id];
   window._selectedMonthlyRankBadges = selected;
   localStorage.setItem(`ltb_rank_badges_${currentUser?.id || 'guest'}`, JSON.stringify(selected));
   if (sb && currentUser && !isAdminTestMode) {
@@ -8705,24 +8729,6 @@ async function toggleProfileRankBadge(id) {
     if (error && !/column|schema cache/i.test(error.message || '')) {
       toast('대표 뱃지 저장에 실패했습니다.');
       return;
-    }
-    const { error: chatBadgeError } = await sb.from('chat_messages')
-      .update({ monthly_badges:selected })
-      .eq('user_id', currentUser.id);
-    if (!chatBadgeError) {
-      // 채팅 전체 리로드 대신 현재 유저 행만 DOM 업데이트
-      const chatBox = $('chat-box');
-      if (chatBox && currentUser) {
-        chatBox.querySelectorAll('.chat-row').forEach(row => {
-          const identDiv = row.querySelector('.chat-identity');
-          if (identDiv && identDiv.textContent.includes(currentNickname())) {
-            const newBadgeHtml = window._systemRankTitle ? getChatBadgeHtml(window._systemRankTitle) : '';
-            const monthlyHtml = getMonthlyRankBadgesHtml(selected);
-            const nickEl = identDiv.querySelector('.chat-user');
-            if (nickEl) identDiv.innerHTML = newBadgeHtml + monthlyHtml + nickEl.outerHTML;
-          }
-        });
-      }
     }
   }
   window._rankBadgePickerOpen = true;
@@ -8745,7 +8751,7 @@ function renderProfile() {
         ${selectedRankBadges.length ? getMonthlyRankBadgesHtml(selectedRankBadges) : '<span style="font-size:11px;color:var(--text-muted);font-weight:700;">대표 뱃지 없음</span>'}
       </div>
       <div style="display:${window._rankBadgePickerOpen?'block':'none'};background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:10px;margin:0 auto 9px;max-width:320px;">
-        <div style="font-size:11px;font-weight:800;color:var(--text-dark);margin-bottom:7px;text-align:center;">대표 뱃지 설정 <span style="font-size:10px;color:var(--text-muted);font-weight:500;">최대 3개</span></div>
+        <div style="font-size:11px;font-weight:800;color:var(--text-dark);margin-bottom:7px;text-align:center;">대표 뱃지 설정 <span style="font-size:10px;color:var(--text-muted);font-weight:500;">1개 선택</span></div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
           ${earnedRankBadges.length ? earnedRankBadges.map(id => {
             const meta = MONTHLY_BADGE_META[id];

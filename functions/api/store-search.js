@@ -12,7 +12,52 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ stores: [], error: '2자 이상 입력' }), { headers: cors });
   }
 
-  // ── 1. Kakao Local API (env: KAKAO_REST_API_KEY) ──────────────
+  // ── 1. 동행복권 공식 판매점 API ───────────────────────────────
+  const officialBase = {
+    l645LtNtslYn: 'Y',
+    l520LtNtslYn: 'N',
+    st5LtNtslYn: 'N',
+    st10LtNtslYn: 'N',
+    st20LtNtslYn: 'N',
+    cpexUsePsbltyYn: 'N',
+    pageNum: '1',
+    recordCountPerPage: '30',
+    pageCount: '5',
+    srchValue: query,
+  };
+  try {
+    const requests = ['1', '2'].map(srchOption => {
+      const params = new URLSearchParams({ ...officialBase, srchOption });
+      return fetch(`https://www.dhlottery.co.kr/prchsplcsrch/selectLtShp.do?${params}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Referer': 'https://www.dhlottery.co.kr/prchsplcsrch/home',
+          'User-Agent': 'Mozilla/5.0 LottoBank/1.0',
+        },
+        signal: AbortSignal.timeout(7000),
+      });
+    });
+    const responses = await Promise.all(requests);
+    const payloads = await Promise.all(responses.map(async response => response.ok ? response.json() : null));
+    const storeMap = new Map();
+    payloads.flatMap(payload => payload?.data?.list || []).forEach(item => {
+      if (!item.ltShpId || !item.conmNm) return;
+      storeMap.set(String(item.ltShpId), {
+        id: `dhlottery_${item.ltShpId}`,
+        name: item.conmNm,
+        address: item.bplcRdnmDaddr || item.bplcLctnDaddr || '',
+        region: [item.tm1BplcLctnAddr, item.tm2BplcLctnAddr].filter(Boolean).join(' '),
+        lat: Number(item.shpLat) || null,
+        lng: Number(item.shpLot) || null,
+      });
+    });
+    const stores = [...storeMap.values()];
+    if (stores.length) {
+      return new Response(JSON.stringify({ stores, source: 'dhlottery' }), { headers: cors });
+    }
+  } catch (_) { /* try next */ }
+
+  // ── 2. Kakao Local API (env: KAKAO_REST_API_KEY) ──────────────
   const kakaoKey = context.env?.KAKAO_REST_API_KEY;
   if (kakaoKey) {
     try {
@@ -40,7 +85,7 @@ export async function onRequest(context) {
     } catch (_) { /* try next */ }
   }
 
-  // ── 2. 동행복권 API ────────────────────────────────────────────
+  // ── 3. 구형 동행복권 API 폴백 ─────────────────────────────────
   const dhlHdrs = {
     'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15',
     'Accept': 'application/json, text/javascript, */*; q=0.01',
