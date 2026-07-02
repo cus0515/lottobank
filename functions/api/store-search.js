@@ -57,7 +57,7 @@ export async function onRequest(context) {
     const list = json?.arr || json?.list || json?.sellerInfoArr || [];
     if (!Array.isArray(list) || !list.length) return null;
     return list.map(item => ({
-      id: String(item.RTLRID || item.rtlrId || Date.now() + Math.random()),
+      id: 'dhlottery_' + String(item.RTLRID || item.rtlrId || Date.now()),
       name: item.RTLRNM || item.rtlrNm || '',
       address: (item.BPLCDORODADDR || item.BPLCDADDR || '').trim(),
       region: (item.BPLCLOCPLCDNM || '').trim(),

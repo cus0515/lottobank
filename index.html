@@ -3270,40 +3270,19 @@ async function searchStorePicker() {
       });
       renderStorePickerList(stores);
     } else {
-      // API 결과 없으면 수동 입력 UI 제공
-      showStoreManualEntry(query);
+      renderStorePickerList([]);
     }
   } catch(e) {
-    showStoreManualEntry(query);
+    $('store-picker-list').innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;">판매점 검색에 실패했습니다. 잠시 후 다시 시도해주세요.</div>';
   }
-}
-
-function showStoreManualEntry(prefill) {
-  const list = $('store-picker-list');
-  if (!list) return;
-  list.innerHTML = `
-    <div style="padding:12px;border-bottom:1px solid var(--border-dashed);">
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">검색 결과가 없습니다. 판매점 정보를 직접 입력하세요.</div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <input id="manual-store-name" class="store-picker-search" placeholder="판매점명 (예: GS25 강남점)" style="margin:0;" value="${prefill||''}">
-        <input id="manual-store-addr" class="store-picker-search" placeholder="주소 (예: 서울 강남구 테헤란로 123)" style="margin:0;">
-        <button onclick="addManualStore()" style="padding:8px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">이 판매점으로 지정</button>
-      </div>
-    </div>`;
-}
-
-async function addManualStore() {
-  const name = ($('manual-store-name')?.value || '').trim();
-  const addr = ($('manual-store-addr')?.value || '').trim();
-  if (!name) { toast('판매점명을 입력하세요.'); return; }
-  const id = 'manual_' + Date.now();
-  const store = { id, name, address: addr, region: '', lat: null, lng: null };
-  (window._lotteryStoreOptions = window._lotteryStoreOptions||[]).push(store);
-  await selectStorePicker(id);
 }
 
 function filterStorePicker(value) {
   // 타이핑 시 Enter 유도 (자동검색 없음)
+}
+
+function escapeStoreText(value) {
+  return String(value || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 function renderStorePickerList(stores) {
@@ -3319,13 +3298,17 @@ function renderStorePickerList(stores) {
   }
   list.innerHTML = `<button class="store-picker-item" onclick="selectStorePicker('')"><b>지정 해제</b></button>` + stores.map(store => {
     const selected = target?.selectedStoreId === store.id;
+    const safeId = String(store.id || '').replace(/[^a-zA-Z0-9_:-]/g, '');
+    const safeName = escapeStoreText(store.name);
+    const safeAddress = escapeStoreText(store.address);
+    const safeRegion = escapeStoreText(store.region);
     const mapHref = store.lat != null && store.lng != null
       ? `https://map.kakao.com/link/map/${encodeURIComponent(store.name)},${store.lat},${store.lng}`
       : `https://map.kakao.com/?q=${encodeURIComponent(`${store.name} ${store.address}`)}`;
     return `<div class="store-picker-item" style="display:flex;align-items:center;gap:8px;background:${selected?'var(--bg-light)':'transparent'};">
-      <button onclick="selectStorePicker('${store.id}')" style="min-width:0;flex:1;border:0;background:none;padding:0;text-align:left;color:inherit;cursor:pointer;font-family:inherit;">
-        <div style="font-size:12px;font-weight:900;">${selected?'✓ ':''}${store.name}</div>
-        <div style="margin-top:3px;font-size:10px;color:var(--text-muted);">${store.address}${store.region?' · '+store.region:''}</div>
+      <button onclick="selectStorePicker('${safeId}')" style="min-width:0;flex:1;border:0;background:none;padding:0;text-align:left;color:inherit;cursor:pointer;font-family:inherit;">
+        <div style="font-size:12px;font-weight:900;">${selected?'✓ ':''}${safeName}</div>
+        <div style="margin-top:3px;font-size:10px;color:var(--text-muted);">${safeAddress}${safeRegion?' · '+safeRegion:''}</div>
       </button>
       <a href="${mapHref}" target="_blank" rel="noopener" title="지도에서 보기" style="flex-shrink:0;color:#2563eb;font-size:10px;font-weight:800;text-decoration:none;">지도</a>
     </div>`;
@@ -3341,7 +3324,7 @@ async function selectStorePicker(storeId) {
     const store = (window._lotteryStoreOptions||[]).find(s=>s.id===storeId);
     if (store) {
       try {
-        await sb.from('lottery_stores').upsert({
+        const { error: storeError } = await sb.from('lottery_stores').upsert({
           id: String(store.id),
           name: store.name,
           address: store.address || '',
@@ -3349,7 +3332,15 @@ async function selectStorePicker(storeId) {
           lat: store.lat || null,
           lng: store.lng || null,
         }, { onConflict: 'id', ignoreDuplicates: true });
-      } catch(e) { console.warn('lottery_stores upsert:', e.message); }
+        if (storeError) {
+          toast('판매점 정보를 저장하지 못했습니다.');
+          return;
+        }
+      } catch(e) {
+        console.warn('lottery_stores upsert:', e.message);
+        toast('판매점 정보를 저장하지 못했습니다.');
+        return;
+      }
     }
   }
   const saved = await saveTicketGameStore(target.ticketId, target.gameIndex, storeId);
@@ -4271,6 +4262,11 @@ window._attendanceStats = { total:0, streak:0 };
 
 async function loadUserDataFromDB() {
   if (!isLoggedIn || !currentUser) return;
+  if (window._badgeStateUserId !== currentUser.id) {
+    window._badgeStateUserId = currentUser.id;
+    window._badgeStateLoaded = false;
+    window._prevBadgeIds = [];
+  }
   if (isAdminTestMode) {
     // 검증 모드: mock dbStats 이미 설정됨, UI만 업데이트
     const nick = currentUser.user_metadata?.nickname || '관리자';
@@ -5471,20 +5467,29 @@ function genRecommended() {
 async function checkAndAwardBadges() {
   if (!sb || !currentUser || !isLoggedIn) return;
   try {
-    const prevEarned = (window._prevBadgeIds || []);
+    if (!window._badgeStateLoaded) {
+      const { data: existingBadges, error: existingBadgeError } = await sb.from('user_badges')
+        .select('badge_id')
+        .eq('user_id', currentUser.id);
+      if (existingBadgeError) throw existingBadgeError;
+      window._prevBadgeIds = (existingBadges || []).map(row => row.badge_id);
+      window._badgeStateLoaded = true;
+    }
+    const prevEarned = window._prevBadgeIds || [];
     const nowEarned  = BADGE_DEFS.filter(b => b.cond()).map(b => b.id);
     const newBadges  = nowEarned.filter(id => !prevEarned.includes(id));
     if (newBadges.length > 0) {
-      await sb.from('user_badges').upsert(
+      const { error: awardError } = await sb.from('user_badges').upsert(
         newBadges.map(id => ({ user_id: currentUser.id, badge_id: id, earned_at: new Date().toISOString() })),
         { onConflict: 'user_id,badge_id', ignoreDuplicates: true }
       );
+      if (awardError) throw awardError;
       newBadges.forEach(id => {
         const bd = BADGE_DEFS.find(b => b.id === id);
         if (bd) { badgeToast(bd.icon, bd.name); }
       });
-      window._prevBadgeIds = nowEarned;
     }
+    window._prevBadgeIds = nowEarned;
   } catch(e) { console.warn('badge check error', e); }
 }
 
@@ -8763,53 +8768,11 @@ function renderProfile() {
     <div style="margin-top:8px;">
       </div>
     ` : `
-    <div class="profile-block" style="text-align:c.</div>
+    <div class="profile-block" style="text-align:center;padding:20px;">
+      <div style="font-size:32px;margin-bottom:8px;">🔒</div>
+      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">로그인이 필요합니다</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">프로필을 보려면 먼저 로그인하세요.</div>
       <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
-    </div>
-    `}
-  `;
-}
-</script>
-</body>
-</html>
-��필을 보려면 먼저 로그인하세요.</div>
-      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
-    </div>
-    `}
-  `;
-}
-</script>
-</body>
-</html>
-                                                                                                    .</div>
-      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
-    </div>
-    `}
-  `;
-}
-</script>
-</body>
-</html>
-                                                                                                                                                                                    .</div>
-      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cu.</div>
-      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그.</div>
-      <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
-    </div>
-    `}
-  `;
-}
-</script>
-</body>
-</html>
-8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">로그인 / 회원가입</button>
-    </div>
-    `}
-  `;
-}
-</script>
-</body>
-</html>
-rsor:pointer;font-family:inherit;">로그인 / 회원가입</button>
     </div>
     `}
   `;

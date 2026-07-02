@@ -18,4 +18,7 @@ CREATE POLICY "feed_read_all"   ON activity_feed FOR SELECT USING (true);
 CREATE POLICY "feed_insert_own" ON activity_feed FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Realtime 활성화
-ALTER PUBLICATION supabase_realtime ADD TABLE activity_feed;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE activity_feed;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;

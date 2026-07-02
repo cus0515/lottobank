@@ -136,6 +136,15 @@ drop policy if exists "lottery stores are public" on public.lottery_stores;
 create policy "lottery stores are public"
   on public.lottery_stores for select using (true);
 
+drop policy if exists "authenticated users register verified stores" on public.lottery_stores;
+create policy "authenticated users register verified stores"
+  on public.lottery_stores for insert to authenticated
+  with check (
+    id like 'kakao\_%' escape '\'
+    or id like 'dhlottery\_%' escape '\'
+    or id like 'osm\_%' escape '\'
+  );
+
 drop policy if exists "ranking snapshots are public" on public.ranking_snapshots;
 create policy "ranking snapshots are public"
   on public.ranking_snapshots for select using (true);
@@ -246,4 +255,6 @@ $$;
 drop trigger if exists refresh_monthly_rankings_on_ticket on public.tickets;
 create trigger refresh_monthly_rankings_on_ticket
   after insert or update or delete on public.tickets
-  for each statement execute function public.refresh
+  for each statement execute function public.refresh_monthly_rankings_after_ticket();
+
+grant execute on function public.refresh_monthly_rankings() to authenticated;
