@@ -1202,6 +1202,12 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 [data-theme='dark'] .qr-dup-card{background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(15,23,42,0));border-color:rgba(139,92,246,.4);}
 .qr-dup-title{font-size:13px;font-weight:800;color:#7c3aed;margin-bottom:3px;}
 .qr-dup-body{font-size:12px;color:var(--text-muted);line-height:1.55;}
+.qr-source-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
+.qr-source-tab{height:36px;border:1px solid var(--border-dashed);border-radius:7px;background:var(--paper-white);color:var(--text-muted);font:800 12px inherit;cursor:pointer;}
+.qr-source-tab.on{border-color:var(--lotto-red);background:var(--lotto-red);color:#fff;}
+.online-capture-drop{display:flex;align-items:center;justify-content:center;min-height:120px;border:1px dashed var(--border-dashed);border-radius:8px;background:var(--bg-light);cursor:pointer;text-align:center;color:var(--text-muted);}
+.online-capture-drop:hover{border-color:var(--lotto-red);color:var(--lotto-red);}
+.online-capture-preview{display:block;max-width:100%;max-height:260px;margin:10px auto 0;border:1px solid var(--border-dashed);border-radius:7px;object-fit:contain;}
 
 /* == Task #123: Community write bar + post card premium upgrade == */
 .post-write-bar{display:flex;gap:8px;margin-bottom:12px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:12px;padding:10px 12px;box-shadow:0 1px 4px rgba(15,23,42,.05);}
@@ -1280,6 +1286,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="application/ld+json">
 {
@@ -1703,6 +1710,11 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <div id="pg-ticket" class="page-content" style="display:none;">
         <div id="qr-register-view">
         <div id="qr-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:14px;margin-bottom:10px;">
+          <div class="qr-source-tabs">
+            <button id="qr-source-url-tab" class="qr-source-tab on" type="button" onclick="setQrSourceMode('url')">실물 QR</button>
+            <button id="qr-source-online-tab" class="qr-source-tab" type="button" onclick="setQrSourceMode('online')">인터넷 구매</button>
+          </div>
+          <div id="qr-url-source">
           <div style="font-size:12px;font-weight:900;color:var(--lotto-red);margin-bottom:8px;">공식 QR 등록</div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
             <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted);">
@@ -1739,6 +1751,21 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
             </div>
           </div>
           <div id="qr-result-display" style="margin-top:10px;"></div>
+          </div>
+          <div id="qr-online-source" style="display:none;">
+            <div style="font-size:12px;font-weight:900;color:var(--lotto-red);margin-bottom:4px;">인터넷 구매 캡처 등록</div>
+            <div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">동행복권 구매내역의 티켓 보기 화면을 캡처해 등록하세요.</div>
+            <label class="online-capture-drop" for="online-capture-input">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 7px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                <b style="display:block;font-size:12px;">구매내역 캡처 선택</b>
+                <span style="font-size:10px;">PNG, JPG</span>
+              </span>
+            </label>
+            <input id="online-capture-input" type="file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="recognizeOnlineTicket(this.files[0])">
+            <div id="online-capture-status" style="min-height:18px;margin-top:7px;font-size:11px;color:var(--text-muted);"></div>
+            <div id="online-capture-result"></div>
+          </div>
         </div>
         <!-- QR 등록 가이드 -->
         <details style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:0;margin-bottom:10px;overflow:hidden;">
@@ -1762,7 +1789,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
               </div>
             </div>
             <div style="margin-top:10px;padding:8px;background:var(--amber-bg,#fef3c7);border-radius:6px;font-size:11px;color:var(--amber-text,#92400e);">
-              <b>온라인 구매도 등록할 수 있습니다.</b> 동행복권 구매내역에서 각 복권의 QR 조회 주소를 복사해 등록해주세요.
+              <b>인터넷 구매도 등록할 수 있습니다.</b> 상단 인터넷 구매 탭에서 티켓 보기 화면을 캡처해 등록하세요.
             </div>
           </div>
         </details>
@@ -2130,6 +2157,325 @@ function getQrPurchaseMeta() {
   };
 }
 
+function setQrSourceMode(mode) {
+  const online = mode === 'online';
+  $('qr-source-url-tab')?.classList.toggle('on', !online);
+  $('qr-source-online-tab')?.classList.toggle('on', online);
+  if ($('qr-url-source')) $('qr-url-source').style.display = online ? 'none' : '';
+  if ($('qr-online-source')) $('qr-online-source').style.display = online ? '' : 'none';
+  if (online) stopCameraQR();
+}
+
+function parseOnlineTicketText(rawText) {
+  const text = String(rawText || '').replace(/\r/g, '').replace(/[|]/g, ' ');
+  const roundMatch = text.match(/(?:제\s*)?(\d{3,4})\s*회/);
+  const roundFallback = text.split('\n')
+    .map(line => line.trim().replace(/\D/g, ''))
+    .find(digits => digits.length >= 4 && digits.length <= 6 && Number(digits.slice(0,4)) >= 1000);
+  const round = roundMatch ? Number(roundMatch[1]) : Number(roundFallback?.slice(0,4) || 0);
+  const dateMatch = text.match(/(?:발행일|구입일|구매일)[^\d]*(20\d{2})[./-](\d{1,2})[./-](\d{1,2})/);
+  const purchaseDate = dateMatch
+    ? `${dateMatch[1]}-${String(dateMatch[2]).padStart(2,'0')}-${String(dateMatch[3]).padStart(2,'0')}`
+    : null;
+
+  const serialCandidates = [];
+  text.split('\n').forEach(line => {
+    const groups = line.match(/\b\d{5}\b/g) || [];
+    if (groups.length >= 6) serialCandidates.push(groups.slice(0, 6).join(''));
+  });
+  const serial = serialCandidates.find((code, index, list) => list.indexOf(code) !== index)
+    || serialCandidates[0]
+    || '';
+
+  const games = [];
+  const modes = [];
+  const firstSerialAt = text.search(/(?:\b\d{5}\b[\s]*){6}/);
+  const ticketBody = firstSerialAt >= 0 ? text.slice(firstSerialAt).split(/합계/)[0] : text;
+  ticketBody.split('\n').forEach(line => {
+    const rawNumbers = (line.match(/\d{1,2}/g) || []).map(Number).filter(n => n >= 1 && n <= 45);
+    const nums = rawNumbers.slice(-6);
+    if (nums.length !== 6 || new Set(nums).size !== 6) return;
+    games.push(nums.sort((a,b) => a-b));
+    modes.push(line.includes('반자동') ? '반자동' : line.includes('자동') ? '자동' : line.includes('수동') ? '수동' : '확인 불가');
+  });
+
+  if (!round || !serial || serial.length !== 30 || !games.length) return null;
+  const knownModes = modes.filter(mode => mode === '자동' || mode === '수동');
+  if (knownModes.length >= Math.ceil(games.length / 2) && new Set(knownModes).size === 1) {
+    modes.forEach((mode, index) => {
+      if (mode === '확인 불가') modes[index] = knownModes[0];
+    });
+  }
+  const purchaseMode = knownModes.length === games.length && new Set(knownModes).size === 1
+    ? (knownModes[0] === '자동' ? 'auto' : 'manual')
+    : modes.every(mode => mode === modes[0]) && (modes[0] === '자동' || modes[0] === '수동')
+      ? (modes[0] === '자동' ? 'auto' : 'manual')
+    : 'mixed';
+  return {
+    type:'lotto',
+    source:'online-capture',
+    round,
+    games,
+    nums:games[0],
+    modes,
+    serial,
+    ticketCode:serial,
+    key:`online:${serial}`,
+    purchaseMeta:{
+      ...getQrPurchaseMeta(),
+      channel:'online',
+      mode:purchaseMode,
+      purchaseDate,
+      storeName:'동행복권 인터넷 구매',
+    },
+  };
+}
+
+async function prepareOnlineTicketImage(file) {
+  const image = new Image();
+  const sourceUrl = URL.createObjectURL(file);
+  try {
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = reject;
+      image.src = sourceUrl;
+    });
+    const source = document.createElement('canvas');
+    source.width = image.naturalWidth;
+    source.height = image.naturalHeight;
+    const sourceContext = source.getContext('2d', { willReadFrequently:true });
+    sourceContext.drawImage(image, 0, 0);
+    const pixels = sourceContext.getImageData(0, 0, source.width, source.height).data;
+    const isWhite = (x, y) => {
+      const index = (y * source.width + x) * 4;
+      return pixels[index] > 238 && pixels[index + 1] > 238 && pixels[index + 2] > 238;
+    };
+    const xScores = Array.from({ length:source.width }, (_, x) => {
+      let count = 0;
+      for (let y = 0; y < source.height; y += 3) if (isWhite(x, y)) count++;
+      return count;
+    });
+    const minXScore = source.height / 3 * .45;
+    let left = xScores.findIndex(score => score >= minXScore);
+    let right = xScores.length - 1 - [...xScores].reverse().findIndex(score => score >= minXScore);
+    if (left < 0 || right <= left || right - left < source.width * .35) {
+      left = 0;
+      right = source.width - 1;
+    }
+    const yScores = Array.from({ length:source.height }, (_, y) => {
+      let count = 0;
+      for (let x = left; x <= right; x += 3) if (isWhite(x, y)) count++;
+      return count;
+    });
+    const minYScore = (right - left + 1) / 3 * .45;
+    let top = yScores.findIndex(score => score >= minYScore);
+    let bottom = yScores.length - 1 - [...yScores].reverse().findIndex(score => score >= minYScore);
+    if (top < 0 || bottom <= top || bottom - top < source.height * .35) {
+      top = 0;
+      bottom = source.height - 1;
+    }
+    const cropWidth = right - left + 1;
+    const cropHeight = bottom - top + 1;
+    const scale = Math.max(2, Math.min(3, 1100 / cropWidth));
+    const output = document.createElement('canvas');
+    output.width = Math.round(cropWidth * scale);
+    output.height = Math.round(cropHeight * scale);
+    output.getContext('2d').drawImage(source, left, top, cropWidth, cropHeight, 0, 0, output.width, output.height);
+    return output;
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
+
+async function recognizeOnlineTicket(file) {
+  const status = $('online-capture-status');
+  const result = $('online-capture-result');
+  if (!file || !status || !result) return;
+  if (!isLoggedIn) {
+    toast('먼저 로그인해 주세요.');
+    return;
+  }
+  if (!window.Tesseract) {
+    status.textContent = '이미지 인식 모듈을 불러오지 못했습니다.';
+    return;
+  }
+  const previewUrl = URL.createObjectURL(file);
+  result.innerHTML = `<img class="online-capture-preview" src="${previewUrl}" alt="선택한 구매내역 캡처">`;
+  status.textContent = '캡처에서 구매 정보를 인식하고 있습니다.';
+  try {
+    const preparedImage = await prepareOnlineTicketImage(file);
+    const recognized = await Tesseract.recognize(preparedImage, 'kor+eng', {
+      logger: progress => {
+        if (progress.status === 'recognizing text') {
+          status.textContent = `구매 정보 인식 중 ${Math.round((progress.progress || 0) * 100)}%`;
+        }
+      }
+    });
+    const parsed = parseOnlineTicketText(recognized?.data?.text || '');
+    if (!parsed) {
+      window._pendingOnlineTicket = null;
+      status.textContent = '회차, 번호 또는 고유 코드를 정확히 인식하지 못했습니다.';
+      result.innerHTML += `<div class="qr-warn-card" style="margin-top:10px;"><span class="qr-err-icon">!</span><div><div class="qr-warn-title">다른 캡처를 사용해주세요</div><div class="qr-warn-body">티켓 전체와 하단 고유 코드가 선명하게 보이는 이미지가 필요합니다.</div></div></div>`;
+      return;
+    }
+    window._pendingOnlineTicket = parsed;
+    status.textContent = `제 ${parsed.round}회 · ${parsed.games.length}게임 · 고유 코드 확인 완료`;
+    result.innerHTML = `
+      ${renderTicketSlip(parsed)}
+      <div style="margin-top:7px;font-size:10px;color:var(--text-muted);text-align:center;">${parsed.modes.join(' · ')} · 인터넷 구매</div>
+      <button type="button" onclick="registerOnlineTicket()" style="width:100%;margin-top:10px;border:0;border-radius:7px;background:var(--lotto-red);color:#fff;padding:11px;font-size:13px;font-weight:900;cursor:pointer;">이 구매내역 등록하기</button>`;
+  } catch (error) {
+    console.warn('online ticket OCR:', error.message);
+    status.textContent = '이미지를 인식하지 못했습니다. 잠시 후 다시 시도해주세요.';
+  } finally {
+    URL.revokeObjectURL(previewUrl);
+  }
+}
+
+async function ticketCodeExists(parsed) {
+  if (!sb || !parsed?.ticketCode) return usedQrKeys.includes(parsed?.key);
+  let result = await sb.from('tickets')
+    .select('id')
+    .or(`ticket_code.eq.${parsed.ticketCode},qr_url.eq.${parsed.key},qr_url.like.%${parsed.ticketCode}`)
+    .limit(1);
+  if (result.error && /column|schema cache/i.test(result.error.message || '')) {
+    result = await sb.from('tickets')
+      .select('id')
+      .or(`qr_url.eq.${parsed.key},qr_url.like.%${parsed.ticketCode}`)
+      .limit(1);
+  }
+  return Boolean(result.data?.length);
+}
+
+async function savePendingOnlineTicket(parsed) {
+  const meta = parsed.purchaseMeta;
+  const payload = {
+    user_id:currentUser.id,
+    qr_url:parsed.key,
+    round_no:parsed.round,
+    numbers:parsed.games[0],
+    game_count:parsed.games.length,
+    purchase_date:meta.purchaseDate,
+    result:'pending',
+    prize_rank:null,
+    prize_amount:0,
+    lottery_type:'lotto',
+    purchase_channel:'online',
+    purchase_mode:meta.mode,
+    game_numbers:parsed.games,
+    qr_payload:parsed.key,
+    ticket_code:parsed.ticketCode,
+    store_name:'동행복권 인터넷 구매',
+  };
+  let { error } = await sb.from('tickets').upsert(payload, { onConflict:'qr_url' });
+  if (error && /column|schema cache/i.test(error.message || '')) {
+    delete payload.ticket_code;
+    ({ error } = await sb.from('tickets').upsert(payload, { onConflict:'qr_url' }));
+  }
+  if (error) throw error;
+  const { data: storedStats } = await sb.from('user_stats').select('*').eq('user_id',currentUser.id).maybeSingle();
+  const current = storedStats || dbStats || {};
+  await sb.from('user_stats').upsert({
+    user_id:currentUser.id,
+    total_tickets:(current.total_tickets || 0) + parsed.games.length,
+    total_spent:(current.total_spent || 0) + parsed.games.length * 1000,
+    total_wins:current.total_wins || 0,
+    total_prize:current.total_prize || 0,
+    best_rank:current.best_rank || null,
+    rank_1_count:current.rank_1_count || 0,
+    rank_2_count:current.rank_2_count || 0,
+    rank_3_count:current.rank_3_count || 0,
+    rank_4_count:current.rank_4_count || 0,
+    rank_5_count:current.rank_5_count || 0,
+    updated_at:new Date().toISOString(),
+  }, { onConflict:'user_id' });
+  insertActivity('qr_register', { round:parsed.round, games:parsed.games.length, channel:'online' });
+}
+
+async function refreshPendingOnlineResults() {
+  if (!sb || !currentUser || isAdminTestMode) return;
+  const { data: pending, error } = await sb.from('tickets')
+    .select('id,round_no,game_numbers,qr_url')
+    .eq('user_id', currentUser.id)
+    .eq('result', 'pending')
+    .eq('purchase_channel', 'online')
+    .limit(50);
+  if (error || !pending?.length) return;
+
+  let addedPrize = 0;
+  let addedWins = 0;
+  const rankAdds = { 1:0, 2:0, 3:0, 4:0, 5:0 };
+  let bestAddedRank = 99;
+  for (const ticket of pending) {
+    const winData = await fetchLotto(ticket.round_no);
+    const restored = Array.isArray(ticket.game_numbers) && ticket.game_numbers.length
+      ? ticket.game_numbers
+      : (parseQRUrl(ticket.qr_url)?.games || []);
+    if (!winData || !restored.length) continue;
+    const gameResults = restored.map(nums => checkWinRank(nums, winData.nums, winData.bonus));
+    const winning = gameResults.filter(item => item.rank <= 5);
+    const totalPrize = gameResults.reduce((sum, item) => sum + calcPrizeAmount(item.rank, winData), 0);
+    const bestResult = gameResults.reduce((best, item) => item.rank < best.rank ? item : best, gameResults[0]);
+    const { error: updateError } = await sb.from('tickets').update({
+      result:'checked',
+      prize_rank:bestResult.rank <= 5 ? bestResult.rank : null,
+      prize_amount:totalPrize,
+      matched_count:gameResults.reduce((sum,item) => sum + item.matched, 0),
+      game_results:gameResults,
+    }).eq('id', ticket.id);
+    if (updateError) continue;
+    addedPrize += totalPrize;
+    addedWins += winning.length;
+    winning.forEach(item => { rankAdds[item.rank] += 1; });
+    if (bestResult.rank <= 5) bestAddedRank = Math.min(bestAddedRank, bestResult.rank);
+  }
+  if (!addedWins && !addedPrize && bestAddedRank === 99) return;
+  const { data: current } = await sb.from('user_stats').select('*').eq('user_id',currentUser.id).single();
+  if (!current) return;
+  const currentBest = current.best_rank || 99;
+  await sb.from('user_stats').upsert({
+    ...current,
+    total_wins:(current.total_wins || 0) + addedWins,
+    total_prize:(current.total_prize || 0) + addedPrize,
+    best_rank:Math.min(currentBest, bestAddedRank) < 99 ? Math.min(currentBest, bestAddedRank) : null,
+    rank_1_count:(current.rank_1_count || 0) + rankAdds[1],
+    rank_2_count:(current.rank_2_count || 0) + rankAdds[2],
+    rank_3_count:(current.rank_3_count || 0) + rankAdds[3],
+    rank_4_count:(current.rank_4_count || 0) + rankAdds[4],
+    rank_5_count:(current.rank_5_count || 0) + rankAdds[5],
+    updated_at:new Date().toISOString(),
+  }, { onConflict:'user_id' });
+  await sb.rpc('refresh_monthly_rankings');
+}
+
+async function registerOnlineTicket() {
+  const parsed = window._pendingOnlineTicket;
+  const result = $('online-capture-result');
+  if (!parsed || !result || !currentUser || !sb) return;
+  if (await ticketCodeExists(parsed)) {
+    result.innerHTML = '<div class="qr-dup-card"><span class="qr-err-icon">↻</span><div><div class="qr-dup-title">이미 등록된 구매내역입니다</div><div class="qr-dup-body">같은 고유 코드는 중복 등록할 수 없습니다.</div></div></div>';
+    return;
+  }
+  result.innerHTML = '<div class="qr-loading-card"><div class="qr-loading-spinner"></div><div class="qr-loading-text">구매내역을 등록하고 있습니다.</div></div>';
+  try {
+    const winData = await fetchLotto(parsed.round);
+    if (winData) {
+      const gameResults = parsed.games.map(nums => checkWinRank(nums, winData.nums, winData.bonus));
+      if (!await saveTicketToDB(parsed, winData, gameResults)) throw new Error('ticket save failed');
+    } else {
+      await savePendingOnlineTicket(parsed);
+    }
+    usedQrKeys.push(parsed.key);
+    saveStorage();
+    await loadUserDataFromDB();
+    result.innerHTML = `${renderTicketSlip(parsed)}<div style="margin-top:10px;padding:10px;border:1px solid #86efac;border-radius:7px;background:#ecfdf5;color:#047857;text-align:center;font-size:12px;font-weight:800;">${winData ? '인터넷 구매 등록 완료' : '인터넷 구매 등록 완료 · 추첨 결과 대기'}</div>`;
+    window._pendingOnlineTicket = null;
+  } catch (error) {
+    console.warn('online ticket save:', error.message);
+    result.innerHTML = '<div class="qr-warn-card"><span class="qr-err-icon">!</span><div><div class="qr-warn-title">등록하지 못했습니다</div><div class="qr-warn-body">잠시 후 다시 시도해주세요.</div></div></div>';
+  }
+}
+
 // QR URL 파싱 (동행복권 실제 포맷)
 // 신 포맷: https://qr.dhlottery.co.kr/?v=1222m082226323641s020516213139...{시리얼}
 //   v값: 회차4 + m + 12자리(게임1) + [s + 12자리(게임N)]* + 시리얼
@@ -2150,7 +2496,7 @@ function parseQRUrl(url) {
         for (let i = 0; i < 12; i += 2) nums.push(parseInt(g.slice(i, i+2)));
         return nums.sort((a, b) => a - b);
       });
-      return { type: 'lotto', round, games, nums: games[0], serial: newFmt[4], key: v };
+      return { type: 'lotto', round, games, nums: games[0], serial: newFmt[4], ticketCode:newFmt[4], key: v };
     }
 
     // 구 포맷: {4}q{12}
@@ -3423,8 +3769,10 @@ async function lookupQrTicket() {
     return;
   }
   if (sb && currentUser) {
-    const { data } = await sb.from('tickets').select('id').eq('qr_url', parsed.key).maybeSingle();
-    if (data) {
+    const duplicate = parsed.ticketCode
+      ? await ticketCodeExists(parsed)
+      : Boolean((await sb.from('tickets').select('id').eq('qr_url', parsed.key).maybeSingle()).data);
+    if (duplicate) {
       display.innerHTML = '<div class="qr-dup-card"><span class="qr-err-icon">↻</span><div><div class="qr-dup-title">이미 등록된 QR입니다</div><div class="qr-dup-body">내 번호 이력에서 확인할 수 있습니다.</div></div></div>';
       return;
     }
@@ -4323,6 +4671,7 @@ async function loadUserDataFromDB() {
   const uid = currentUser.id;
   try {
     const { data: profile } = await sb.from('profiles').select('nickname').eq('id', uid).single();
+    await refreshPendingOnlineResults();
 
     const { data: stats } = await sb.from('user_stats').select('*').eq('user_id', uid).single();
     if (stats) {
@@ -4589,6 +4938,7 @@ async function saveTicketToDB(parsed, winData, gameResults) {
       store_lng: meta.lng,
       game_numbers: parsed.games,
       qr_payload: parsed.key,
+      ticket_code: parsed.ticketCode || parsed.serial || null,
     };
     let { error: ticketError } = await sb.from('tickets').upsert({ ...baseTicket, ...rankingFields }, { onConflict:'qr_url' });
     if (ticketError && /column|schema cache/i.test(ticketError.message || '')) {
@@ -4596,6 +4946,7 @@ async function saveTicketToDB(parsed, winData, gameResults) {
       delete compatibleFields.game_results;
       delete compatibleFields.game_numbers;
       delete compatibleFields.qr_payload;
+      delete compatibleFields.ticket_code;
       ({ error: ticketError } = await sb.from('tickets').upsert({ ...baseTicket, ...compatibleFields }, { onConflict:'qr_url' }));
     }
     if (ticketError && /column|schema cache/i.test(ticketError.message || '')) {

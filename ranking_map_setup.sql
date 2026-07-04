@@ -16,7 +16,12 @@ alter table public.tickets
   add column if not exists pension_group integer,
   add column if not exists pension_number text,
   add column if not exists serial_meta text,
+  add column if not exists ticket_code text,
   add column if not exists game_results jsonb not null default '[]'::jsonb;
+
+create unique index if not exists idx_tickets_ticket_code_unique
+  on public.tickets (ticket_code)
+  where ticket_code is not null;
 
 alter table public.chat_messages
   add column if not exists monthly_badges jsonb not null default '[]'::jsonb;
@@ -177,11 +182,13 @@ begin
   with ticket_scored as (
     select
       ticket.*,
-      case when jsonb_array_length(coalesce(game_results, '[]'::jsonb)) > 0
+      case when ticket.result = 'pending' then 0
+        when jsonb_array_length(coalesce(game_results, '[]'::jsonb)) > 0
         then (select coalesce(sum((item ->> 'matched')::numeric), 0) from jsonb_array_elements(game_results) item)
         else coalesce(matched_count, 0)::numeric
       end as ticket_matches,
-      case when jsonb_array_length(coalesce(game_results, '[]'::jsonb)) > 0
+      case when ticket.result = 'pending' then 0
+        when jsonb_array_length(coalesce(game_results, '[]'::jsonb)) > 0
         then (select count(*)::numeric from jsonb_array_elements(game_results) item where coalesce((item ->> 'matched')::integer, 0) = 0)
         else case when coalesce(matched_count, 0) = 0 then greatest(coalesce(game_count, 1), 1) else 0 end::numeric
       end as ticket_misses
