@@ -240,6 +240,136 @@ begin
 end;
 $$;
 
+create or replace function public.refresh_all_time_rankings()
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  delete from public.ranking_snapshots
+  where period_key = 'all'
+    and ranking_type in ('donor','attendance','streak','scan','auto','manual','rank3','rank4','rank5');
+
+  insert into public.ranking_snapshots
+    (period_key, ranking_type, user_id, rank, score, title, badge_icon, border_color)
+  with ticket_scored as (
+    select
+      ticket.user_id,
+      greatest(coalesce(ticket.game_count, 1), 1)::numeric as games,
+      coalesce(ticket.prize_amount, 0)::numeric as prize,
+      ticket.purchase_mode,
+      case when jsonb_array_length(coalesce(ticket.game_results, '[]'::jsonb)) > 0
+        then (select count(*)::numeric from jsonb_array_elements(ticket.game_results) item where (item ->> 'rank')::integer = 3)
+        else case when ticket.prize_rank = 3 then 1 else 0 end::numeric
+      end as rank3_count,
+      case when jsonb_array_length(coalesce(ticket.game_results, '[]'::jsonb)) > 0
+        then (select count(*)::numeric from jsonb_array_elements(ticket.game_results) item where (item ->> 'rank')::integer = 4)
+        else case when ticket.prize_rank = 4 then 1 else 0 end::numeric
+      end as rank4_count,
+      case when jsonb_array_length(coalesce(ticket.game_results, '[]'::jsonb)) > 0
+        then (select count(*)::numeric from jsonb_array_elements(ticket.game_results) item where (item ->> 'rank')::integer = 5)
+        else case when ticket.prize_rank = 5 then 1 else 0 end::numeric
+      end as rank5_count
+    from public.tickets ticket
+  ),
+  ticket_base as (
+    select
+      user_id,
+      count(*)::numeric as scans,
+      sum(games * 1000)::numeric as spent,
+      sum(prize)::numeric as prize,
+      sum(case when purchase_mode = 'auto' then games else 0 end)::numeric as auto_games,
+      sum(case when purchase_mode = 'manual' then games else 0 end)::numeric as manual_games,
+      sum(rank3_count)::numeric as rank3_count,
+      sum(rank4_count)::numeric as rank4_count,
+      sum(rank5_count)::numeric as rank5_count
+    from ticket_scored
+    group by user_id
+  ),
+  visit_grouped as (
+    select
+      user_id,
+      visit_date,
+      visit_date - (row_number() over (partition by user_id order by visit_date))::integer as streak_group
+    from public.user_daily_visits
+  ),
+  visit_base as (
+    select
+      user_id,
+      count(*)::numeric as attendance_days
+    from public.user_daily_visits
+    group by user_id
+  ),
+  visit_streaks as (
+    select
+      user_id,
+      count(*)::numeric as streak_days
+    from visit_grouped
+    group by user_id, streak_group
+  ),
+  longest_streaks as (
+    select user_id, max(streak_days)::numeric as longest_streak
+    from visit_streaks
+    group by user_id
+  ),
+  scores as (
+    select user_id, metric.ranking_type, metric.score
+    from ticket_base
+    cross join lateral (values
+      ('donor', greatest(spent - prize, 0)),
+      ('scan', scans),
+      ('auto', auto_games),
+      ('manual', manual_games),
+      ('rank3', rank3_count),
+      ('rank4', rank4_count),
+      ('rank5', rank5_count)
+    ) as metric(ranking_type, score)
+    where metric.score > 0
+
+    union all
+
+    select user_id, 'attendance', attendance_days
+    from visit_base
+    where attendance_days > 0
+
+    union all
+
+    select user_id, 'streak', longest_streak
+    from longest_streaks
+    where longest_streak > 0
+  ),
+  ranked as (
+    select
+      user_id,
+      ranking_type,
+      score,
+      dense_rank() over (partition by ranking_type order by score desc)::integer as rank
+    from scores
+  )
+  select
+    'all',
+    ranking_type,
+    user_id,
+    rank,
+    score,
+    case ranking_type
+      when 'donor' then '기부왕'
+      when 'attendance' then '출석왕'
+      when 'streak' then '개근왕'
+      when 'scan' then '스캔왕'
+      when 'auto' then '자동왕'
+      when 'manual' then '수동왕'
+      when 'rank3' then '3등 콜렉터'
+      when 'rank4' then '4등 콜렉터'
+      else '5등 콜렉터'
+    end,
+    null,
+    '#f5c451'
+  from ranked;
+end;
+$$;
+
 create or replace function public.refresh_monthly_rankings_after_ticket()
 returns trigger
 language plpgsql
@@ -248,6 +378,7 @@ set search_path = public
 as $$
 begin
   perform public.refresh_monthly_rankings();
+  perform public.refresh_all_time_rankings();
   return null;
 end;
 $$;
@@ -257,4 +388,22 @@ create trigger refresh_monthly_rankings_on_ticket
   after insert or update or delete on public.tickets
   for each statement execute function public.refresh_monthly_rankings_after_ticket();
 
+create or replace function public.refresh_all_time_rankings_after_visit()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  perform public.refresh_all_time_rankings();
+  return null;
+end;
+$$;
+
+drop trigger if exists refresh_all_time_rankings_on_visit on public.user_daily_visits;
+create trigger refresh_all_time_rankings_on_visit
+  after insert or update or delete on public.user_daily_visits
+  for each statement execute function public.refresh_all_time_rankings_after_visit();
+
 grant execute on function public.refresh_monthly_rankings() to authenticated;
+grant execute on function public.refresh_all_time_rankings() to authenticated;
