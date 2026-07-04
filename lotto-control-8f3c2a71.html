@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LottoBank 관리자</title>
+<title>LottoBank 운영 관리</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
   :root {
@@ -103,7 +103,7 @@
     <div class="login-logo">LottoBank</div>
     <div class="login-sub">관리자 전용 페이지</div>
     <label class="form-label">이메일</label>
-    <input class="form-input" type="email" id="adm-email" value="jobdevil23@gmail.com" placeholder="관리자 이메일">
+    <input class="form-input" type="email" id="adm-email" placeholder="관리자 이메일">
     <label class="form-label">비밀번호</label>
     <input class="form-input" type="password" id="adm-pw" placeholder="비밀번호" onkeyup="if(event.key==='Enter')doLogin()">
     <button class="btn-login" onclick="doLogin()">로그인</button>
@@ -132,6 +132,7 @@
       <button class="tab-btn" onclick="switchTab('data')">전체 데이터</button>
       <button class="tab-btn" onclick="switchTab('insert')">✏️ 직접 입력</button>
       <button class="tab-btn" onclick="switchTab('verify')">🔬 기능 검증</button>
+      <button class="tab-btn" onclick="switchTab('operations')">운영 설정</button>
     </div>
 
     <div id="table-area"></div>
@@ -159,10 +160,16 @@ let searchQuery = '';
 const ADMIN_TABLES = [
   'profiles','tickets','user_stats','user_badges','activity_feed','chat_messages',
   'posts','comments','post_likes','ranking_snapshots','user_system_titles',
-  'user_daily_visits','lottery_stores','user_lottery_stores'
+  'user_daily_visits','lottery_stores','user_lottery_stores','saved_number_sets',
+  'ticket_game_stores','app_admins'
 ];
 
 // ── 로그인 ──────────────────────────────────────────
+async function hasAdminAccess() {
+  const { data, error } = await sb.rpc('is_app_admin');
+  return !error && data === true;
+}
+
 async function doLogin() {
   const email = document.getElementById('adm-email').value.trim();
   const pw = document.getElementById('adm-pw').value;
@@ -172,8 +179,7 @@ async function doLogin() {
   try {
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
     if (error) throw error;
-    // 관리자 확인 (이메일 체크)
-    if (data.user.email !== 'jobdevil23@gmail.com') {
+    if (!await hasAdminAccess()) {
       await sb.auth.signOut();
       err.textContent = '관리자 계정이 아닙니다.';
       return;
@@ -227,6 +233,10 @@ async function loadTab(tab) {
     renderVerificationPanel();
     return;
   }
+  if (tab === 'operations') {
+    renderOperationsPanel();
+    return;
+  }
 
   const cfg = configs[tab];
   if (!cfg) return;
@@ -276,6 +286,114 @@ function renderDataManager() {
     </div>
     <div class="table-wrap"><div class="table-header"><span class="table-title">최근 데이터 50건</span></div><pre id="data-rows" style="padding:14px;margin:0;overflow:auto;max-height:520px;font-size:11px;line-height:1.6;">불러오는 중...</pre></div>`;
   loadDataManagerRows();
+}
+
+async function renderOperationsPanel() {
+  const area = document.getElementById('table-area');
+  area.innerHTML = `
+    <div class="admin-form">
+      <div class="table-title">운영 상태</div>
+      <div id="ops-counts" style="margin-top:12px;color:var(--muted);font-size:12px;">데이터를 확인하고 있습니다.</div>
+      <div class="form-actions">
+        <button class="btn-refresh" onclick="loadOperationStatus()">새로고침</button>
+      </div>
+    </div>
+
+    <div class="admin-form">
+      <div class="table-title">관리자 계정</div>
+      <div style="font-size:12px;color:var(--muted);margin:6px 0 12px;">먼저 일반 회원가입을 완료한 이메일만 관리자로 지정할 수 있습니다.</div>
+      <div class="form-grid">
+        <div>
+          <label class="form-label">회원 이메일</label>
+          <input class="form-input" id="ops-admin-email" type="email" placeholder="member@example.com">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="setAdminAccount(true)">관리자 추가</button>
+        <button class="btn-del" onclick="setAdminAccount(false)">관리자 해제</button>
+      </div>
+      <div class="form-result" id="ops-admin-result"></div>
+      <div id="ops-admin-list" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="admin-form" style="border:1px solid #fecaca;">
+      <div class="table-title" style="color:var(--red);">데이터 초기화</div>
+      <div style="font-size:12px;line-height:1.7;color:var(--muted);margin:8px 0 12px;">
+        계정 유지 초기화는 회원과 관리자 계정을 남깁니다.<br>
+        전체 초기화는 인증 회원까지 삭제하며 다시 로그인할 수 없습니다.
+      </div>
+      <div class="form-actions">
+        <button class="btn-del" onclick="resetApplicationData(false)">계정 유지 초기화</button>
+        <button class="btn-del" onclick="resetApplicationData(true)" style="background:#7f1d1d;">회원 포함 전체 초기화</button>
+      </div>
+      <div class="form-result" id="ops-reset-result"></div>
+    </div>
+
+    <div class="admin-form">
+      <div class="table-title">전체 초기화 후 관리자 지정</div>
+      <div style="font-size:12px;line-height:1.8;color:var(--muted);margin-top:8px;">
+        1. 메인 사이트에서 새 관리자 계정으로 회원가입합니다.<br>
+        2. Supabase SQL Editor를 엽니다.<br>
+        3. <code>select public.bootstrap_app_admin('가입한 이메일');</code>을 실행합니다.<br>
+        4. 이 관리자 페이지에서 새 계정으로 로그인합니다.
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);">현재 관리자 주소 <code>${location.pathname}</code></div>
+    </div>`;
+  await loadOperationStatus();
+}
+
+async function loadOperationStatus() {
+  const counts = document.getElementById('ops-counts');
+  const adminList = document.getElementById('ops-admin-list');
+  if (!counts || !adminList) return;
+  const countRows = await Promise.all(ADMIN_TABLES.filter(table => table !== 'app_admins').map(async table => {
+    const { count, error } = await sb.from(table).select('*', { count:'exact', head:true });
+    return { table, count:error ? null : count };
+  }));
+  counts.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">${countRows.map(row => `
+    <div style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);">
+      <b style="display:block;font-size:12px;">${row.table}</b>
+      <span style="font-size:18px;font-weight:900;color:var(--red);">${row.count ?? '확인 실패'}</span>
+    </div>`).join('')}</div>`;
+  const { data:admins, error } = await sb.rpc('admin_list');
+  adminList.innerHTML = error
+    ? `<div style="font-size:12px;color:var(--red);">${error.message}</div>`
+    : `<div style="font-size:12px;font-weight:800;margin-bottom:6px;">현재 관리자 ${admins?.length || 0}명</div>${(admins || []).map(admin => `
+      <div style="padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;">${admin.email}</div>`).join('')}`;
+}
+
+async function setAdminAccount(enabled) {
+  const email = document.getElementById('ops-admin-email').value.trim();
+  const result = document.getElementById('ops-admin-result');
+  if (!email) { result.textContent = '회원 이메일을 입력하세요.'; return; }
+  const { error } = await sb.rpc('admin_set_by_email', { target_email:email, enabled });
+  result.style.color = error ? 'var(--red)' : 'var(--green)';
+  result.textContent = error ? error.message : enabled ? '관리자로 지정했습니다.' : '관리자 권한을 해제했습니다.';
+  if (!error) await loadOperationStatus();
+}
+
+async function resetApplicationData(deleteUsers) {
+  const phrase = deleteUsers ? '전체 회원 삭제' : '서비스 데이터 삭제';
+  const entered = prompt(`실행하려면 "${phrase}"를 정확히 입력하세요.`);
+  if (entered !== phrase) return;
+  if (!confirm('삭제 후 복구할 수 없습니다. 계속하시겠습니까?')) return;
+  const result = document.getElementById('ops-reset-result');
+  result.style.color = 'var(--muted)';
+  result.textContent = '데이터를 초기화하고 있습니다.';
+  const { error } = await sb.rpc('admin_reset_app_data', { delete_auth_users:deleteUsers });
+  if (error) {
+    result.style.color = 'var(--red)';
+    result.textContent = error.message;
+    return;
+  }
+  result.style.color = 'var(--green)';
+  result.textContent = '초기화를 완료했습니다.';
+  if (deleteUsers) {
+    await sb.auth.signOut();
+    location.reload();
+  } else {
+    await loadOperationStatus();
+  }
 }
 
 async function checkAdminDatabase() {
@@ -579,7 +697,7 @@ function renderVerificationPanel() {
 
 async function getAdminTestContext() {
   const { data:{ session } } = await sb.auth.getSession();
-  if (!session || session.user.email !== 'jobdevil23@gmail.com') throw new Error('관리자 로그인이 필요합니다.');
+  if (!session || !await hasAdminAccess()) throw new Error('관리자 로그인이 필요합니다.');
   const { data:profile } = await sb.from('profiles').select('nickname').eq('id', session.user.id).maybeSingle();
   return { user:session.user, nickname:profile?.nickname || '관리자' };
 }
@@ -975,8 +1093,8 @@ document.getElementById('detail-modal').addEventListener('click', function(e) {
 });
 
 // 자동 로그인 확인
-sb.auth.getSession().then(({ data: { session } }) => {
-  if (session && session.user.email === 'jobdevil23@gmail.com') {
+sb.auth.getSession().then(async ({ data: { session } }) => {
+  if (session && await hasAdminAccess()) {
     document.getElementById('adm-user-label').textContent = session.user.email;
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('admin-screen').style.display = 'block';

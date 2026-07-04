@@ -4506,8 +4506,6 @@ document.addEventListener('click', e => {
   if (!$('user-profile')?.contains(e.target)) closeUserDropdown();
 });
 
-const ADMIN_EMAIL = 'jobdevil23@gmail.com';
-
 // ── 관리자 검증 모드 (Supabase 인증 우회, 기능 테스트용)
 let isAdminTestMode = false;
 
@@ -4516,6 +4514,10 @@ function applyLoginUI(user) {
   const mp = document.getElementById('h-my-purchase');
   if (mp) mp.style.display = '';
   currentUser = user;
+  window._isAppAdmin = false;
+  sb.rpc('is_app_admin').then(({ data }) => {
+    window._isAppAdmin = data === true;
+  }).catch(() => {});
   const nick = user.user_metadata?.nickname || user.email.split('@')[0];
   updateHeaderUser(nick, myVerifiedTitle || '');
   $('btn-auth').style.display = 'none';
@@ -4548,6 +4550,7 @@ function applyLogoutUI() {
   const mpL = document.getElementById('h-my-purchase');
   if (mpL) mpL.style.display = 'none';
   currentUser = null;
+  window._isAppAdmin = false;
   dbStats = null;
   $('btn-auth').style.display = '';
   $('user-profile').style.display = 'none';
@@ -7622,7 +7625,7 @@ function feedItemHtml(a, isNew) {
   const icon  = icons[aType] || svgIcon('star',15,'#94a3b8');
   const label = labels[aType] ? labels[aType](aData) : (aType || '활동');
   const time  = relativeTime(a.created_at);
-  const canDelete = isLoggedIn && currentUser && (currentUser.email === ADMIN_EMAIL || currentUser.id === a.user_id);
+  const canDelete = isLoggedIn && currentUser && (window._isAppAdmin || currentUser.id === a.user_id);
   return `<div class="feed-item ${typeClass}${newClass}">
     <div class="feed-avatar" style="background:${avatarBg};">${icon}</div>
     <div class="feed-body">
@@ -7911,7 +7914,7 @@ async function renderRankingHub() {
   const list = $('ranking-hub-list');
   if (!sb || !list) return;
   try {
-    const adminPreview = location.search.includes('admin-test=1') && currentUser?.email === ADMIN_EMAIL;
+    const adminPreview = location.search.includes('admin-test=1') && window._isAppAdmin;
     const periodKey = adminPreview
       ? 'admin-test'
       : rankingScope === 'monthly' ? new Date().toISOString().slice(0,7) : 'all';
@@ -8838,7 +8841,7 @@ const ADMIN_TABS = { users:'users', tickets:'tickets', posts:'posts', stats:'sta
 let currentAdminTab = 'users';
 
 async function renderAdmin() {
-  const isAdmin = isLoggedIn && currentUser?.email === ADMIN_EMAIL;
+  const isAdmin = isLoggedIn && window._isAppAdmin;
   $('admin-gate').style.display = isAdmin ? 'none' : '';
   $('admin-content').style.display = isAdmin ? '' : 'none';
   if (!isAdmin) return;
