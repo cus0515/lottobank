@@ -5540,6 +5540,36 @@ function renderFortune() {
     <!-- ═══ 레이더 탭 ═══ -->
     <div id="fortune-tab-radar">
 
+      <!-- 헤더: 레이더 SVG 애니메이션 -->
+      <div style="display:flex;align-items:center;gap:12px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+        <div style="flex-shrink:0;">
+          <svg viewBox="0 0 60 60" width="44" height="44">
+            <circle cx="30" cy="30" r="28" fill="${_dm?'#0f172a':'#fff1f2'}" stroke="#e11d4866" stroke-width="1.5"/>
+            <circle cx="30" cy="30" r="18" fill="none" stroke="#e11d4833" stroke-width="1"/>
+            <circle cx="30" cy="30" r="9" fill="none" stroke="#e11d4833" stroke-width="1"/>
+            <line x1="30" y1="2" x2="30" y2="58" stroke="#e11d4822" stroke-width="0.8"/>
+            <line x1="2" y1="30" x2="58" y2="30" stroke="#e11d4822" stroke-width="0.8"/>
+            <line x1="9.4" y1="9.4" x2="50.6" y2="50.6" stroke="#e11d4815" stroke-width="0.8"/>
+            <line x1="50.6" y1="9.4" x2="9.4" y2="50.6" stroke="#e11d4815" stroke-width="0.8"/>
+            <path d="M30,30 L30,2 A28,28,0,0,1,58,30 Z" fill="#e11d4822">
+              <animateTransform attributeName="transform" type="rotate" from="0 30 30" to="360 30 30" dur="4s" repeatCount="indefinite"/>
+            </path>
+            <circle cx="30" cy="30" r="3" fill="#e11d48"/>
+            <circle cx="42" cy="18" r="2" fill="#e11d48" opacity="0.7">
+              <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="18" cy="38" r="1.5" fill="#e11d48" opacity="0.5">
+              <animate attributeName="opacity" values="0.5;0.1;0.5" dur="3s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--lotto-red,#e11d48);font-weight:800;letter-spacing:1.5px;margin-bottom:2px;">LOTTOBANK EXCLUSIVE</div>
+          <div style="font-size:16px;font-weight:900;color:var(--text-dark);line-height:1.2;">번호 레이더</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">최근 50회차 데이터 기반 자동 분석 · 매주 추천 번호 자동 저장</div>
+        </div>
+      </div>
+
       <!-- ⭐ 추천 번호 5게임 (최상단) -->
       <div style="background:var(--paper-white);border:2px solid var(--lotto-red,#e11d48);border-radius:10px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;">
         <div style="position:absolute;top:0;right:0;background:var(--lotto-red,#e11d48);font-size:9px;font-weight:800;color:#fff;padding:3px 10px;border-radius:0 0 0 8px;letter-spacing:.5px;">자동 저장</div>
@@ -5758,75 +5788,219 @@ function renderFortuneHistory() {
 }
 
 function renderFortunePension() {
-  // 연금복권 720+ 결과 탭 렌더링
+  // 연금복권 720+ 탭 — 레이더/추천이력 서브탭 구성
   const el = $('fortune-tab-pension');
   if (!el) return;
-  el.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">연금복권 데이터 불러오는 중...</div>`;
 
+  const PPKEY = 'ltb-pension-picks';
+
+  // 연금 서브탭 전환
+  window._pensionSubTab = window._pensionSubTab || 'radar';
+  const subBtnSt = (active) =>
+    `flex:1;padding:7px 0;border-radius:7px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;background:${active?'#7c3aed':'transparent'};color:${active?'#fff':'var(--text-muted)'};`;
+
+  el.innerHTML = `
+    <!-- 서브탭 -->
+    <div style="display:flex;gap:3px;background:var(--bg-light,#f1f5f9);border-radius:9px;padding:3px;margin-bottom:10px;">
+      <button id="pension-btn-radar" onclick="switchPensionSubTab('radar')" style="${subBtnSt(true)}">📡 레이더 분석</button>
+      <button id="pension-btn-history" onclick="switchPensionSubTab('history')" style="${subBtnSt(false)}">📋 추천 이력</button>
+    </div>
+    <div id="pension-sub-radar"></div>
+    <div id="pension-sub-history" style="display:none;"></div>
+  `;
+
+  // 즉시 레이더 렌더
   fetch('./pension-cache.json').then(r=>r.json()).then(data => {
-    if (!data || data.returnValue !== 'success') {
-      el.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text-muted);">연금복권 데이터를 불러올 수 없습니다.</div>`;
-      return;
-    }
-    const prizeNames = ['','🥇 1등(월 700만×20년)','🥈 2등(월 100만×10년)','🥉 3등(100만원)','4등(5만원)','5등(1만원)','6등(5천원)','7등(1천원)','특별(연금)'];
-    const prizeRows = (data.prizes||[]).map(p => {
-      const name = prizeNames[p.rank] || `${p.rank}등`;
-      const amt = p.rank<=2 ? '-' : (p.totAmt/(p.total||1)).toLocaleString()+'원';
-      return `<tr>
-        <td style="padding:7px 8px;font-size:12px;font-weight:700;">${name}</td>
-        <td style="padding:7px 8px;text-align:center;font-size:12px;">${(p.total||0).toLocaleString()}명</td>
-        <td style="padding:7px 8px;text-align:right;font-size:12px;font-weight:700;">${amt}</td>
-      </tr>`;
-    }).join('');
+    renderPensionRadar(data);
+  }).catch(()=>renderPensionRadar(null));
 
-    el.innerHTML = `
-      <div style="background:linear-gradient(135deg,#1a0a3e 0%,#2d1b69 100%);border-radius:12px;padding:16px;margin-bottom:10px;color:#fff;">
-        <div style="font-size:10px;letter-spacing:1px;opacity:.7;margin-bottom:4px;">PENSION LOTTERY 720+</div>
-        <div style="font-size:18px;font-weight:900;margin-bottom:8px;">제 ${data.drwNo}회 당첨 결과</div>
-        <div style="font-size:12px;opacity:.8;margin-bottom:12px;">${data.drwNoDate}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:9px;opacity:.7;margin-bottom:4px;">당첨 조</div>
-            <div style="font-size:22px;font-weight:900;">${data.wnBndNo}조</div>
-          </div>
-          <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:9px;opacity:.7;margin-bottom:4px;">1등 번호</div>
-            <div style="font-size:16px;font-weight:900;letter-spacing:3px;">${data.wnRnkVl}</div>
-          </div>
-        </div>
-        <div style="margin-top:10px;background:rgba(255,255,255,.08);border-radius:8px;padding:8px 10px;text-align:center;">
-          <div style="font-size:9px;opacity:.7;margin-bottom:2px;">보너스 번호</div>
-          <div style="font-size:15px;font-weight:900;letter-spacing:2px;">${data.bnsRnkVl}</div>
-        </div>
-      </div>
+  // 서브탭 전환
+  window.switchPensionSubTab = function(sub) {
+    window._pensionSubTab = sub;
+    ['radar','history'].forEach(t => {
+      const p = $('pension-sub-'+t), b = $('pension-btn-'+t);
+      if(p) p.style.display = t===sub?'':'none';
+      if(b){ b.style.background=t===sub?'#7c3aed':'transparent'; b.style.color=t===sub?'#fff':'var(--text-muted)'; }
+    });
+    if(sub==='history') renderPensionHistory();
+  };
+}
 
-      <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;overflow:hidden;margin-bottom:10px;">
-        <div style="padding:10px 12px;background:var(--bg-light);border-bottom:1px solid var(--border-dashed);">
-          <div style="font-size:12px;font-weight:900;color:var(--text-dark);">등수별 당첨 현황</div>
-        </div>
-        <table style="width:100%;border-collapse:collapse;">
-          <thead><tr style="background:var(--bg-light);">
-            <th style="padding:7px 8px;text-align:left;font-size:10px;color:var(--text-muted);font-weight:700;">등수</th>
-            <th style="padding:7px 8px;text-align:center;font-size:10px;color:var(--text-muted);font-weight:700;">당첨자</th>
-            <th style="padding:7px 8px;text-align:right;font-size:10px;color:var(--text-muted);font-weight:700;">1인 당첨금</th>
-          </tr></thead>
-          <tbody>${prizeRows}</tbody>
-        </table>
-      </div>
+function renderPensionRadar(data) {
+  // 연금복권 레이더 분석 — 최신 결과 + 5게임 추천
+  const el = $('pension-sub-radar');
+  if (!el) return;
 
-      <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;">
-        <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">🏦 연금복권이란?</div>
-        <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">1등 당첨 시 매월 700만원씩 20년간 지급(총 16.8억)되는 연금형 복권입니다. 1장 1,000원으로 1~5조 5게임을 구매합니다. QR 등록을 통해 나의 연금복권 구매 이력을 관리할 수 있습니다.</div>
-        <button onclick="go('result');setTimeout(()=>switchResultTab('pension'),300)" style="margin-top:10px;width:100%;padding:9px 0;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">연금복권 회차 조회</button>
-      </div>
-    `;
-  }).catch(()=>{
+  if (!data || data.returnValue !== 'success') {
     el.innerHTML = `<div style="text-align:center;padding:32px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;">
-      <div style="font-size:13px;font-weight:800;color:var(--text-dark);margin-bottom:4px;">데이터 로드 실패</div>
-      <div style="font-size:11px;color:var(--text-muted);">연금복권 데이터를 불러올 수 없습니다.</div>
-      <button onclick="go('result');setTimeout(()=>switchResultTab('pension'),300)" style="margin-top:10px;padding:8px 16px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;">회차 조회에서 확인</button>
+      <div style="font-size:13px;font-weight:800;color:var(--text-dark);margin-bottom:4px;">데이터 없음</div>
+      <button onclick="go('result');setTimeout(()=>switchResultTab('pension'),300)" style="margin-top:8px;padding:8px 16px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;">회차 조회에서 확인</button>
     </div>`;
-  });
+    return;
+  }
+
+  const nextDrw = data.drwNo + 1;
+  const today = new Date().toLocaleDateString('ko-KR');
+
+  // 연금복권 추천 5게임 생성 (조 1~5 + 6자리)
+  // 조: 마지막 당첨 조 제외한 확률 높은 추천 + 시드 기반 다양화
+  const lastJo = parseInt(data.wnBndNo) || 1;
+  const PPKEY = 'ltb-pension-picks';
+  const allPPicks = JSON.parse(localStorage.getItem(PPKEY)||'{}');
+
+  if (!allPPicks[nextDrw]) {
+    // 6자리 숫자 생성 — 시드 기반 (마지막 당첨번호 활용)
+    const seed = parseInt(data.wnRnkVl) || 123456;
+    const genNum = (s) => {
+      let x = (seed * (s+7) * nextDrw) % 999999;
+      return String(Math.abs(x)).padStart(6,'0').slice(0,6);
+    };
+    const joOrder = [1,2,3,4,5].filter(j=>j!==lastJo).concat([lastJo]);
+    const games = Array.from({length:5},(_,i)=>({
+      jo: joOrder[i % joOrder.length],
+      num: genNum(i)
+    }));
+    allPPicks[nextDrw] = { games, date: today };
+    localStorage.setItem(PPKEY, JSON.stringify(allPPicks));
+  }
+  const recGames = allPPicks[nextDrw].games;
+
+  const prizeNames = ['','🥇 1등(월700만×20년)','🥈 2등(월100만×10년)','🥉 3등(100만)','4등(5만)','5등(1만)','6등(5천)','7등(1천)','특별'];
+  const prizeRows = (data.prizes||[]).map(p=>{
+    const nm = prizeNames[p.rank]||`${p.rank}등`;
+    const amt = p.rank<=2?'-':(p.totAmt/(p.total||1)).toLocaleString()+'원';
+    return `<tr><td style="padding:7px 8px;font-size:11px;font-weight:700;">${nm}</td>
+      <td style="padding:7px 8px;text-align:center;font-size:11px;">${(p.total||0).toLocaleString()}명</td>
+      <td style="padding:7px 8px;text-align:right;font-size:11px;font-weight:700;">${amt}</td></tr>`;
+  }).join('');
+
+  const numDigitBalls = (numStr) => numStr.split('').map(d=>
+    `<span style="width:24px;height:30px;border-radius:5px;background:linear-gradient(135deg,#6d28d9,#4c1d95);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;">${d}</span>`
+  ).join('');
+
+  el.innerHTML = `
+    <!-- 헤더 -->
+    <div style="background:linear-gradient(135deg,#1a0a3e 0%,#2d1b69 100%);border-radius:12px;padding:14px;margin-bottom:10px;color:#fff;">
+      <div style="font-size:9px;letter-spacing:1px;opacity:.7;margin-bottom:3px;">PENSION LOTTERY 720+</div>
+      <div style="font-size:17px;font-weight:900;margin-bottom:6px;">제 ${data.drwNo}회 당첨 결과</div>
+      <div style="font-size:11px;opacity:.8;margin-bottom:10px;">${data.drwNoDate}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:9px;opacity:.7;margin-bottom:3px;">당첨 조</div>
+          <div style="font-size:24px;font-weight:900;">${data.wnBndNo}조</div>
+        </div>
+        <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:9px;opacity:.7;margin-bottom:6px;">1등 번호</div>
+          <div style="display:flex;gap:3px;justify-content:center;">${numDigitBalls(data.wnRnkVl)}</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:8px 10px;text-align:center;">
+        <div style="font-size:9px;opacity:.7;margin-bottom:4px;">보너스 번호</div>
+        <div style="display:flex;gap:3px;justify-content:center;">${numDigitBalls(data.bnsRnkVl)}</div>
+      </div>
+    </div>
+
+    <!-- ⭐ 추천 5게임 -->
+    <div style="background:var(--paper-white);border:2px solid #7c3aed;border-radius:10px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;right:0;background:#7c3aed;font-size:9px;font-weight:800;color:#fff;padding:3px 10px;border-radius:0 0 0 8px;">자동 저장</div>
+      <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:4px;">⭐ 제 ${nextDrw}회 연금복권 추천</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">조 + 6자리 번호 · 5게임 · 이력 탭에서 결과 확인</div>
+      ${recGames.map((g,i)=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:7px 0;${i<4?'border-bottom:1px dashed var(--border-dashed);':''}">
+          <span style="font-size:10px;font-weight:900;color:var(--text-muted);min-width:44px;">게임 ${i+1}</span>
+          <span style="background:linear-gradient(135deg,#7c3aed,#4c1d95);color:#fff;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:900;white-space:nowrap;">${g.jo}조</span>
+          <div style="display:flex;gap:3px;">${numDigitBalls(g.num)}</div>
+        </div>`).join('')}
+      <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-dashed);font-size:10px;color:var(--text-muted);">
+        📋 이력·적중률 확인은 <b style="color:var(--text-dark);cursor:pointer;" onclick="switchPensionSubTab('history')">추천 이력 탭</b>에서 확인하세요
+      </div>
+    </div>
+
+    <!-- 등수별 현황 -->
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;overflow:hidden;margin-bottom:10px;">
+      <div style="padding:10px 12px;background:var(--bg-light);border-bottom:1px solid var(--border-dashed);">
+        <div style="font-size:12px;font-weight:900;color:var(--text-dark);">등수별 당첨 현황</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:var(--bg-light);">
+          <th style="padding:7px 8px;text-align:left;font-size:10px;color:var(--text-muted);">등수</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;color:var(--text-muted);">당첨자</th>
+          <th style="padding:7px 8px;text-align:right;font-size:10px;color:var(--text-muted);">1인 당첨금</th>
+        </tr></thead>
+        <tbody>${prizeRows}</tbody>
+      </table>
+    </div>
+
+    <!-- 안내 -->
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;">
+      <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:6px;">🏦 연금복권이란?</div>
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">1장 1,000원에 1~5조 5게임 구매. 1등 당첨 시 매월 700만원씩 20년간 지급(총 16.8억).</div>
+      <button onclick="go('result');setTimeout(()=>switchResultTab('pension'),300)" style="margin-top:10px;width:100%;padding:9px 0;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">연금복권 회차 조회</button>
+    </div>
+  `;
+}
+
+function renderPensionHistory() {
+  // 연금복권 추천 이력 탭 렌더링
+  const el = $('pension-sub-history');
+  if (!el) return;
+  const PPKEY = 'ltb-pension-picks';
+  const allPPicks = JSON.parse(localStorage.getItem(PPKEY)||'{}');
+  const pRounds = Object.keys(allPPicks).map(Number).sort((a,b)=>b-a);
+
+  const numDigitBalls = (numStr,sm=true) => (numStr||'').split('').map(d=>
+    `<span style="width:${sm?'18px':'22px'};height:${sm?'22px':'28px'};border-radius:4px;background:linear-gradient(135deg,#6d28d9,#4c1d95);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:${sm?'9':'12'}px;font-weight:900;">${d}</span>`
+  ).join('');
+
+  if (!pRounds.length) {
+    el.innerHTML = `<div style="text-align:center;padding:32px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;">
+      <div style="font-size:32px;margin-bottom:8px;">📋</div>
+      <div style="font-size:13px;font-weight:800;color:var(--text-dark);margin-bottom:4px;">저장된 이력이 없습니다</div>
+      <div style="font-size:11px;color:var(--text-muted);">레이더 탭을 방문하면 자동 저장됩니다.</div>
+    </div>`;
+    return;
+  }
+
+  const cards = pRounds.map(r => {
+    const pk = allPPicks[r];
+    const games = pk.games || [];
+    // 연금복권 결과 비교는 DB 데이터가 필요하므로 현재는 대기중 표시
+    const isPending = true; // TODO: 실제 결과 연동 시 비교 로직 추가
+
+    const gameRows = games.map((g,gi)=>`
+      <div style="display:flex;align-items:center;gap:6px;padding:5px 0;${gi<games.length-1?'border-bottom:1px dashed var(--border-dashed);':''}">
+        <span style="font-size:9px;font-weight:700;color:var(--text-muted);min-width:44px;">게임 ${gi+1}</span>
+        <span style="background:linear-gradient(135deg,#7c3aed,#4c1d95);color:#fff;border-radius:5px;padding:2px 6px;font-size:10px;font-weight:900;">${g.jo}조</span>
+        <div style="display:flex;gap:2px;">${numDigitBalls(g.num)}</div>
+        <span style="font-size:10px;color:#94a3b8;font-weight:600;margin-left:auto;">대기 중</span>
+      </div>`).join('');
+
+    return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:14px;font-weight:900;color:var(--text-dark);">제 ${r}회</span>
+          <span style="font-size:9px;font-weight:800;background:#f59e0b22;color:#92400e;padding:2px 8px;border-radius:10px;">🕐 추첨 전</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:10px;color:var(--text-muted);">${pk.date||''}</span>
+          <button onclick="deletePensionPick(${r})" style="font-size:10px;color:#dc2626;background:none;border:1px solid #dc262633;border-radius:6px;padding:2px 8px;cursor:pointer;font-family:inherit;">삭제</button>
+        </div>
+      </div>
+      ${gameRows}
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">총 ${pRounds.length}회 이력</div>${cards}`;
+}
+
+function deletePensionPick(round) {
+  // 연금복권 추천 이력 삭제
+  if (!confirm(`제 ${round}회 연금복권 추천 이력을 삭제합니까?`)) return;
+  const PPKEY = 'ltb-pension-picks';
+  const allPPicks = JSON.parse(localStorage.getItem(PPKEY)||'{}');
+  delete allPPicks[round];
+  localStorage.setItem(PPKEY, JSON.stringify(allPPicks));
+  renderPensionHistory();
 }
 
 function showNumDetail(n) {

@@ -480,6 +480,27 @@ async function deleteFriendlyRow() {
   }
 }
 
+async function adminPanelLogin() {
+  const email = document.getElementById('admin-login-email')?.value?.trim();
+  const pw    = document.getElementById('admin-login-pw')?.value;
+  const res   = document.getElementById('admin-login-result');
+  if (!email || !pw) { res.style.color='var(--red)'; res.textContent='이메일과 비밀번호를 입력하세요.'; return; }
+  res.style.color='var(--muted)'; res.textContent='로그인 중...';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+  if (error) { res.style.color='var(--red)'; res.textContent='❌ ' + error.message; return; }
+  res.style.color='var(--green)';
+  res.textContent = `✅ 로그인 성공: ${data.user?.email}`;
+  document.getElementById('admin-login-pw').value = '';
+  checkMyAuth();
+}
+
+async function adminPanelLogout() {
+  await sb.auth.signOut();
+  const res = document.getElementById('admin-login-result');
+  if (res) { res.style.color='var(--muted)'; res.textContent='로그아웃 완료.'; }
+  checkMyAuth();
+}
+
 async function checkMyAuth() {
   const el = document.getElementById('my-auth-status');
   const { data: { user } } = await sb.auth.getUser();
@@ -553,10 +574,25 @@ async function renderOperationsPanel() {
 
     <div class="admin-form" style="border:1px solid #fef08a;">
       <div class="table-title" style="color:#854d0e;">🎖️ 내 계정 칭호 · 뱃지 직접 삭제</div>
-      <div style="font-size:12px;color:var(--muted);margin:6px 0 12px;line-height:1.7;">
+      <div style="font-size:12px;color:var(--muted);margin:6px 0 10px;line-height:1.7;">
         부정확한 칭호(예: 로또 1등)나 테스트 뱃지를 내 계정에서 직접 삭제합니다.<br>
-        삭제 후 메인 사이트를 새로고침하면 즉시 반영됩니다.
+        삭제 전에 <b>반드시 아래에서 로그인</b>하세요.
       </div>
+
+      <!-- 어드민 직접 로그인 -->
+      <div id="admin-login-box" style="background:#fafaf9;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:8px;">🔐 이 패널에서 직접 로그인</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+          <input id="admin-login-email" type="email" placeholder="이메일" style="padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-family:inherit;"/>
+          <input id="admin-login-pw" type="password" placeholder="비밀번호" style="padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-family:inherit;"/>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="adminPanelLogin()" style="flex:1;padding:7px;background:#1d4ed8;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">로그인</button>
+          <button onclick="adminPanelLogout()" style="padding:7px 12px;background:#6b7280;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">로그아웃</button>
+        </div>
+        <div id="admin-login-result" style="font-size:11px;margin-top:6px;color:var(--muted);"></div>
+      </div>
+
       <div id="my-auth-status" style="font-size:11px;color:var(--muted);margin-bottom:10px;">로그인 상태 확인 중...</div>
       <div class="form-actions" style="flex-wrap:wrap;gap:8px;">
         <button class="btn-del" onclick="deleteMyTitles()" style="background:#92400e;">🗑️ 내 칭호 전체 삭제</button>
@@ -564,11 +600,6 @@ async function renderOperationsPanel() {
         <button class="btn-refresh" onclick="checkMyAuth()">🔄 로그인 상태 확인</button>
       </div>
       <div class="form-result" id="my-data-result"></div>
-      <div style="margin-top:10px;padding:10px;background:#fafaf9;border-radius:6px;font-size:11px;color:var(--muted);">
-        <b>위 버튼이 안 되면</b> → Supabase 대시보드 SQL Editor에서 직접 실행:<br>
-        <code style="display:block;margin-top:4px;padding:6px;background:#fff;border-radius:4px;font-size:10px;">DELETE FROM user_system_titles WHERE user_id = auth.uid();</code>
-        <code style="display:block;margin-top:4px;padding:6px;background:#fff;border-radius:4px;font-size:10px;">DELETE FROM user_badges WHERE user_id = auth.uid();</code>
-      </div>
     </div>
 
     <div class="admin-form" style="border:1px solid #fecaca;">
