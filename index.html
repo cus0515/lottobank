@@ -5199,7 +5199,7 @@ function go(id) {
     home:      '실시간 피드',
     result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="qr-tab-register" class="qr-inner-tab on" onclick="switchQrView(\'register\')">QR 인증</button><button id="qr-tab-history" class="qr-inner-tab" onclick="switchQrView(\'history\')">번호 이력</button></div>',
-    fortune:   '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 실시간 당첨 인증 피드',
+    fortune:   '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" style="display:inline-block;vertical-align:-2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="12"/><line x1="12" y1="12" x2="19" y2="19"/><line x1="2" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="3" fill="var(--lotto-red)" opacity="0.4"/></svg> 번호 레이더',
     stats:     '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="stats-tab-all" class="qr-inner-tab on" onclick="setStatsLotteryMode(\'all\')">Total</button><button id="stats-tab-lotto" class="qr-inner-tab" onclick="setStatsLotteryMode(\'lotto\')">로또</button><button id="stats-tab-pension" class="qr-inner-tab" onclick="setStatsLotteryMode(\'pension\')">연금</button></div>',
     rank:      '<div class="rank-view-tabs" style="width:100%;margin-bottom:0;"><button id="rank-view-ranking" class="rank-view-btn on" onclick="setRankView(\'ranking\')">랭킹</button><button id="rank-view-hall" class="rank-view-btn" onclick="setRankView(\'hall\')">명예의 전당</button></div>',
     map:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 내 주변 판매점',
@@ -5386,15 +5386,24 @@ function saveFortuneSet(numsJson) {
 }
 
 function renderFortune() {
-  // LottoBank 전용 번호 레이더 페이지
+  // LottoBank 번호 레이더 — 전용 분석 페이지
   const el = $('fortune-content');
   const d = latestData;
   const rounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
 
   if (!d || rounds.length < 5) {
     el.innerHTML = `<div style="text-align:center;padding:48px 20px;color:var(--text-muted);">
-      <div style="font-size:32px;margin-bottom:10px;">📡</div>
-      <div style="font-size:14px;font-weight:800;margin-bottom:6px;">신호 수신 중...</div>
+      <svg viewBox="0 0 60 60" width="48" height="48" style="display:block;margin:0 auto 12px;">
+        <circle cx="30" cy="30" r="28" fill="none" stroke="#e11d4844" stroke-width="1.5"/>
+        <circle cx="30" cy="30" r="18" fill="none" stroke="#e11d4844" stroke-width="1"/>
+        <circle cx="30" cy="30" r="8" fill="none" stroke="#e11d4844" stroke-width="1"/>
+        <line x1="30" y1="2" x2="30" y2="58" stroke="#e11d4822" stroke-width="1"/>
+        <line x1="2" y1="30" x2="58" y2="30" stroke="#e11d4822" stroke-width="1"/>
+        <path d="M30,30 L30,3 A27,27,0,0,1,57,30 Z" fill="#e11d4833">
+          <animateTransform attributeName="transform" type="rotate" from="0 30 30" to="360 30 30" dur="3s" repeatCount="indefinite"/>
+        </path>
+      </svg>
+      <div style="font-size:14px;font-weight:800;margin-bottom:6px;">레이더 수신 중...</div>
       <div style="font-size:11px;opacity:.6;">회차 데이터를 불러오고 있습니다</div>
     </div>`;
     setTimeout(()=>{ if($('fortune-content')) renderFortune(); }, 2500);
@@ -5423,12 +5432,14 @@ function renderFortune() {
   }
 
   const gapFrom = n => latestRound - lastSeenRound[n];
-  const maxGap = Math.max(...Array.from({length:45},(_,i)=>gapFrom(i+1)));
+  const allNums = Array.from({length:45},(_,i)=>i+1);
+  const maxGap = Math.max(...allNums.map(n=>gapFrom(n)));
+  const maxFreq = Math.max(...allNums.map(n=>freq[n]));
 
   // ── 구간 색상 ────────────────────────────────────────────
   const zC = n => n<=10?'#f59e0b':n<=20?'#3b82f6':n<=30?'#ef4444':n<=40?'#64748b':'#10b981';
 
-  // ── Section 1: 최신 회차 요약 ────────────────────────────
+  // ── 기본 통계 ────────────────────────────────────────────
   const sorted = [...nums].sort((a,b)=>a-b);
   const oddCnt = nums.filter(n=>n%2).length;
   const sum = nums.reduce((a,b)=>a+b,0);
@@ -5441,22 +5452,20 @@ function renderFortune() {
     return `<span style="width:32px;height:32px;border-radius:50%;background:${isBs?'transparent':c};color:${isBs?c:'#fff'};border:${isBs?'2.5px solid '+c:'none'};display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">${String(n).padStart(2,'0')}</span>`;
   };
 
-  const sPill = (label, val, col='var(--text-dark)') =>
+  const sPill = (label, val, sub='', col='var(--text-dark)') =>
     `<div style="background:var(--bg-light,#f1f5f9);border-radius:8px;padding:8px 10px;text-align:center;">
       <div style="font-size:9px;color:var(--text-muted);margin-bottom:2px;">${label}</div>
       <div style="font-size:13px;font-weight:900;color:${col};">${val}</div>
+      ${sub?`<div style="font-size:9px;color:var(--text-muted);margin-top:1px;">${sub}</div>`:''}
     </div>`;
 
-  // ── Section 2: 번호 지형도 (9×5 grid) ─────────────────
+  // ── 번호 지형도 ──────────────────────────────────────────
   const _dm = document.documentElement.getAttribute('data-theme') === 'dark';
-
-  const terrainCells = Array.from({length:45},(_,i) => {
-    const n = i+1;
+  const terrainCells = allNums.map(n => {
     const isWin = nums.includes(n);
     const isBns = bonus === n;
     const gap = gapFrom(n);
     const ratio = maxGap > 0 ? gap / maxGap : 0;
-
     let bg, tc, border, shadow;
     if (isWin) {
       bg = zC(n); tc = '#fff'; border = 'none';
@@ -5466,34 +5475,26 @@ function renderFortune() {
       border = `2px solid ${zC(n)}`; shadow = 'none';
     } else {
       if (_dm) {
-        const rv = Math.round(180*(1-ratio)+20*ratio);
-        const gv = Math.round(40*(1-ratio)+40*ratio);
-        const bv = Math.round(40*(1-ratio)+180*ratio);
-        bg = `rgba(${rv},${gv},${bv},${0.18+ratio*0.55})`;
-        tc = ratio > 0.5 ? '#93c5fd' : '#fca5a5';
+        const rv=Math.round(180*(1-ratio)+20*ratio), gv=40, bv=Math.round(40*(1-ratio)+180*ratio);
+        bg=`rgba(${rv},${gv},${bv},${0.18+ratio*0.55})`; tc=ratio>.5?'#93c5fd':'#fca5a5';
       } else {
-        const rv = Math.round(220*(1-ratio)+37*ratio);
-        const gv = Math.round(80*(1-ratio)+99*ratio);
-        const bv = Math.round(50*(1-ratio)+235*ratio);
-        bg = `rgba(${rv},${gv},${bv},${0.1+ratio*0.42})`;
-        tc = ratio > 0.5 ? '#1e40af' : '#991b1b';
+        const rv=Math.round(220*(1-ratio)+37*ratio), gv=Math.round(80*(1-ratio)+99*ratio), bv=Math.round(50*(1-ratio)+235*ratio);
+        bg=`rgba(${rv},${gv},${bv},${0.1+ratio*0.42})`; tc=ratio>.5?'#1e40af':'#991b1b';
       }
-      border = 'none'; shadow = 'none';
+      border='none'; shadow='none';
     }
-
     return `<div onclick="showNumDetail(${n})"
-      title="${n}번 · ${gap===0?'이번 회차 당첨!':gap+'회 전 마지막 등장'} · 50회 중 ${freq[n]}회"
-      style="border-radius:7px;background:${bg};color:${tc};border:${border};box-shadow:${shadow};display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;cursor:pointer;position:relative;${isWin?'transform:scale(1.1);z-index:1;':''}"
+      title="${n}번 · ${gap===0?'이번 회차 당첨!':gap+'회 전 등장'} · 50회 중 ${freq[n]}회"
+      style="border-radius:7px;background:${bg};color:${tc};border:${border};box-shadow:${shadow};display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;cursor:pointer;${isWin?'transform:scale(1.1);z-index:1;':''}"
       onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'">
       <span style="font-size:11px;font-weight:900;line-height:1.1;">${n}</span>
-      ${isWin?'<span style="font-size:6px;line-height:1;margin-top:1px;">★</span>':isBns?'<span style="font-size:6px;line-height:1;margin-top:1px;">+</span>':gap>=12?`<span style="font-size:6px;line-height:1;margin-top:1px;opacity:.7;">${gap}↑</span>`:''}
+      ${isWin?'<span style="font-size:6px;line-height:1;margin-top:1px;">★</span>':isBns?'<span style="font-size:6px;line-height:1;margin-top:1px;">+</span>':gap>=12?`<span style="font-size:6px;opacity:.7;line-height:1;margin-top:1px;">${gap}↑</span>`:''}
     </div>`;
   }).join('');
 
-  // ── Section 3: 주목 번호 ─────────────────────────────────
-  const allN = Array.from({length:45},(_,i)=>i+1);
-  const overdue = [...allN].sort((a,b)=>gapFrom(b)-gapFrom(a)).slice(0,6);
-  const frequent = [...allN].sort((a,b)=>freq[b]-freq[a]).slice(0,6);
+  // ── 주목 번호 ────────────────────────────────────────────
+  const overdue  = [...allNums].sort((a,b)=>gapFrom(b)-gapFrom(a)).slice(0,5);
+  const frequent = [...allNums].sort((a,b)=>freq[b]-freq[a]).slice(0,5);
 
   const numChip = (n, sub) =>
     `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg-light,#f1f5f9);border-radius:8px;">
@@ -5504,13 +5505,61 @@ function renderFortune() {
       </div>
     </div>`;
 
-  // ── Section 4: 최근 10회차 구간 흐름 ─────────────────────
-  const flowBars = rounds.slice(0,10).map(r => {
+  // ── 추천 번호 알고리즘 ───────────────────────────────────
+  const scored = allNums.filter(n=>!nums.includes(n)&&n!==bonus).map(n=>({
+    n,
+    score: (gapFrom(n)/(maxGap||1))*0.6 + (freq[n]/(maxFreq||1))*0.4
+  })).sort((a,b)=>b.score-a.score);
+
+  const lo2 = scored.filter(x=>x.n<=15);
+  const mi2 = scored.filter(x=>x.n>=16&&x.n<=30);
+  const hi2 = scored.filter(x=>x.n>=31);
+  const picks = new Set();
+  [[lo2,2],[mi2,2],[hi2,2]].forEach(([arr,cnt])=>arr.slice(0,cnt).forEach(x=>picks.add(x.n)));
+  for (const x of scored) { if(picks.size>=6) break; picks.add(x.n); }
+  const pickArr = [...picks].sort((a,b)=>a-b);
+
+  // localStorage 저장
+  const PKEY = 'ltb-radar-picks';
+  const allPicks = JSON.parse(localStorage.getItem(PKEY)||'{}');
+  if (!allPicks[latestRound]) {
+    allPicks[latestRound] = { nums: pickArr, date: d.date||'' };
+    localStorage.setItem(PKEY, JSON.stringify(allPicks));
+  }
+
+  // 이력 비교 (저장된 추천 vs 실제 결과)
+  const histRounds = Object.keys(allPicks).map(Number).sort((a,b)=>b-a).slice(0,6);
+  const histRows = histRounds.map(r => {
+    const pk = allPicks[r];
     const rd = recentData[r];
-    if (!rd) return '';
-    const lo = rd.nums.filter(n=>n<=15).length;
-    const mi = rd.nums.filter(n=>n>=16&&n<=30).length;
-    const hi = rd.nums.filter(n=>n>=31).length;
+    const isCurrent = r === latestRound;
+    let matchInfo = '';
+    if (!isCurrent && rd) {
+      const hits = pk.nums.filter(n=>rd.nums.includes(n)).length;
+      const bonusHit = pk.nums.includes(rd.bonus);
+      let badge = '';
+      if(hits===6) badge='🥇 1등';
+      else if(hits===5&&bonusHit) badge='🥈 2등';
+      else if(hits===5) badge='🥉 3등';
+      else if(hits===4) badge='🎯 4등';
+      else if(hits===3) badge='✅ 5등';
+      else badge=`${hits}개`;
+      matchInfo = `<span style="font-size:10px;font-weight:800;color:${hits>=3?'#dc2626':'#94a3b8'};">${badge}</span>`;
+    } else if (isCurrent) {
+      matchInfo = `<span style="font-size:10px;color:#94a3b8;font-weight:700;">대기중</span>`;
+    }
+    const ballStr = pk.nums.map(n=>`<span style="width:18px;height:18px;border-radius:50%;background:${zC(n)};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;">${n}</span>`).join('');
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-dashed);">
+      <span style="font-size:10px;color:var(--text-muted);min-width:36px;font-weight:700;">${r}회</span>
+      <div style="display:flex;gap:2px;flex:1;">${ballStr}</div>
+      ${matchInfo}
+    </div>`;
+  }).join('');
+
+  // 구간 흐름
+  const flowBars = rounds.slice(0,10).map(r=>{
+    const rd=recentData[r]; if(!rd) return '';
+    const lo=rd.nums.filter(n=>n<=15).length, mi=rd.nums.filter(n=>n>=16&&n<=30).length, hi=rd.nums.filter(n=>n>=31).length;
     return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;">
       <div style="width:100%;display:flex;flex-direction:column;gap:1px;height:52px;border-radius:4px;overflow:hidden;">
         <div style="flex:${hi};background:#ef4444;min-height:${hi?'3':'0'}px;"></div>
@@ -5523,37 +5572,60 @@ function renderFortune() {
 
   // ── 렌더링 ─────────────────────────────────────────────
   el.innerHTML = `
-    <div style="border-left:4px solid var(--lotto-red,#e11d48);background:var(--paper-white);border-radius:0 10px 10px 0;padding:10px 14px;margin-bottom:12px;">
-      <div style="font-size:9px;color:var(--lotto-red,#e11d48);font-weight:800;letter-spacing:1.5px;margin-bottom:2px;">LOTTOBANK EXCLUSIVE</div>
-      <div style="font-size:15px;font-weight:900;color:var(--text-dark);">번호 레이더</div>
-      <div style="font-size:10px;color:var(--text-muted);margin-top:1px;">최근 50회차 실제 데이터 기반 · LottoBank에서만 볼 수 있는 분석</div>
+    <!-- 헤더: 레이더 SVG + 타이틀 -->
+    <div style="display:flex;align-items:center;gap:12px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+      <div style="flex-shrink:0;">
+        <svg viewBox="0 0 60 60" width="44" height="44">
+          <circle cx="30" cy="30" r="28" fill="${_dm?'#0f172a':'#fff1f2'}" stroke="#e11d4866" stroke-width="1.5"/>
+          <circle cx="30" cy="30" r="18" fill="none" stroke="#e11d4833" stroke-width="1"/>
+          <circle cx="30" cy="30" r="9" fill="none" stroke="#e11d4833" stroke-width="1"/>
+          <line x1="30" y1="2" x2="30" y2="58" stroke="#e11d4822" stroke-width="0.8"/>
+          <line x1="2" y1="30" x2="58" y2="30" stroke="#e11d4822" stroke-width="0.8"/>
+          <line x1="9.4" y1="9.4" x2="50.6" y2="50.6" stroke="#e11d4815" stroke-width="0.8"/>
+          <line x1="50.6" y1="9.4" x2="9.4" y2="50.6" stroke="#e11d4815" stroke-width="0.8"/>
+          <path d="M30,30 L30,2 A28,28,0,0,1,58,30 Z" fill="#e11d4822">
+            <animateTransform attributeName="transform" type="rotate" from="0 30 30" to="360 30 30" dur="4s" repeatCount="indefinite"/>
+          </path>
+          <circle cx="30" cy="30" r="3" fill="#e11d48"/>
+          <circle cx="42" cy="18" r="2" fill="#e11d48" opacity="0.7">
+            <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="18" cy="38" r="1.5" fill="#e11d48" opacity="0.5">
+            <animate attributeName="opacity" values="0.5;0.1;0.5" dur="3s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--lotto-red,#e11d48);font-weight:800;letter-spacing:1.5px;margin-bottom:2px;">LOTTOBANK EXCLUSIVE</div>
+        <div style="font-size:16px;font-weight:900;color:var(--text-dark);line-height:1.2;">번호 레이더</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">최근 50회차 데이터 기반 자동 분석 · 매주 추천 번호 자동 저장</div>
+      </div>
     </div>
 
+    <!-- Section 1: 이번 회차 요약 -->
     <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-        <div>
-          <div style="font-size:13px;font-weight:900;color:var(--text-dark);">제 ${latestRound}회 당첨번호</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:1px;">${d.date || ''}</div>
-        </div>
-        <span style="font-size:9px;background:#fef2f2;color:#dc2626;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:.5px;">LATEST</span>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:900;color:var(--text-dark);">제 ${latestRound}회 당첨번호 요약</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">이번 회차 당첨번호의 패턴입니다. 홀짝 비율·번호 합계·구간 분포로 회차의 특성을 파악하세요.</div>
       </div>
       <div style="display:flex;align-items:center;gap:5px;margin-bottom:12px;flex-wrap:wrap;">
         ${nums.map(n=>bBall(n)).join('')}
         <span style="font-size:13px;font-weight:900;color:var(--text-muted);margin:0 1px;">+</span>
-        ${bBall(bonus, true)}
+        ${bBall(bonus,true)}
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
-        ${sPill('홀 : 짝', `${oddCnt} : ${6-oddCnt}`)}
-        ${sPill('번호 합계', sum, '#dc2626')}
-        ${sPill('저 · 중 · 고', `${lowCnt}·${midCnt}·${hiCnt}`)}
-        ${sPill('범위', `${sorted[0]}~${sorted[5]}`)}
+        ${sPill('홀 : 짝', `${oddCnt} : ${6-oddCnt}`, '홀수 vs 짝수')}
+        ${sPill('번호 합계', sum, `평균 ${(sum/6).toFixed(0)}`, '#dc2626')}
+        ${sPill('저 · 중 · 고', `${lowCnt}·${midCnt}·${hiCnt}`, '1~15 / 16~30 / 31~45')}
+        ${sPill('범위', `${sorted[0]}~${sorted[5]}`, `폭 ${sorted[5]-sorted[0]}`)}
       </div>
     </div>
 
+    <!-- Section 2: 번호 지형도 -->
     <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
       <div style="margin-bottom:8px;">
         <div style="font-size:13px;font-weight:900;color:var(--text-dark);">번호 지형도</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">최근 50회차 기준 · 색이 진할수록 오랫동안 등장하지 않은 번호 · 번호 클릭 시 상세 확인</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.5;">1~45 각 번호가 최근 50회차에서 언제 마지막으로 등장했는지 색상으로 표현합니다. <b style="color:#1e40af;">파란색(오래됨)</b>일수록 최근에 안 나온 번호, <b style="color:#991b1b;">붉은색(최근)</b>일수록 최근에 이미 나온 번호입니다. 번호를 클릭하면 상세 정보를 확인할 수 있습니다.</div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-bottom:8px;">
         ${terrainCells}
@@ -5566,27 +5638,52 @@ function renderFortune() {
       </div>
     </div>
 
+    <!-- Section 3: 주목할 번호 -->
     <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
-      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">주목할 번호</div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:900;color:var(--text-dark);">주목할 번호</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.5;">통계적으로 관심을 가질 만한 번호를 추려냈습니다. <b>오랫동안 안 나온 번호</b>는 "나올 때가 됐을 수도" 있는 번호, <b>자주 나온 번호</b>는 최근 사이클에서 활발한 번호입니다. 단, 로또는 매 회차 독립 시행이므로 과거 패턴이 다음 결과를 보장하지 않습니다.</div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div>
           <div style="font-size:10px;font-weight:800;color:#1d4ed8;margin-bottom:6px;">📭 오랫동안 안 나온 번호</div>
           <div style="display:flex;flex-direction:column;gap:4px;">
-            ${overdue.map(n=>numChip(n, `${gapFrom(n)}회차 전 마지막 등장`)).join('')}
+            ${overdue.map(n=>numChip(n,`${gapFrom(n)}회 전 마지막 등장`)).join('')}
           </div>
         </div>
         <div>
           <div style="font-size:10px;font-weight:800;color:#b91c1c;margin-bottom:6px;">🔥 최근 자주 나온 번호</div>
           <div style="display:flex;flex-direction:column;gap:4px;">
-            ${frequent.map(n=>numChip(n, `50회 중 ${freq[n]}회 등장`)).join('')}
+            ${frequent.map(n=>numChip(n,`50회 중 ${freq[n]}회 등장`)).join('')}
           </div>
         </div>
       </div>
     </div>
 
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;">
-      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:2px;">최근 10회차 구간 흐름</div>
-      <div style="font-size:10px;color:var(--text-muted);margin-bottom:10px;">
+    <!-- Section 4: LottoBank 추천 번호 ⭐ -->
+    <div style="background:var(--paper-white);border:2px solid var(--lotto-red,#e11d48);border-radius:10px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;right:0;background:var(--lotto-red,#e11d48);font-size:9px;font-weight:800;color:#fff;padding:3px 8px;border-radius:0 0 0 8px;letter-spacing:.5px;">이번 회 자동 저장</div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:900;color:var(--text-dark);">⭐ 제 ${latestRound}회 LottoBank 추천 번호</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.5;">위 분석을 종합해 <b>등장 간격(60%) + 출현 빈도(40%)</b> 가중치로 점수를 매기고, 저·중·고 구간 균형을 맞춰 6개를 선별합니다. 통계 기반 참고용이며 당첨을 보장하지 않습니다.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+        ${pickArr.map(n=>`<span style="width:38px;height:38px;border-radius:50%;background:${zC(n)};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.15);">${String(n).padStart(2,'0')}</span>`).join('')}
+      </div>
+      <div style="font-size:11px;font-weight:800;color:var(--text-dark);margin-bottom:6px;">추천 번호 이력 & 정확도</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">저장된 추천 번호와 실제 당첨번호가 몇 개 일치했는지 기록합니다.</div>
+      <div style="font-size:10px;">
+        ${histRows || '<div style="color:var(--text-muted);padding:8px 0;">이력이 없습니다. 매주 방문 시 자동 저장됩니다.</div>'}
+      </div>
+    </div>
+
+    <!-- Section 5: 최근 10회차 구간 흐름 -->
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div style="margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:900;color:var(--text-dark);">최근 10회차 구간 흐름</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.5;">저번호(1~15)·중번호(16~30)·고번호(31~45)가 각 회차에서 몇 개씩 당첨됐는지 보여줍니다. 연속적인 패턴이 있다면 구간 비중 참고에 활용할 수 있습니다.</div>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">
         <span style="color:#f59e0b;font-weight:700;">■</span> 1~15
         <span style="margin:0 6px;color:#3b82f6;font-weight:700;">■</span> 16~30
         <span style="margin-right:6px;color:#ef4444;font-weight:700;">■</span> 31~45
@@ -5594,6 +5691,15 @@ function renderFortune() {
       <div style="display:flex;gap:4px;align-items:flex-end;">
         ${flowBars}
       </div>
+    </div>
+
+    <!-- Section 6: 연금복권 안내 -->
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:4px;">🏦 연금복권 720+ 분석</div>
+        <div style="font-size:10px;color:var(--text-muted);line-height:1.5;">연금복권 레이더는 별도 탭으로 준비 중입니다.<br>현재는 회차조회에서 연금복권 최신 결과를 확인할 수 있습니다.</div>
+      </div>
+      <button onclick="go('result')" style="flex-shrink:0;padding:8px 14px;background:var(--lotto-red,#e11d48);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;">연금 결과 보기</button>
     </div>
   `;
 }
@@ -5603,31 +5709,24 @@ function showNumDetail(n) {
   const freq2 = new Array(46).fill(0);
   const lastSeen2 = new Array(46).fill(0);
   const appearances = [];
-
   rounds2.slice(0,50).forEach(r => {
-    const rd = recentData[r];
-    if (!rd) return;
+    const rd = recentData[r]; if(!rd) return;
     const arr = [...rd.nums, rd.bonus];
-    arr.forEach(num => {
-      freq2[num]++;
-      if (!lastSeen2[num]) lastSeen2[num] = r;
-    });
+    arr.forEach(num => { freq2[num]++; if(!lastSeen2[num]) lastSeen2[num]=r; });
     if (arr.includes(n)) appearances.push(r);
   });
-
   const latR = latestData ? latestData.round : 0;
   const gap = latR - (lastSeen2[n] || latR);
   const zC2 = num => num<=10?'#f59e0b':num<=20?'#3b82f6':num<=30?'#ef4444':num<=40?'#64748b':'#10b981';
-
-  const t = $('toast');
-  if (!t) return;
+  const t = $('toast'); if(!t) return;
   t.innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;">
       <span style="width:38px;height:38px;border-radius:50%;background:${zC2(n)};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;flex-shrink:0;">${n}</span>
       <div>
         <div style="font-size:13px;font-weight:900;">${n}번 상세</div>
-        <div style="font-size:11px;opacity:.85;">50회 중 ${freq2[n]}회 · ${gap===0?'이번 회차 당첨!':gap+'회차 전 마지막 등장'}</div>
-        ${appearances.length?`<div style="font-size:10px;opacity:.65;margin-top:2px;">최근 등장: ${appearances.slice(0,3).join('회, ')}회${appearances.length>3?' 외':''}</div>`:''}
+        <div style="font-size:11px;opacity:.85;">최근 50회 중 ${freq2[n]}회 등장</div>
+        <div style="font-size:10px;opacity:.7;">${gap===0?'이번 회차 당첨!':gap+'회차 전 마지막 등장'}</div>
+        ${appearances.length?`<div style="font-size:10px;opacity:.6;margin-top:2px;">등장 회차: ${appearances.slice(0,4).join(', ')}회${appearances.length>4?' 외':''}</div>`:''}
       </div>
     </div>`;
   t.classList.add('on');
