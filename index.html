@@ -1324,6 +1324,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
       <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-map" class="menu-btn" onclick="go('map')">지도</button>
+      <button id="m-fortune" class="menu-btn" onclick="go('fortune')">📡 레이더</button>
       <button id="m-stats" class="menu-btn auth-member-tab" onclick="go('stats')" style="display:none;">나의 전적</button>
       <button id="m-ticket" class="menu-btn auth-member-tab" onclick="go('ticket')" style="display:none;">QR 인증</button>
     </div>
@@ -1386,7 +1387,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   <button class="mob-menu-item" onclick="go('result');closeMobMenu()">회차 조회</button>
   <button class="mob-menu-item" onclick="go('rank');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> 랭킹</button>
   <button class="mob-menu-item" onclick="go('map');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 지도</button>
-  <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()">🔮 번호운세</button>
+  <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()">📡 레이더</button>
   <div id="mob-auth-section" style="display:none;border-top:2px solid var(--border-dashed);margin-top:4px;">
     <div style="padding:10px 4px 4px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.5px;">내 계정</div>
     <button class="mob-menu-item auth-member-tab" onclick="go('stats');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적</button>
@@ -5383,632 +5384,254 @@ function saveFortuneSet(numsJson) {
 }
 
 function renderFortune() {
-  $('fortune-content').innerHTML = `
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border-dashed);">
-        <div>
-          <div style="font-size:13px;font-weight:900;color:var(--text-dark);">실시간 당첨 인증</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">QR로 확인된 당첨과 회원 활동을 최신순으로 보여드립니다.</div>
-        </div>
-        <span style="font-size:10px;font-weight:700;color:#16a34a;">LIVE</span>
-      </div>
-      <div id="feed-list-live" style="min-height:160px;"></div>
-    </div>
-    <button onclick="go('ticket')" style="width:100%;margin-top:10px;padding:10px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">QR 당첨 인증하기</button>
-  `;
-  renderFeed();
-  return;
-  const _dm = document.documentElement.getAttribute('data-theme') === 'dark';
-  const rounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
+  // LottoBank 전용 번호 레이더 페이지
+  const el = $('fortune-content');
   const d = latestData;
-  if (!d || rounds.length === 0) {
-    $('fortune-content').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px;">회차 데이터 로딩 중...</div>';
+  const rounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
+
+  if (!d || rounds.length < 5) {
+    el.innerHTML = `<div style="text-align:center;padding:48px 20px;color:var(--text-muted);">
+      <div style="font-size:32px;margin-bottom:10px;">📡</div>
+      <div style="font-size:14px;font-weight:800;margin-bottom:6px;">신호 수신 중...</div>
+      <div style="font-size:11px;opacity:.6;">회차 데이터를 불러오고 있습니다</div>
+    </div>`;
+    setTimeout(()=>{ if($('fortune-content')) renderFortune(); }, 2500);
     return;
   }
 
-  // 번호별 출현 빈도 계산 (최근 50회차)
+  const nums = d.nums;
+  const bonus = d.bonus;
+  const latestRound = d.round;
+
+  // ── 번호별 분석 (최근 50회) ──────────────────────────────
   const freq = new Array(46).fill(0);
-  const recentRounds = rounds.slice(0, 50);
-  recentRounds.forEach(r => {
+  const lastSeenRound = new Array(46).fill(0);
+  const recent50 = rounds.slice(0, 50);
+
+  recent50.forEach(r => {
     const rd = recentData[r];
     if (!rd) return;
-    rd.nums.forEach(n => freq[n]++);
-    freq[rd.bonus]++;
-  });
-  const totalDraws = recentRounds.length;
-
-  // 핫/콜드 번호
-  const indexed = freq.map((c,i)=>({n:i,c})).slice(1);
-  const sorted = [...indexed].sort((a,b)=>b.c-a.c);
-  const hot6 = sorted.slice(0,6).map(x=>x.n);
-  const cold6 = sorted.slice(-6).map(x=>x.n);
-
-  // 연번(연속번호) 분석 (최근 20회차)
-  let consec2=0, consec3=0, consecNone=0;
-  recentRounds.slice(0,20).forEach(r => {
-    const rd = recentData[r];
-    if (!rd) return;
-    const nums = [...rd.nums].sort((a,b)=>a-b);
-    let maxRun=1, curRun=1;
-    for(let i=1;i<nums.length;i++){
-      if(nums[i]===nums[i-1]+1) { curRun++; maxRun=Math.max(maxRun,curRun); }
-      else curRun=1;
-    }
-    if(maxRun>=3) consec3++;
-    else if(maxRun>=2) consec2++;
-    else consecNone++;
-  });
-  const consecTotal = (consec2+consec3+consecNone)||1;
-
-  // 합계 분포 분석 (최근 20회차)
-  const sumBuckets = [0,0,0,0,0]; // <100, 100-149, 150-199, 200-249, >=250
-  const sumBucketLabels = ['~99','100~149','150~199','200~249','250~'];
-  recentRounds.slice(0,20).forEach(r => {
-    const rd = recentData[r];
-    if (!rd) return;
-    const s = rd.nums.reduce((a,b)=>a+b,0);
-    if(s<100) sumBuckets[0]++;
-    else if(s<150) sumBuckets[1]++;
-    else if(s<200) sumBuckets[2]++;
-    else if(s<250) sumBuckets[3]++;
-    else sumBuckets[4]++;
-  });
-  const sumTotal = sumBuckets.reduce((a,b)=>a+b,0)||1;
-
-  // 패턴 기반 추천 번호 생성 (5세트)
-  // ── 로또 DNA 시스템 ──
-  function hashCode(str) {
-    let h = 0;
-    for (let i = 0; i < str.length; i++) { h = Math.imul(31, h) + str.charCodeAt(i) | 0; }
-    return Math.abs(h);
-  }
-  function lcg(seed) { return ((seed * 1664525 + 1013904223) & 0x7fffffff); }
-  function pickN(seed, n, min, max) {
-    const picked = []; let s = seed;
-    for (let t = 0; t < 500 && picked.length < n; t++) {
-      s = lcg(s); const v = (s % (max - min + 1)) + min;
-      if (!picked.includes(v)) picked.push(v);
-    }
-    return picked.sort((a,b)=>a-b);
-  }
-
-  // 이번 주 시드 (월요일 기준, 매주 변경)
-  const _now = new Date();
-  const _mon = new Date(_now); _mon.setDate(_now.getDate() - ((_now.getDay()+6)%7));
-  _mon.setHours(0,0,0,0);
-  const weekSeed = Math.floor(_mon.getTime() / 1000) & 0x7fffffff;
-
-  // 다음 업데이트까지 남은 시간 (다음 월요일 00:00)
-  const _nextMon = new Date(_mon); _nextMon.setDate(_mon.getDate() + 7);
-  const _dnaTimeLeft = _nextMon - _now;
-  const _dnaDays = Math.floor(_dnaTimeLeft / 86400000);
-  const _dnaHrs  = Math.floor((_dnaTimeLeft % 86400000) / 3600000);
-
-  // 개인 DNA 시드 (닉네임 기반)
-  const _nick = (typeof currentUser !== 'undefined' && currentUser?.email) || 'guest';
-  const personalSeed = hashCode(_nick + 'ltb2024') ^ weekSeed;
-  const dnaNums = pickN(personalSeed, 6, 1, 45);
-
-  // 커뮤니티 집단지성 (공개 빈도 기반 + 주간 시드 섞기)
-  const _wisdomSeed = weekSeed ^ 0xDEADBEEF;
-  const wisdomNums = (function() {
-    const w = Array.from({length:46}, (_,i)=>i===0?0:1);
-    freq.forEach((c,i)=>{ if(i>0) w[i] += c * 2; });
-    let s = _wisdomSeed;
-    const picked = [];
-    for (let t=0; t<200 && picked.length<6; t++) {
-      s = lcg(s);
-      const idx2 = (s % 45) + 1;
-      if (!picked.includes(idx2) && Math.random() < w[idx2]/(Math.max(...w)+1)) picked.push(idx2);
-    }
-    // fallback if not enough
-    for (let n=1; n<=45 && picked.length<6; n++) { if (!picked.includes(n)) picked.push(n); }
-    return picked.slice(0,6).sort((a,b)=>a-b);
-  })();
-
-  // 주간 행운 번호 (hot+cold 조합, 주마다 변경)
-  const _luckySeed = weekSeed ^ 0xCAFEBABE;
-  const luckyNums = pickN(_luckySeed ^ hashCode(String(totalDraws)), 6, 1, 45);
-
-function genRecommended() {
-    const nums = [];
-    const pool = [...indexed].sort((a,b)=>{
-      const weight = (b.c * 0.6) + (Math.random() * totalDraws * 0.4);
-      const wa = (a.c * 0.6) + (Math.random() * totalDraws * 0.4);
-      return weight - wa;
-    });
-    while (nums.length < 6) {
-      const pick = pool.shift();
-      if (pick && !nums.includes(pick.n)) nums.push(pick.n);
-    }
-    return nums.sort((a,b)=>a-b);
-  }
-
-  // 홀짝/고저 분석
-  const recentNums = d.nums;
-  const odd = recentNums.filter(n=>n%2!==0).length;
-  const even = 6 - odd;
-  const low = recentNums.filter(n=>n<=22).length;
-  const high = 6 - low;
-  const latestSum = recentNums.reduce((a,b)=>a+b,0);
-
-  // 구간별 분포 (최근 20회차)
-  const zones = [0,0,0,0,0]; // 1-9, 10-19, 20-29, 30-39, 40-45
-  recentRounds.slice(0,20).forEach(r => {
-    const rd = recentData[r];
-    if (!rd) return;
-    rd.nums.forEach(n => {
-      if (n<=9) zones[0]++;
-      else if (n<=19) zones[1]++;
-      else if (n<=29) zones[2]++;
-      else if (n<=39) zones[3]++;
-      else zones[4]++;
+    [...rd.nums, rd.bonus].forEach(n => {
+      freq[n]++;
+      if (!lastSeenRound[n]) lastSeenRound[n] = r;
     });
   });
-  const zoneTotal = zones.reduce((s,v)=>s+v,0)||1;
-
-  // 추천 번호 5세트 생성
-  const setLabels = ['A','B','C','D','E'];
-  const sets = setLabels.map(() => genRecommended());
-
-  // 미출현 간격 계산 (각 번호의 마지막 출현 이후 회차 수)
-  const lastAppear = new Array(46).fill(0); // 0 = 아직 한 번도 안나온 번호
-  const gapRounds = [...recentRounds]; // 최신→과거 순
-  for (let idx = 0; idx < gapRounds.length; idx++) {
-    const rd = recentData[gapRounds[idx]];
-    if (!rd) continue;
-    const allNums = [...rd.nums, rd.bonus];
-    allNums.forEach(n => { if (lastAppear[n] === 0) lastAppear[n] = idx + 1; });
-  }
-  // 미출현 간격 TOP 10 (오래 안나온 번호 순)
-  const gapList = Array.from({length:45},(_,i)=>({n:i+1, gap:lastAppear[i+1]||recentRounds.length}))
-    .sort((a,b)=>b.gap-a.gap).slice(0,10);
-
-  // 다음 추첨 카운트다운 계산
-  function getNextDraw() {
-    const now = new Date();
-    const day = now.getDay(); // 0=일,6=토
-    const diffToSat = (6 - day + 7) % 7 || 7;
-    const sat = new Date(now);
-    sat.setDate(now.getDate() + diffToSat);
-    sat.setHours(20, 35, 0, 0);
-    if (sat <= now) sat.setDate(sat.getDate() + 7);
-    const diff = sat - now;
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    return { d, h, m, s, total: diff };
+  for (let i = 1; i <= 45; i++) {
+    if (!lastSeenRound[i]) lastSeenRound[i] = rounds[rounds.length-1] || 1;
   }
 
-  // 출현 빈도 히트맵 HTML
-  const maxFreq = Math.max(...freq.slice(1));
-  const heatmapRows = [];
-  for (let row=0; row<5; row++) {
-    let cells = '';
-    for (let col=0; col<9; col++) {
-      const n = row*9 + col + 1;
-      if (n > 45) break;
-      const ratio = freq[n] / maxFreq;
-      const alpha = 0.15 + ratio * 0.75;
-      const color = n<=9?`rgba(239,68,68,${alpha})`:n<=19?`rgba(249,115,22,${alpha})`:n<=29?`rgba(234,179,8,${alpha})`:n<=39?`rgba(59,130,246,${alpha})`:`rgba(107,114,128,${alpha})`;
-      const isHot = hot6.includes(n);
-      const isCold = cold6.includes(n);
-      cells += `<div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:${color};font-size:10px;font-weight:${isHot?'900':'600'};color:${ratio>0.5?'#fff':(_dm?'#e2e8f0':'#1e293b')};position:relative;border:${isHot?'2px solid #dc2626':isCold?'2px dashed #94a3b8':'1px solid transparent'};cursor:default;" title="${totalDraws}회 중 ${freq[n]}회 출현">${n}</div>`;
+  const gapFrom = n => latestRound - lastSeenRound[n];
+  const maxGap = Math.max(...Array.from({length:45},(_,i)=>gapFrom(i+1)));
+
+  // ── 구간 색상 ────────────────────────────────────────────
+  const zC = n => n<=10?'#f59e0b':n<=20?'#3b82f6':n<=30?'#ef4444':n<=40?'#64748b':'#10b981';
+
+  // ── Section 1: 최신 회차 요약 ────────────────────────────
+  const sorted = [...nums].sort((a,b)=>a-b);
+  const oddCnt = nums.filter(n=>n%2).length;
+  const sum = nums.reduce((a,b)=>a+b,0);
+  const lowCnt = nums.filter(n=>n<=15).length;
+  const midCnt = nums.filter(n=>n>=16&&n<=30).length;
+  const hiCnt = nums.filter(n=>n>=31).length;
+
+  const bBall = (n, isBs=false) => {
+    const c = zC(n);
+    return `<span style="width:32px;height:32px;border-radius:50%;background:${isBs?'transparent':c};color:${isBs?c:'#fff'};border:${isBs?'2.5px solid '+c:'none'};display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">${String(n).padStart(2,'0')}</span>`;
+  };
+
+  const sPill = (label, val, col='var(--text-dark)') =>
+    `<div style="background:var(--bg-light,#f1f5f9);border-radius:8px;padding:8px 10px;text-align:center;">
+      <div style="font-size:9px;color:var(--text-muted);margin-bottom:2px;">${label}</div>
+      <div style="font-size:13px;font-weight:900;color:${col};">${val}</div>
+    </div>`;
+
+  // ── Section 2: 번호 지형도 (9×5 grid) ─────────────────
+  const _dm = document.documentElement.getAttribute('data-theme') === 'dark';
+
+  const terrainCells = Array.from({length:45},(_,i) => {
+    const n = i+1;
+    const isWin = nums.includes(n);
+    const isBns = bonus === n;
+    const gap = gapFrom(n);
+    const ratio = maxGap > 0 ? gap / maxGap : 0;
+
+    let bg, tc, border, shadow;
+    if (isWin) {
+      bg = zC(n); tc = '#fff'; border = 'none';
+      shadow = `0 0 0 3px ${zC(n)}55`;
+    } else if (isBns) {
+      bg = 'transparent'; tc = zC(n);
+      border = `2px solid ${zC(n)}`; shadow = 'none';
+    } else {
+      if (_dm) {
+        const rv = Math.round(180*(1-ratio)+20*ratio);
+        const gv = Math.round(40*(1-ratio)+40*ratio);
+        const bv = Math.round(40*(1-ratio)+180*ratio);
+        bg = `rgba(${rv},${gv},${bv},${0.18+ratio*0.55})`;
+        tc = ratio > 0.5 ? '#93c5fd' : '#fca5a5';
+      } else {
+        const rv = Math.round(220*(1-ratio)+37*ratio);
+        const gv = Math.round(80*(1-ratio)+99*ratio);
+        const bv = Math.round(50*(1-ratio)+235*ratio);
+        bg = `rgba(${rv},${gv},${bv},${0.1+ratio*0.42})`;
+        tc = ratio > 0.5 ? '#1e40af' : '#991b1b';
+      }
+      border = 'none'; shadow = 'none';
     }
-    heatmapRows.push(`<div style="display:flex;gap:3px;justify-content:center;">${cells}</div>`);
-  }
 
-  $('fortune-content').innerHTML = `
-    <!-- page banner -->
-    <div style="border-left:4px solid var(--lotto-red);background:var(--paper-white);border-radius:0 10px 10px 0;padding:12px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(225,29,72,.06);">
-      <div style="font-size:9px;color:var(--lotto-red);font-weight:800;letter-spacing:1.5px;margin-bottom:2px;">NUMBER ANALYSIS</div>
-      <div style="font-size:16px;font-weight:900;color:var(--text-dark);margin-bottom:1px;">번호분석 &amp; 로또 DNA</div>
-      <div style="font-size:11px;color:var(--text-muted);">출현 패턴 · 냉온 번호 · 나만의 이번주 추천 번호</div>
-    </div>
+    return `<div onclick="showNumDetail(${n})"
+      title="${n}번 · ${gap===0?'이번 회차 당첨!':gap+'회 전 마지막 등장'} · 50회 중 ${freq[n]}회"
+      style="border-radius:7px;background:${bg};color:${tc};border:${border};box-shadow:${shadow};display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;cursor:pointer;position:relative;${isWin?'transform:scale(1.1);z-index:1;':''}"
+      onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'">
+      <span style="font-size:11px;font-weight:900;line-height:1.1;">${n}</span>
+      ${isWin?'<span style="font-size:6px;line-height:1;margin-top:1px;">★</span>':isBns?'<span style="font-size:6px;line-height:1;margin-top:1px;">+</span>':gap>=12?`<span style="font-size:6px;line-height:1;margin-top:1px;opacity:.7;">${gap}↑</span>`:''}
+    </div>`;
+  }).join('');
 
-    <!-- 번호 미출현 간격 분석 -->
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:16px;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        미출현 간격 분석 <span style="font-size:10px;font-weight:500;color:#94a3b8;">오래 안 나온 번호 TOP10</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:5px;">
-        ${gapList.map((item,i)=>{
-          const pct = Math.round(item.gap/totalDraws*100);
-          const urgency = item.gap>=20?'#dc2626':item.gap>=10?'#f59e0b':'#64748b';
-          return `<div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:10px;color:#94a3b8;min-width:16px;">${i+1}.</span>
-            ${bH(item.n)}
-            <div style="flex:1;background:var(--bg-light);border-radius:3px;height:8px;overflow:hidden;">
-              <div style="height:100%;width:${pct}%;background:${urgency};border-radius:3px;transition:width .5s;"></div>
-            </div>
-            <span style="font-size:10px;font-weight:700;min-width:54px;color:${urgency};">${item.gap}회 미출현</span>
-          </div>`;
-        }).join('')}
-      </div>
-      <div style="font-size:10px;color:#94a3b8;margin-top:8px;text-align:center;">※ 미출현 기간이 길다고 당첨 확률이 올라가진 않지만 참고 지표입니다</div>
-    </div>
+  // ── Section 3: 주목 번호 ─────────────────────────────────
+  const allN = Array.from({length:45},(_,i)=>i+1);
+  const overdue = [...allN].sort((a,b)=>gapFrom(b)-gapFrom(a)).slice(0,6);
+  const frequent = [...allN].sort((a,b)=>freq[b]-freq[a]).slice(0,6);
 
-    <!-- 1. 로또 DNA 개인 번호 (매주 변경) -->
-    <div class="dna-card">
-      <div class="dna-card-label">🧬 나만의 로또 DNA</div>
-      <div class="dna-card-title">
-        ${isLoggedIn ? '내 전용 번호' : '이번 주 번호'}
-        <span class="dna-week-chip">이번 주</span>
-      </div>
-      <div class="ball-context" style="margin:0 0 14px;gap:6px;">${dnaNums.map(n=>bH(n)).join('')}</div>
-      <div style="font-size:10px;opacity:.45;margin-bottom:10px;">
-        ${isLoggedIn ? '내 계정 고유 알고리즘 · 매주 월요일 갱신' : '로그인하면 나만의 고유 번호를 받아요'}
-        <span style="margin-left:8px;opacity:.7;">다음 업데이트 ${_dnaDays}일 ${_dnaHrs}시간 후</span>
-      </div>
-      <div style="margin-bottom:10px;">
-        <div style="display:flex;gap:3px;margin-top:6px;">
-          ${['월','화','수','목','금','토','일'].map((d,i) => {
-            const isToday = ((new Date().getDay()+6)%7) === i;
-            const isPast = ((new Date().getDay()+6)%7) > i;
-            return `<div style="flex:1;height:4px;border-radius:2px;background:${isPast?'rgba(139,92,246,.6)':isToday?'#c4b5fd':'rgba(255,255,255,.15)'};"></div>`;
-          }).join('')}
-        </div>
-        <div style="display:flex;gap:3px;margin-top:3px;">
-          ${['월','화','수','목','금','토','일'].map((d,i) => {
-            const isToday = ((new Date().getDay()+6)%7) === i;
-            return `<div style="flex:1;text-align:center;font-size:8px;opacity:${isToday?.8:.3};">${d}</div>`;
-          }).join('')}
-        </div>
-      </div>
-      <div style="display:flex;gap:6px;">
-        <button class="dna-refresh-btn" onclick="saveFortuneSet('${JSON.stringify(dnaNums)}')">💾 저장</button>
-        <button class="dna-refresh-btn" onclick="copyNumSet(${JSON.stringify(dnaNums)})">📋 복사</button>
-        <button class="dna-refresh-btn" onclick="shareDNANums(${JSON.stringify(dnaNums)})">📤 공유</button>
-        ${!isLoggedIn ? '<button class="dna-refresh-btn" onclick="showAuthModal()" style="background:rgba(220,38,38,.3);border-color:rgba(220,38,38,.5);">🔑 로그인하면 내 번호 생성</button>' : ''}
-      </div>
-    </div>
-
-    <!-- 1-2. 커뮤니티 집단지성 픽 -->
-    <div class="wisdom-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div>
-          <span class="wisdom-pulse"></span>
-          <span style="font-size:12px;font-weight:900;">이번 주 집단지성 픽</span>
-          <span style="font-size:10px;opacity:.5;margin-left:6px;">통계 기반 공동 분석</span>
-        </div>
-        <span style="font-size:9px;background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:2px 8px;font-weight:700;">LIVE</span>
-      </div>
-      <div class="ball-context" style="margin:0 0 10px;gap:6px;">${wisdomNums.map(n=>bH(n)).join('')}</div>
-      <div style="font-size:10px;opacity:.45;margin-bottom:10px;">최근 ${totalDraws}회 출현빈도 + 주간 알고리즘 분석</div>
-      <div style="display:flex;gap:6px;">
-        <button class="dna-refresh-btn" onclick="saveFortuneSet('${JSON.stringify(wisdomNums)}')">💾 저장</button>
-        <button class="dna-refresh-btn" onclick="copyNumSet(${JSON.stringify(wisdomNums)})">📋 복사</button>
-      </div>
-    </div>
-
-    <!-- 1-3. 주간 행운 번호 (핫/콜드 통계 기반, 주마다 고정) -->
-    <div style="background:linear-gradient(135deg,#0a1628,#1e3a8a);border-radius:12px;padding:14px;margin-bottom:12px;color:#fff;border:1px solid rgba(59,130,246,.25);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div>
-          <span style="font-size:12px;font-weight:900;">⭐ 이번 주 행운 번호</span>
-          <span style="font-size:10px;opacity:.45;margin-left:6px;">핫·콜드 균형 조합</span>
-        </div>
-        <span style="font-size:9px;background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);border-radius:10px;padding:2px 8px;font-weight:700;">WEEKLY</span>
-      </div>
-      <div class="ball-context" style="margin:0 0 10px;gap:6px;">${luckyNums.map(n=>bH(n)).join('')}</div>
-      <div style="font-size:10px;opacity:.4;margin-bottom:10px;">최근 ${totalDraws}회 출현 균형 알고리즘 · 매주 월요일 갱신</div>
-      <div style="display:flex;gap:6px;">
-        <button class="dna-refresh-btn" onclick="saveFortuneSet('${JSON.stringify(luckyNums)}')" style="background:rgba(59,130,246,.2);border-color:rgba(59,130,246,.4);">💾 저장</button>
-        <button class="dna-refresh-btn" onclick="copyNumSet(${JSON.stringify(luckyNums)})" style="background:rgba(59,130,246,.2);border-color:rgba(59,130,246,.4);">📋 복사</button>
-      </div>
-    </div>
-
-    <!-- 1-4. 통계 기반 5세트 (펼치기/접기) -->
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:14px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-size:13px;font-weight:900;color:var(--text-dark);">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          전략별 추천 5세트
-          <span style="font-size:9px;font-weight:500;color:#94a3b8;margin-left:4px;">매 재생성마다 변경</span>
-        </div>
-        <button onclick="renderFortune()" style="font-size:11px;background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;padding:4px 10px;cursor:pointer;color:var(--text-muted);font-weight:700;transition:all .15s;" onmouseover="this.style.background='var(--border-dashed)'" onmouseout="this.style.background='var(--bg-light)'">🔄 재생성</button>
-      </div>
-      ${sets.map((nums, i) => `
-        <div style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;transition:background .15s;" onmouseover="this.style.background='var(--border-dashed)'" onmouseout="this.style.background='var(--bg-light)'">
-          <div style="flex-shrink:0;min-width:72px;">
-            <div style="font-size:9px;font-weight:800;color:var(--text-dark);margin-bottom:1px;">${['🔥','⚖️','🧊','🎯','🎲'][i]} ${['핫번호','밸런스','콜드번호','패턴','랜덤'][i]}</div>
-            <span style="font-size:9px;color:#94a3b8;">${setLabels[i]}세트</span>
-          </div>
-          <div class="ball-context" style="margin:0;gap:4px;flex:1;">${nums.map(n=>bH(n)).join('')}</div>
-          <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
-            <button onclick="saveFortuneSet('${JSON.stringify(nums)}')" style="font-size:10px;font-weight:700;background:#dc2626;color:#fff;border:none;border-radius:5px;padding:4px 8px;cursor:pointer;">저장</button>
-            <button onclick="copyNumSet(${JSON.stringify(nums)})" style="font-size:10px;font-weight:700;background:var(--bg-light);color:var(--text-muted);border:1px solid var(--border-dashed);border-radius:5px;padding:4px 8px;cursor:pointer;">복사</button>
-          </div>
-        </div>`).join('')}
-      <div style="font-size:10px;color:#94a3b8;margin-top:8px;text-align:center;">※ 통계적 추천 · 당첨 보장 없음 · 오락 목적</div>
-    </div>
-
-    <!-- 2. 출현 빈도 히트맵 -->
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
-        번호별 출현 빈도 <span style="font-size:10px;color:#94a3b8;font-weight:500;">(최근 ${totalDraws}회)</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:3px;">
-        ${heatmapRows.join('')}
-      </div>
-      <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;font-size:10px;color:var(--text-muted);">
-        <span><span style="display:inline-block;width:8px;height:8px;border:2px solid #dc2626;border-radius:50%;vertical-align:middle;"></span> 핫 번호 TOP6</span>
-        <span><span style="display:inline-block;width:8px;height:8px;border:2px dashed #94a3b8;border-radius:50%;vertical-align:middle;"></span> 콜드 번호 BOTTOM6</span>
-        <span>색 진할수록 출현 빈도 높음</span>
-      </div>
-    </div>
-
-    <!-- 3. 고급 패턴 분석 -->
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-        패턴 분석
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-        <div style="background:var(--bg-light);border-radius:6px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">최신회 홀/짝</div>
-          <div style="font-size:15px;font-weight:900;">${odd}홀 ${even}짝</div>
-        </div>
-        <div style="background:var(--bg-light);border-radius:6px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">저/고 번호</div>
-          <div style="font-size:15px;font-weight:900;">${low}저 ${high}고</div>
-        </div>
-        <div style="background:var(--bg-light);border-radius:6px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">최신회 합계</div>
-          <div style="font-size:15px;font-weight:900;">${latestSum}</div>
-        </div>
-      </div>
-
-      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;">연번(연속번호) 출현 비율 (최근 20회)</div>
-      ${[['없음',consecNone],['2연번',consec2],['3연번+',consec3]].map(([label,cnt])=>{
-        const pct = Math.round(cnt/consecTotal*100);
-        const cs = label==='없음'?'#94a3b8':label==='2연번'?'#3b82f6':'#dc2626';
-        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <span style="font-size:10px;color:var(--text-muted);min-width:42px;">${label}</span>
-          <div style="flex:1;background:var(--bg-light);border-radius:3px;height:10px;overflow:hidden;">
-            <div style="height:100%;width:${pct}%;background:${cs};border-radius:3px;"></div>
-          </div>
-          <span style="font-size:10px;font-weight:700;min-width:34px;text-align:right;">${cnt}회(${pct}%)</span>
-        </div>`;
-      }).join('')}
-
-      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-top:10px;margin-bottom:6px;">합계 범위 분포 (최근 20회)</div>
-      ${sumBucketLabels.map((label,i)=>{
-        const pct = Math.round(sumBuckets[i]/sumTotal*100);
-        const cs = i===2?'#10b981':i===1||i===3?'#3b82f6':'#94a3b8';
-        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <span style="font-size:10px;color:var(--text-muted);min-width:48px;">${label}</span>
-          <div style="flex:1;background:var(--bg-light);border-radius:3px;height:10px;overflow:hidden;">
-            <div style="height:100%;width:${pct}%;background:${cs};border-radius:3px;"></div>
-          </div>
-          <span style="font-size:10px;font-weight:700;min-width:34px;text-align:right;">${sumBuckets[i]}회(${pct}%)</span>
-        </div>`;
-      }).join('')}
-
-      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-top:10px;margin-bottom:6px;">구간별 출현 비율 (최근 20회)</div>
-      ${['1~9','10~19','20~29','30~39','40~45'].map((zone,i)=>{
-        const pct = Math.round(zones[i]/zoneTotal*100);
-        const colors = ['#ef4444','#f97316','#eab308','#3b82f6','#6b7280'];
-        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <span style="font-size:10px;color:var(--text-muted);min-width:36px;">${zone}</span>
-          <div style="flex:1;background:var(--bg-light);border-radius:3px;height:10px;overflow:hidden;">
-            <div style="height:100%;width:${pct}%;background:${colors[i]};border-radius:3px;"></div>
-          </div>
-          <span style="font-size:10px;font-weight:700;min-width:26px;text-align:right;">${pct}%</span>
-        </div>`;
-      }).join('')}
-    </div>
-
-    <!-- 4. 핫/콜드 번호 -->
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">핫/콜드 번호</div>
-      <div style="margin-bottom:10px;">
-        <div style="font-size:11px;color:#dc2626;font-weight:700;margin-bottom:5px;">🔥 자주 나온 번호 (최근 ${totalDraws}회)</div>
-        <div class="ball-context" style="justify-content:flex-start;gap:5px;">${hot6.map(n=>bH(n)).join('')}</div>
-      </div>
-      <div>
-        <div style="font-size:11px;color:#3b82f6;font-weight:700;margin-bottom:5px;">🧊 적게 나온 번호 (장기 미출현 후보)</div>
-        <div class="ball-context" style="justify-content:flex-start;gap:5px;">${cold6.map(n=>bH(n)).join('')}</div>
-      </div>
-    </div>
-        <!-- 4-2. 번호 히트맵 (1~45 전체 출현빈도) -->
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-size:13px;font-weight:900;color:var(--text-dark);">🗺️ 번호 히트맵 <span style="font-size:10px;font-weight:500;color:var(--text-muted);">최근 ${totalDraws}회 기준</span></div>
-        <div style="display:flex;gap:4px;align-items:center;font-size:9px;color:var(--text-muted);">
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--comm-hot-bg,#fef2f2);border:1px solid var(--comm-hot-border,#fecaca);"></span>낮음
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${document.documentElement.getAttribute('data-theme')==='dark'?'#9f1239':'#fca5a5'};"></span>중간
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc2626;"></span>높음
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:3px;">
-        ${(()=>{
-          const maxF = Math.max(...freq.slice(1));
-          const minF = Math.min(...freq.slice(1));
-          const _hmDm = document.documentElement.getAttribute('data-theme')==='dark';
-          let out = '';
-          for(let i=1;i<=45;i++){
-            const cnt = freq[i]||0;
-            const ratio = maxF>minF ? (cnt-minF)/(maxF-minF) : 0;
-            const bg = _hmDm
-              ? (ratio>0.7?'#dc2626':ratio>0.4?'#9f1239':'#263244')
-              : (ratio>0.7?'#dc2626':ratio>0.4?'#fca5a5':'#fef2f2');
-            const tc = ratio>0.7?'#fff':(_hmDm?(ratio>0.4?'#fda4af':'#94a3b8'):'#dc2626');
-            const sc = ratio>0.7?'rgba(255,255,255,.75)':(_hmDm?'rgba(255,255,255,.35)':'#94a3b8');
-            out += '<div style="background:'+bg+';border-radius:4px;padding:3px 1px;text-align:center;cursor:default;" title="'+i+'번: '+cnt+'회">'
-              +'<div style="font-size:10px;font-weight:700;color:'+tc+';">'+i+'</div>'
-              +'<div style="font-size:8px;color:'+sc+';">'+cnt+'</div>'
-              +'</div>';
-          }
-          return out;
-        })()}
-      </div>
-    </div>
-    <!-- 5. 확률 시뮬레이터 -->
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
-        🎯 당첨 확률 시뮬레이터
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
-        <div style="background:var(--bg-light);border-radius:8px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">1등 확률</div>
-          <div style="font-size:12px;font-weight:900;color:#dc2626;">1/8,145,060</div>
-          <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">≈ 0.0000123%</div>
-        </div>
-        <div style="background:var(--bg-light);border-radius:8px;padding:10px;text-align:center;">
-          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">5등 확률</div>
-          <div style="font-size:12px;font-weight:900;color:#10b981;">1/44.8</div>
-          <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">≈ 2.23%</div>
-        </div>
-      </div>
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">내가 구매한 게임 수로 기대 당첨 확인</div>
-      <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
-        <input type="number" id="sim-games" value="10" min="1" max="10000" style="flex:1;padding:7px 10px;border:1.5px solid var(--border-dashed);border-radius:6px;font-size:13px;font-weight:700;font-family:inherit;background:var(--paper-white);color:var(--text-dark);">
-        <span style="font-size:12px;color:var(--text-muted);">게임</span>
-        <button onclick="runSimulator()" style="padding:7px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">계산</button>
-      </div>
-      <div id="sim-result" style="font-size:12px;"></div>
-    </div>
-    <!-- 5-2. 내 번호 분석기 -->
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
-        🔬 내 번호 조합 분석
-        <span style="font-size:10px;font-weight:500;color:var(--text-muted);margin-left:6px;">숫자 입력 후 패턴 확인</span>
-      </div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;" id="analyze-balls">
-        ${Array.from({length:6},(_,i)=>`<div style="width:32px;height:32px;border-radius:50%;border:2px dashed var(--border-dashed);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#94a3b8;cursor:pointer;background:var(--bg-light);" onclick="promptAnalyzeNum(${i})" id="aball-${i}" title="번호 입력">?</div>`).join('')}
-        <button onclick="analyzeMyNums()" style="padding:0 12px;height:32px;border-radius:8px;background:var(--lotto-red);color:#fff;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">분석</button>
-        <button onclick="clearAnalyzeNums()" style="padding:0 10px;height:32px;border-radius:8px;background:var(--bg-light);color:var(--text-muted);border:1px solid var(--border-dashed);font-size:11px;cursor:pointer;font-family:inherit;">초기화</button>
-      </div>
-      <div id="analyze-result" style="font-size:12px;"></div>
-    </div>
-    <!-- 5. 내 번호 통계 (로그인 후 표시) -->
-    <div id="my-num-stats"></div>
-    <!-- 6. 최근 당첨번호 vs 내 QR 매칭 (로그인 후 표시) -->
-    <div id="my-match-section"></div>
-    <!-- 7. 아깝게 놓친 번호 분석 (로그인 후 표시) -->
-    <div id="near-miss-block"></div>
-    <!-- 8. 연금복권 720+ 분석 섹션 -->
-    <div id="pension-section-block"></div>
-    <!-- 8-2. 로또 팁 & 인포 -->
-    <details style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;margin-bottom:12px;overflow:hidden;">
-      <summary style="padding:12px 16px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text-dark);list-style:none;display:flex;align-items:center;justify-content:space-between;user-select:none;">
-        <span>💡 로또 상식 & 참고 정보</span>
-        <span style="font-size:10px;color:var(--text-muted);">▼ 클릭하여 펼치기</span>
-      </summary>
-      <div style="padding:0 16px 14px;font-size:11px;color:var(--text-muted);line-height:1.8;border-top:1px solid var(--border-dashed);">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
-          <div style="background:var(--bg-light);border-radius:6px;padding:8px;">
-            <b style="color:var(--text-dark);">1등 확률</b><br>1/8,145,060
-          </div>
-          <div style="background:var(--bg-light);border-radius:6px;padding:8px;">
-            <b style="color:var(--text-dark);">추첨 방식</b><br>45개 중 6개 무작위
-          </div>
-          <div style="background:var(--bg-light);border-radius:6px;padding:8px;">
-            <b style="color:var(--text-dark);">추첨 시간</b><br>매주 토요일 20:35
-          </div>
-          <div style="background:var(--bg-light);border-radius:6px;padding:8px;">
-            <b style="color:var(--text-dark);">당첨 유효기간</b><br>추첨일로부터 1년
-          </div>
-        </div>
-        <p style="margin:10px 0 0;padding:8px;background:var(--amber-bg,#fef3c7);border:1px solid var(--amber-border,#fde68a);border-radius:6px;color:var(--amber-text,#92400e);font-size:10px;">
-          ⚠️ 로또는 오락 목적입니다. 당첨번호 추천은 통계 참고용이며 당첨을 보장하지 않습니다. 과도한 구매는 삼가주세요.
-        </p>
-      </div>
-    </details>
-    <!-- 9. 내 번호 보관함 -->
-    <div id="fortune-savedbox"></div>
-  `;
-  if (isLoggedIn && currentUser && sb) { loadMyNumberStats(); loadMyMatchSection(); loadNearMissAnalysis(); }
-
-  // 연금복권 720+ 분석 섹션
-  renderPensionSection();
-
-  // 주간 공명 번호 + 로또 DNA
-  renderWeeklyResonance(freq, hot6, cold6, rounds);
-  if (isLoggedIn && currentUser) renderLottoDNA(freq, rounds);
-
-  // 내 번호 보관함 렌더링
-  (function renderSavedBox() {
-    const el = document.getElementById('fortune-savedbox');
-    if (!el) return;
-    const saved = (MY || []).filter(m => m.type === 'recommend');
-    if (!saved.length) { el.innerHTML = ''; return; }
-    const recent = saved.slice(0, 8);
-    el.innerHTML = `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:14px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-size:13px;font-weight:900;color:var(--text-dark);">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M20 7H4a2 2 0 0 0-2 2v10c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-          내 번호 보관함 <span style="font-size:10px;font-weight:500;color:#94a3b8;">${saved.length}세트 저장됨</span>
-        </div>
-        <button onclick="if(confirm('보관함을 비울까요?')){MY=MY.filter(m=>m.type!=='recommend');saveStorage();renderFortune();}" style="font-size:10px;background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:5px;padding:3px 8px;cursor:pointer;color:#94a3b8;font-weight:700;">전체삭제</button>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        ${(()=>{
-          const ld = latestData;
-          return recent.map((m,i)=>{
-            let matchCnt=0, matchLabel='';
-            if(ld && m.nums) {
-              const hits = m.nums.filter(n=>ld.nums.includes(n));
-              const bonus = m.nums.includes(ld.bonus);
-              matchCnt = hits.length;
-              if(matchCnt===6) matchLabel='🥇 1등!';
-              else if(matchCnt===5&&bonus) matchLabel='🥈 2등!';
-              else if(matchCnt===5) matchLabel='🥉 3등';
-              else if(matchCnt===4) matchLabel='🎯 4등';
-              else if(matchCnt===3) matchLabel='✅ 5등';
-              else matchLabel=matchCnt+'개 일치';
-            }
-            const borderColor = matchCnt>=3?'var(--comm-hot-border,#fecaca)':'var(--border-dashed)';
-            const _dmc = document.documentElement.getAttribute('data-theme')==='dark';
-            const bg = matchCnt>=3?(_dmc?'#2a0f0f':'#fff5f5'):(_dmc?'#1e293b':'#f8fafc');
-            return '<div style="background:'+bg+';border:1px solid '+borderColor+';border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">'
-              +'<span style="font-size:9px;color:#94a3b8;min-width:38px;font-weight:600;">'+(m.date||'')+'</span>'
-              +'<div class="ball-context" style="margin:0;gap:3px;flex:1;">'
-              + (ld&&m.nums ? m.nums.map(n=>{
-                const isHit = ld.nums.includes(n)||n===ld.bonus;
-                return bH(n, isHit);
-              }).join('') : m.nums.map(n=>bH(n)).join(''))
-              +'</div>'
-              +(ld?'<span style="font-size:9px;font-weight:700;white-space:nowrap;color:'+(matchCnt>=3?'#dc2626':'#94a3b8')+';">'+matchLabel+'</span>':'')
-              +'</div>';
-          }).join('');
-        })()}
+  const numChip = (n, sub) =>
+    `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg-light,#f1f5f9);border-radius:8px;">
+      <span style="width:26px;height:26px;border-radius:50%;background:${zC(n)};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;">${n}</span>
+      <div style="line-height:1.3;">
+        <div style="font-size:11px;font-weight:800;">${n}번</div>
+        <div style="font-size:10px;color:var(--text-muted);">${sub}</div>
       </div>
     </div>`;
-  })();
 
-  // 카운트다운 타이머 시작
-  if (window._cdTimer) clearInterval(window._cdTimer);
-  function updateCD() {
-    // 로또 카운트다운
-    const { d, h, m, s } = getNextDraw();
-    const cdD = $('cd-d'), cdH = $('cd-h'), cdM = $('cd-m'), cdS = $('cd-s');
-    if (cdD) { cdD.textContent = String(d).padStart(2,'0'); cdH.textContent = String(h).padStart(2,'0'); cdM.textContent = String(m).padStart(2,'0'); cdS.textContent = String(s).padStart(2,'0'); }
-    const nrl = $('next-round-label');
-    if (nrl && latestRound) nrl.textContent = latestRound + 1;
-    // 연금복권 카운트다운
-    const now2 = new Date();
-    const day2 = now2.getDay();
-    const diffToThu = (4 - day2 + 7) % 7 || 7;
-    const nextThu = new Date(now2);
-    nextThu.setDate(now2.getDate() + diffToThu);
-    nextThu.setHours(10, 0, 0, 0);
-    if (nextThu <= now2) nextThu.setDate(nextThu.getDate() + 7);
-    const pdiff = nextThu - now2;
-    const pd = Math.floor(pdiff/86400000), ph = Math.floor((pdiff%86400000)/3600000);
-    const pm = Math.floor((pdiff%3600000)/60000), ps = Math.floor((pdiff%60000)/1000);
-    const pcdD=$('pen-cd-d'),pcdH=$('pen-cd-h'),pcdM=$('pen-cd-m'),pcdS=$('pen-cd-s');
-    if (pcdD) { pcdD.textContent=String(pd).padStart(2,'0'); pcdH.textContent=String(ph).padStart(2,'0'); pcdM.textContent=String(pm).padStart(2,'0'); pcdS.textContent=String(ps).padStart(2,'0'); }
-    const pnrl = $("pen-next-round-label");
-    if (pnrl) { const penBase=new Date("2020-05-07"); const penWeeks=Math.floor((now2-penBase)/(7*24*3600*1000)); pnrl.textContent = penWeeks+2; }
-  }
-  updateCD();
-  window._cdTimer = setInterval(updateCD, 1000);
+  // ── Section 4: 최근 10회차 구간 흐름 ─────────────────────
+  const flowBars = rounds.slice(0,10).map(r => {
+    const rd = recentData[r];
+    if (!rd) return '';
+    const lo = rd.nums.filter(n=>n<=15).length;
+    const mi = rd.nums.filter(n=>n>=16&&n<=30).length;
+    const hi = rd.nums.filter(n=>n>=31).length;
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;">
+      <div style="width:100%;display:flex;flex-direction:column;gap:1px;height:52px;border-radius:4px;overflow:hidden;">
+        <div style="flex:${hi};background:#ef4444;min-height:${hi?'3':'0'}px;"></div>
+        <div style="flex:${mi};background:#3b82f6;min-height:${mi?'3':'0'}px;"></div>
+        <div style="flex:${lo};background:#f59e0b;min-height:${lo?'3':'0'}px;"></div>
+      </div>
+      <div style="font-size:8px;color:var(--text-muted);white-space:nowrap;">${String(r).slice(-3)}회</div>
+    </div>`;
+  }).join('');
+
+  // ── 렌더링 ─────────────────────────────────────────────
+  el.innerHTML = `
+    <div style="border-left:4px solid var(--lotto-red,#e11d48);background:var(--paper-white);border-radius:0 10px 10px 0;padding:10px 14px;margin-bottom:12px;">
+      <div style="font-size:9px;color:var(--lotto-red,#e11d48);font-weight:800;letter-spacing:1.5px;margin-bottom:2px;">LOTTOBANK EXCLUSIVE</div>
+      <div style="font-size:15px;font-weight:900;color:var(--text-dark);">번호 레이더</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:1px;">최근 50회차 실제 데이터 기반 · LottoBank에서만 볼 수 있는 분석</div>
+    </div>
+
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+        <div>
+          <div style="font-size:13px;font-weight:900;color:var(--text-dark);">제 ${latestRound}회 당첨번호</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:1px;">${d.date || ''}</div>
+        </div>
+        <span style="font-size:9px;background:#fef2f2;color:#dc2626;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:.5px;">LATEST</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;margin-bottom:12px;flex-wrap:wrap;">
+        ${nums.map(n=>bBall(n)).join('')}
+        <span style="font-size:13px;font-weight:900;color:var(--text-muted);margin:0 1px;">+</span>
+        ${bBall(bonus, true)}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+        ${sPill('홀 : 짝', `${oddCnt} : ${6-oddCnt}`)}
+        ${sPill('번호 합계', sum, '#dc2626')}
+        ${sPill('저 · 중 · 고', `${lowCnt}·${midCnt}·${hiCnt}`)}
+        ${sPill('범위', `${sorted[0]}~${sorted[5]}`)}
+      </div>
+    </div>
+
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div style="margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:900;color:var(--text-dark);">번호 지형도</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">최근 50회차 기준 · 색이 진할수록 오랫동안 등장하지 않은 번호 · 번호 클릭 시 상세 확인</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-bottom:8px;">
+        ${terrainCells}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:9px;color:var(--text-muted);flex-wrap:wrap;">
+        <span style="display:flex;align-items:center;gap:3px;"><span style="width:10px;height:10px;border-radius:2px;background:rgba(220,60,40,.55);display:inline-block;"></span>최근 등장</span>
+        <span style="display:flex;align-items:center;gap:3px;"><span style="width:10px;height:10px;border-radius:2px;background:rgba(37,99,235,.55);display:inline-block;"></span>오래됨</span>
+        <span style="display:flex;align-items:center;gap:3px;"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>★ 이번 회 당첨</span>
+        <span style="display:flex;align-items:center;gap:3px;"><span style="width:10px;height:10px;border-radius:50%;border:2px solid #3b82f6;display:inline-block;"></span>+ 보너스</span>
+      </div>
+    </div>
+
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">주목할 번호</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <div style="font-size:10px;font-weight:800;color:#1d4ed8;margin-bottom:6px;">📭 오랫동안 안 나온 번호</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            ${overdue.map(n=>numChip(n, `${gapFrom(n)}회차 전 마지막 등장`)).join('')}
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:800;color:#b91c1c;margin-bottom:6px;">🔥 최근 자주 나온 번호</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            ${frequent.map(n=>numChip(n, `50회 중 ${freq[n]}회 등장`)).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;">
+      <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:2px;">최근 10회차 구간 흐름</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:10px;">
+        <span style="color:#f59e0b;font-weight:700;">■</span> 1~15
+        <span style="margin:0 6px;color:#3b82f6;font-weight:700;">■</span> 16~30
+        <span style="margin-right:6px;color:#ef4444;font-weight:700;">■</span> 31~45
+      </div>
+      <div style="display:flex;gap:4px;align-items:flex-end;">
+        ${flowBars}
+      </div>
+    </div>
+  `;
 }
+
+function showNumDetail(n) {
+  const rounds2 = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
+  const freq2 = new Array(46).fill(0);
+  const lastSeen2 = new Array(46).fill(0);
+  const appearances = [];
+
+  rounds2.slice(0,50).forEach(r => {
+    const rd = recentData[r];
+    if (!rd) return;
+    const arr = [...rd.nums, rd.bonus];
+    arr.forEach(num => {
+      freq2[num]++;
+      if (!lastSeen2[num]) lastSeen2[num] = r;
+    });
+    if (arr.includes(n)) appearances.push(r);
+  });
+
+  const latR = latestData ? latestData.round : 0;
+  const gap = latR - (lastSeen2[n] || latR);
+  const zC2 = num => num<=10?'#f59e0b':num<=20?'#3b82f6':num<=30?'#ef4444':num<=40?'#64748b':'#10b981';
+
+  const t = $('toast');
+  if (!t) return;
+  t.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="width:38px;height:38px;border-radius:50%;background:${zC2(n)};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;flex-shrink:0;">${n}</span>
+      <div>
+        <div style="font-size:13px;font-weight:900;">${n}번 상세</div>
+        <div style="font-size:11px;opacity:.85;">50회 중 ${freq2[n]}회 · ${gap===0?'이번 회차 당첨!':gap+'회차 전 마지막 등장'}</div>
+        ${appearances.length?`<div style="font-size:10px;opacity:.65;margin-top:2px;">최근 등장: ${appearances.slice(0,3).join('회, ')}회${appearances.length>3?' 외':''}</div>`:''}
+      </div>
+    </div>`;
+  t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'), 4000);
+}
+
 
 // ── 뱃지 체크 (외부 호출용) ──
 async function checkAndAwardBadges() {
