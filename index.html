@@ -235,12 +235,6 @@ main.chat-hidden .chat-panel { display: none; }
 .badge.b-guest { background: #94a3b8; color: #fff; font-weight: 500; }
 .badge.b-system { background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; font-weight:900; animation: neonGold 2s ease-in-out infinite alternate; }
 .emoji-gap { margin-right: 6px; }
-.adm-edit-row { background: #fffbeb; }
-[data-theme="dark"] .adm-edit-row { background:#1a1200 !important; }
-.adm-input { width:100%; padding:4px 6px; border:1px solid #fbbf24; border-radius:4px; font-size:11px; box-sizing:border-box; background:var(--paper-white); color:var(--text-dark); }
-[data-theme="dark"] .adm-input { background:#1e293b !important; color:#f1f5f9 !important; border-color:#fbbf24 !important; }
-.adm-save-btn { padding:3px 10px; background:#16a34a; color:#fff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; }
-.adm-cancel-btn { padding:3px 8px; background:var(--bg-light); color:var(--text-muted); border:none; border-radius:4px; font-size:11px; cursor:pointer; margin-left:4px; }
 @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
 @keyframes neonGreen {
   from { box-shadow: 0 0 8px rgba(134,239,172,0.5), 0 0 16px rgba(22,163,74,0.2); }
@@ -412,9 +406,6 @@ main.chat-hidden .chat-panel { display: none; }
 .comment-input:focus { border-color:var(--lotto-red); }
 .comment-submit-btn { padding:8px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit; }
 .post-card-stats   { font-size:11px;color:var(--text-muted);display:flex;gap:10px;margin-top:4px;align-items:center; }
-/* ===== 관리자 패널 ===== */
-.admin-section-title { font-size:13px;font-weight:900;color:var(--lotto-red);margin:16px 0 8px;border-bottom:2px solid var(--lotto-red);padding-bottom:6px; }
-
 /* ===== 커뮤니티 페이지 ===== */
 .comm-tab-row { display: flex; gap: 6px; margin-bottom: 12px; }
 .comm-tab-btn { padding:6px 16px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s; }
@@ -625,7 +616,6 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] #ticket-history-section div[style*="background:var(--paper-white);"],
 [data-theme="dark"] #badge-content div[style*="background:var(--paper-white);"],
 [data-theme="dark"] #rank-content div[style*="background:var(--paper-white);"],
-[data-theme="dark"] #admin-content div[style*="background:var(--paper-white);"],
 [data-theme="dark"] #ticket-history-section table,
 [data-theme="dark"] #post-write-expanded { background:#1e293b !important; border-color:#334155 !important; }
 [data-theme="dark"] #pg-ticket details { background:#1e293b !important; border-color:#334155 !important; }
@@ -1021,13 +1011,6 @@ input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(220,38,3
 [data-theme="dark"] #qc-4,[data-theme="dark"] #qc-5,[data-theme="dark"] #qc-6 {
   background:#1e293b !important; color:#e2e8f0 !important; border-color:#334155 !important;
 }
-/* Admin insert/stat tab plain inputs dark mode */
-[data-theme="dark"] #admin-table-wrap input:not(.adm-input),
-[data-theme="dark"] #admin-table-wrap select:not(.adm-input) {
-  background:#1e293b !important; color:#f1f5f9 !important; border-color:#475569 !important;
-}
-/* Admin stat edit modal inputs */
-[data-theme="dark"] #stat-edit-modal input { background:#1e293b !important; color:#f1f5f9 !important; border-color:#475569 !important; }
 [data-theme="dark"] #quick-check-result div { color:var(--text-dark); }
 
 /* Scrollbar dark */
@@ -2572,7 +2555,7 @@ async function saveOnlinePensionTickets(parsed) {
 }
 
 async function refreshPendingOnlineResults() {
-  if (!sb || !currentUser || isAdminTestMode) return;
+  if (!sb || !currentUser) return;
   const { data: pending, error } = await sb.from('tickets')
     .select('id,round_no,game_numbers,qr_url')
     .eq('user_id', currentUser.id)
@@ -4107,7 +4090,7 @@ const rBgs   = _isDm2 ? { 1:'#2a0f0f', 2:'#1e0a3e', 3:'#0a1f10', 4:'#0a1628', 5:
   usedQrKeys.push(parsed.key);
   saveStorage();
   // 1~3등 인증 시 채팅 브로드캐스트 (랭킹 포지션 포함)
-  if (bestRank <= 3 && isLoggedIn && currentUser && !isAdminTestMode) {
+  if (bestRank <= 3 && isLoggedIn && currentUser) {
     const bNick = currentUser.user_metadata?.nickname || currentUser.email.split('@')[0];
     // 랭킹 포지션 비동기 조회 후 브로드캐스트
     (async () => {
@@ -4507,9 +4490,6 @@ document.addEventListener('click', e => {
   if (!$('user-profile')?.contains(e.target)) closeUserDropdown();
 });
 
-// ── 관리자 검증 모드 (Supabase 인증 우회, 기능 테스트용)
-let isAdminTestMode = false;
-
 function applyLoginUI(user) {
   isLoggedIn = true;
   const mp = document.getElementById('h-my-purchase');
@@ -4777,7 +4757,7 @@ function computeBestTitle(titles) {
 }
 
 async function syncDailyVisitAndSystemTitle() {
-  if (!sb || !currentUser || isAdminTestMode) return;
+  if (!sb || !currentUser) return;
   try {
     const visitDate = new Intl.DateTimeFormat('en-CA', {
       timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit'
@@ -4851,14 +4831,6 @@ async function loadUserDataFromDB() {
     window._badgeStateUserId = currentUser.id;
     window._badgeStateLoaded = false;
     window._prevBadgeIds = [];
-  }
-  if (isAdminTestMode) {
-    // 검증 모드: mock dbStats 이미 설정됨, UI만 업데이트
-    const nick = currentUser.user_metadata?.nickname || '관리자';
-    updateHeaderUser(nick, '🔐 관리자');
-    updateBadgeUI();
-    updateDropdownStats();
-    return;
   }
   const uid = currentUser.id;
   try {
@@ -5096,10 +5068,6 @@ function calcPrizeAmount(rank, winData) {
 
 async function saveTicketToDB(parsed, winData, gameResults) {
   if (!isLoggedIn || !currentUser || !sb) return false;
-  // 검증 모드에서는 Supabase 저장 스킵 (로컬만 처리)
-  if (isAdminTestMode) {
-    return true;
-  }
   try {
     const bestResult = gameResults.reduce((b, r) => r.rank < b.rank ? r : b, gameResults[0]);
     const totalPrize = gameResults.reduce((sum, r) => sum + calcPrizeAmount(r.rank, winData), 0);
@@ -5174,16 +5142,6 @@ async function saveTicketToDB(parsed, winData, gameResults) {
 
 async function upsertUserStats(gameCount, gameResults, totalPrize = 0, winData = null) {
   if (!isLoggedIn || !currentUser) return;
-  if (isAdminTestMode) {
-    // 검증 모드: dbStats 로컬 업데이트만
-    if (dbStats) {
-      dbStats.total_tickets = (dbStats.total_tickets || 0) + gameCount;
-      dbStats.total_spent   = (dbStats.total_spent   || 0) + gameCount * 1000;
-      dbStats.total_prize   = (dbStats.total_prize   || 0) + totalPrize;
-      if (totalPrize > 0) dbStats.total_wins = (dbStats.total_wins || 0) + 1;
-    }
-    return;
-  }
   const uid = currentUser.id;
   const c = dbStats || {};
   const winCount = gameResults.filter(r => r.rank <= 5).length;
@@ -6960,154 +6918,6 @@ function renderStats() {
   `;
 }
 
-function renderStatsLegacy() {
-  let totalBuy, totalInvest, totalPrize, winCount, bestRank, rankCounts, isMock;
-
-  // 비로그인 우선 안내
-  if (!isLoggedIn) {
-    const _sbn = document.getElementById('stats-login-banner');
-    if (!_sbn) {
-      const _sc = $('stats-content');
-      if (_sc) _sc.insertAdjacentHTML('beforebegin',
-        '<div id="stats-login-banner" style="background:linear-gradient(135deg,rgba(220,38,38,.08),rgba(220,38,38,.04));border:1.5px solid rgba(220,38,38,.25);border-radius:10px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;">'
-        +'<span style="font-size:20px;">&#x1F512;</span>'
-        +'<div style="flex:1;"><div style="font-size:12px;font-weight:800;color:var(--text-dark);">'
-        +'로그인하면 실제 전적이 기록됩니다</div>'
-        +'<div style="font-size:10px;color:var(--text-muted);margin-top:1px;">아래는 샘플 데이터입니다</div></div>'
-        +'<button onclick="showAuthModal()" style="padding:6px 12px;background:#dc2626;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:900;cursor:pointer;white-space:nowrap;">로그인</button></div>');
-    }
-  } else {
-    const _sbn = document.getElementById('stats-login-banner');
-    if (_sbn) _sbn.remove();
-  }
-
-  if (isLoggedIn && Array.isArray(window._ltbTickets)) {
-    const sourceTickets = statsLotteryMode === 'all'
-      ? window._ltbTickets
-      : window._ltbTickets.filter(ticket => ticketLotteryType(ticket) === statsLotteryMode);
-    totalBuy = sourceTickets.reduce((sum,ticket)=>sum+(ticket.game_count||1),0);
-    totalInvest = totalBuy * 1000;
-    totalPrize = sourceTickets.reduce((sum,ticket)=>sum+(ticket.prize_amount||0),0);
-    winCount = sourceTickets.filter(ticket=>ticket.prize_rank&&ticket.prize_rank<=5).length;
-    bestRank = sourceTickets.reduce((best,ticket)=>ticket.prize_rank&&ticket.prize_rank<best?ticket.prize_rank:best,99);
-    if (bestRank === 99) bestRank = 0;
-    rankCounts = {1:0,2:0,3:0,4:0,5:0};
-    sourceTickets.forEach(ticket => {
-      if (ticket.prize_rank>=1 && ticket.prize_rank<=5) rankCounts[ticket.prize_rank]++;
-    });
-    isMock = false;
-  } else {
-    // 로컬 폴백
-    totalBuy = MY.length;
-    totalInvest = totalBuy * 1000;
-    totalPrize = 0; winCount = 0; bestRank = 0;
-    rankCounts = {1:0, 2:0, 3:0, 4:0, 5:0};
-    MY.forEach(tk => {
-      const target = apiCache[tk.drw];
-      if (!target) return;
-      const r = checkWinRank(tk.nums, target.nums, target.bonus);
-      if (r.rank >= 1 && r.rank <= 5) {
-        winCount++;
-        if (bestRank === 0 || r.rank < bestRank) bestRank = r.rank;
-        rankCounts[r.rank] = (rankCounts[r.rank] || 0) + 1;
-        if (r.rank === 1) totalPrize += target.prize_1st || 0;
-        else if (r.rank === 2) totalPrize += target.prize_2nd || 60000000;
-        else if (r.rank === 3) totalPrize += target.prize_3rd || 1500000;
-        else if (r.rank === 4) totalPrize += target.prize_4th || 50000;
-        else if (r.rank === 5) totalPrize += target.prize_5th || 5000;
-      }
-    });
-    isMock = (totalBuy === 0);
-  }
-
-  const roi = totalInvest > 0 ? ((totalPrize - totalInvest) / totalInvest * 100) : 0;
-  const roiPos = roi >= 0;
-  const roiPct = Math.min(Math.abs(roi), 100);
-  const bestLabel = bestRank > 0 ? bestRank + '등' : '-';
-  const rankConditions = statsLotteryMode === 'pension'
-    ? ['7자리 일치','6자리 일치','5자리 일치','4자리 일치','3자리 일치']
-    : ['6개 일치','5개+보너스','5개 일치','4개 일치','3개 일치'];
-
-  // 스트릭 계산 (DB 데이터 기준)
-  // 연속 낙첨 / 연속 당첨 카운트는 loadTicketHistory 후 계산
-  // 여기서는 기본 placeholder 렌더 후 loadTicketHistory에서 업데이트
-
-  $('stats-content').innerHTML = `
-    <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:12px;">
-      <button onclick="shareMyStats(${totalBuy},${totalPrize.toFixed(0)},${roi.toFixed(1)},${winCount})" style="display:flex;align-items:center;gap:5px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--text-dark);cursor:pointer;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        전적 공유
-      </button>
-    </div>
-    <div class="kpi-grid">
-      <div class="kpi-box"><div class="kpi-label">총 구매 게임수</div><div class="kpi-value">${totalBuy}<span style="font-size:13px;font-weight:500;">게임</span></div><div class="kpi-sub">총 ${fmtMFull(totalInvest)} 투자</div></div>
-      <div class="kpi-box"><div class="kpi-label">총 당첨 횟수</div><div class="kpi-value blue">${winCount}<span style="font-size:13px;font-weight:500;">회</span></div><div class="kpi-sub">당첨률 ${totalBuy > 0 ? (winCount/totalBuy*100).toFixed(1) : 0}%</div></div>
-      <div class="kpi-box hl"><div class="kpi-label">총 당첨금</div><div class="kpi-value red">${fmtMFull(totalPrize)}</div><div class="kpi-sub">투자 대비 ${roi.toFixed(1)}%</div></div>
-      <div class="kpi-box"><div class="kpi-label">최고 등수</div><div class="kpi-value">${bestLabel}</div><div class="kpi-sub">역대 최고 당첨 등수</div></div>
-      <div class="kpi-box hl"><div class="kpi-label">수익률</div><div class="kpi-value ${roiPos?'green':'red'}">${roiPos?'+':''}${roi.toFixed(1)}<span style="font-size:12px;font-weight:500;">%</span></div><div class="kpi-sub">투자 대비 수익률</div></div>
-      <div class="kpi-box"><div class="kpi-label">최고 당첨금</div><div class="kpi-value red" id="kpi-best-prize" style="font-size:16px;">-</div><div class="kpi-sub" id="kpi-best-prize-rank">-</div></div>
-    </div>
-    <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">수익률 분석</div>
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:14px;margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <span style="font-size:12px;color:var(--text-muted);">수익률</span>
-        <span style="font-size:14px;font-weight:900;color:${roiPos ? 'var(--b-green)' : 'var(--b-red)'};">${roiPos ? '+' : ''}${roi.toFixed(1)}%</span>
-      </div>
-      <div class="roi-bar-wrap"><div class="roi-bar${roiPos ? '' : ' neg'}" style="width:${roiPct}%;"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:6px;">
-        <span>투자 ${fmtMFull(totalInvest)}</span><span>회수 ${fmtMFull(totalPrize)}</span>
-      </div>
-    </div>
-    <!-- 등수 분포 도넛 차트 -->
-    ${(rankCounts[1]+rankCounts[2]+rankCounts[3]+rankCounts[4]+rankCounts[5]) > 0 ? `
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:14px;">
-      <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-        등수 분포
-      </div>
-      <div style="display:flex;align-items:center;gap:16px;">
-        <canvas id="rank-donut-chart" width="100" height="100" style="max-width:100px;flex-shrink:0;"></canvas>
-        <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
-          ${[
-            [1,'#dc2626','1등 (자동)'],
-            [2,'#a855f7','2등 (자동)'],
-            [3,'#16a34a','3등 (자동)'],
-            [4,'#3b82f6','4등 (자동)'],
-            [5,'#94a3b8','5등 (자동)']
-          ].map(([rank,color,label])=>{
-            const cnt = rankCounts[rank] || 0;
-            const maxCnt = Math.max(1, rankCounts[1]||0, rankCounts[2]||0, rankCounts[3]||0, rankCounts[4]||0, rankCounts[5]||0);
-            const pct = (cnt/maxCnt*100).toFixed(0);
-            return `<div style="display:grid;grid-template-columns:44px 1fr 28px;gap:6px;align-items:center;font-size:11px;margin-bottom:4px;">
-              <span style="color:var(--text-muted);">${label.split(' ')[0]}</span>
-              <div style="background:var(--bg-light);border-radius:4px;height:8px;overflow:hidden;">
-                <div style="height:100%;width:${cnt>0?pct:'0'}%;background:${color};border-radius:4px;transition:width 1s ease;"></div>
-              </div>
-              <span style="font-weight:700;text-align:right;">${cnt}</span>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>
-    </div>` : ''}
-    <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">등수별 당첨 이력</div>
-    <table class="rank-history-table">
-      <thead><tr><th>등수</th><th>조건</th><th style="text-align:center;">당첨 횟수</th><th style="text-align:right;">누적 당첨금</th></tr></thead>
-      <tbody id="rank-breakdown-tbody">
-        <tr><td><b style="color:var(--lotto-red);">1등</b></td><td>${rankConditions[0]}</td><td style="font-weight:700;text-align:center;">${rankCounts[1]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
-        <tr><td><b style="color:#a855f7;">2등</b></td><td>${rankConditions[1]}</td><td style="font-weight:700;text-align:center;">${rankCounts[2]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
-        <tr><td><b style="color:var(--b-green);">3등</b></td><td>${rankConditions[2]}</td><td style="font-weight:700;text-align:center;">${rankCounts[3]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
-        <tr><td>4등</td><td>${rankConditions[3]}</td><td style="font-weight:700;text-align:center;">${rankCounts[4]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
-        <tr><td>5등</td><td>${rankConditions[4]}</td><td style="font-weight:700;text-align:center;">${rankCounts[5]}회</td><td style="font-size:11px;color:var(--text-muted);text-align:right;">집계 중...</td></tr>
-      </tbody>
-    </table>
-    ${!isLoggedIn ? '<div style="margin-top:14px;padding:12px;background:var(--comm-hot-bg);border:1px solid var(--comm-hot-border,#fecaca);border-radius:6px;text-align:center;font-size:12px;"><b style=\"color:var(--comm-hot-text,#dc2626);\">로그인</b><span style=\"color:var(--text-muted);">하면 실제 QR 인증 데이터 기반 전적이 기록됩니다</span><br><button onclick=\"showAuthModal()\" style=\"margin-top:8px;background:#dc2626;color:#fff;border:none;border-radius:4px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;\">로그인하기</button></div>' : isMock ? '<div style="margin-top:14px;padding:12px;background:var(--bg-light);border:1px dashed #cbd5e1;border-radius:6px;text-align:center;font-size:12px;color:var(--text-muted);">QR 인증 탭에서 실제 복권 QR을 등록하면 전적이 자동으로 기록됩니다</div>' : ''}
-  `;
-
-  // 티켓 이력 비동기 로드
-  loadTicketHistory();
-  renderStatsSavedNumbers();
-}
-
 async function loadTicketHistory() {
   const container = $('stats-content');
   if (!container) return;
@@ -7560,17 +7370,6 @@ async function scanCameraLoop() {
 
 async function insertActivity(type, data = {}) {
   if (!isLoggedIn || !currentUser || !sb) return;
-  if (isAdminTestMode) {
-    // 검증 모드: 피드에 mock 아이템 추가
-    const mockAct = {
-      type, data, nick: '관리자',
-      created_at: new Date().toISOString(),
-      id: 'mock-' + Date.now(),
-    };
-    const fl = $('feed-list');
-    if (fl) fl.insertAdjacentHTML('afterbegin', feedItemHtml(mockAct));
-    return;
-  }
   try {
     const nick = window._profileNickname || currentUser.user_metadata?.nickname || currentUser.email?.split('@')[0] || '익명';
     await sb.from('activity_feed').insert({ user_id: currentUser.id, nick, type, data });
@@ -7641,7 +7440,6 @@ function feedItemHtml(a, isNew) {
 async function deleteActivityFeed(id) {
   if (!isLoggedIn || !currentUser || !id) return;
   if (!confirm('이 피드 항목을 삭제할까요?')) return;
-  if (isAdminTestMode && String(id).startsWith('mock-')) { renderFeed(); return; }
   const { error } = await sb.from('activity_feed').delete().eq('id', id);
   if (error) { toast('피드 삭제 권한을 확인해주세요.'); return; }
   await renderFeed();
@@ -8492,16 +8290,6 @@ async function writePost() {
   const body = bodyInp ? bodyInp.value.trim() : '';
   if (!text) { toast('⚠️ 제목을 입력해주세요'); return; }
   const nick = currentNickname();
-  if (isAdminTestMode) {
-    // 검증 모드: 로컬 mock 게시글
-    const mockPost = { id: 'mock-post-' + Date.now(), user_id: currentUser.id, nickname: nick, tag: curCommTab, title: text, body: body || null, likes: 0, comment_count: 0, created_at: new Date().toISOString() };
-    if (!commPosts[curCommTab]) commPosts[curCommTab] = [];
-    commPosts[curCommTab].unshift(mockPost);
-    collapsePostForm();
-    renderCommunityList();
-    toast('✅ [검증] 게시글 등록됨 (mock)');
-    return;
-  }
   const postTagPrefix = (_selectedPostTag && _selectedPostTag !== '') ? `[${_selectedPostTag}] ` : '';
   _ownPostTs = Date.now(); // Realtime 중복 알림 억제
   const { error } = await sb.from('posts').insert({
@@ -8659,20 +8447,6 @@ async function submitComment(postId) {
   const btn = document.querySelector('.comment-submit-btn');
   if (btn) { btn.disabled = true; btn.textContent = '등록 중...'; }
   try {
-    if (isAdminTestMode) {
-      if (inp) { inp.value = ''; const cc=$('cmt-char-cnt');if(cc)cc.textContent='0/200'; }
-      const mockCmt = { id: 'mock-cmt-' + Date.now(), post_id: postId, user_id: currentUser.id, nickname: nick, body, created_at: new Date().toISOString() };
-      const cl = $('comment-list');
-      if (cl) {
-        const existing = cl.innerHTML.includes('첫 댓글') ? '' : cl.innerHTML;
-        cl.innerHTML = existing + `<div class="comment-item"><div class="comment-nick">${mockCmt.nickname}</div><div class="comment-body">${mockCmt.body.replace(/</g,'&lt;')}</div><div class="comment-time">방금 전</div></div>`;
-        const lbl = $('comment-count-label');
-        if (lbl) { const n = parseInt(lbl.textContent.replace(/\D/g,''))||0; lbl.textContent = '(' + (n+1) + ')'; }
-      }
-      toast('✅ [검증] 댓글 등록됨 (mock)');
-      if (btn) { btn.disabled = false; btn.textContent = '등록'; }
-      return;
-    }
     await sb.from('comments').insert({ post_id: postId, user_id: currentUser.id, nickname: nick, body });
     // 게시글 comment_count 증가
     const cur = [...(commPosts.free||[]),...(commPosts.verify||[])].find(p=>String(p.id)===String(postId));
@@ -8810,14 +8584,6 @@ async function changeNickname() {
   const btn = $('nick-save-btn');
   btn.disabled = true; btn.textContent = '저장 중...';
   try {
-    if (isAdminTestMode) {
-      // 검증 모드: 로컬만 업데이트
-      currentUser.user_metadata.nickname = newNick;
-      updateHeaderUser(newNick, myVerifiedTitle || '');
-      toast('✅ [검증] 닉네임 변경됨 (mock)');
-      renderProfile();
-      return;
-    }
     // 1) profiles 테이블
     const { error: pe } = await sb.from('profiles').update({ nickname: newNick }).eq('id', currentUser.id);
     if (pe) throw pe;
@@ -8832,414 +8598,6 @@ async function changeNickname() {
     toast('❌ 저장 실패: ' + (e.message || ''));
   } finally {
     btn.disabled = false; btn.textContent = '저장';
-  }
-}
-
-// ══════════════════════════════════════════════
-// 관리자 패널
-// ══════════════════════════════════════════════
-const ADMIN_TABS = { users:'users', tickets:'tickets', posts:'posts', stats:'stats' };
-let currentAdminTab = 'users';
-
-async function renderAdmin() {
-  const isAdmin = isLoggedIn && window._isAppAdmin;
-  $('admin-gate').style.display = isAdmin ? 'none' : '';
-  $('admin-content').style.display = isAdmin ? '' : 'none';
-  if (!isAdmin) return;
-  await loadAdminStats();
-  await adminTab('users');
-}
-
-async function loadAdminStats() {
-  try {
-    const [uRes, tRes, pRes, sRes] = await Promise.all([
-      sb.from('profiles').select('id', { count: 'exact', head: true }),
-      sb.from('tickets').select('id', { count: 'exact', head: true }),
-      sb.from('posts').select('id', { count: 'exact', head: true }),
-      sb.from('user_stats').select('total_prize'),
-    ]);
-    $('adm-kpi-users').textContent = fmtCnt(uRes.count || 0) + '명';
-    $('adm-kpi-tickets').textContent = fmtCnt(tRes.count || 0) + '개';
-    $('adm-kpi-posts').textContent = fmtCnt(pRes.count || 0) + '개';
-    const totalPrize = (sRes.data || []).reduce((a, r) => a + (r.total_prize || 0), 0);
-    $('adm-kpi-prize').textContent = fmtMShort(totalPrize);
-  } catch (e) {
-    console.warn('admin stats error', e);
-  }
-}
-
-async function adminTab(tab, btn) {
-  currentAdminTab = tab;
-  document.querySelectorAll('#admin-content .rank-tab-pill').forEach(b => b.classList.remove('on'));
-  if (btn) btn.classList.add('on');
-  const wrap = $('admin-table-wrap');
-  wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px;">로딩 중...</div>';
-  try {
-    if (tab === 'users') {
-      const { data } = await sb.from('profiles').select('id,nickname,created_at').order('created_at', { ascending: false }).limit(50);
-      if (!data || !data.length) { wrap.innerHTML = adminEmpty('회원이 없습니다'); return; }
-      wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
-        <th>#</th><th>닉네임</th><th>가입일</th><th style="width:60px;">수정</th>
-      </tr></thead><tbody>${data.map((u,i) => `<tr id="urow-${u.id}">
-        <td>${i+1}</td>
-        <td style="font-weight:700;" id="unick-${u.id}">${u.nickname||'-'}</td>
-        <td style="font-size:11px;color:var(--text-muted);">${u.created_at?u.created_at.slice(0,10):'-'}</td>
-        <td><button data-uid="${u.id}" data-nick="${u.nickname||''}" onclick="adminEditUser(this.dataset.uid,this.dataset.nick,'')" style="padding:3px 8px;background:var(--bg-light);color:var(--text-muted);border:1px solid var(--border-dashed);border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
-      </tr>`).join('')}</tbody></table>`;
-    } else if (tab === 'tickets') {
-      const { data } = await sb.from('tickets').select('id,round_no,created_at,user_id,game_count,prize_amount').order('created_at', { ascending: false }).limit(100);
-      // 닉네임 별도 조회
-      const tUids = [...new Set((data||[]).map(t => t.user_id))];
-      const { data: tProfs } = tUids.length ? await sb.from('profiles').select('id,nickname').in('id', tUids) : { data: [] };
-      const tNickMap = Object.fromEntries((tProfs||[]).map(p => [p.id, p.nickname]));
-      if (!data || !data.length) { wrap.innerHTML = adminEmpty('등록된 티켓이 없습니다'); return; }
-      wrap.innerHTML = `<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">각 행의 수정 버튼으로 당첨금·게임수 직접 편집 가능합니다</div>
-      <table class="rank-board-table"><thead><tr>
-        <th>#</th><th>회원</th><th>회차</th><th>게임수</th><th>당첨금</th><th>등록일</th><th style="width:80px;">수정/삭제</th>
-      </tr></thead><tbody>${data.map((t,i) => `<tr id="trow-${t.id}">
-        <td>${i+1}</td>
-        <td style="font-weight:700;">${tNickMap[t.user_id]||'-'}</td>
-        <td id="tdrw-${t.id}">${t.round_no||'-'}회</td>
-        <td id="tgame-${t.id}">${fmtCnt(t.game_count||0)}게임</td>
-        <td id="tprize-${t.id}" style="color:var(--lotto-red);font-weight:700;">${fmtMShort(t.prize_amount||0)}</td>
-        <td style="font-size:11px;color:var(--text-muted);">${t.created_at?t.created_at.slice(0,10):'-'}</td>
-        <td style="display:flex;gap:4px;">
-          <button onclick="adminEditTicket('${t.id}',${t.round_no||0},${t.game_count||0},${t.prize_amount||0})" style="padding:3px 6px;background:var(--bg-light);color:var(--text-muted);border:1px solid var(--border-dashed);border-radius:4px;font-size:11px;cursor:pointer;">수정</button>
-          <button onclick="adminDelete('tickets','${t.id}')" style="padding:3px 6px;background:var(--comm-hot-bg,#fee2e2);color:var(--lotto-red);border:1px solid #fecaca;border-radius:4px;font-size:11px;cursor:pointer;">삭제</button>
-        </td>
-      </tr>`).join('')}</tbody></table>`;
-    } else if (tab === 'posts') {
-      const { data } = await sb.from('posts').select('id,title,nickname,tag,likes,comment_count,created_at').order('created_at', { ascending: false }).limit(50);
-      if (!data || !data.length) { wrap.innerHTML = adminEmpty('게시글이 없습니다'); return; }
-      wrap.innerHTML = `<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">삭제 버튼 클릭 시 게시글과 댓글이 즉시 삭제됩니다</div>
-      <table class="rank-board-table"><thead><tr>
-        <th>#</th><th>제목</th><th>작성자</th><th>구분</th><th>좋아요</th><th>댓글</th><th>작성일</th><th>삭제</th>
-      </tr></thead><tbody>${data.map((p,i) => `<tr>
-        <td>${i+1}</td>
-        <td style="font-weight:700;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(p.title||'').replace(/</g,'&lt;')}</td>
-        <td>${p.nickname||'-'}</td>
-        <td><span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='free'?'자유':'인증'}</span></td>
-        <td>${p.likes||0}</td>
-        <td>${p.comment_count||0}</td>
-        <td style="font-size:11px;color:var(--text-muted);">${p.created_at?p.created_at.slice(0,10):'-'}</td>
-        <td><button onclick="adminDelete('posts','${p.id}')" style="padding:3px 8px;background:var(--comm-hot-bg,#fee2e2);color:var(--lotto-red);border:1px solid #fecaca;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">삭제</button></td>
-      </tr>`).join('')}</tbody></table>`;
-    } else if (tab === 'insert') {
-      // 임의 데이터 삽입 폼
-      wrap.innerHTML = `
-        <div style="font-size:12px;color:#92400e;background:var(--amber-bg,#fef3c7);border:1px solid var(--amber-border,#fde68a);border-radius:6px;padding:10px 12px;margin-bottom:14px;">
-          ⚠️  이 탭은 테스트 전용입니다. 실제 DB에 데이터가 삽입됩니다.
-        </div>
-
-        <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:14px;margin-bottom:12px;">
-          <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-            티켓 직접 삽입
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">대상 회원 닉네임</label>
-              <input id="ins-nick" type="text" placeholder="닉네임 입력" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">회차</label>
-              <input id="ins-round" type="number" placeholder="${latestRound}" value="${latestRound}" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">게임 수</label>
-              <input id="ins-games" type="number" placeholder="5" value="5" min="1" max="100" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">당첨 등수 (0=낙첨)</label>
-              <select id="ins-rank" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-                <option value="0">낙첨</option>
-                <option value="5">5등 (5,000원)</option>
-                <option value="4">4등 (50,000원)</option>
-                <option value="3">3등 (약 150만원)</option>
-                <option value="2">2등 (약 6,000만원)</option>
-                <option value="1">1등 (수억원)</option>
-              </select>
-            </div>
-            <div style="grid-column:1/-1;">
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">당첨금 직접 입력 (원, 선택사항)</label>
-              <input id="ins-prize" type="number" placeholder="당첨금 (비워두면 자동)" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-            </div>
-          </div>
-          <button onclick="adminInsertTicket()" style="width:100%;padding:9px;background:#dc2626;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;">티켓 삽입하기</button>
-          <div id="ins-result" style="margin-top:8px;font-size:11px;"></div>
-        </div>
-
-        <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:14px;">
-          <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            전적(user_stats) 직접 수정
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">대상 닉네임</label>
-              <input id="ins-stat-nick" type="text" placeholder="닉네임" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 구매 게임수</label>
-              <input id="ins-stat-tickets" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 투자금 (원)</label>
-              <input id="ins-stat-spent" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 당첨금 (원)</label>
-              <input id="ins-stat-prize" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 당첨 횟수</label>
-              <input id="ins-stat-wins" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">최고 등수 (1~5)</label>
-              <input id="ins-stat-best" type="number" placeholder="5" min="1" max="5" style="width:100%;padding:6px 8px;border:1px solid var(--border-dashed);border-radius:5px;font-size:12px;box-sizing:border-box;">
-            </div>
-          </div>
-          <button onclick="adminUpdateStats()" style="width:100%;padding:9px;background:#475569;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;">전적 업데이트하기</button>
-          <div id="ins-stat-result" style="margin-top:8px;font-size:11px;"></div>
-        </div>
-      `;
-    } else if (tab === 'stats') {
-      const { data } = await sb.from('user_stats').select('user_id,total_tickets,total_spent,total_prize,total_wins,best_rank,rank_1_count').order('total_prize', { ascending: false }).limit(30);
-      const sUids = (data||[]).map(s => s.user_id);
-      const { data: sProfs } = sUids.length ? await sb.from('profiles').select('id,nickname').in('id', sUids) : { data: [] };
-      const sNickMap = Object.fromEntries((sProfs||[]).map(p => [p.id, p.nickname]));
-      if (!data || !data.length) { wrap.innerHTML = adminEmpty('전적 데이터가 없습니다'); return; }
-      wrap.innerHTML = `<table class="rank-board-table"><thead><tr>
-        <th>#</th><th>회원</th><th>구매게임</th><th>구매금액</th><th>당첨금</th><th>수익률</th><th>최고등수</th><th>1등횟수</th><th style="width:50px;">수정</th>
-      </tr></thead><tbody>${data.map((s,i) => {
-        const roi = s.total_spent > 0 ? ((s.total_prize - s.total_spent) / s.total_spent * 100).toFixed(1) : '-';
-        const roiColor = roi !== '-' && parseFloat(roi) >= 0 ? '#10b981' : '#ef4444';
-        return `<tr>
-          <td>${i+1}</td>
-          <td style="font-weight:700;">${sNickMap[s.user_id]||'-'}</td>
-          <td>${fmtCnt(s.total_tickets||0)}게임</td>
-          <td>${fmtMShort(s.total_spent||0)}</td>
-          <td style="color:var(--lotto-red);font-weight:700;">${fmtMShort(s.total_prize||0)}</td>
-          <td style="color:${roiColor};font-weight:700;">${roi !== '-' ? (parseFloat(roi) >= 0 ? '+' : '') + roi + '%' : '-'}</td>
-          <td>${s.best_rank ? s.best_rank + '등' : '-'}</td>
-          <td>${fmtCnt(s.rank_1_count||0)}회</td>
-          <td><button data-uid="${s.user_id}" data-nick="${sNickMap[s.user_id]||''}" data-tickets="${s.total_tickets||0}" data-spent="${s.total_spent||0}" data-prize="${s.total_prize||0}" data-wins="${s.total_wins||0}" data-best="${s.best_rank||0}" onclick="adminEditStat(this.dataset.uid,this.dataset.nick,+this.dataset.tickets,+this.dataset.spent,+this.dataset.prize,+this.dataset.wins,+this.dataset.best)" style="padding:3px 8px;background:var(--bg-light);color:var(--text-muted);border:1px solid var(--border-dashed);border-radius:4px;font-size:11px;cursor:pointer;">수정</button></td>
-        </tr>`;
-      }).join('')}</tbody></table>`;
-    }
-  } catch (e) {
-    wrap.innerHTML = `<div style="color:var(--b-red);font-size:12px;padding:12px;">오류: ${e.message}</div>`;
-  }
-}
-
-async function adminDelete(table, id) {
-  if (!confirm('정말 삭제하시겠습니까?')) return;
-  try {
-    const { error } = await sb.from(table).delete().eq('id', id);
-    if (error) throw error;
-    toast('🗑 삭제 완료');
-    await adminTab(currentAdminTab);   // 목록 새로고침
-    await loadAdminStats();            // KPI 재계산
-  } catch(e) {
-    toast('❌ 삭제 실패: ' + e.message);
-  }
-}
-
-function adminEmpty(msg) {
-  return `<div style="text-align:center;padding:40px 20px;font-size:13px;color:var(--text-muted);">${msg}</div>`;
-}
-
-// 인라인 편집 함수들
-function adminEditUser(id, nick, email) {
-  const row = $(`urow-${id}`);
-  if (!row) return;
-  row.innerHTML = `
-    <td colspan="4">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span style="font-size:11px;font-weight:700;color:var(--text-muted);">닉네임</span>
-        <input class="adm-input" id="edit-unick-${id}" value="${nick.replace(/"/g,'&quot;')}" style="width:120px;">
-        <button class="adm-save-btn" onclick="adminSaveUser('${id}')">저장</button>
-        <button class="adm-cancel-btn" onclick="adminTab('users')">취소</button>
-      </div>
-    </td><td></td>`;
-}
-
-async function adminSaveUser(id) {
-  const newNick = ($(`edit-unick-${id}`)?.value || '').trim();
-  if (!newNick) { toast('닉네임을 입력하세요'); return; }
-  try {
-    const { error } = await sb.from('profiles').update({ nickname: newNick }).eq('id', id);
-    if (error) throw error;
-    toast('✅ 닉네임 수정 완료');
-    adminTab('users');
-  } catch(e) { toast('❌ ' + e.message); }
-}
-
-function adminEditTicket(id, drwNo, games, prize) {
-  const row = $(`trow-${id}`);
-  if (!row) return;
-  row.className = 'adm-edit-row';
-  row.innerHTML = `
-    <td colspan="5">
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0;">
-        <span style="font-size:11px;font-weight:700;color:var(--text-muted);">회차</span>
-        <input class="adm-input" id="edit-tdrw-${id}" value="${drwNo}" style="width:60px;" type="number">
-        <span style="font-size:11px;font-weight:700;color:var(--text-muted);">게임수</span>
-        <input class="adm-input" id="edit-tgame-${id}" value="${games}" style="width:55px;" type="number">
-        <span style="font-size:11px;font-weight:700;color:var(--text-muted);">당첨금</span>
-        <input class="adm-input" id="edit-tprize-${id}" value="${prize}" style="width:90px;" type="number">
-        <button class="adm-save-btn" onclick="adminSaveTicket('${id}')">저장</button>
-        <button class="adm-cancel-btn" onclick="adminTab('tickets')">취소</button>
-      </div>
-    </td>
-    <td></td><td></td>`;
-}
-
-async function adminSaveTicket(id) {
-  const drwNo = parseInt($(`edit-tdrw-${id}`)?.value) || 0;
-  const games = parseInt($(`edit-tgame-${id}`)?.value) || 0;
-  const prize = parseInt($(`edit-tprize-${id}`)?.value) || 0;
-  try {
-    const { error } = await sb.from('tickets').update({ round_no: drwNo, game_count: games, prize_amount: prize }).eq('id', id);
-    if (error) throw error;
-    toast('✅ 티켓 수정 완료');
-    adminTab('tickets');
-  } catch(e) { toast('❌ ' + e.message); }
-}
-
-function adminEditStat(uid, nick, tickets, spent, prize, wins, best) {
-  const wrap = $('admin-table-wrap');
-  // 모달 스타일 인라인 편집
-  const existing = document.getElementById('stat-edit-modal');
-  if (existing) existing.remove();
-  const div = document.createElement('div');
-  div.id = 'stat-edit-modal';
-  div.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:20px;z-index:9999;min-width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.15);';
-  div.innerHTML = `
-    <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-bottom:12px;">전적 수정 — ${nick}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div><label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">구매 게임수</label>
-        <input id="sedit-tickets" type="number" value="${tickets}" class="adm-input"></div>
-      <div><label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 투자금</label>
-        <input id="sedit-spent" type="number" value="${spent}" class="adm-input"></div>
-      <div><label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 당첨금</label>
-        <input id="sedit-prize" type="number" value="${prize}" class="adm-input"></div>
-      <div><label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">총 당첨 횟수</label>
-        <input id="sedit-wins" type="number" value="${wins}" class="adm-input"></div>
-      <div><label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:3px;">최고 등수</label>
-        <input id="sedit-best" type="number" value="${best||''}" min="1" max="5" class="adm-input"></div>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button class="adm-save-btn" onclick="adminSaveStat('${uid}')" style="flex:1;padding:8px;">저장</button>
-      <button class="adm-cancel-btn" onclick="document.getElementById('stat-edit-modal').remove()" style="padding:8px 14px;">취소</button>
-    </div>`;
-  document.body.appendChild(div);
-}
-
-async function adminSaveStat(uid) {
-  const patch = {
-    user_id: uid,
-    total_tickets: parseInt($('sedit-tickets')?.value) || 0,
-    total_spent:   parseInt($('sedit-spent')?.value)   || 0,
-    total_prize:   parseInt($('sedit-prize')?.value)   || 0,
-    total_wins:    parseInt($('sedit-wins')?.value)    || 0,
-  };
-  const best = parseInt($('sedit-best')?.value);
-  if (best >= 1 && best <= 5) patch.best_rank = best;
-  try {
-    const { error } = await sb.from('user_stats').upsert(patch, { onConflict: 'user_id' });
-    if (error) throw error;
-    document.getElementById('stat-edit-modal')?.remove();
-    toast('✅ 전적 수정 완료');
-    adminTab('stats');
-    await loadAdminStats();
-  } catch(e) { toast('❌ ' + e.message); }
-}
-
-async function adminInsertTicket() {
-  const nick     = ($('ins-nick')?.value  || '').trim();
-  const round    = parseInt($('ins-round')?.value) || latestRound;
-  const games    = parseInt($('ins-games')?.value) || 1;
-  const rank     = parseInt($('ins-rank')?.value)  || 0;
-  const prizeInput = parseInt($('ins-prize')?.value) || 0;
-  const PRIZE_DEF = {1: 2000000000, 2: 60000000, 3: 1500000, 4: 50000, 5: 5000, 0: 0};
-  const prizeAmt = prizeInput || PRIZE_DEF[rank] || 0;
-  const resEl = $('ins-result');
-
-  if (!nick) { resEl.innerHTML = '<span style="color:#dc2626;">닉네임을 입력하세요.</span>'; return; }
-  resEl.innerHTML = '<span style="color:#94a3b8;">처리 중...</span>';
-
-  try {
-    // profiles 에서 user_id 조회
-    const { data: prof } = await sb.from('profiles').select('id').eq('nickname', nick).single();
-    if (!prof) { resEl.innerHTML = '<span style="color:#dc2626;">해당 닉네임 회원 없음.</span>'; return; }
-    const uid = prof.id;
-
-    // tickets insert (qr_url은 관리자 삽입이므로 고유 가상 키 생성)
-    const fakeQrKey = `admin-insert-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const { error: te } = await sb.from('tickets').insert({
-      user_id: uid,
-      qr_url: fakeQrKey,
-      round_no: round,
-      numbers: [1, 2, 3, 4, 5, 6],
-      game_count: games,
-      prize_amount: prizeAmt,
-      prize_rank: rank || null,
-      result: 'checked',
-    });
-    if (te) throw te;
-
-    // user_stats upsert (합산)
-    const { data: st } = await sb.from('user_stats').select('*').eq('user_id', uid).single();
-    const cur = st || {};
-    const rankField = rank >= 1 && rank <= 5 ? `rank_${rank}_count` : null;
-    const patch = {
-      user_id: uid,
-      total_tickets: (cur.total_tickets||0) + games,
-      total_spent:   (cur.total_spent||0)   + games * 1000,
-      total_prize:   (cur.total_prize||0)   + prizeAmt,
-      total_wins:    (cur.total_wins||0)    + (rank >= 1 && rank <= 5 ? 1 : 0),
-      best_rank:     (!cur.best_rank || (rank > 0 && rank < cur.best_rank)) ? rank || cur.best_rank : cur.best_rank,
-    };
-    if (rankField) patch[rankField] = (cur[rankField]||0) + 1;
-    await sb.from('user_stats').upsert(patch, { onConflict: 'user_id' });
-
-    const rankLabel = rank ? rank + '등 (' + fmtMFull(prizeAmt) + ')' : '낙첨';
-    resEl.innerHTML = `<span style="color:#16a34a;">✅ 삽입 완료 — ${nick} / ${round}회차 / ${games}게임 / ${rankLabel}</span>`;
-    await loadAdminStats();
-  } catch(e) {
-    resEl.innerHTML = `<span style="color:#dc2626;">❌ 오류: ${e.message}</span>`;
-  }
-}
-
-async function adminUpdateStats() {
-  const nick    = ($('ins-stat-nick')?.value    || '').trim();
-  const tickets = parseInt($('ins-stat-tickets')?.value) || 0;
-  const spent   = parseInt($('ins-stat-spent')?.value)   || 0;
-  const prize   = parseInt($('ins-stat-prize')?.value)   || 0;
-  const wins    = parseInt($('ins-stat-wins')?.value)    || 0;
-  const best    = parseInt($('ins-stat-best')?.value)    || null;
-  const resEl   = $('ins-stat-result');
-
-  if (!nick) { resEl.innerHTML = '<span style="color:#dc2626;">닉네임을 입력하세요.</span>'; return; }
-  resEl.innerHTML = '<span style="color:#94a3b8;">처리 중...</span>';
-
-  try {
-    const { data: prof } = await sb.from('profiles').select('id').eq('nickname', nick).single();
-    if (!prof) { resEl.innerHTML = '<span style="color:#dc2626;">해당 닉네임 회원 없음.</span>'; return; }
-    const patch = { user_id: prof.id };
-    if (tickets) patch.total_tickets = tickets;
-    if (spent)   patch.total_spent   = spent;
-    if (prize)   patch.total_prize   = prize;
-    if (wins)    patch.total_wins    = wins;
-    if (best)    patch.best_rank     = best;
-    const { error } = await sb.from('user_stats').upsert(patch, { onConflict: 'user_id' });
-    if (error) throw error;
-    resEl.innerHTML = `<span style="color:#16a34a;">✅ 전적 업데이트 완료 — ${nick}</span>`;
-    await loadAdminStats();
-  } catch(e) {
-    resEl.innerHTML = `<span style="color:#dc2626;">❌ 오류: ${e.message}</span>`;
   }
 }
 
@@ -9272,7 +8630,7 @@ async function toggleProfileRankBadge(id) {
   const selected = getActiveMonthlyBadges().includes(id) ? [] : [id];
   window._selectedMonthlyRankBadges = selected;
   localStorage.setItem(`ltb_rank_badges_${currentUser?.id || 'guest'}`, JSON.stringify(selected));
-  if (sb && currentUser && !isAdminTestMode) {
+  if (sb && currentUser) {
     const { error } = await sb.from('profiles').update({ selected_rank_badges:selected }).eq('id', currentUser.id);
     if (error && !/column|schema cache/i.test(error.message || '')) {
       toast('대표 뱃지 저장에 실패했습니다.');
