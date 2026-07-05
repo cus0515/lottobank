@@ -2418,6 +2418,10 @@ async function savePendingOnlineTicket(parsed) {
     ({ error } = await sb.from('tickets').upsert(payload, { onConflict:'qr_url' }));
   }
   if (error) throw error;
+  if (await rebuildCurrentUserStats()) {
+    insertActivity('qr_register', { round:parsed.round, games:parsed.games.length, channel:'online' });
+    return;
+  }
   const { data: storedStats } = await sb.from('user_stats').select('*').eq('user_id',currentUser.id).maybeSingle();
   const current = storedStats || dbStats || {};
   await sb.from('user_stats').upsert({
@@ -2533,6 +2537,15 @@ async function saveOnlinePensionTickets(parsed) {
     });
     if (assignmentError) throw assignmentError;
   }
+  if (await rebuildCurrentUserStats()) {
+    insertActivity('qr_register', {
+      round:parsed.round,
+      games:parsed.pensionGames.length,
+      type:'pension',
+      channel:'online',
+    });
+    return assignments.length === parsed.pensionGames.length;
+  }
   const { data:storedStats } = await sb.from('user_stats').select('*').eq('user_id',currentUser.id).maybeSingle();
   const current = storedStats || dbStats || {};
   await sb.from('user_stats').upsert({
@@ -2596,6 +2609,11 @@ async function refreshPendingOnlineResults() {
     if (bestResult.rank <= 5) bestAddedRank = Math.min(bestAddedRank, bestResult.rank);
   }
   if (!addedWins && !addedPrize && bestAddedRank === 99) return;
+  if (await rebuildCurrentUserStats()) {
+    await sb.rpc('refresh_monthly_rankings');
+    await sb.rpc('refresh_all_time_rankings');
+    return;
+  }
   const { data: current } = await sb.from('user_stats').select('*').eq('user_id',currentUser.id).single();
   if (!current) return;
   const currentBest = current.best_rank || 99;
@@ -4977,38 +4995,44 @@ function updateLeftUserPanel(buy, wins, inv, prz, roi) {
 }
 
 async function loadGuestStats() {
-  // 비로그인 상태: 플랫폼 전체 통계 로드
+  const setStat = (id, val) => {
+    const element = $(id);
+    if (!element) return;
+    element.textContent = val;
+    element.classList.remove('stat-anim');
+    void element.offsetWidth;
+    element.classList.add('stat-anim');
+  };
+
+  // 공개 집계 RPC를 우선 사용하고, 미적용 DB에서는 기존 공개 테이블로 대체한다.
   try {
-    const { count: memberCount } = await sb.from('profiles').select('*', { count: 'exact', head: true });
-    const el0 = $('gs-members');
-    if (el0) { el0.textContent = memberCount > 0 ? fmtCnt(memberCount) + '명' : '0명'; }
-    const { data } = await sb.from('user_stats')
-      .select('total_tickets, total_wins, total_spent, total_prize, rank_1_count');
-    const tot = (data||[]).reduce((a, r) => ({
-      tickets: a.tickets + (r.total_tickets||0),
-      wins:    a.wins    + (r.total_wins||0),
-      spent:   a.spent   + (r.total_spent||0),
-      prize:   a.prize   + (r.total_prize||0),
-      rank1:   a.rank1   + (r.rank_1_count||0),
-    }), { tickets:0, wins:0, spent:0, prize:0, rank1:0 });
-    const roi = tot.spent > 0 ? ((tot.prize - tot.spent) / tot.spent * 100).toFixed(1) : null;
-    const el = (id, val) => {
-      const e = $(id);
-      if (!e) return;
-      e.textContent = val;
-      e.classList.remove('stat-anim');
-      void e.offsetWidth; // reflow
-      e.classList.add('stat-anim');
-    };
-    el('gs-tickets', tot.tickets > 0 ? fmtCnt(tot.tickets) + '게임' : '0게임');
-    el('gs-wins',    tot.wins > 0    ? fmtCnt(tot.wins) + '회'    : '0회');
-    el('gs-rank1',   tot.rank1 > 0   ? fmtCnt(tot.rank1) + '명'   : '0명');
-    // 이번주 등록 게임 수
-    try {
-      const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString();
-      const { count: wk } = await sb.from('tickets').select('*', { count:'exact', head:true }).gte('created_at', weekAgo);
-      el('gs-weekly', wk != null ? fmtCnt(wk) + '게임' : '-');
-    } catch(_) {}
+    let { data: stats, error } = await sb.rpc('get_public_platform_stats');
+    if (error || !stats) {
+      const [{ count:members }, { data:rows }] = await Promise.all([
+        sb.from('profiles').select('*', { count:'exact', head:true }),
+        sb.from('user_stats').select('total_tickets,total_wins,total_spent,total_prize,rank_1_count'),
+      ]);
+      const total = (rows || []).reduce((sum, row) => ({
+        games:sum.games + (row.total_tickets || 0),
+        wins:sum.wins + (row.total_wins || 0),
+        spent:sum.spent + (row.total_spent || 0),
+        prize:sum.prize + (row.total_prize || 0),
+        rank1:sum.rank1 + ((row.rank_1_count || 0) > 0 ? 1 : 0),
+      }), { games:0, wins:0, spent:0, prize:0, rank1:0 });
+      stats = {
+        members:members || 0, total_games:total.games, total_wins:total.wins,
+        total_spent:total.spent, total_prize:total.prize, rank1_users:total.rank1,
+        weekly_games:0,
+      };
+    }
+    setStat('gs-members', fmtCnt(stats.members || 0) + '명');
+    setStat('gs-tickets', fmtCnt(stats.total_games || 0) + '게임');
+    setStat('gs-wins', fmtCnt(stats.total_wins || 0) + '회');
+    setStat('gs-rank1', fmtCnt(stats.rank1_users || 0) + '명');
+    setStat('gs-weekly', fmtCnt(stats.weekly_games || 0) + '게임');
+    const roi = Number(stats.total_spent) > 0
+      ? ((Number(stats.total_prize) - Number(stats.total_spent)) / Number(stats.total_spent) * 100).toFixed(1)
+      : null;
     const roiEl = $('gs-roi');
     if (roiEl) {
       if (roi === null) { roiEl.textContent = '-'; }
@@ -5019,24 +5043,16 @@ async function loadGuestStats() {
     }
   } catch(e) { console.warn('loadGuestStats:', e.message); }
 
-  // 인기/제외 번호 — tickets 테이블 집계 (별도 try)
+  // 개별 티켓을 공개하지 않고 번호별 집계만 조회한다.
   try {
-    const { data: tData } = await sb.from('tickets')
-      .select('numbers')
-      .not('numbers', 'is', null)
-      .limit(500);
+    const { data: frequencyRows, error } = await sb.rpc('get_public_number_frequency');
+    if (error) throw error;
     const hotEl = $('gs-hot-nums');
     const coldEl = $('gs-cold-nums');
-    if (tData && tData.length) {
-      const freq = new Array(46).fill(0);
-      tData.forEach(t => {
-        let nums = Array.isArray(t.numbers) ? t.numbers : (typeof t.numbers === 'string' ? JSON.parse(t.numbers) : []);
-        // 2D 배열 (멀티게임) 평탄화
-        const flatNums = Array.isArray(nums[0]) ? nums.flat() : nums;
-        flatNums.forEach(n => { if (typeof n === 'number' && n >= 1 && n <= 45) freq[n]++; });
-      });
-      const indexed = freq.map((c,i) => ({ n:i, c })).slice(1);
-      const sorted = [...indexed].sort((a,b) => b.c - a.c);
+    if (frequencyRows?.length) {
+      const sorted = frequencyRows
+        .map(row => ({ n:Number(row.number), c:Number(row.selections) }))
+        .sort((a,b) => b.c - a.c || a.n - b.n);
       if (hotEl) {
         const top5 = sorted.slice(0,5).filter(x => x.c > 0);
         hotEl.innerHTML = top5.length
@@ -5044,7 +5060,7 @@ async function loadGuestStats() {
           : '<span style="font-size:11px;color:#94a3b8;">아직 데이터 없음</span>';
       }
       if (coldEl) {
-        const cold5 = sorted.slice(-5).reverse().filter(x => x.c > 0);
+        const cold5 = [...sorted].sort((a,b) => a.c - b.c || a.n - b.n).slice(0,5);
         coldEl.innerHTML = cold5.length
           ? cold5.map(x => bH(x.n)).join('')
           : '<span style="font-size:11px;color:#94a3b8;">아직 데이터 없음</span>';
@@ -5147,6 +5163,7 @@ async function saveTicketToDB(parsed, winData, gameResults) {
 
 async function upsertUserStats(gameCount, gameResults, totalPrize = 0, winData = null) {
   if (!isLoggedIn || !currentUser) return;
+  if (await rebuildCurrentUserStats()) return;
   const uid = currentUser.id;
   const c = dbStats || {};
   const winCount = gameResults.filter(r => r.rank <= 5).length;
@@ -5167,6 +5184,16 @@ async function upsertUserStats(gameCount, gameResults, totalPrize = 0, winData =
     rank_5_count:  (c.rank_5_count  || 0) + gameResults.filter(r => r.rank === 5).length,
     updated_at: new Date().toISOString(),
   }, { onConflict: 'user_id' });
+}
+
+async function rebuildCurrentUserStats() {
+  if (!isLoggedIn || !currentUser || !sb) return false;
+  try {
+    const { error } = await sb.rpc('rebuild_user_stats', { p_user_id:currentUser.id });
+    return !error;
+  } catch (_) {
+    return false;
+  }
 }
 
 // =====================================================

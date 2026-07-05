@@ -138,6 +138,153 @@ create index if not exists idx_lottery_stores_location
 create index if not exists idx_tickets_ranking_fields
   on public.tickets (purchase_date, user_id, prize_rank, store_id);
 
+create or replace function public.rebuild_user_stats(p_user_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.user_stats (
+    user_id, total_tickets, total_spent, total_wins, total_prize, best_rank,
+    rank_1_count, rank_2_count, rank_3_count, rank_4_count, rank_5_count, updated_at
+  )
+  select
+    p_user_id,
+    coalesce(sum(greatest(coalesce(t.game_count, 1), 1)), 0)::integer,
+    coalesce(sum(greatest(coalesce(t.game_count, 1), 1) * 1000), 0)::bigint,
+    coalesce(sum(case
+      when jsonb_array_length(coalesce(t.game_results, '[]'::jsonb)) > 0
+        then (select count(*) from jsonb_array_elements(t.game_results) item
+              where coalesce((item ->> 'rank')::integer, 99) between 1 and 5)
+      when t.prize_rank between 1 and 5 then 1 else 0 end), 0)::integer,
+    coalesce(sum(t.prize_amount), 0)::bigint,
+    min(case
+      when jsonb_array_length(coalesce(t.game_results, '[]'::jsonb)) > 0
+        then (select min((item ->> 'rank')::integer) from jsonb_array_elements(t.game_results) item
+              where coalesce((item ->> 'rank')::integer, 99) between 1 and 5)
+      when t.prize_rank between 1 and 5 then t.prize_rank else null end),
+    coalesce(sum(case when jsonb_array_length(coalesce(t.game_results, '[]'::jsonb)) > 0
+      then (select count(*) from jsonb_array_elements(t.game_results) item where (item ->> 'rank')::integer = 1)
+      when t.prize_rank = 1 then 1 else 0 end), 0)::integer,
+    coalesce(sum(case when jsonb_array_length(coalesce(t.game_results, '[]'::jsonb)) > 0
+      then (select count(*) from jsonb_array_elements(t.game_results) item where (item ->> 'rank')::integer = 2)
+      when t.prize_rank = 2 then 1 else 0 end), 0)::integer,
+    coalesce(sum(case when jsonb_array_length(coalesce(t.game_results, '[]'::jsonb)) > 0
+      then (select count(*) from jsonb_array_elements(t.game_results) item where (item ->> 'rank')::integer = 3)
+      when t.prize_rank = 3 then 1 else 0 end), 0)::integer,
+    coalesce(sum(case when jsonb_array_length(coalesce(t.game_results, '[]'::jsonb)) > 0
+      then (select count(*) from jsonb_array_elements(t.game_results) item where (item ->> 'rank')::integer = 4)
+      when t.prize_rank = 4 then 1 else 0 end), 0)::integer,
+    coalesce(sum(case when jsonb_array_length(coalesce(t.game_results, '[]'::jsonb)) > 0
+      then (select count(*) from jsonb_array_elements(t.game_results) item where (item ->> 'rank')::integer = 5)
+      when t.prize_rank = 5 then 1 else 0 end), 0)::integer,
+    now()
+  from public.tickets t
+  where t.user_id = p_user_id
+  on conflict (user_id) do update set
+    total_tickets = excluded.total_tickets,
+    total_spent = excluded.total_spent,
+    total_wins = excluded.total_wins,
+    total_prize = excluded.total_prize,
+    best_rank = excluded.best_rank,
+    rank_1_count = excluded.rank_1_count,
+    rank_2_count = excluded.rank_2_count,
+    rank_3_count = excluded.rank_3_count,
+    rank_4_count = excluded.rank_4_count,
+    rank_5_count = excluded.rank_5_count,
+    updated_at = excluded.updated_at;
+end;
+$$;
+
+create or replace function public.rebuild_user_stats_after_ticket()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if tg_op <> 'DELETE' then
+    perform public.rebuild_user_stats(new.user_id);
+  end if;
+  if tg_op = 'DELETE' or (tg_op = 'UPDATE' and old.user_id <> new.user_id) then
+    perform public.rebuild_user_stats(old.user_id);
+  end if;
+  return null;
+end;
+$$;
+
+drop trigger if exists rebuild_user_stats_on_ticket on public.tickets;
+create trigger rebuild_user_stats_on_ticket
+  after insert or update or delete on public.tickets
+  for each row execute function public.rebuild_user_stats_after_ticket();
+
+do $$
+declare
+  target_user uuid;
+begin
+  for target_user in select id from auth.users loop
+    insert into public.profiles (id, nickname)
+    select target_user, coalesce(raw_user_meta_data ->> 'nickname', split_part(email, '@', 1))
+    from auth.users where id = target_user
+    on conflict (id) do nothing;
+    perform public.rebuild_user_stats(target_user);
+  end loop;
+end
+$$;
+
+create or replace function public.get_public_platform_stats()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select jsonb_build_object(
+    'members', (select count(*) from public.profiles),
+    'total_games', coalesce((select sum(total_tickets) from public.user_stats), 0),
+    'total_wins', coalesce((select sum(total_wins) from public.user_stats), 0),
+    'total_spent', coalesce((select sum(total_spent) from public.user_stats), 0),
+    'total_prize', coalesce((select sum(total_prize) from public.user_stats), 0),
+    'rank1_users', coalesce((select count(*) from public.user_stats where rank_1_count > 0), 0),
+    'weekly_games', coalesce((
+      select sum(greatest(coalesce(game_count, 1), 1))
+      from public.tickets
+      where created_at >= now() - interval '7 days'
+    ), 0)
+  );
+$$;
+
+create or replace function public.get_public_number_frequency()
+returns table(number integer, selections bigint)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with selected_numbers as (
+    select value::integer as number
+    from public.tickets ticket
+    cross join lateral jsonb_array_elements(coalesce(ticket.game_numbers, '[]'::jsonb)) game
+    cross join lateral jsonb_array_elements_text(
+      case when jsonb_typeof(game) = 'array' then game else '[]'::jsonb end
+    ) value
+    where ticket.lottery_type = 'lotto'
+
+    union all
+
+    select unnest(ticket.numbers)::integer
+    from public.tickets ticket
+    where ticket.lottery_type = 'lotto'
+      and jsonb_array_length(coalesce(ticket.game_numbers, '[]'::jsonb)) = 0
+  )
+  select number, count(*)::bigint
+  from selected_numbers
+  where number between 1 and 45
+  group by number
+  order by number;
+$$;
+
 alter table public.lottery_stores enable row level security;
 alter table public.ranking_snapshots enable row level security;
 alter table public.user_system_titles enable row level security;
@@ -420,3 +567,9 @@ create trigger refresh_all_time_rankings_on_visit
 
 grant execute on function public.refresh_monthly_rankings() to authenticated;
 grant execute on function public.refresh_all_time_rankings() to authenticated;
+grant execute on function public.rebuild_user_stats(uuid) to authenticated;
+grant execute on function public.get_public_platform_stats() to anon, authenticated;
+grant execute on function public.get_public_number_frequency() to anon, authenticated;
+
+select public.refresh_monthly_rankings();
+select public.refresh_all_time_rankings();
