@@ -35,7 +35,10 @@ export async function onRequest(context) {
     const r = await ft(GITHUB_CACHE_URL, {}, 4000);
     if (r.ok) {
       const d = await r.json();
-      if (d && d.returnValue === 'success' && Number(d.drwNo) === round) {
+      const complete = d && Number(d.rnk2WnNope) > 0 &&
+        Number(d.rnk3WnNope) > 0 && Number(d.rnk4WnNope) > 0 &&
+        Number(d.rnk5WnNope) > 0 && Number(d.totSellamnt) > 0;
+      if (d && d.returnValue === 'success' && Number(d.drwNo) === round && complete) {
         d._source = 'github-cache';
         return new Response(JSON.stringify(d), { headers: cors });
       }

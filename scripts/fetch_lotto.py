@@ -47,6 +47,15 @@ def build_result(item):
         'bnusNo': int(item.get('bnsWnNo', 0)),
         'firstWinamnt': int(item.get('rnk1WnAmt', 0) or 0),
         'firstPrzwnerCo': int(item.get('rnk1WnNope', 0) or 0),
+        'rnk2WnAmt': int(item.get('rnk2WnAmt', 0) or 0),
+        'rnk2WnNope': int(item.get('rnk2WnNope', 0) or 0),
+        'rnk3WnAmt': int(item.get('rnk3WnAmt', 0) or 0),
+        'rnk3WnNope': int(item.get('rnk3WnNope', 0) or 0),
+        'rnk4WnAmt': int(item.get('rnk4WnAmt', 0) or 0),
+        'rnk4WnNope': int(item.get('rnk4WnNope', 0) or 0),
+        'rnk5WnAmt': int(item.get('rnk5WnAmt', 0) or 0),
+        'rnk5WnNope': int(item.get('rnk5WnNope', 0) or 0),
+        'totSellamnt': int(item.get('rlvtEpsdSumNtslAmt', 0) or 0),
     }
 
 
@@ -111,6 +120,15 @@ def try_old_api(round_num):
                 'bnusNo': data['bnusNo'],
                 'firstWinamnt': data.get('firstWinamnt', 0),
                 'firstPrzwnerCo': data.get('firstPrzwnerCo', 0),
+                'rnk2WnAmt': data.get('secondWinamnt', 0),
+                'rnk2WnNope': data.get('secondPrzwnerCo', 0),
+                'rnk3WnAmt': data.get('thirdWinamnt', 0),
+                'rnk3WnNope': data.get('thirdPrzwnerCo', 0),
+                'rnk4WnAmt': data.get('fourthWinamnt', 0),
+                'rnk4WnNope': data.get('fourthPrzwnerCo', 0),
+                'rnk5WnAmt': data.get('fifthWinamnt', 0),
+                'rnk5WnNope': data.get('fifthPrzwnerCo', 0),
+                'totSellamnt': data.get('totSellamnt', 0),
             }
     except Exception as e:
         print(f"  구 API 실패: {e}")
