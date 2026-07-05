@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://lottobank.pages.dev/sitemap.xml

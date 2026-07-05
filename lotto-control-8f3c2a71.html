@@ -459,19 +459,61 @@ async function deleteFriendlyRow() {
   const filterDesc = Object.entries(_friendlyFilter).map(([k,v])=>`${k}: ${v}`).join(', ');
   if (!confirm(`정말 삭제하시겠습니까?\n\n조건: ${filterDesc}\n\n삭제 후 복구할 수 없습니다.`)) return;
   const result = document.getElementById('friendly-result');
+  result.style.color = 'var(--muted)';
+  result.textContent = '삭제 중...';
   try {
-    let query = sb.from(selectedDataTable).delete();
+    // 인증 상태 확인
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) throw new Error('로그인이 필요합니다. 메인 사이트에서 로그인 후 다시 시도하세요.');
+    let query = sb.from(selectedDataTable).delete().select();
     Object.entries(_friendlyFilter).forEach(([k,v]) => { query = query.eq(k, v); });
-    const { error } = await query;
+    const { data, error } = await query;
     if (error) throw error;
+    if (!data || data.length === 0) throw new Error('삭제된 행이 없습니다. RLS 정책으로 차단됐을 수 있습니다.\nSupabase SQL Editor에서 직접 실행하세요.');
     result.style.color = 'var(--green)';
-    result.textContent = '✅ 삭제되었습니다.';
+    result.textContent = `✅ ${data.length}행 삭제되었습니다.`;
     closeFriendlyEdit();
     await loadDataManagerRows();
   } catch(e) {
     result.style.color = 'var(--red)';
     result.textContent = '❌ 삭제 실패: ' + e.message;
   }
+}
+
+async function checkMyAuth() {
+  const el = document.getElementById('my-auth-status');
+  const { data: { user } } = await sb.auth.getUser();
+  if (user) {
+    el.innerHTML = `✅ 로그인됨: <b>${user.email}</b> (ID: ${user.id.slice(0,8)}...)`;
+    el.style.color = 'var(--green)';
+  } else {
+    el.innerHTML = '❌ 미로그인 — 메인 사이트(<a href="/" target="_blank">lottobank.pages.dev</a>)에서 로그인 후 이 페이지를 새로고침하세요.';
+    el.style.color = 'var(--red)';
+  }
+}
+
+async function deleteMyTitles() {
+  const result = document.getElementById('my-data-result');
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) { result.style.color='var(--red)'; result.textContent='❌ 로그인 후 시도하세요.'; return; }
+  if (!confirm('내 계정의 모든 칭호(타이틀)를 삭제합니까?')) return;
+  result.style.color='var(--muted)'; result.textContent='삭제 중...';
+  const { data, error } = await sb.from('user_system_titles').delete().eq('user_id', user.id).select();
+  if (error) { result.style.color='var(--red)'; result.textContent='❌ ' + error.message; return; }
+  result.style.color='var(--green)';
+  result.textContent = `✅ 칭호 ${data?.length ?? 0}개 삭제 완료. 메인 사이트를 새로고침하세요.`;
+}
+
+async function deleteMyBadges() {
+  const result = document.getElementById('my-data-result');
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) { result.style.color='var(--red)'; result.textContent='❌ 로그인 후 시도하세요.'; return; }
+  if (!confirm('내 계정의 모든 뱃지를 삭제합니까?')) return;
+  result.style.color='var(--muted)'; result.textContent='삭제 중...';
+  const { data, error } = await sb.from('user_badges').delete().eq('user_id', user.id).select();
+  if (error) { result.style.color='var(--red)'; result.textContent='❌ ' + error.message; return; }
+  result.style.color='var(--green)';
+  result.textContent = `✅ 뱃지 ${data?.length ?? 0}개 삭제 완료. 메인 사이트를 새로고침하세요.`;
 }
 
 function openOperationTable(table) {
@@ -509,6 +551,26 @@ async function renderOperationsPanel() {
       <div id="ops-admin-list" style="margin-top:12px;"></div>
     </div>
 
+    <div class="admin-form" style="border:1px solid #fef08a;">
+      <div class="table-title" style="color:#854d0e;">🎖️ 내 계정 칭호 · 뱃지 직접 삭제</div>
+      <div style="font-size:12px;color:var(--muted);margin:6px 0 12px;line-height:1.7;">
+        부정확한 칭호(예: 로또 1등)나 테스트 뱃지를 내 계정에서 직접 삭제합니다.<br>
+        삭제 후 메인 사이트를 새로고침하면 즉시 반영됩니다.
+      </div>
+      <div id="my-auth-status" style="font-size:11px;color:var(--muted);margin-bottom:10px;">로그인 상태 확인 중...</div>
+      <div class="form-actions" style="flex-wrap:wrap;gap:8px;">
+        <button class="btn-del" onclick="deleteMyTitles()" style="background:#92400e;">🗑️ 내 칭호 전체 삭제</button>
+        <button class="btn-del" onclick="deleteMyBadges()">🗑️ 내 뱃지 전체 삭제</button>
+        <button class="btn-refresh" onclick="checkMyAuth()">🔄 로그인 상태 확인</button>
+      </div>
+      <div class="form-result" id="my-data-result"></div>
+      <div style="margin-top:10px;padding:10px;background:#fafaf9;border-radius:6px;font-size:11px;color:var(--muted);">
+        <b>위 버튼이 안 되면</b> → Supabase 대시보드 SQL Editor에서 직접 실행:<br>
+        <code style="display:block;margin-top:4px;padding:6px;background:#fff;border-radius:4px;font-size:10px;">DELETE FROM user_system_titles WHERE user_id = auth.uid();</code>
+        <code style="display:block;margin-top:4px;padding:6px;background:#fff;border-radius:4px;font-size:10px;">DELETE FROM user_badges WHERE user_id = auth.uid();</code>
+      </div>
+    </div>
+
     <div class="admin-form" style="border:1px solid #fecaca;">
       <div class="table-title" style="color:var(--red);">데이터 초기화</div>
       <div style="font-size:12px;line-height:1.7;color:var(--muted);margin:8px 0 12px;">
@@ -533,6 +595,7 @@ async function renderOperationsPanel() {
       <div style="margin-top:10px;font-size:11px;color:var(--muted);">현재 관리자 주소 <code>${location.pathname}</code></div>
     </div>`;
   await loadOperationStatus();
+  checkMyAuth();
 }
 
 async function loadOperationStatus() {
