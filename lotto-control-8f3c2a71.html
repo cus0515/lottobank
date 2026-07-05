@@ -77,6 +77,12 @@
 
   .loading { padding:40px; text-align:center; color:var(--muted); font-size:13px; }
   .count-badge { font-size:11px; color:var(--muted); font-weight:600; }
+  .status-card { padding:10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); text-align:left; cursor:pointer; }
+  .status-card:hover { border-color:var(--red); background:#fff7f7; }
+  .status-card b { display:block; font-size:12px; }
+  .status-card span { font-size:18px; font-weight:900; color:var(--red); }
+  .data-row { cursor:pointer; }
+  .data-row:hover td { background:#fff1f2; }
 
   /* 모달 */
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; align-items:center; justify-content:center; }
@@ -123,16 +129,16 @@
 
   <div class="container">
     <div class="tabs">
-      <button class="tab-btn on" onclick="switchTab('users')">👤 유저</button>
-      <button class="tab-btn" onclick="switchTab('tickets')">🎫 티켓</button>
-      <button class="tab-btn" onclick="switchTab('posts')">📝 게시글</button>
-      <button class="tab-btn" onclick="switchTab('comments')">💬 댓글</button>
-      <button class="tab-btn" onclick="switchTab('chat')">🗨️ 채팅</button>
-      <button class="tab-btn" onclick="switchTab('stats')">📊 전적</button>
-      <button class="tab-btn" onclick="switchTab('data')">전체 데이터</button>
-      <button class="tab-btn" onclick="switchTab('insert')">✏️ 직접 입력</button>
-      <button class="tab-btn" onclick="switchTab('verify')">🔬 기능 검증</button>
-      <button class="tab-btn" onclick="switchTab('operations')">운영 설정</button>
+      <button class="tab-btn on" data-tab="users" onclick="switchTab('users')">👤 유저</button>
+      <button class="tab-btn" data-tab="tickets" onclick="switchTab('tickets')">🎫 티켓</button>
+      <button class="tab-btn" data-tab="posts" onclick="switchTab('posts')">📝 게시글</button>
+      <button class="tab-btn" data-tab="comments" onclick="switchTab('comments')">💬 댓글</button>
+      <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')">🗨️ 채팅</button>
+      <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">📊 전적</button>
+      <button class="tab-btn" data-tab="data" onclick="switchTab('data')">전체 데이터</button>
+      <button class="tab-btn" data-tab="insert" onclick="switchTab('insert')">✏️ 직접 입력</button>
+      <button class="tab-btn" data-tab="verify" onclick="switchTab('verify')">🔬 기능 검증</button>
+      <button class="tab-btn" data-tab="operations" onclick="switchTab('operations')">운영 설정</button>
     </div>
 
     <div id="table-area"></div>
@@ -157,12 +163,22 @@ let currentTab = 'users';
 let currentPage = 1;
 const PAGE_SIZE = 30;
 let searchQuery = '';
+let selectedDataTable = 'profiles';
 const ADMIN_TABLES = [
   'profiles','tickets','user_stats','user_badges','activity_feed','chat_messages',
   'posts','comments','post_likes','ranking_snapshots','user_system_titles',
   'user_daily_visits','lottery_stores','user_lottery_stores','saved_number_sets',
   'ticket_game_stores','app_admins'
 ];
+const ADMIN_TABLE_KEYS = {
+  profiles:['id'], tickets:['id'], user_stats:['user_id'],
+  user_badges:['user_id','badge_id'], activity_feed:['id'],
+  chat_messages:['id'], posts:['id'], comments:['id'],
+  post_likes:['post_id','user_id'], ranking_snapshots:['id'],
+  user_system_titles:['id'], user_daily_visits:['user_id','visit_date'],
+  lottery_stores:['id'], user_lottery_stores:['id'], saved_number_sets:['id'],
+  ticket_game_stores:['ticket_id','game_index'], app_admins:['user_id']
+};
 
 // ── 로그인 ──────────────────────────────────────────
 async function hasAdminAccess() {
@@ -203,9 +219,14 @@ function switchTab(tab) {
   currentTab = tab;
   currentPage = 1;
   searchQuery = '';
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
-  event.target.classList.add('on');
+  activateTabButton(tab);
   loadTab(tab);
+}
+
+function activateTabButton(tab) {
+  document.querySelectorAll('.tab-btn').forEach(button => {
+    button.classList.toggle('on', button.dataset.tab === tab);
+  });
 }
 
 async function loadTab(tab) {
@@ -258,7 +279,8 @@ async function loadTab(tab) {
   }
 }
 
-function renderDataManager() {
+function renderDataManager(table = selectedDataTable) {
+  selectedDataTable = ADMIN_TABLES.includes(table) ? table : 'profiles';
   document.getElementById('table-area').innerHTML = `
     <div class="admin-form">
       <div class="table-title">전체 기능 데이터 관리</div>
@@ -266,7 +288,7 @@ function renderDataManager() {
       <div class="form-grid" style="margin-top:14px;">
         <div>
           <label class="form-label">테이블</label>
-          <select class="form-input" id="data-table" onchange="loadDataManagerRows()">${ADMIN_TABLES.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+          <select class="form-input" id="data-table" onchange="selectedDataTable=this.value;loadDataManagerRows()">${ADMIN_TABLES.map(t=>`<option value="${t}" ${t===selectedDataTable?'selected':''}>${t}</option>`).join('')}</select>
         </div>
         <div>
           <label class="form-label">조건 JSON</label>
@@ -284,8 +306,15 @@ function renderDataManager() {
       </div>
       <div class="form-result" id="data-result"></div>
     </div>
-    <div class="table-wrap"><div class="table-header"><span class="table-title">최근 데이터 50건</span></div><pre id="data-rows" style="padding:14px;margin:0;overflow:auto;max-height:520px;font-size:11px;line-height:1.6;">불러오는 중...</pre></div>`;
+    <div class="table-wrap"><div class="table-header"><span class="table-title">최근 데이터 50건</span><span class="count-badge">행을 누르면 수정값이 자동 입력됩니다.</span></div><div id="data-rows" style="overflow:auto;max-height:520px;"><div class="loading">불러오는 중...</div></div></div>`;
   loadDataManagerRows();
+}
+
+function openOperationTable(table) {
+  selectedDataTable = table;
+  currentTab = 'data';
+  activateTabButton('data');
+  renderDataManager(table);
 }
 
 async function renderOperationsPanel() {
@@ -351,10 +380,10 @@ async function loadOperationStatus() {
     return { table, count:error ? null : count };
   }));
   counts.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">${countRows.map(row => `
-    <div style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);">
-      <b style="display:block;font-size:12px;">${row.table}</b>
-      <span style="font-size:18px;font-weight:900;color:var(--red);">${row.count ?? '확인 실패'}</span>
-    </div>`).join('')}</div>`;
+    <button class="status-card" onclick="openOperationTable('${row.table}')" title="${row.table} 데이터 관리">
+      <b>${row.table}</b>
+      <span>${row.count ?? '확인 실패'}</span>
+    </button>`).join('')}</div>`;
   const { data:admins, error } = await sb.rpc('admin_list');
   adminList.innerHTML = error
     ? `<div style="font-size:12px;color:var(--red);">${error.message}</div>`
@@ -431,14 +460,48 @@ async function loadDataManagerRows() {
   const table = document.getElementById('data-table')?.value;
   const rows = document.getElementById('data-rows');
   if (!table || !rows) return;
-  rows.textContent = '불러오는 중...';
+  selectedDataTable = table;
+  rows.innerHTML = '<div class="loading">불러오는 중...</div>';
   try {
     const { data, error } = await sb.from(table).select('*').limit(50);
     if (error) throw error;
-    rows.textContent = JSON.stringify(data || [], null, 2);
+    if (!data?.length) {
+      rows.innerHTML = '<div class="loading">데이터가 없습니다.</div>';
+      return;
+    }
+    const columns = Object.keys(data[0]).slice(0, 6);
+    rows.innerHTML = `<table><thead><tr>${columns.map(column=>`<th>${escapeAdminHtml(column)}</th>`).join('')}<th>관리</th></tr></thead><tbody>${data.map(row => `
+      <tr class="data-row" onclick="selectDataManagerRow(decodeURIComponent('${encodeURIComponent(JSON.stringify(row)).replace(/'/g,'%27')}'))">
+        ${columns.map(column=>`<td>${escapeAdminHtml(formatAdminCell(row[column]))}</td>`).join('')}
+        <td><button class="btn-refresh" type="button">선택</button></td>
+      </tr>`).join('')}</tbody></table>`;
   } catch (e) {
-    rows.textContent = `오류: ${e.message}`;
+    rows.innerHTML = `<div class="loading" style="color:var(--red);">오류: ${escapeAdminHtml(e.message)}</div>`;
   }
+}
+
+function formatAdminCell(value) {
+  if (value === null || value === undefined) return '-';
+  const text = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  return text.length > 80 ? text.slice(0, 77) + '...' : text;
+}
+
+function escapeAdminHtml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  })[char]);
+}
+
+function selectDataManagerRow(jsonStr) {
+  const row = JSON.parse(jsonStr);
+  const keys = ADMIN_TABLE_KEYS[selectedDataTable] || ['id'];
+  const filter = Object.fromEntries(keys.filter(key => row[key] !== undefined).map(key => [key, row[key]]));
+  document.getElementById('data-filter').value = JSON.stringify(filter);
+  document.getElementById('data-payload').value = JSON.stringify(row, null, 2);
+  const result = document.getElementById('data-result');
+  result.style.color = 'var(--green)';
+  result.textContent = `${selectedDataTable} 행을 선택했습니다. 값을 수정한 뒤 수정 버튼을 누르세요.`;
+  document.getElementById('data-payload').focus();
 }
 
 async function runDataAction(action) {
@@ -446,6 +509,9 @@ async function runDataAction(action) {
   const result = document.getElementById('data-result');
   try {
     const filters = readAdminJson('data-filter', action !== 'insert');
+    if (action !== 'insert' && Object.keys(filters).length === 0) {
+      throw new Error('수정·삭제 조건은 한 개 이상 필요합니다.');
+    }
     const payload = action === 'delete' ? null : readAdminJson('data-payload', true);
     let response;
     if (action === 'insert') response = await sb.from(table).insert(payload).select();
