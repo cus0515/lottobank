@@ -40,6 +40,9 @@ create table if not exists public.saved_number_sets (
   created_at timestamptz not null default now()
 );
 
+alter table public.saved_number_sets
+  add column if not exists source text not null default 'manual';
+
 alter table public.saved_number_sets enable row level security;
 drop policy if exists "users manage own saved numbers" on public.saved_number_sets;
 create policy "users manage own saved numbers"
@@ -49,6 +52,9 @@ create policy "users manage own saved numbers"
 
 create index if not exists idx_saved_number_sets_user_round
   on public.saved_number_sets (user_id, lottery_type, round_no desc);
+
+create index if not exists idx_saved_number_sets_radar
+  on public.saved_number_sets (user_id, source, lottery_type, round_no desc);
 
 drop policy if exists "admin deletes activity feed" on public.activity_feed;
 create policy "admin deletes activity feed"
