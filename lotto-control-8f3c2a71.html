@@ -180,6 +180,26 @@ const ADMIN_TABLE_KEYS = {
   ticket_game_stores:['ticket_id','game_index'], app_admins:['user_id']
 };
 
+// 테이블 한글명 + 설명 + 초보자 안내
+const TABLE_META = {
+  profiles:           { name:'👤 회원 프로필',     desc:'가입된 회원의 닉네임, 가입일 정보', tip:'회원 닉네임을 수정하거나 특정 회원 정보를 확인할 때 사용합니다.' },
+  tickets:            { name:'🎫 QR 티켓',          desc:'회원이 등록한 로또/연금복권 QR 이력', tip:'특정 티켓의 당첨등수나 금액을 수정할 때 사용합니다.' },
+  user_stats:         { name:'📊 회원 전적',         desc:'총 구매금액, 당첨금, 등수 자동집계', tip:'전적 수치가 맞지 않을 때 직접 수정할 수 있습니다.' },
+  user_badges:        { name:'🏅 보유 뱃지',         desc:'회원이 획득한 뱃지 목록', tip:'특정 회원에게 뱃지를 직접 지급하거나 삭제할 때 사용합니다.' },
+  activity_feed:      { name:'📢 활동 피드',         desc:'홈 화면에 표시되는 실시간 활동 기록', tip:'부적절한 활동 항목을 삭제할 수 있습니다.' },
+  chat_messages:      { name:'💬 채팅 메시지',       desc:'홈 채팅창 대화 내역', tip:'욕설이나 스팸 메시지를 삭제할 때 사용합니다.' },
+  posts:              { name:'📝 커뮤니티 게시글',   desc:'자유/인증 게시판 게시글', tip:'신고된 게시글을 삭제할 때 사용합니다.' },
+  comments:           { name:'💭 댓글',              desc:'게시글에 달린 댓글', tip:'신고된 댓글을 삭제할 때 사용합니다.' },
+  post_likes:         { name:'❤️ 좋아요',            desc:'게시글 좋아요 기록', tip:'일반적으로 수정할 일이 없는 내부 기록입니다.' },
+  ranking_snapshots:  { name:'🏆 랭킹 스냅샷',      desc:'월간/주간 랭킹 집계 결과', tip:'랭킹 데이터가 비어있을 때 수동으로 집계를 트리거할 수 있습니다.' },
+  user_system_titles: { name:'🎖️ 시스템 칭호',      desc:'관리자가 부여한 특별 칭호 (명예의전당)', tip:'1·2등 당첨자에게 칭호를 부여하거나 수정할 때 사용합니다.' },
+  user_daily_visits:  { name:'📅 출석 기록',         desc:'회원 일별 방문 이력 (출석 연속일 계산용)', tip:'일반적으로 수정할 일이 없습니다.' },
+  lottery_stores:     { name:'🏪 판매점 정보',       desc:'QR 등록 시 수집된 로또 판매점 데이터', tip:'잘못 등록된 판매점 주소나 이름을 수정할 수 있습니다.' },
+  user_lottery_stores:{ name:'⭐ 즐겨찾기 판매점',  desc:'회원이 설정한 자주 가는 판매점', tip:'일반적으로 수정할 일이 없습니다.' },
+  saved_number_sets:  { name:'🔢 저장 번호',         desc:'회원이 저장해둔 번호 조합', tip:'일반적으로 수정할 일이 없습니다.' },
+  ticket_game_stores: { name:'🗺️ 게임별 판매점',    desc:'게임마다 지정한 판매점 배정', tip:'일반적으로 수정할 일이 없습니다.' },
+};
+
 // ── 로그인 ──────────────────────────────────────────
 async function hasAdminAccess() {
   const { data, error } = await sb.rpc('is_app_admin');
@@ -281,33 +301,177 @@ async function loadTab(tab) {
 
 function renderDataManager(table = selectedDataTable) {
   selectedDataTable = ADMIN_TABLES.includes(table) ? table : 'profiles';
+  const meta = TABLE_META[selectedDataTable] || { name: selectedDataTable, desc: '', tip: '' };
+  const tableOptions = ADMIN_TABLES.map(t => {
+    const m = TABLE_META[t] || { name: t };
+    return `<option value="${t}" ${t===selectedDataTable?'selected':''}>${m.name.replace(/[🎫📊🏅📢💬📝💭❤️🏆🎖️📅🏪⭐🔢🗺️👤]/gu,'')} (${t})</option>`;
+  }).join('');
+
   document.getElementById('table-area').innerHTML = `
     <div class="admin-form">
-      <div class="table-title">전체 기능 데이터 관리</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px;">테이블을 선택하고 JSON으로 직접 입력·수정·삭제할 수 있습니다.</div>
-      <div class="form-grid" style="margin-top:14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <div class="table-title">${meta.name}</div>
+        <span style="font-size:11px;color:var(--muted);">데이터 직접 수정</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">${meta.desc}${meta.tip ? `<br><b style="color:#2563eb;">💡 ${meta.tip}</b>` : ''}</div>
+
+      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;">
         <div>
-          <label class="form-label">테이블</label>
-          <select class="form-input" id="data-table" onchange="selectedDataTable=this.value;loadDataManagerRows()">${ADMIN_TABLES.map(t=>`<option value="${t}" ${t===selectedDataTable?'selected':''}>${t}</option>`).join('')}</select>
+          <label class="form-label">테이블 선택</label>
+          <select class="form-input" id="data-table" onchange="selectedDataTable=this.value;renderDataManager(this.value)" style="min-width:220px;">${tableOptions}</select>
         </div>
-        <div>
-          <label class="form-label">조건 JSON</label>
-          <input class="form-input" id="data-filter" placeholder='{"id":"UUID"}'>
+        <button class="btn-refresh" onclick="loadDataManagerRows()">📋 데이터 조회</button>
+        <button class="btn-refresh" onclick="checkAdminDatabase()">🔌 DB 연결 점검</button>
+      </div>
+
+      <!-- 친절한 편집 영역: 행 클릭 시 필드별 입력 -->
+      <div id="friendly-edit-area" style="display:none;">
+        <div style="background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:10px;padding:14px;margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:900;color:#0369a1;margin-bottom:10px;">✏️ 선택한 행 편집 — 수정할 값만 바꾸고 저장하세요</div>
+          <div id="friendly-fields" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;"></div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+            <button class="btn-save" onclick="saveFriendlyEdit()">💾 수정 저장</button>
+            <button class="btn-del" onclick="deleteFriendlyRow()">🗑️ 이 행 삭제</button>
+            <button class="btn-refresh" onclick="closeFriendlyEdit()">취소</button>
+          </div>
+          <div id="friendly-result" style="margin-top:8px;font-size:12px;"></div>
         </div>
       </div>
-      <label class="form-label" style="margin-top:10px;">입력 또는 수정 데이터 JSON</label>
-      <textarea class="form-input" id="data-payload" rows="8" style="resize:vertical;font-family:Consolas,monospace;" placeholder='{"user_id":"UUID","field":"value"}'></textarea>
-      <div class="form-actions">
-        <button class="btn-save" onclick="runDataAction('insert')">입력</button>
-        <button class="btn-refresh" onclick="runDataAction('update')">수정</button>
-        <button class="btn-del" onclick="runDataAction('delete')">삭제</button>
-        <button class="btn-refresh" onclick="loadDataManagerRows()">조회</button>
-        <button class="btn-refresh" onclick="checkAdminDatabase()">DB 연결 점검</button>
-      </div>
-      <div class="form-result" id="data-result"></div>
+
+      <!-- 고급: JSON 직접 편집 (접기/펼치기) -->
+      <details style="margin-bottom:10px;">
+        <summary style="cursor:pointer;font-size:12px;font-weight:700;color:var(--muted);padding:6px 0;">⚙️ 고급: JSON 직접 입력/수정 (초보자는 위 편집 창을 이용하세요)</summary>
+        <div style="margin-top:10px;">
+          <div class="form-grid" style="margin-bottom:10px;">
+            <div>
+              <label class="form-label">조건 JSON (수정·삭제 대상 지정)</label>
+              <input class="form-input" id="data-filter" placeholder='예: {"id":"UUID값"}'>
+            </div>
+          </div>
+          <label class="form-label">데이터 JSON (입력하거나 수정할 값)</label>
+          <textarea class="form-input" id="data-payload" rows="6" style="resize:vertical;font-family:Consolas,monospace;" placeholder='예: {"nickname":"새닉네임"}'></textarea>
+          <div class="form-actions" style="margin-top:8px;">
+            <button class="btn-save" onclick="runDataAction('insert')">+ 새로 입력</button>
+            <button class="btn-refresh" onclick="runDataAction('update')">수정</button>
+            <button class="btn-del" onclick="runDataAction('delete')">삭제</button>
+          </div>
+          <div class="form-result" id="data-result"></div>
+        </div>
+      </details>
     </div>
-    <div class="table-wrap"><div class="table-header"><span class="table-title">최근 데이터 50건</span><span class="count-badge">행을 누르면 수정값이 자동 입력됩니다.</span></div><div id="data-rows" style="overflow:auto;max-height:520px;"><div class="loading">불러오는 중...</div></div></div>`;
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">최근 데이터 50건</span>
+        <span class="count-badge" style="color:#2563eb;">👆 행을 클릭하면 편집 창이 열립니다</span>
+      </div>
+      <div id="data-rows" style="overflow:auto;max-height:520px;"><div class="loading">불러오는 중...</div></div>
+    </div>`;
   loadDataManagerRows();
+}
+
+// 친절한 편집 관련 상태
+let _friendlyRow = null;
+let _friendlyFilter = null;
+
+function openFriendlyEdit(row) {
+  _friendlyRow = row;
+  const keys = ADMIN_TABLE_KEYS[selectedDataTable] || ['id'];
+  _friendlyFilter = Object.fromEntries(keys.filter(k => row[k] !== undefined).map(k => [k, row[k]]));
+
+  const FIELD_LABELS = {
+    id:'고유 ID', user_id:'회원 ID', nickname:'닉네임', email:'이메일',
+    created_at:'생성일시', updated_at:'수정일시', round_no:'회차번호',
+    prize_rank:'당첨 등수 (1~5, 없으면 빈칸)', prize_amount:'당첨금액 (원)',
+    numbers:'번호 배열', game_count:'게임 수', lottery_type:'복권 종류 (lotto/pension)',
+    result:'결과 상태', message:'메시지 내용', body:'내용', title:'제목',
+    tag:'태그', likes:'좋아요 수', comment_count:'댓글 수', total_tickets:'총 게임 수',
+    total_spent:'총 구매금액 (원)', total_prize:'총 당첨금 (원)', total_wins:'당첨 횟수',
+    best_rank:'최고 등수', badge_id:'뱃지 ID', earned_at:'뱃지 획득일시',
+    name:'이름', address:'주소', lat:'위도', lng:'경도', active:'활성 여부',
+    qr_url:'QR URL 키', purchase_date:'구매일',
+  };
+  const READONLY = new Set(['id','user_id','created_at','updated_at','post_id']);
+  const primaryKeys = new Set(keys);
+
+  const fieldsHtml = Object.entries(row).map(([key, val]) => {
+    const label = FIELD_LABELS[key] || key;
+    const isReadonly = READONLY.has(key) && !primaryKeys.has(key);
+    const isPK = primaryKeys.has(key);
+    const displayVal = val === null || val === undefined ? '' : typeof val === 'object' ? JSON.stringify(val) : String(val);
+    return `<div>
+      <label class="form-label" style="${isPK ? 'color:#dc2626;' : isReadonly ? 'color:#94a3b8;' : ''}">${label}${isPK ? ' 🔑' : ''}${isReadonly ? ' (읽기전용)' : ''}</label>
+      <input class="form-input" id="ff-${key}" value="${escapeAdminHtml(displayVal)}" style="margin:0;font-size:12px;${isReadonly ? 'background:#f8fafc;color:#94a3b8;' : ''}" ${isReadonly ? 'readonly' : ''} placeholder="${val === null ? '(비어있음)' : ''}">
+    </div>`;
+  }).join('');
+
+  document.getElementById('friendly-fields').innerHTML = fieldsHtml;
+  document.getElementById('friendly-edit-area').style.display = 'block';
+  document.getElementById('friendly-result').textContent = '';
+  document.getElementById('friendly-edit-area').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function closeFriendlyEdit() {
+  document.getElementById('friendly-edit-area').style.display = 'none';
+  _friendlyRow = null;
+  _friendlyFilter = null;
+}
+
+async function saveFriendlyEdit() {
+  if (!_friendlyRow || !_friendlyFilter) return;
+  const result = document.getElementById('friendly-result');
+  result.style.color = 'var(--muted)';
+  result.textContent = '저장 중...';
+  try {
+    const updated = {};
+    Object.keys(_friendlyRow).forEach(key => {
+      const input = document.getElementById('ff-' + key);
+      if (!input || input.readOnly) return;
+      const orig = _friendlyRow[key];
+      const newVal = input.value.trim();
+      // 타입 추정: 원래 숫자면 숫자로, null이면 빈값=null, 배열이면 JSON 파싱
+      if (newVal === '' && orig === null) return; // 변경 없음
+      if (newVal === '' && orig !== null) { updated[key] = null; return; }
+      if (typeof orig === 'number') { updated[key] = Number(newVal); return; }
+      if (typeof orig === 'boolean') { updated[key] = newVal === 'true'; return; }
+      if (Array.isArray(orig) || (typeof orig === 'object' && orig !== null)) {
+        try { updated[key] = JSON.parse(newVal); } catch { updated[key] = newVal; }
+        return;
+      }
+      if (String(orig) !== newVal) updated[key] = newVal;
+    });
+    if (Object.keys(updated).length === 0) { result.style.color='var(--muted)'; result.textContent='변경된 내용이 없습니다.'; return; }
+    let query = sb.from(selectedDataTable).update(updated);
+    Object.entries(_friendlyFilter).forEach(([k,v]) => { query = query.eq(k, v); });
+    const { error } = await query.select();
+    if (error) throw error;
+    result.style.color = 'var(--green)';
+    result.textContent = `✅ 저장 완료 — ${Object.keys(updated).join(', ')} 필드가 수정되었습니다.`;
+    await loadDataManagerRows();
+  } catch(e) {
+    result.style.color = 'var(--red)';
+    result.textContent = '❌ 저장 실패: ' + e.message;
+  }
+}
+
+async function deleteFriendlyRow() {
+  if (!_friendlyFilter) return;
+  const filterDesc = Object.entries(_friendlyFilter).map(([k,v])=>`${k}: ${v}`).join(', ');
+  if (!confirm(`정말 삭제하시겠습니까?\n\n조건: ${filterDesc}\n\n삭제 후 복구할 수 없습니다.`)) return;
+  const result = document.getElementById('friendly-result');
+  try {
+    let query = sb.from(selectedDataTable).delete();
+    Object.entries(_friendlyFilter).forEach(([k,v]) => { query = query.eq(k, v); });
+    const { error } = await query;
+    if (error) throw error;
+    result.style.color = 'var(--green)';
+    result.textContent = '✅ 삭제되었습니다.';
+    closeFriendlyEdit();
+    await loadDataManagerRows();
+  } catch(e) {
+    result.style.color = 'var(--red)';
+    result.textContent = '❌ 삭제 실패: ' + e.message;
+  }
 }
 
 function openOperationTable(table) {
@@ -379,11 +543,23 @@ async function loadOperationStatus() {
     const { count, error } = await sb.from(table).select('*', { count:'exact', head:true });
     return { table, count:error ? null : count };
   }));
-  counts.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">${countRows.map(row => `
-    <button class="status-card" onclick="openOperationTable('${row.table}')" title="${row.table} 데이터 관리">
-      <b>${row.table}</b>
-      <span>${row.count ?? '확인 실패'}</span>
-    </button>`).join('')}</div>`;
+  counts.innerHTML = `
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">카드를 클릭하면 해당 테이블 데이터를 직접 수정할 수 있습니다.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+      ${countRows.map(row => {
+        const meta = TABLE_META[row.table] || { name: row.table, desc: '', tip: '' };
+        const cnt = row.count ?? null;
+        return `
+        <button class="status-card" onclick="openOperationTable('${row.table}')" title="${meta.tip || row.table + ' 관리'}" style="text-align:left;padding:12px 14px;">
+          <div style="font-size:13px;font-weight:900;color:var(--text);margin-bottom:3px;">${meta.name}</div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:6px;line-height:1.4;">${meta.desc}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:10px;color:#64748b;font-family:monospace;">${row.table}</span>
+            <span style="font-size:18px;font-weight:900;color:${cnt === null ? '#dc2626' : cnt === 0 ? '#94a3b8' : 'var(--red)'};">${cnt ?? '⚠️'}</span>
+          </div>
+        </button>`;
+      }).join('')}
+    </div>`;
   const { data:admins, error } = await sb.rpc('admin_list');
   adminList.innerHTML = error
     ? `<div style="font-size:12px;color:var(--red);">${error.message}</div>`
@@ -494,14 +670,15 @@ function escapeAdminHtml(value) {
 
 function selectDataManagerRow(jsonStr) {
   const row = JSON.parse(jsonStr);
+  // 친절한 편집 창 열기
+  openFriendlyEdit(row);
+  // 고급 JSON 편집 칸도 함께 채워두기
   const keys = ADMIN_TABLE_KEYS[selectedDataTable] || ['id'];
   const filter = Object.fromEntries(keys.filter(key => row[key] !== undefined).map(key => [key, row[key]]));
-  document.getElementById('data-filter').value = JSON.stringify(filter);
-  document.getElementById('data-payload').value = JSON.stringify(row, null, 2);
-  const result = document.getElementById('data-result');
-  result.style.color = 'var(--green)';
-  result.textContent = `${selectedDataTable} 행을 선택했습니다. 값을 수정한 뒤 수정 버튼을 누르세요.`;
-  document.getElementById('data-payload').focus();
+  const filterEl = document.getElementById('data-filter');
+  const payloadEl = document.getElementById('data-payload');
+  if (filterEl) filterEl.value = JSON.stringify(filter);
+  if (payloadEl) payloadEl.value = JSON.stringify(row, null, 2);
 }
 
 async function runDataAction(action) {
