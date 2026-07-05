@@ -495,13 +495,14 @@ main.chat-hidden .chat-panel { display: none; }
 /* ── 로그인 모달 ── */
 .auth-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); backdrop-filter:blur(6px); z-index:9999; display:none; align-items:center; justify-content:center; }
 .auth-overlay.open { display:flex; }
-.auth-box { background:var(--paper-white); border-radius:20px; padding:36px 32px 28px; width:400px; max-width:92vw; box-shadow:0 32px 64px rgba(0,0,0,.28),0 0 0 1px rgba(0,0,0,.06); position:relative; }
+.auth-box { background:var(--paper-white); border-radius:20px; padding:36px 32px 28px; width:400px; max-width:92vw; max-height:calc(100vh - 24px); overflow-y:auto; box-shadow:0 32px 64px rgba(0,0,0,.28),0 0 0 1px rgba(0,0,0,.06); position:relative; }
 .auth-box h2 { color:var(--lotto-red); font-size:22px; font-weight:900; margin-bottom:6px; }
 .auth-box p.auth-sub { font-size:13px; color:var(--text-muted); margin-bottom:22px; }
 .auth-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted); line-height:1; }
 .auth-field { margin-bottom:14px; }
 .auth-field label { display:block; font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:5px; }
 .auth-field input { width:100%; padding:11px 14px; border:1.5px solid var(--border-dashed); border-radius:7px; font-size:14px; font-family:inherit; outline:none; transition:border-color .15s; }
+.auth-field input[type="checkbox"] { width:16px; height:16px; padding:0; }
 .auth-field input:focus { border-color:var(--lotto-red); }
 .auth-submit { width:100%; padding:13px; background:var(--lotto-red); color:#fff; font-size:15px; font-weight:700; border:none; border-radius:7px; cursor:pointer; margin-top:6px; font-family:inherit; }
 .auth-submit:disabled { opacity:0.55; cursor:not-allowed; }
@@ -1459,8 +1460,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     </div>
     <div class="auth-field" id="auth-terms-row" style="display:none;">
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12px;font-weight:500;line-height:1.4;">
-        <input type="checkbox" id="auth-terms-chk" style="margin-top:2px;flex-shrink:0;accent-color:var(--lotto-red);">
-        <span><a href="javascript:void(0)" onclick="openTermsModal()" style="color:var(--lotto-red);text-decoration:underline;">이용약관</a> 및 <a href="javascript:void(0)" onclick="openTermsModal('privacy')" style="color:var(--lotto-red);text-decoration:underline;">개인정보처리방침</a>에 동의합니다</span>
+        <input type="checkbox" id="auth-terms-chk" style="width:16px;height:16px;padding:0;margin-top:2px;flex:0 0 16px;accent-color:var(--lotto-red);">
+        <span style="min-width:0;flex:1;"><a href="javascript:void(0)" onclick="openTermsModal()" style="color:var(--lotto-red);text-decoration:underline;">이용약관</a> 및 <a href="javascript:void(0)" onclick="openTermsModal('privacy')" style="color:var(--lotto-red);text-decoration:underline;">개인정보처리방침</a>에 동의합니다</span>
       </label>
     </div>
     <div class="auth-divider">계정이 없으신가요?</div>
