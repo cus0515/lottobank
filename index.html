@@ -1437,6 +1437,67 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   from { transform:scaleY(.08); opacity:.35; }
   to { transform:scaleY(1); opacity:1; }
 }
+@keyframes ui-rise-in {
+  from { opacity:0; transform:translateY(7px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes ui-pop-in {
+  from { opacity:0; transform:translateY(3px) scale(.84); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+.page-content.ui-motion-enter .kpi-box,
+.page-content.ui-motion-enter .kpi-card,
+.page-content.ui-motion-enter .stat-kpi-card,
+.page-content.ui-motion-enter .profile-block,
+.page-content.ui-motion-enter .profile-stat-cell,
+.page-content.ui-motion-enter .badge-card-item,
+.page-content.ui-motion-enter .ranking-category-btn {
+  animation:ui-rise-in .34s cubic-bezier(.22,.75,.25,1) both;
+}
+.page-content.ui-motion-enter .feed-item,
+.page-content.ui-motion-enter .ticket-slip,
+.page-content.ui-motion-enter .rank-board-table tbody tr {
+  animation:ui-rise-in .3s ease-out both;
+}
+.page-content.ui-motion-enter #res-balls .ball,
+.page-content.ui-motion-enter .pension-number-ball {
+  animation:ui-pop-in .3s cubic-bezier(.2,.8,.25,1.15) both;
+}
+.page-content.ui-motion-enter .kpi-box:nth-child(2),
+.page-content.ui-motion-enter .kpi-card:nth-child(2),
+.page-content.ui-motion-enter .stat-kpi-card:nth-child(2),
+.page-content.ui-motion-enter .profile-stat-cell:nth-child(2),
+.page-content.ui-motion-enter .ranking-category-btn:nth-child(2),
+.page-content.ui-motion-enter .feed-item:nth-child(2),
+.page-content.ui-motion-enter .ticket-slip:nth-child(2),
+.page-content.ui-motion-enter .rank-board-table tbody tr:nth-child(2),
+.page-content.ui-motion-enter #res-balls .ball:nth-child(2),
+.page-content.ui-motion-enter .pension-number-ball:nth-child(2) { animation-delay:45ms; }
+.page-content.ui-motion-enter .kpi-box:nth-child(3),
+.page-content.ui-motion-enter .kpi-card:nth-child(3),
+.page-content.ui-motion-enter .stat-kpi-card:nth-child(3),
+.page-content.ui-motion-enter .profile-stat-cell:nth-child(3),
+.page-content.ui-motion-enter .ranking-category-btn:nth-child(3),
+.page-content.ui-motion-enter .feed-item:nth-child(3),
+.page-content.ui-motion-enter .ticket-slip:nth-child(3),
+.page-content.ui-motion-enter .rank-board-table tbody tr:nth-child(3),
+.page-content.ui-motion-enter #res-balls .ball:nth-child(3),
+.page-content.ui-motion-enter .pension-number-ball:nth-child(3) { animation-delay:90ms; }
+.page-content.ui-motion-enter .kpi-box:nth-child(4),
+.page-content.ui-motion-enter .kpi-card:nth-child(4),
+.page-content.ui-motion-enter .stat-kpi-card:nth-child(4),
+.page-content.ui-motion-enter .profile-stat-cell:nth-child(4),
+.page-content.ui-motion-enter .ranking-category-btn:nth-child(4),
+.page-content.ui-motion-enter .feed-item:nth-child(4),
+.page-content.ui-motion-enter .ticket-slip:nth-child(4),
+.page-content.ui-motion-enter .rank-board-table tbody tr:nth-child(4),
+.page-content.ui-motion-enter #res-balls .ball:nth-child(4),
+.page-content.ui-motion-enter .pension-number-ball:nth-child(4) { animation-delay:135ms; }
+.page-content.ui-motion-enter .feed-item:nth-child(n+5),
+.page-content.ui-motion-enter .ticket-slip:nth-child(n+5),
+.page-content.ui-motion-enter .rank-board-table tbody tr:nth-child(n+5),
+.page-content.ui-motion-enter #res-balls .ball:nth-child(n+5),
+.page-content.ui-motion-enter .pension-number-ball:nth-child(n+5) { animation-delay:180ms; }
 .radar-history-link {
   display:flex;
   align-items:center;
@@ -1482,7 +1543,19 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   }
   .radar-game-row,
   .radar-number-ball,
-  .radar-flow-bar {
+  .radar-flow-bar,
+  .page-content.ui-motion-enter .kpi-box,
+  .page-content.ui-motion-enter .kpi-card,
+  .page-content.ui-motion-enter .stat-kpi-card,
+  .page-content.ui-motion-enter .profile-block,
+  .page-content.ui-motion-enter .profile-stat-cell,
+  .page-content.ui-motion-enter .badge-card-item,
+  .page-content.ui-motion-enter .ranking-category-btn,
+  .page-content.ui-motion-enter .feed-item,
+  .page-content.ui-motion-enter .ticket-slip,
+  .page-content.ui-motion-enter .rank-board-table tbody tr,
+  .page-content.ui-motion-enter #res-balls .ball,
+  .page-content.ui-motion-enter .pension-number-ball {
     animation:none !important;
     opacity:1;
     transform:none;
@@ -5487,8 +5560,10 @@ function go(id) {
   const pg = $('pg-' + id);
   pg.style.display = 'block';
   pg.classList.remove('page-fade');
+  pg.classList.remove('ui-motion-enter');
   void pg.offsetWidth;
   pg.classList.add('page-fade');
+  pg.classList.add('ui-motion-enter');
   const mBtn = $('m-' + id);
   if (mBtn) mBtn.classList.add('on');
   ['home','result','ticket','stats','fortune','rank','map','community'].forEach(k => {
