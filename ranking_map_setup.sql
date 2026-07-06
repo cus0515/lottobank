@@ -263,12 +263,12 @@ security definer
 set search_path = public
 as $$
   with selected_numbers as (
-    select value::integer as number
+    select digit.raw_value::integer as number
     from public.tickets ticket
     cross join lateral jsonb_array_elements(coalesce(ticket.game_numbers, '[]'::jsonb)) game
     cross join lateral jsonb_array_elements_text(
       case when jsonb_typeof(game) = 'array' then game else '[]'::jsonb end
-    ) value
+    ) as digit(raw_value)
     where ticket.lottery_type = 'lotto'
 
     union all
