@@ -1280,9 +1280,9 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   --ui-panel-pad:16px;
   --ui-section-gap:12px;
   --ui-text-caption:11px;
-  --ui-text-body:12px;
-  --ui-text-section:13px;
-  --ui-text-panel:14px;
+  --ui-text-body:13px;
+  --ui-text-section:14px;
+  --ui-text-panel:15px;
 }
 .panel {
   border-radius:var(--ui-radius-panel);
@@ -1381,13 +1381,61 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 }
 .page-content [style*="font-size:9px"],
 .left-dashboard-card [style*="font-size:9px"] {
-  font-size:10px !important;
-  line-height:1.4;
+  font-size:11px !important;
+  line-height:1.45;
 }
 .page-content [style*="font-size:10px"],
 .left-dashboard-card [style*="font-size:10px"] {
   font-size:var(--ui-text-caption) !important;
-  line-height:1.45;
+  line-height:1.5;
+}
+.page-content [style*="font-size:11px"] {
+  line-height:1.5;
+}
+.radar-intro {
+  min-height:68px;
+}
+.radar-recommendation {
+  padding:15px 16px !important;
+}
+.radar-history-link {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.radar-history-link small {
+  color:var(--text-muted);
+  font-size:11px;
+  white-space:nowrap;
+}
+.market-analysis-card {
+  border:1px solid var(--border-dashed) !important;
+  border-radius:6px !important;
+  box-shadow:none !important;
+  padding:14px 16px !important;
+  margin-bottom:8px !important;
+}
+.market-analysis-card > div:first-child {
+  margin-bottom:10px !important;
+}
+.market-analysis-card [style*="border-radius:8px"][style*="text-align:center"] {
+  border-radius:4px !important;
+  border-left:2px solid var(--lotto-red);
+  background:var(--bg-light) !important;
+}
+#fortune-tab-pension .market-analysis-card [style*="border-radius:8px"][style*="text-align:center"] {
+  border-left-color:#16a34a;
+}
+.market-analysis-card [style*="font-size:13px"][style*="font-weight:900"] {
+  font-size:14px !important;
+}
+.market-analysis-card [style*="font-size:14px"][style*="font-weight:900"] {
+  font-size:16px !important;
+}
+[data-theme="dark"] .market-analysis-card {
+  background:#182130 !important;
+  border-color:#334155 !important;
 }
 .kpi-box:hover,
 .kpi-card:hover,
@@ -1432,6 +1480,14 @@ textarea {
   }
   .ticket-slip {
     padding:14px;
+  }
+  .radar-history-link {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:3px;
+  }
+  .market-analysis-card {
+    padding:12px !important;
   }
 }
 </style>
@@ -5789,7 +5845,7 @@ function renderFortune() {
     <div id="fortune-tab-radar">
 
       <!-- 헤더: 레이더 SVG 애니메이션 -->
-      <div style="display:flex;align-items:center;gap:12px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px 14px;margin-bottom:10px;">
+      <div class="radar-intro" style="display:flex;align-items:center;gap:12px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px 14px;margin-bottom:10px;">
         <div style="flex-shrink:0;">
           <svg viewBox="0 0 60 60" width="44" height="44">
             <circle cx="30" cy="30" r="28" fill="${_dm?'#0f172a':'#fff1f2'}" stroke="#e11d4866" stroke-width="1.5"/>
@@ -5819,7 +5875,7 @@ function renderFortune() {
       </div>
 
       <!-- ⭐ 추천 번호 5게임 (최상단) -->
-      <div style="background:var(--paper-white);border:2px solid var(--lotto-red,#e11d48);border-radius:8px;padding:12px 14px;margin-bottom:10px;position:relative;overflow:hidden;">
+      <div class="radar-recommendation" style="background:var(--paper-white);border:2px solid var(--lotto-red,#e11d48);border-radius:8px;padding:12px 14px;margin-bottom:10px;position:relative;overflow:hidden;">
         <div style="position:absolute;top:0;right:0;background:var(--lotto-red,#e11d48);font-size:9px;font-weight:800;color:#fff;padding:3px 10px;border-radius:0 0 0 8px;letter-spacing:.5px;">자동 저장</div>
         <div style="margin-bottom:12px;">
           <div style="font-size:15px;font-weight:900;color:var(--text-dark);">⭐ 제 ${nextRound}회 추천 번호</div>
@@ -5830,14 +5886,14 @@ function renderFortune() {
             <span style="font-size:10px;font-weight:900;color:var(--text-muted);min-width:44px;flex-shrink:0;">게임 ${i+1}</span>
             <div style="display:flex;gap:5px;flex-wrap:wrap;">${g.map(n=>gBall(n)).join('')}</div>
           </div>`).join('')}
-        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-dashed);font-size:10px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
-          ${svgIcon('history',13,'currentColor')}
-          <button type="button" onclick="openFortuneHistory('lotto')" style="border:0;background:none;padding:0;color:var(--text-dark);font:800 10px inherit;cursor:pointer;">로또 추천 이력과 당첨 결과 보기</button>
+        <div class="radar-history-link" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-dashed);font-size:10px;color:var(--text-muted);">
+          <button type="button" onclick="openFortuneHistory('lotto')" style="display:flex;align-items:center;gap:6px;border:0;background:none;padding:0;color:var(--text-dark);font:800 11px inherit;cursor:pointer;">${svgIcon('history',13,'currentColor')} 로또 추천 이력 · 당첨 결과 보기</button>
+          <small>최근 결과 제 ${latestRound}회</small>
         </div>
       </div>
 
       <!-- 이번 회차 당첨번호 요약 -->
-      <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
         <div style="margin-bottom:10px;">
           <div style="font-size:13px;font-weight:900;color:var(--text-dark);">제 ${latestRound}회 당첨번호</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">이번 회차 당첨번호의 패턴 분석입니다.</div>
@@ -5856,7 +5912,7 @@ function renderFortune() {
       </div>
 
       <!-- 번호 지형도 -->
-      <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
         <div style="margin-bottom:8px;">
           <div style="font-size:13px;font-weight:900;color:var(--text-dark);">번호 지형도</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.5;"><b style="color:#1e40af;">파란색</b>=오랫동안 안 나온 번호 · <b style="color:#991b1b;">붉은색</b>=최근 나온 번호 · 클릭하면 상세 정보 확인</div>
@@ -5873,7 +5929,7 @@ function renderFortune() {
       </div>
 
       <!-- 주목할 번호 -->
-      <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
         <div style="margin-bottom:10px;">
           <div style="font-size:13px;font-weight:900;color:var(--text-dark);">주목할 번호</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">오랫동안 안 나온 번호와 최근 자주 나온 번호입니다. 로또는 매 회차 독립 시행으로 과거 패턴이 당첨을 보장하지 않습니다.</div>
@@ -5891,7 +5947,7 @@ function renderFortune() {
       </div>
 
       <!-- 최근 10회차 구간 흐름 -->
-      <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;">
+      <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;">
         <div style="margin-bottom:8px;">
           <div style="font-size:13px;font-weight:900;color:var(--text-dark);">최근 10회차 구간 흐름</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">저(1~15) · 중(16~30) · 고(31~45) 번호가 각 회차에서 몇 개씩 당첨됐는지 시각화합니다.</div>
@@ -6142,7 +6198,7 @@ function renderPensionRadar(data) {
 
   el.innerHTML = `
     <!-- 연금 번호 레이더 헤더 -->
-    <div style="display:flex;align-items:center;gap:12px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px 14px;margin-bottom:10px;">
+    <div class="radar-intro" style="display:flex;align-items:center;gap:12px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px 14px;margin-bottom:10px;">
       <div style="flex-shrink:0;">
         <svg viewBox="0 0 60 60" width="44" height="44">
           <circle cx="30" cy="30" r="28" fill="rgba(22,163,74,.08)" stroke="rgba(22,163,74,.45)" stroke-width="1.5"/>
@@ -6167,7 +6223,7 @@ function renderPensionRadar(data) {
     </div>
 
     <!-- ⭐ 추천 5게임 -->
-    <div style="background:var(--paper-white);border:2px solid #16a34a;border-radius:8px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;">
+    <div class="radar-recommendation" style="background:var(--paper-white);border:2px solid #16a34a;border-radius:8px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;right:0;background:#16a34a;font-size:9px;font-weight:800;color:#fff;padding:3px 10px;border-radius:0 0 0 8px;">자동 저장</div>
       <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:4px;">⭐ 제 ${nextDrw}회 연금복권 추천</div>
       <div style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">조 + 6자리 번호 · 5게임 · 이력 탭에서 결과 확인</div>
@@ -6177,13 +6233,14 @@ function renderPensionRadar(data) {
           <span style="background:#16a34a;color:#fff;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:900;white-space:nowrap;">${g.jo}조</span>
           <div style="display:flex;gap:3px;">${numDigitBalls(g.num)}</div>
         </div>`).join('')}
-      <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-dashed);font-size:10px;color:var(--text-muted);">
-        <button type="button" onclick="openFortuneHistory('pension')" style="display:flex;align-items:center;gap:5px;border:0;background:none;padding:0;color:var(--text-dark);font:800 10px inherit;cursor:pointer;">${svgIcon('history',13,'currentColor')} 연금 추천 이력 보기</button>
+      <div class="radar-history-link" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-dashed);font-size:10px;color:var(--text-muted);">
+        <button type="button" onclick="openFortuneHistory('pension')" style="display:flex;align-items:center;gap:5px;border:0;background:none;padding:0;color:var(--text-dark);font:800 11px inherit;cursor:pointer;">${svgIcon('history',13,'currentColor')} 연금 추천 이력 · 당첨 결과 보기</button>
+        <small>최근 결과 제 ${data.drwNo}회</small>
       </div>
     </div>
 
     <!-- 번호 패턴 분석 -->
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
+    <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;">
         <div>
           <div style="font-size:13px;font-weight:900;color:var(--text-dark);">연금 번호 패턴 분석</div>
@@ -6206,7 +6263,7 @@ function renderPensionRadar(data) {
     </div>
 
     <!-- 분석 안내 -->
-    <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;">
+    <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;">
       <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:5px;">분석 참고</div>
       <div style="font-size:10px;color:var(--text-muted);line-height:1.6;">연금복권도 각 추첨이 독립적으로 진행됩니다. 패턴은 번호 구성을 살펴보는 참고 자료이며 당첨을 보장하지 않습니다.</div>
     </div>
