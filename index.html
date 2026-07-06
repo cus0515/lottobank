@@ -1398,6 +1398,45 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .radar-recommendation {
   padding:15px 16px !important;
 }
+.radar-recommendation::after {
+  content:"";
+  position:absolute;
+  inset:-40% auto -40% -42%;
+  width:28%;
+  z-index:2;
+  pointer-events:none;
+  transform:skewX(-18deg);
+  background:linear-gradient(90deg,transparent,rgba(var(--scan-color,225,29,72),.13),rgba(255,255,255,.48),rgba(var(--scan-color,225,29,72),.13),transparent);
+  animation:radar-scan-pass 1.15s cubic-bezier(.22,.7,.25,1) .15s both;
+}
+.radar-game-row {
+  opacity:0;
+  transform:translateY(5px);
+  animation:radar-row-in .32s ease-out forwards;
+}
+.radar-number-ball {
+  opacity:0;
+  transform:translateY(4px) scale(.9);
+  animation:radar-ball-in .28s cubic-bezier(.2,.8,.25,1.15) var(--ball-delay,0ms) forwards;
+}
+.radar-flow-bar {
+  transform-origin:bottom;
+  animation:radar-bar-rise .55s cubic-bezier(.25,.7,.25,1) var(--bar-delay,0ms) both;
+}
+@keyframes radar-scan-pass {
+  from { left:-42%; }
+  to { left:118%; }
+}
+@keyframes radar-row-in {
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes radar-ball-in {
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes radar-bar-rise {
+  from { transform:scaleY(.08); opacity:.35; }
+  to { transform:scaleY(1); opacity:1; }
+}
 .radar-history-link {
   display:flex;
   align-items:center;
@@ -1436,6 +1475,18 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 [data-theme="dark"] .market-analysis-card {
   background:#182130 !important;
   border-color:#334155 !important;
+}
+@media (prefers-reduced-motion:reduce) {
+  .radar-recommendation::after {
+    display:none;
+  }
+  .radar-game-row,
+  .radar-number-ball,
+  .radar-flow-bar {
+    animation:none !important;
+    opacity:1;
+    transform:none;
+  }
 }
 .kpi-box:hover,
 .kpi-card:hover,
@@ -5823,10 +5874,10 @@ function renderFortune() {
     </div>`;
 
   // ── 구간 흐름 ────────────────────────────────────────────
-  const flowBars = rounds.slice(0,10).map(r=>{
+  const flowBars = rounds.slice(0,10).map((r,i)=>{
     const rd=recentData[r]; if(!rd) return '';
     const lo=rd.nums.filter(n=>n<=15).length,mi=rd.nums.filter(n=>n>=16&&n<=30).length,hi=rd.nums.filter(n=>n>=31).length;
-    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;">
+    return `<div class="radar-flow-bar" style="--bar-delay:${i*45}ms;flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;">
       <div style="width:100%;display:flex;flex-direction:column;gap:1px;height:52px;border-radius:4px;overflow:hidden;">
         <div style="flex:${hi};background:#ef4444;min-height:${hi?'3':'0'}px;"></div>
         <div style="flex:${mi};background:#3b82f6;min-height:${mi?'3':'0'}px;"></div>
@@ -5837,8 +5888,8 @@ function renderFortune() {
   }).join('');
 
   // ── 렌더링 ─────────────────────────────────────────────
-  const gBall = (n) =>
-    `<span style="width:32px;height:32px;border-radius:50%;background:${zC(n)};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;box-shadow:0 2px 6px rgba(0,0,0,.15);flex-shrink:0;">${String(n).padStart(2,'0')}</span>`;
+  const gBall = (n, delay=0) =>
+    `<span class="radar-number-ball" style="--ball-delay:${delay}ms;width:32px;height:32px;border-radius:50%;background:${zC(n)};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;box-shadow:0 2px 6px rgba(0,0,0,.15);flex-shrink:0;">${String(n).padStart(2,'0')}</span>`;
 
   el.innerHTML = `
     <!-- ═══ 레이더 탭 ═══ -->
@@ -5875,16 +5926,16 @@ function renderFortune() {
       </div>
 
       <!-- ⭐ 추천 번호 5게임 (최상단) -->
-      <div class="radar-recommendation" style="background:var(--paper-white);border:2px solid var(--lotto-red,#e11d48);border-radius:8px;padding:12px 14px;margin-bottom:10px;position:relative;overflow:hidden;">
+      <div class="radar-recommendation" style="--scan-color:225,29,72;background:var(--paper-white);border:2px solid var(--lotto-red,#e11d48);border-radius:8px;padding:12px 14px;margin-bottom:10px;position:relative;overflow:hidden;">
         <div style="position:absolute;top:0;right:0;background:var(--lotto-red,#e11d48);font-size:9px;font-weight:800;color:#fff;padding:3px 10px;border-radius:0 0 0 8px;letter-spacing:.5px;">자동 저장</div>
         <div style="margin-bottom:12px;">
           <div style="font-size:15px;font-weight:900;color:var(--text-dark);">⭐ 제 ${nextRound}회 추천 번호</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">등장 간격(60~70%) + 출현 빈도(30~40%) 가중치 · 저·중·고 구간 균형 · 5가지 조합 제시</div>
         </div>
         ${games.map((g,i)=>`
-          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;${i<4?'border-bottom:1px dashed var(--border-dashed);':''}">
+          <div class="radar-game-row" style="animation-delay:${i*65}ms;display:flex;align-items:center;gap:8px;padding:6px 0;${i<4?'border-bottom:1px dashed var(--border-dashed);':''}">
             <span style="font-size:10px;font-weight:900;color:var(--text-muted);min-width:44px;flex-shrink:0;">게임 ${i+1}</span>
-            <div style="display:flex;gap:5px;flex-wrap:wrap;">${g.map(n=>gBall(n)).join('')}</div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">${g.map((n,j)=>gBall(n,150+i*65+j*35)).join('')}</div>
           </div>`).join('')}
         <div class="radar-history-link" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-dashed);font-size:10px;color:var(--text-muted);">
           <button type="button" onclick="openFortuneHistory('lotto')" style="display:flex;align-items:center;gap:6px;border:0;background:none;padding:0;color:var(--text-dark);font:800 11px inherit;cursor:pointer;">${svgIcon('history',13,'currentColor')} 로또 추천 이력 · 당첨 결과 보기</button>
@@ -6177,8 +6228,8 @@ function renderPensionRadar(data) {
   const recGames = allPPicks[nextDrw].games;
   syncRadarRecommendation('pension', nextDrw, recGames);
 
-  const numDigitBalls = (numStr) => numStr.split('').map(d=>
-    `<span style="width:24px;height:30px;border-radius:5px;background:#16a34a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;">${d}</span>`
+  const numDigitBalls = (numStr, gameIndex=0) => numStr.split('').map((d,digitIndex)=>
+    `<span class="radar-number-ball" style="--ball-delay:${150+gameIndex*65+digitIndex*35}ms;width:24px;height:30px;border-radius:5px;background:#16a34a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;">${d}</span>`
   ).join('');
   const sourceDigits = `${data.wnRnkVl || ''}${data.bnsRnkVl || ''}`.split('').map(Number).filter(Number.isFinite);
   const digitCounts = Array.from({length:10}, (_, digit) => ({
@@ -6223,15 +6274,15 @@ function renderPensionRadar(data) {
     </div>
 
     <!-- ⭐ 추천 5게임 -->
-    <div class="radar-recommendation" style="background:var(--paper-white);border:2px solid #16a34a;border-radius:8px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;">
+    <div class="radar-recommendation" style="--scan-color:22,163,74;background:var(--paper-white);border:2px solid #16a34a;border-radius:8px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;right:0;background:#16a34a;font-size:9px;font-weight:800;color:#fff;padding:3px 10px;border-radius:0 0 0 8px;">자동 저장</div>
       <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:4px;">⭐ 제 ${nextDrw}회 연금복권 추천</div>
       <div style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">조 + 6자리 번호 · 5게임 · 이력 탭에서 결과 확인</div>
       ${recGames.map((g,i)=>`
-        <div style="display:flex;align-items:center;gap:8px;padding:7px 0;${i<4?'border-bottom:1px dashed var(--border-dashed);':''}">
+        <div class="radar-game-row" style="animation-delay:${i*65}ms;display:flex;align-items:center;gap:8px;padding:7px 0;${i<4?'border-bottom:1px dashed var(--border-dashed);':''}">
           <span style="font-size:10px;font-weight:900;color:var(--text-muted);min-width:44px;">게임 ${i+1}</span>
           <span style="background:#16a34a;color:#fff;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:900;white-space:nowrap;">${g.jo}조</span>
-          <div style="display:flex;gap:3px;">${numDigitBalls(g.num)}</div>
+          <div style="display:flex;gap:3px;">${numDigitBalls(g.num,i)}</div>
         </div>`).join('')}
       <div class="radar-history-link" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-dashed);font-size:10px;color:var(--text-muted);">
         <button type="button" onclick="openFortuneHistory('pension')" style="display:flex;align-items:center;gap:5px;border:0;background:none;padding:0;color:var(--text-dark);font:800 11px inherit;cursor:pointer;">${svgIcon('history',13,'currentColor')} 연금 추천 이력 · 당첨 결과 보기</button>
