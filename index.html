@@ -1671,7 +1671,7 @@ textarea {
       <button id="m-result" class="menu-btn" onclick="go('result')">회차 조회</button>
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-map" class="menu-btn" onclick="go('map')">지도</button>
-      <button id="m-fortune" class="menu-btn" onclick="go('fortune')">📡 레이더</button>
+      <button id="m-fortune" class="menu-btn" onclick="go('fortune')">레이더</button>
       <button id="m-stats" class="menu-btn auth-member-tab" onclick="go('stats')" style="display:none;">나의 전적</button>
       <button id="m-ticket" class="menu-btn auth-member-tab" onclick="go('ticket')" style="display:none;">QR 인증</button>
     </div>
@@ -1734,7 +1734,7 @@ textarea {
   <button class="mob-menu-item" onclick="go('result');closeMobMenu()">회차 조회</button>
   <button class="mob-menu-item" onclick="go('rank');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> 랭킹</button>
   <button class="mob-menu-item" onclick="go('map');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 지도</button>
-  <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()">📡 레이더</button>
+  <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()">레이더</button>
   <div id="mob-auth-section" style="display:none;border-top:2px solid var(--border-dashed);margin-top:4px;">
     <div style="padding:10px 4px 4px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.5px;">내 계정</div>
     <button class="mob-menu-item auth-member-tab" onclick="go('stats');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적</button>
@@ -3454,6 +3454,7 @@ async function initPensionTab() {
       if (d.returnValue === 'success') { latest = r; break; }
     } catch(_) {}
   }
+  window._latestPenRound = latest;  // 연금 최신 회차 전역 저장
   penRounds = [];
   for (let i = latest; i >= Math.max(1, latest - 99); i--) penRounds.push(i);
   penCurrentIdx = 0;
@@ -3557,7 +3558,47 @@ function renderPensionResult(d, container, round) {
     }).join('');
   }
 
+  // ── 연금 AI 분석 ────────────────────────────────────────────────────────────────
+  const _wnDigitArr = wnStr.padStart(6,'0').split('').map(Number);
+  const _penSum = _wnDigitArr.reduce((s,n)=>s+n, 0);
+  const _penOdd = _wnDigitArr.filter(n=>n%2).length;
+  const _penRepeat = _wnDigitArr.length - new Set(_wnDigitArr).size;
+  const _penHasZero = _wnDigitArr.includes(0);
+  const _penMax = Math.max(..._wnDigitArr);
+  const _penAiSignal = (()=>{
+    const pts = [];
+    pts.push(_penOdd > 3 ? '홀수 우세' : _penOdd < 3 ? '짝수 우세' : '홀짝 균등');
+    pts.push(_penRepeat > 0 ? `중복 숫자 ${_penRepeat}개` : '중복 없음');
+    pts.push(_penSum > 27 ? '자리 합계 높음' : _penSum < 18 ? '자리 합계 낮음' : '합계 중립');
+    if (_penHasZero) pts.push('0 포함');
+    return pts.join('  ·  ');
+  })();
+  const _penChip = (label, val, sub, color='var(--text-dark)') => {
+    const _sub = sub ? `<div style="font-size:9px;color:var(--text-muted);margin-top:1px;">${sub}</div>` : '';
+    return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:7px 5px;text-align:center;"><div style="font-size:9px;color:var(--text-muted);margin-bottom:3px;">${label}</div><div style="font-size:14px;font-weight:900;color:${color};">${val}</div>${_sub}</div>`;
+  };
+
   container.innerHTML = `
+    <!-- 연금 번호 패턴 분석 카드 -->
+    <div style="background:rgba(22,163,74,.06);border:1px solid rgba(22,163,74,.2);border-radius:11px;padding:12px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:11px;font-weight:900;color:var(--text-dark);">번호 패턴 분석</span>
+        <span style="font-size:9px;font-weight:700;color:#16a34a;background:rgba(22,163,74,.1);padding:2px 8px;border-radius:10px;">제 ${round}회</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px;">
+        ${_penChip('홀 : 짝', _penOdd+' : '+(6-_penOdd), '1등 6자리')}
+        ${_penChip('자리 합계', _penSum, '평균 22.5')}
+        ${_penChip('중복 숫자', _penRepeat?_penRepeat+'개':'없음', '', _penRepeat?'#d97706':'#16a34a')}
+        ${_penChip('최고 자릿값', _penMax, '0~9 중')}
+        ${_penChip('0 포함', _penHasZero?'있음':'없음', '', _penHasZero?'#dc2626':'var(--text-muted)')}
+        ${_penChip('당첨 조', jo+'조', '1~5조')}
+      </div>
+      <div style="padding:7px 10px;background:var(--paper-white);border-radius:7px;border-left:3px solid #16a34a;">
+        <span style="font-size:9px;font-weight:800;color:#16a34a;letter-spacing:.3px;">AI 요약</span>
+        <span style="font-size:10px;color:var(--text-muted);margin-left:6px;">${_penAiSignal}</span>
+      </div>
+    </div>
+
     <div style="text-align:center;margin-bottom:14px;">
       <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;">추첨일 ${dateStr} · 제 ${round}회차</div>
       <div style="font-size:11px;font-weight:700;color:#16a34a;margin-bottom:10px;">1등 당첨번호</div>
@@ -3754,16 +3795,58 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
   ];
 
 
+  // ── AI 번호 분석 데이터 ────────────────────────────────────────────────
+  const _sum = d.nums.reduce((s,n)=>s+n, 0);
+  const _sorted = [...d.nums].sort((a,b)=>a-b);
+  const _range = _sorted[5] - _sorted[0];
+  const _mid = d.nums.filter(n=>n>=16&&n<=30).length;
+  const _aiSignal = (()=>{
+    const pts = [];
+    if (a.odd > a.even) pts.push('홀수 우세');
+    else if (a.even > a.odd) pts.push('짝수 우세');
+    else pts.push('홀짝 균등');
+    if (a.high > a.low) pts.push('고번호 편중');
+    else if (a.low > a.high) pts.push('저번호 편중');
+    else pts.push('구간 균형');
+    pts.push(_sum > 155 ? '합계 높음' : _sum < 110 ? '합계 낮음' : '합계 중립');
+    if (a.seq >= 2) pts.push('연속번호 ' + a.seq + '쌍');
+    return pts.join('  ·  ');
+  })();
+  const _chip = (label, val, sub, color='var(--text-dark)') => {
+    const _subHtml = sub ? `<div style="font-size:9px;color:var(--text-muted);margin-top:2px;">${sub}</div>` : '';
+    return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:8px 6px;text-align:center;"><div style="font-size:9px;color:var(--text-muted);margin-bottom:3px;">${label}</div><div style="font-size:14px;font-weight:900;color:${color};">${val}</div>${_subHtml}</div>`;
+  };
+
   $('res-list').innerHTML = `
-    <!-- Summary row -->
+    <!-- AI 번호 분석 카드 -->
+    <div style="background:var(--bg-light);border-radius:11px;padding:12px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:11px;font-weight:900;color:var(--text-dark);">번호 패턴 분석</span>
+        <span style="font-size:9px;font-weight:700;color:var(--lotto-red);background:rgba(220,38,38,.1);padding:2px 8px;border-radius:10px;">제 \${d.round}회</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px;">
+        \${_chip('홀 : 짝', a.odd+' : '+a.even, '홀수 vs 짝수')}
+        \${_chip('저 · 중 · 고', a.low+'·'+_mid+'·'+a.high, '1~15 · 16~30 · 31~45')}
+        \${_chip('번호 합계', _sum, '평균 138', _sum>155?'#dc2626':_sum<110?'#2563eb':'var(--text-dark)')}
+        \${_chip('번호 범위', _sorted[0]+'~'+_sorted[5], '폭 '+_range+'칸')}
+        \${_chip('연속번호', a.seq?a.seq+'쌍':'없음', '', a.seq>=2?'#d97706':'var(--text-muted)')}
+        \${_chip('최고번호', _sorted[5], _sorted[5]>=40?'고번호권':_sorted[5]<=20?'저번호권':'중간대')}
+      </div>
+      <div style="padding:7px 10px;background:var(--paper-white);border-radius:7px;border-left:3px solid var(--lotto-red);">
+        <span style="font-size:9px;font-weight:800;color:var(--lotto-red);letter-spacing:.3px;">AI 요약</span>
+        <span style="font-size:10px;color:var(--text-muted);margin-left:6px;">\${_aiSignal}</span>
+      </div>
+    </div>
+
+    <!-- 추첨 정보 요약 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
       <div style="background:var(--bg-light);border-radius:8px;padding:10px 12px;">
         <div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;">추첨일</div>
-        <div style="font-size:14px;font-weight:900;margin-top:2px;">${d.date}</div>
+        <div style="font-size:14px;font-weight:900;margin-top:2px;">\${d.date}</div>
       </div>
       <div style="background:var(--bg-light);border-radius:8px;padding:10px 12px;">
         <div style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;">총 판매액</div>
-        <div style="font-size:14px;font-weight:900;margin-top:2px;">${fmtMFull(d.totalSales)}</div>
+        <div style="font-size:14px;font-weight:900;margin-top:2px;">\${fmtMFull(d.totalSales)}</div>
       </div>
     </div>
     <!-- Prize table -->
@@ -6417,7 +6500,10 @@ function renderPensionRadar(data) {
     return;
   }
 
-  const nextDrw = data.drwNo + 1;
+  // 스테일 캐시 방지 — 이미 추첨된 회차는 스킵해 항상 미래 회차 추천
+  const _penLatest = window._latestPenRound || data.drwNo;
+  let nextDrw = data.drwNo + 1;
+  while (nextDrw <= _penLatest) nextDrw++;
   const today = new Date().toLocaleDateString('ko-KR');
 
   // 연금복권 추천 5게임 생성 (조 1~5 + 6자리)
