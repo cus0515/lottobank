@@ -15,14 +15,14 @@
 <link rel="canonical" href="https://lottobank.pages.dev">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://lottobank.pages.dev">
-<meta property="og:title" content="LottoBank — 로또 전적 &amp; 당첨 인증">
-<meta property="og:description" content="QR로 로또를 등록하고 구매 이력, 당첨금, 뱃지, 랭킹을 한 곳에서 관리하세요.">
-<meta property="og:image" content="https://lottobank.pages.dev/og.png">
+<meta property="og:title" content="내 로또 수익률은 몇 %? 단 3초 만에 확인 | 로또뱅크">
+<meta property="og:description" content="로또 QR 코드 스캔 한 번으로 내 역대 구매 금액, 당첨금, ROI 투자 포트폴리오를 실시간으로 추적하고 분석하세요.">
+<meta property="og:image" content="https://lottobank.pages.dev/og-image.png">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="LottoBank — 로또 전적 &amp; 당첨 인증">
-<meta name="twitter:description" content="QR로 로또를 등록하고 구매 이력, 당첨금, 뱃지, 랭킹을 한 곳에서 관리하세요.">
-<meta name="twitter:image" content="https://lottobank.pages.dev/og.png">
+<meta name="twitter:title" content="내 로또 수익률은 몇 %? 단 3초 만에 확인 | 로또뱅크">
+<meta name="twitter:description" content="로또 QR 코드 스캔 한 번으로 내 역대 구매 금액, 당첨금, ROI 투자 포트폴리오를 실시간으로 추적하고 분석하세요.">
+<meta name="twitter:image" content="https://lottobank.pages.dev/og-image.png">
 <meta name="theme-color" content="#d61c4e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="LottoBank">
@@ -1623,12 +1623,12 @@ textarea {
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
+  "@type": "SoftwareApplication",
   "name": "LottoBank",
   "url": "https://lottobank.pages.dev",
-  "description": "QR 기반 로또 구매 이력 인증 및 전적 관리 플랫폼",
-  "applicationCategory": "EntertainmentApplication",
-  "operatingSystem": "Web",
+  "description": "로또 645·연금복권 720+ QR 인증 기반 구매 이력·당첨금·ROI·뱃지·랭킹 통합 관리 플랫폼",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "All",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
 }
 </script>
@@ -2981,6 +2981,65 @@ async function registerOnlineTicket() {
   const parsed = window._pendingOnlineTicket;
   const result = $('online-capture-result');
   if (!parsed || !result || !currentUser || !sb) return;
+
+  // ── 인터넷 판매점 회차 보안 검증 ──────────────────────────────────────────────────
+  // (1) 회차 범위 유효성: 1000 이상, getLatestRound()+5 이하
+  const _maxAllowed = getLatestRound() + 5;
+  if (!parsed.round || parsed.round < 1000 || parsed.round > _maxAllowed) {
+    result.innerHTML = `<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div>
+      <div class="qr-warn-title">유효하지 않은 회차</div>
+      <div class="qr-warn-desc">인식된 회차(${parsed.round || '?'})가 정상 범위를 벗어났습니다. 캡처 이미지를 다시 확인해 주세요.</div></div></div>`;
+    return;
+  }
+  // (2) 과거 확정 회차 차단: 이미 추첨된 회차의 인터넷 구매 캡처 등록 불가
+  //     → 결과 공개 후 당첨권 역추적 조작 방지
+  const _curLatest = latestRound || getLatestRound();
+  if (parsed.round < _curLatest) {
+    result.innerHTML = `<div class="qr-warn-card"><span class="qr-err-icon">🔒</span><div>
+      <div class="qr-warn-title">인터넷 구매 과거 회차 등록 불가</div>
+      <div class="qr-warn-desc">제 ${parsed.round}회는 이미 추첨이 완료된 회차입니다.<br>
+      인터넷 구매 캡처는 <b>현재 진행 중인 회차(제 ${_curLatest + 1}회)</b>만 등록할 수 있습니다.<br>
+      <span style="font-size:10px;color:var(--text-muted);">※ 실물 QR 스캔으로는 과거 회차 등록이 가능합니다.</span></div></div></div>`;
+    return;
+  }
+  // (3) 위변조 패턴 탐지: 로또 시리얼 30자리 / 연금 6자리 형식 교차 검증
+  if (parsed.type === 'lotto') {
+    const serial = String(parsed.ticketCode || '');
+    if (serial.length !== 30 || !/^\d{30}$/.test(serial)) {
+      result.innerHTML = `<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div>
+        <div class="qr-warn-title">티켓 식별값 오류</div>
+        <div class="qr-warn-desc">30자리 고유 식별값을 정확히 인식하지 못했습니다. 티켓 전체가 포함된 선명한 캡처를 다시 등록해 주세요.</div></div></div>`;
+      return;
+    }
+    if (!parsed.games?.length || parsed.games.length > 5) {
+      result.innerHTML = `<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div>
+        <div class="qr-warn-title">게임 수 오류</div>
+        <div class="qr-warn-desc">유효한 게임 수(1~5게임)를 인식하지 못했습니다. 다시 시도해 주세요.</div></div></div>`;
+      return;
+    }
+    // 각 게임 번호 유효성 (1~45, 6개, 중복 없음)
+    const _gamesOk = parsed.games.every(g =>
+      Array.isArray(g) && g.length === 6 &&
+      new Set(g).size === 6 &&
+      g.every(n => n >= 1 && n <= 45)
+    );
+    if (!_gamesOk) {
+      result.innerHTML = `<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div>
+        <div class="qr-warn-title">번호 범위 오류</div>
+        <div class="qr-warn-desc">인식된 번호 중 1~45 범위를 벗어나거나 중복된 번호가 있습니다. 선명한 캡처로 다시 시도해 주세요.</div></div></div>`;
+      return;
+    }
+  }
+  if (parsed.type === 'pension') {
+    if (!parsed.pensionGames?.length || parsed.pensionGames.length !== 5) {
+      result.innerHTML = `<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div>
+        <div class="qr-warn-title">연금복권 게임 수 오류</div>
+        <div class="qr-warn-desc">연금복권 720+는 5게임이어야 합니다. 캡처 이미지를 다시 확인해 주세요.</div></div></div>`;
+      return;
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────────────
+
   if (await ticketCodeExists(parsed)) {
     result.innerHTML = '<div class="qr-dup-card"><span class="qr-err-icon">↻</span><div><div class="qr-dup-title">이미 등록된 구매내역입니다</div><div class="qr-dup-body">같은 고유 코드는 중복 등록할 수 없습니다.</div></div></div>';
     return;
@@ -6002,7 +6061,7 @@ function renderFortune() {
         </div>
         <div>
           <div style="font-size:9px;color:var(--lotto-red,#e11d48);font-weight:800;letter-spacing:1.5px;margin-bottom:2px;">LOTTOBANK EXCLUSIVE</div>
-          <div style="font-size:16px;font-weight:900;color:var(--text-dark);line-height:1.2;">번호 레이더</div>
+          <h3 style="margin:0;font-size:16px;font-weight:900;color:var(--text-dark);line-height:1.2;">로또 645 번호 레이더</h3>
           <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">최근 50회차 데이터 기반 자동 분석 · 매주 추천 번호 자동 저장</div>
         </div>
       </div>
@@ -6011,7 +6070,7 @@ function renderFortune() {
       <div class="radar-recommendation" style="--scan-color:225,29,72;background:var(--paper-white);border:2px solid var(--lotto-red,#e11d48);border-radius:8px;padding:12px 14px;margin-bottom:10px;position:relative;overflow:hidden;">
         <div style="position:absolute;top:0;right:0;background:var(--lotto-red,#e11d48);font-size:9px;font-weight:800;color:#fff;padding:3px 10px;border-radius:0 0 0 8px;letter-spacing:.5px;">자동 저장</div>
         <div style="margin-bottom:12px;">
-          <div style="font-size:15px;font-weight:900;color:var(--text-dark);">⭐ 제 ${nextRound}회 추천 번호</div>
+          <h3 style="margin:0;font-size:15px;font-weight:900;color:var(--text-dark);">⭐ 로또 645 제 ${nextRound}회 추천 번호</h3>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">등장 간격(60~70%) + 출현 빈도(30~40%) 가중치 · 저·중·고 구간 균형 · 5가지 조합 제시</div>
         </div>
         ${games.map((g,i)=>`
@@ -6028,7 +6087,7 @@ function renderFortune() {
       <!-- 이번 회차 당첨번호 요약 -->
       <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
         <div style="margin-bottom:10px;">
-          <div style="font-size:13px;font-weight:900;color:var(--text-dark);">제 ${latestRound}회 당첨번호</div>
+          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 645 제 ${latestRound}회 당첨번호</h4>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">이번 회차 당첨번호의 패턴 분석입니다.</div>
         </div>
         <div style="display:flex;align-items:center;gap:5px;margin-bottom:12px;flex-wrap:wrap;">
@@ -6047,7 +6106,7 @@ function renderFortune() {
       <!-- 번호 지형도 -->
       <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
         <div style="margin-bottom:8px;">
-          <div style="font-size:13px;font-weight:900;color:var(--text-dark);">번호 지형도</div>
+          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 645 번호 지형도</h4>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.5;"><b style="color:#1e40af;">파란색</b>=오랫동안 안 나온 번호 · <b style="color:#991b1b;">붉은색</b>=최근 나온 번호 · 클릭하면 상세 정보 확인</div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-bottom:8px;">
@@ -6064,7 +6123,7 @@ function renderFortune() {
       <!-- 주목할 번호 -->
       <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
         <div style="margin-bottom:10px;">
-          <div style="font-size:13px;font-weight:900;color:var(--text-dark);">주목할 번호</div>
+          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 645 주목할 번호 통계</h4>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">오랫동안 안 나온 번호와 최근 자주 나온 번호입니다. 로또는 매 회차 독립 시행으로 과거 패턴이 당첨을 보장하지 않습니다.</div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
@@ -6082,7 +6141,7 @@ function renderFortune() {
       <!-- 최근 10회차 구간 흐름 -->
       <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;">
         <div style="margin-bottom:8px;">
-          <div style="font-size:13px;font-weight:900;color:var(--text-dark);">최근 10회차 구간 흐름</div>
+          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 645 최근 10회차 구간 흐름 분석</h4>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">저(1~15) · 중(16~30) · 고(31~45) 번호가 각 회차에서 몇 개씩 당첨됐는지 시각화합니다.</div>
         </div>
         <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">
@@ -6093,6 +6152,14 @@ function renderFortune() {
         <div style="display:flex;gap:4px;align-items:flex-end;">${flowBars}</div>
       </div>
 
+      <!-- 내부 링크 그물망 — SEO 순회 & 사용자 탐색 동선 -->
+      <nav aria-label="관련 분석 바로가기" style="margin-top:12px;padding:10px 12px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;font-size:11px;color:var(--text-muted);line-height:2;">
+        <span style="font-weight:700;color:var(--text-dark);display:block;margin-bottom:4px;">📌 관련 페이지 바로가기</span>
+        <button type="button" onclick="openFortuneHistory('lotto')" style="background:none;border:none;color:var(--lotto-red);cursor:pointer;font-size:11px;padding:0;margin-right:14px;">📋 로또 645 추천이력 보기</button>
+        <button type="button" onclick="switchRadarType('pension')" style="background:none;border:none;color:#16a34a;cursor:pointer;font-size:11px;padding:0;margin-right:14px;">🏦 연금복권 720+ 레이더</button>
+        <button type="button" onclick="navigateTo('result')" style="background:none;border:none;color:#1d4ed8;cursor:pointer;font-size:11px;padding:0;margin-right:14px;">🔍 역대 당첨번호 조회</button>
+        <button type="button" onclick="navigateTo('ranking')" style="background:none;border:none;color:#7c3aed;cursor:pointer;font-size:11px;padding:0;">🏆 전국 랭킹</button>
+      </nav>
       </div><!-- /radar-sub-lotto -->
       <div id="radar-sub-pension" style="display:none;"></div>
     </div><!-- /fortune-tab-radar -->
@@ -6108,11 +6175,47 @@ function renderFortune() {
     </div>
   `;
 
+  // URL 파라미터에서 탭 상태 복원 (공유 링크 진입 지원)
+  _restoreTabFromUrl();
   // 탭 상태 복원 (pension은 radar의 서브탭으로 이동됨)
   const _tab = window._fortuneTab === 'pension' ? 'radar' : (window._fortuneTab || 'radar');
   if (_tab !== 'radar') switchFortuneTab(_tab);
   if (window._fortuneTab === 'pension') switchRadarType('pension');
   else switchRadarType(window._radarType || 'lotto');
+}
+
+function _seoMeta(title, desc) {
+  // 탭 전환 시 검색엔진용 동적 메타태그 갱신
+  document.title = title;
+  let m = document.querySelector('meta[name="description"]');
+  if (m) m.setAttribute('content', desc);
+}
+
+function _syncTabUrl(tab, type) {
+  // 서브탭 주소창 동기화 — 고유 URL 생성으로 공유·백링크 최적화
+  try {
+    const params = new URLSearchParams(window.location.search);
+    params.set('tab', tab);
+    if (type) params.set('type', type); else params.delete('type');
+    const newUrl = window.location.pathname + '?' + params.toString() + window.location.hash;
+    history.replaceState(null, '', newUrl);
+  } catch(e) { /* 지원하지 않는 환경 무시 */ }
+}
+
+function _restoreTabFromUrl() {
+  // 페이지 로드 시 URL 파라미터로 탭 상태 복원 (공유 링크 진입)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const tab  = params.get('tab');
+    const type = params.get('type');
+    if (tab === 'radar' || tab === 'history') {
+      window._fortuneTab = tab;
+      if (type) {
+        if (tab === 'radar')   window._radarType = type;
+        if (tab === 'history') window._fortuneHistoryType = type;
+      }
+    }
+  } catch(e) { /* 무시 */ }
 }
 
 function switchFortuneTab(tab) {
@@ -6126,6 +6229,8 @@ function switchFortuneTab(tab) {
   });
   if (tab === 'history') switchHistoryType(window._fortuneHistoryType || 'lotto');
   if (tab === 'radar') switchRadarType(window._radarType || 'lotto');
+  // URL 동기화 (서브탭은 switchRadarType/switchHistoryType에서 추가 갱신)
+  _syncTabUrl(tab, tab === 'radar' ? (window._radarType||'lotto') : (window._fortuneHistoryType||'lotto'));
 }
 
 function switchRadarType(type) {
@@ -6144,7 +6249,17 @@ function switchRadarType(type) {
       fetch('./pension-cache.json').then(r=>r.json()).then(data=>renderPensionRadar(data))
         .catch(()=>renderPensionRadar(null));
     }
+    _seoMeta(
+      '연금복권 720+ 당첨 확률 추적 레이더 | 로또뱅크',
+      '연금복권 720+ 회차별 당첨 확률·번호 분석 레이더. 최근 출현 통계와 추천 번호를 실시간으로 확인하세요.'
+    );
+  } else {
+    _seoMeta(
+      '실시간 로또645 당첨 번호 분석 레이더 | 로또뱅크',
+      '로또 645 최근 50회차 빅데이터 기반 번호 레이더. 오래된 번호·자주 나온 번호·다음 회차 추천 번호를 확인하세요.'
+    );
   }
+  _syncTabUrl('radar', window._radarType);
 }
 
 function switchHistoryType(type) {
@@ -6157,8 +6272,20 @@ function switchHistoryType(type) {
     if (btn) btn.classList.toggle('on', t === type);
     if (panel) panel.style.display = t === type ? '' : 'none';
   });
-  if (active === 'pension') renderPensionHistory();
-  else renderLottoHistory();
+  if (active === 'pension') {
+    renderPensionHistory();
+    _seoMeta(
+      '연금복권 720+ 회차별 추천 이력 조회 | 로또뱅크',
+      '내 연금복권 720+ 추천 번호 이력을 회차별로 조회하고 당첨 결과를 비교하세요. LottoBank 추천 통계.'
+    );
+  } else {
+    renderLottoHistory();
+    _seoMeta(
+      '로또645 역대 추천 번호 및 당첨 이력 통계 | 로또뱅크',
+      '내 로또 645 역대 추천 번호와 당첨 이력을 회차별로 비교 분석. ROI와 적중률을 한눈에 확인하세요.'
+    );
+  }
+  _syncTabUrl('history', active);
 }
 
 function openFortuneHistory(type) {
