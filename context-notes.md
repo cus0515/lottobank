@@ -338,3 +338,9 @@
 - Google `ads.txt` 항목은 `ca-` 접두사 없이 `pub-3323488098461026`로 작성해야 한다.
 - Cloudflare Pages 루트에 `ads.txt`가 없어서 AdSense에서 `찾을 수 없음`으로 표시된 상태였다.
 - 루트 정적 파일로 `ads.txt`를 추가하면 배포 후 `https://lottobank.pages.dev/ads.txt`에서 확인할 수 있다.
+
+# Search Console 사이트맵 상태
+- 네이버 URL 검사는 정상이고 구글 Search Console에서만 사이트맵을 가져올 수 없다고 표시됐다.
+- 기존 사이트맵은 단일 SPA 내부 탭을 `#result`, `#rank` 같은 해시 URL로 나눠 제출하고 있었다.
+- 사이트맵은 검색에 노출할 canonical 절대 URL 중심으로 제출하는 것이 맞으므로 현재 구조에서는 루트 URL만 남겼다.
+- 탭별 검색 노출이 필요하면 해시가 아니라 실제 경로 라우팅과 페이지별 canonical, title, description을 별도로 만들어야 한다.
