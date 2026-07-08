@@ -5574,7 +5574,7 @@ function go(id) {
     home:      '실시간 피드',
     result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="qr-tab-register" class="qr-inner-tab on" onclick="switchQrView(\'register\')">QR 인증</button><button id="qr-tab-history" class="qr-inner-tab" onclick="switchQrView(\'history\')">번호 이력</button></div>',
-    fortune:   '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="fortune-tab-btn-radar" class="qr-inner-tab on" onclick="switchFortuneTab(\'radar\')">📡 레이더</button><button id="fortune-tab-btn-history" class="qr-inner-tab" onclick="switchFortuneTab(\'history\')">📋 추천이력</button></div>',
+    fortune:   `<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="fortune-tab-btn-radar" class="qr-inner-tab on" onclick="switchFortuneTab('radar')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('radar',13,'currentColor')} 레이더</button><button id="fortune-tab-btn-history" class="qr-inner-tab" onclick="switchFortuneTab('history')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('history',13,'currentColor')} 추천이력</button></div>`,
     stats:     '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="stats-tab-all" class="qr-inner-tab on" onclick="setStatsLotteryMode(\'all\')">Total</button><button id="stats-tab-lotto" class="qr-inner-tab" onclick="setStatsLotteryMode(\'lotto\')">로또</button><button id="stats-tab-pension" class="qr-inner-tab" onclick="setStatsLotteryMode(\'pension\')">연금</button></div>',
     rank:      '<div class="rank-view-tabs" style="width:100%;margin-bottom:0;"><button id="rank-view-ranking" class="rank-view-btn on" onclick="setRankView(\'ranking\')">랭킹</button><button id="rank-view-hall" class="rank-view-btn" onclick="setRankView(\'hall\')">명예의 전당</button></div>',
     map:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 내 주변 판매점',
@@ -5970,8 +5970,8 @@ function renderFortune() {
     <!-- ═══ 레이더 탭 ═══ -->
     <div id="fortune-tab-radar">
       <div class="qr-inner-tabs" style="width:100%;margin:0 0 10px;grid-template-columns:1fr 1fr;">
-        <button id="radar-sub-btn-lotto" class="qr-inner-tab on" onclick="switchRadarType('lotto')">🎰 로또</button>
-        <button id="radar-sub-btn-pension" class="qr-inner-tab" onclick="switchRadarType('pension')">🏦 연금</button>
+        <button id="radar-sub-btn-lotto" class="qr-inner-tab on" onclick="switchRadarType('lotto')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('ticket',12,'currentColor')} 로또</button>
+        <button id="radar-sub-btn-pension" class="qr-inner-tab" onclick="switchRadarType('pension')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('bank',12,'currentColor')} 연금</button>
       </div>
       <div id="radar-sub-lotto">
 
@@ -6098,8 +6098,8 @@ function renderFortune() {
     <!-- ═══ 추천 이력 탭 ═══ -->
     <div id="fortune-tab-history" style="display:none;">
       <div class="qr-inner-tabs" style="width:100%;margin:0 0 10px;grid-template-columns:1fr 1fr;">
-        <button id="history-sub-btn-lotto" class="qr-inner-tab on" onclick="switchHistoryType('lotto')">🎰 로또</button>
-        <button id="history-sub-btn-pension" class="qr-inner-tab" onclick="switchHistoryType('pension')">🏦 연금</button>
+        <button id="history-sub-btn-lotto" class="qr-inner-tab on" onclick="switchHistoryType('lotto')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('ticket',12,'currentColor')} 로또</button>
+        <button id="history-sub-btn-pension" class="qr-inner-tab" onclick="switchHistoryType('pension')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('bank',12,'currentColor')} 연금</button>
       </div>
       <div id="history-sub-lotto"></div>
       <div id="history-sub-pension" style="display:none;"></div>
@@ -7795,6 +7795,8 @@ const SVG_ICONS = {
   pin:       '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
   star:      '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
   history:   '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>',
+  radar:     '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-width="1.5" opacity="0.4"/></svg>',
+  bank:      '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22h18"/><path d="M6 18V9"/><path d="M10 18V9"/><path d="M14 18V9"/><path d="M18 18V9"/><path d="M4 9h16"/><path d="M12 3L4 7h16L12 3z"/></svg>',
   ranking:   '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>',
   community: '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
 };
