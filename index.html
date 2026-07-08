@@ -6411,8 +6411,8 @@ function renderLottoHistory() {
     }).join('');
 
     const statusBadge = isPending
-      ? `<span style="font-size:9px;font-weight:800;background:#f59e0b22;color:#92400e;padding:2px 8px;border-radius:10px;">🕐 추첨 전</span>`
-      : `<span style="font-size:9px;font-weight:800;background:#22c55e22;color:#166534;padding:2px 8px;border-radius:10px;">✅ 결과 확인</span>`;
+      ? `<span style="font-size:9px;font-weight:800;background:#f59e0b22;color:#92400e;padding:2px 8px;border-radius:10px;">추첨 전</span>`
+      : `<span style="font-size:9px;font-weight:800;background:#22c55e22;color:#166534;padding:2px 8px;border-radius:10px;">결과 확인</span>`;
 
     return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;margin-bottom:8px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
@@ -6420,10 +6420,7 @@ function renderLottoHistory() {
           <span style="font-size:14px;font-weight:900;color:var(--text-dark);">제 ${r}회</span>
           ${statusBadge}
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:10px;color:var(--text-muted);">${pk.date||''}</span>
-          <button onclick="deleteFortunePick(${r})" style="font-size:10px;color:#dc2626;background:none;border:1px solid #dc262633;border-radius:6px;padding:2px 8px;cursor:pointer;font-family:inherit;">삭제</button>
-        </div>
+        <span style="font-size:10px;color:var(--text-muted);">${pk.date||''}</span>
       </div>
       ${winBalls}
       ${gameRows}
@@ -6431,7 +6428,7 @@ function renderLottoHistory() {
   }).join('');
 
   el.innerHTML = `
-    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">총 ${pickRounds.length}회 이력 · 탭 방문 시 자동 저장 · 삭제 가능</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">총 ${pickRounds.length}회 이력 · 탭 방문 시 자동 저장</div>
     ${cards}
   `;
 }
@@ -6658,10 +6655,7 @@ async function renderPensionHistory() {
           <span style="font-size:14px;font-weight:900;color:var(--text-dark);">제 ${r}회</span>
           <span style="font-size:9px;font-weight:800;background:${isPending?'#f59e0b22':'#22c55e22'};color:${isPending?'#92400e':'#166534'};padding:2px 8px;border-radius:10px;">${isPending?'추첨 전':'결과 확인'}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:10px;color:var(--text-muted);">${pk.date||''}</span>
-          <button onclick="deletePensionPick(${r})" style="font-size:10px;color:#dc2626;background:none;border:1px solid #dc262633;border-radius:6px;padding:2px 8px;cursor:pointer;font-family:inherit;">삭제</button>
-        </div>
+        <span style="font-size:10px;color:var(--text-muted);">${pk.date||''}</span>
       </div>
       ${gameRows}
     </div>`;
