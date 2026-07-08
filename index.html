@@ -199,7 +199,7 @@ main.chat-hidden .chat-panel { display: none; }
 .qr-inner-tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
 .qr-inner-tab { border:1.5px solid var(--border-dashed); border-radius:8px; background:var(--paper-white); color:var(--text-muted); padding:6px 0; font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; }
 .qr-inner-tab.on { border-color:var(--lotto-red); background:var(--lotto-red); color:#fff; }
-#fortune-head-pension.on { border-color:#16a34a; background:#16a34a; color:#fff; }
+#fortune-head-pension.on, #radar-sub-btn-pension.on, #history-sub-btn-pension.on { border-color:#16a34a; background:#16a34a; color:#fff; }
 .ticket-slip { max-width:440px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
 .ticket-slip-games { display:grid; gap:0; }
@@ -5574,7 +5574,7 @@ function go(id) {
     home:      '실시간 피드',
     result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="qr-tab-register" class="qr-inner-tab on" onclick="switchQrView(\'register\')">QR 인증</button><button id="qr-tab-history" class="qr-inner-tab" onclick="switchQrView(\'history\')">번호 이력</button></div>',
-    fortune:   '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="fortune-head-lotto" class="qr-inner-tab on" onclick="switchFortuneTab(\'radar\')">로또 6/45</button><button id="fortune-head-pension" class="qr-inner-tab" onclick="switchFortuneTab(\'pension\')">연금복권 720+</button></div>',
+    fortune:   '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="fortune-tab-btn-radar" class="qr-inner-tab on" onclick="switchFortuneTab(\'radar\')">📡 레이더</button><button id="fortune-tab-btn-history" class="qr-inner-tab" onclick="switchFortuneTab(\'history\')">📋 추천이력</button></div>',
     stats:     '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="stats-tab-all" class="qr-inner-tab on" onclick="setStatsLotteryMode(\'all\')">Total</button><button id="stats-tab-lotto" class="qr-inner-tab" onclick="setStatsLotteryMode(\'lotto\')">로또</button><button id="stats-tab-pension" class="qr-inner-tab" onclick="setStatsLotteryMode(\'pension\')">연금</button></div>',
     rank:      '<div class="rank-view-tabs" style="width:100%;margin-bottom:0;"><button id="rank-view-ranking" class="rank-view-btn on" onclick="setRankView(\'ranking\')">랭킹</button><button id="rank-view-hall" class="rank-view-btn" onclick="setRankView(\'hall\')">명예의 전당</button></div>',
     map:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 내 주변 판매점',
@@ -5969,6 +5969,11 @@ function renderFortune() {
   el.innerHTML = `
     <!-- ═══ 레이더 탭 ═══ -->
     <div id="fortune-tab-radar">
+      <div class="qr-inner-tabs" style="width:100%;margin:0 0 10px;grid-template-columns:1fr 1fr;">
+        <button id="radar-sub-btn-lotto" class="qr-inner-tab on" onclick="switchRadarType('lotto')">🎰 로또</button>
+        <button id="radar-sub-btn-pension" class="qr-inner-tab" onclick="switchRadarType('pension')">🏦 연금</button>
+      </div>
+      <div id="radar-sub-lotto">
 
       <!-- 헤더: 레이더 SVG 애니메이션 -->
       <div class="radar-intro" style="display:flex;align-items:center;gap:12px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px 14px;margin-bottom:10px;">
@@ -6086,68 +6091,83 @@ function renderFortune() {
         <div style="display:flex;gap:4px;align-items:flex-end;">${flowBars}</div>
       </div>
 
+      </div><!-- /radar-sub-lotto -->
+      <div id="radar-sub-pension" style="display:none;"></div>
     </div><!-- /fortune-tab-radar -->
 
     <!-- ═══ 추천 이력 탭 ═══ -->
     <div id="fortune-tab-history" style="display:none;">
-      <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">이력 불러오는 중...</div>
-    </div>
-
-    <!-- ═══ 연금복권 탭 ═══ -->
-    <div id="fortune-tab-pension" style="display:none;">
-      <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">불러오는 중...</div>
+      <div class="qr-inner-tabs" style="width:100%;margin:0 0 10px;grid-template-columns:1fr 1fr;">
+        <button id="history-sub-btn-lotto" class="qr-inner-tab on" onclick="switchHistoryType('lotto')">🎰 로또</button>
+        <button id="history-sub-btn-pension" class="qr-inner-tab" onclick="switchHistoryType('pension')">🏦 연금</button>
+      </div>
+      <div id="history-sub-lotto"></div>
+      <div id="history-sub-pension" style="display:none;"></div>
     </div>
   `;
 
-  // 탭 상태 복원
-  if (window._fortuneTab && window._fortuneTab !== 'radar') {
-    switchFortuneTab(window._fortuneTab);
-  }
+  // 탭 상태 복원 (pension은 radar의 서브탭으로 이동됨)
+  const _tab = window._fortuneTab === 'pension' ? 'radar' : (window._fortuneTab || 'radar');
+  if (_tab !== 'radar') switchFortuneTab(_tab);
+  if (window._fortuneTab === 'pension') switchRadarType('pension');
+  else switchRadarType(window._radarType || 'lotto');
 }
 
 function switchFortuneTab(tab) {
-  // LottoBank 번호 레이더 탭 전환
+  // LottoBank 번호 레이더 탭 전환 (레이더 | 추천이력)
   window._fortuneTab = tab;
-  ['radar','history','pension'].forEach(t => {
+  ['radar','history'].forEach(t => {
     const panel = $('fortune-tab-'+t);
     if (panel) panel.style.display = t === tab ? '' : 'none';
+    const btn = $('fortune-tab-btn-'+t);
+    if (btn) btn.classList.toggle('on', t === tab);
   });
-  const activeType = tab === 'pension' || (tab === 'history' && window._fortuneHistoryType === 'pension')
-    ? 'pension' : 'lotto';
-  $('fortune-head-lotto')?.classList.toggle('on', activeType === 'lotto');
-  $('fortune-head-pension')?.classList.toggle('on', activeType === 'pension');
-  if (tab === 'history') renderRecommendationHistory(window._fortuneHistoryType || 'lotto');
-  if (tab === 'pension') renderFortunePension();
+  if (tab === 'history') switchHistoryType(window._fortuneHistoryType || 'lotto');
+  if (tab === 'radar') switchRadarType(window._radarType || 'lotto');
+}
+
+function switchRadarType(type) {
+  // 레이더 탭 내 로또/연금 전환
+  window._radarType = type === 'pension' ? 'pension' : 'lotto';
+  ['lotto','pension'].forEach(t => {
+    const btn = $('radar-sub-btn-'+t);
+    const panel = $('radar-sub-'+t);
+    if (btn) btn.classList.toggle('on', t === type);
+    if (panel) panel.style.display = t === type ? '' : 'none';
+  });
+  if (type === 'pension') {
+    const el = $('radar-sub-pension');
+    if (el && !el.innerHTML.trim()) {
+      el.innerHTML = '<div id="pension-sub-radar"></div>';
+      fetch('./pension-cache.json').then(r=>r.json()).then(data=>renderPensionRadar(data))
+        .catch(()=>renderPensionRadar(null));
+    }
+  }
+}
+
+function switchHistoryType(type) {
+  // 추천이력 탭 내 로또/연금 전환
+  window._fortuneHistoryType = type === 'pension' ? 'pension' : 'lotto';
+  const active = window._fortuneHistoryType;
+  ['lotto','pension'].forEach(t => {
+    const btn = $('history-sub-btn-'+t);
+    const panel = $('history-sub-'+t);
+    if (btn) btn.classList.toggle('on', t === type);
+    if (panel) panel.style.display = t === type ? '' : 'none';
+  });
+  if (active === 'pension') renderPensionHistory();
+  else renderLottoHistory();
 }
 
 function openFortuneHistory(type) {
   window._fortuneHistoryType = type === 'pension' ? 'pension' : 'lotto';
+  window._radarType = window._radarType || 'lotto';
   switchFortuneTab('history');
 }
 
 function renderRecommendationHistory(type) {
-  const el = $('fortune-tab-history');
-  if (!el) return;
-  window._fortuneHistoryType = type === 'pension' ? 'pension' : 'lotto';
-  const active = window._fortuneHistoryType;
-  const historyIcon = svgIcon('history',13,'currentColor');
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
-      <div style="display:flex;gap:4px;flex:1;">
-        <button type="button" class="rank-tab-pill ${active==='lotto'?'on':''}" data-history-type="lotto">로또 6/45</button>
-        <button type="button" class="rank-tab-pill ${active==='pension'?'on':''}" data-history-type="pension">연금복권 720+</button>
-      </div>
-      <button type="button" data-history-back="${active}" style="display:flex;align-items:center;gap:4px;border:1px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);border-radius:7px;padding:6px 9px;font:700 10px inherit;cursor:pointer;">${historyIcon} 분석으로</button>
-    </div>
-    <div id="fortune-history-body"></div>`;
-  el.querySelectorAll('[data-history-type]').forEach(btn => {
-    btn.addEventListener('click', () => renderRecommendationHistory(btn.dataset.historyType));
-  });
-  el.querySelector('[data-history-back]')?.addEventListener('click', () => {
-    switchFortuneTab(active === 'pension' ? 'pension' : 'radar');
-  });
-  if (active === 'pension') renderPensionHistory();
-  else renderLottoHistory();
+  // 하위 호환 — switchHistoryType으로 위임
+  switchHistoryType(type);
 }
 
 async function deleteFortunePick(round) {
@@ -6167,7 +6187,7 @@ async function deleteFortunePick(round) {
 
 function renderLottoHistory() {
   // 회차별 추천 이력 탭 렌더링
-  const el = $('fortune-history-body');
+  const el = $('history-sub-lotto');
   if (!el) return;
   const PKEY = 'ltb-radar-picks';
   const allPicks = JSON.parse(localStorage.getItem(PKEY)||'{}');
@@ -6251,16 +6271,8 @@ function renderLottoHistory() {
 }
 
 function renderFortunePension() {
-  // 연금복권 720+ 추천과 분석
-  const el = $('fortune-tab-pension');
-  if (!el) return;
-
-  el.innerHTML = `<div id="pension-sub-radar"></div>`;
-
-  // 즉시 레이더 렌더
-  fetch('./pension-cache.json').then(r=>r.json()).then(data => {
-    renderPensionRadar(data);
-  }).catch(()=>renderPensionRadar(null));
+  // 연금복권 720+ 추천과 분석 — radar-sub-pension으로 위임
+  switchRadarType('pension');
 }
 
 function renderPensionRadar(data) {
@@ -6397,8 +6409,8 @@ function renderPensionRadar(data) {
 }
 
 async function renderPensionHistory() {
-  // 연금복권 추천 이력 탭 렌더링
-  const el = $('fortune-history-body');
+  // 연금복권 추천 이력 렌더링
+  const el = $('history-sub-pension');
   if (!el) return;
   const PPKEY = 'ltb-pension-picks';
   const allPPicks = JSON.parse(localStorage.getItem(PPKEY)||'{}');
