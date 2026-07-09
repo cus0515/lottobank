@@ -6353,7 +6353,7 @@ async function deleteFortunePick(round) {
   renderRecommendationHistory('lotto');
 }
 
-function renderLottoHistory() {
+async function renderLottoHistory() {
   // 회차별 추천 이력 탭 렌더링
   const el = $('history-sub-lotto');
   if (!el) return;
@@ -6362,6 +6362,12 @@ function renderLottoHistory() {
   const pickRounds = Object.keys(allPicks).map(Number).sort((a,b)=>b-a);
   const latestRound = latestData ? latestData.round : 0;
   const nextRound   = latestRound + 1;
+
+  // 과거 회차 중 recentData에 없는 회차 일괄 fetch (당첨 결과 연동)
+  const missingRounds = pickRounds.filter(r => r <= latestRound && !recentData[r]);
+  if (missingRounds.length > 0) {
+    await Promise.allSettled(missingRounds.map(r => fetchLotto(r).then(d => { if (d) recentData[r] = d; })));
+  }
   const zC = n => n<=10?'#f59e0b':n<=20?'#3b82f6':n<=30?'#ef4444':n<=40?'#64748b':'#10b981';
   const sBall = n =>
     `<span style="width:20px;height:20px;border-radius:50%;background:${zC(n)};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;">${n}</span>`;
@@ -6605,9 +6611,13 @@ async function renderPensionHistory() {
   }
 
   el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:11px;">당첨 결과를 확인하는 중...</div>';
+  // 날짜 기반 추첨 시간 계산 (연금복권: 매주 목요일 10:00 KST = 01:00 UTC)
+  const _penBaseMs = new Date('2020-05-07T01:00:00Z').getTime();
+  const _penDrawMs = r => _penBaseMs + (r - 1) * 7 * 24 * 3600 * 1000;
   const resultEntries = await Promise.all(pRounds.map(async r => {
+    if (Date.now() < _penDrawMs(r)) return [r, null]; // 추첨 전 — API 불필요
     try {
-      const response = await fetch(`/api/pension?round=${r}`);
+      const response = await fetch(`/api/pension?round=${r}`, {cache:'no-store'});
       const result = await response.json();
       return [r, result?.returnValue === 'success' ? result : null];
     } catch (_) {
@@ -6620,11 +6630,12 @@ async function renderPensionHistory() {
     const pk = allPPicks[r];
     const games = pk.games || [];
     const result = resultMap[r];
-    const isPending = !result;
+    const isPending = Date.now() < _penDrawMs(r);      // 추첨 전 (미래)
+    const isTabulating = !isPending && !result;         // 집계 중 (추첨 후 API 미갱신)
 
     const gameRows = games.map((g,gi)=>{
-      let resultLabel = '추첨 전';
-      let resultColor = '#94a3b8';
+      let resultLabel = isPending ? '추첨 전' : isTabulating ? '집계 중' : '';
+      let resultColor = isPending ? '#94a3b8' : isTabulating ? '#94a3b8' : '#94a3b8';
       if (result) {
         const selected = String(g.num || '').padStart(6,'0');
         const winning = String(result.wnRnkVl || '').padStart(6,'0');
@@ -6655,7 +6666,7 @@ async function renderPensionHistory() {
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:14px;font-weight:900;color:var(--text-dark);">제 ${r}회</span>
-          <span style="font-size:9px;font-weight:800;background:${isPending?'#f59e0b22':'#22c55e22'};color:${isPending?'#92400e':'#166534'};padding:2px 8px;border-radius:10px;">${isPending?'추첨 전':'결과 확인'}</span>
+          <span style="font-size:9px;font-weight:800;background:${isPending?'#f59e0b22':isTabulating?'#94a3b822':'#22c55e22'};color:${isPending?'#92400e':isTabulating?'#475569':'#166534'};padding:2px 8px;border-radius:10px;">${isPending?'추첨 전':isTabulating?'집계 중':'결과 확인'}</span>
         </div>
         <span style="font-size:10px;color:var(--text-muted);">${pk.date||''}</span>
       </div>
