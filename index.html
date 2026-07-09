@@ -3441,7 +3441,7 @@ async function initPensionTab() {
   const sel = $('pen-sel');
   if (!sel) return;
   // 날짜 기반 최신 회차 계산 (매주 목요일)
-  const base = new Date('2020-05-07');
+  const base = new Date('2020-05-07T10:05:00Z'); // 연금복권 추첨 시간 기준 (19:05 KST)
   const now = new Date();
   const weeks = Math.floor((now - base) / (7 * 24 * 3600 * 1000));
   let calcLatest = weeks + 1;
@@ -6461,7 +6461,7 @@ function renderPensionRadar(data) {
 
   // 스테일 캐시 방지 — 이미 추첨된 회차는 스킵해 항상 미래 회차 추천
   // 연금복권 720+ 1회: 2020-05-07 기준 매주 목요일. 날짜로 독립 계산해 _latestPenRound 미설정 시도 대응
-  const _penCalcLatest = Math.floor((Date.now() - new Date('2020-05-07').getTime()) / (7*24*3600*1000)) + 1;
+  const _penCalcLatest = Math.floor((Date.now() - new Date('2020-05-07T10:05:00Z').getTime()) / (7*24*3600*1000)) + 1; // 19:05 KST 기준
   const _penLatest = Math.max(window._latestPenRound || 0, _penCalcLatest, data.drwNo);
   let nextDrw = data.drwNo + 1;
   while (nextDrw <= _penLatest) nextDrw++;
@@ -6612,7 +6612,7 @@ async function renderPensionHistory() {
 
   el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:11px;">당첨 결과를 확인하는 중...</div>';
   // 날짜 기반 추첨 시간 계산 (연금복권: 매주 목요일 10:00 KST = 01:00 UTC)
-  const _penBaseMs = new Date('2020-05-07T01:00:00Z').getTime();
+  const _penBaseMs = new Date('2020-05-07T10:05:00Z').getTime(); // 19:05 KST 추첨 시간 기준
   const _penDrawMs = r => _penBaseMs + (r - 1) * 7 * 24 * 3600 * 1000;
   const resultEntries = await Promise.all(pRounds.map(async r => {
     if (Date.now() < _penDrawMs(r)) return [r, null]; // 추첨 전 — API 불필요
@@ -6875,13 +6875,13 @@ function renderPensionSection() {
   // 연금복권 내 등록 이력
   const myPension = (usedQrKeys || []).filter(k => k.startsWith('p'));
 
-  // 연금복권 다음 추첨 계산 (매주 목요일 오전 10시)
+  // 연금복권 다음 추첨 계산 (매주 목요일 오후 7시 5분)
   const now = new Date();
   const day = now.getDay(); // 0=일,4=목
   const diffToThu = (4 - day + 7) % 7 || 7;
   const nextThu = new Date(now);
   nextThu.setDate(now.getDate() + diffToThu);
-  nextThu.setHours(10, 0, 0, 0);
+  nextThu.setHours(19, 5, 0, 0);
   if (nextThu <= now) nextThu.setDate(nextThu.getDate() + 7);
   const diff = nextThu - now;
   const pd = Math.floor(diff / 86400000);
@@ -7270,7 +7270,7 @@ function startDashboardCountdown() {
     if (nextSat <= now) nextSat.setDate(nextSat.getDate() + 7);
     const nextThu = new Date(now);
     nextThu.setDate(now.getDate() + ((4 - now.getDay() + 7) % 7));
-    nextThu.setHours(10, 0, 0, 0);
+    nextThu.setHours(19, 5, 0, 0); // 19:05 KST 추첨
     if (nextThu <= now) nextThu.setDate(nextThu.getDate() + 7);
     fill('cd-', nextSat);
     fill('pen-cd-', nextThu);
@@ -7278,7 +7278,7 @@ function startDashboardCountdown() {
     if (lottoRound) lottoRound.textContent = latestRound ? latestRound + 1 : '-';
     const pensionRound = $('pen-next-round-label');
     if (pensionRound) {
-      const base = new Date('2020-05-07T10:00:00+09:00');
+      const base = new Date('2020-05-07T19:05:00+09:00'); // 19:05 KST 추첨 기준
       pensionRound.textContent = Math.floor((nextThu - base) / (7 * 86400000)) + 1;
     }
   };
