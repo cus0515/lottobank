@@ -5976,6 +5976,53 @@ function getRadarHitStatsHtml(type, data) {
   </div>`;
 }
 
+function getPensionRecommendationRank(game, result) {
+  if (!game || !result) return null;
+  const selected = String(game.num || '').padStart(6, '0');
+  const winning = String(result.wnRnkVl || '').padStart(6, '0');
+  const bonus = String(result.bnsRnkVl || '').padStart(6, '0');
+  if (Number(game.jo) === Number(result.wnBndNo) && selected === winning) return '1';
+  if (selected === winning) return '2';
+  if (selected === bonus) return 'bonus';
+  const suffixRank = [[5,'3'],[4,'4'],[3,'5'],[2,'6'],[1,'7']]
+    .find(([digits]) => selected.slice(-digits) === winning.slice(-digits));
+  return suffixRank ? suffixRank[1] : null;
+}
+
+async function getPensionRadarHitStatsHtml(latestResultRound) {
+  const counts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, bonus:0};
+  try {
+    const picks = JSON.parse(localStorage.getItem('ltb-pension-picks') || '{}');
+    const rounds = Object.keys(picks).map(Number).filter(round => round <= latestResultRound).sort((a,b)=>b-a);
+    const results = await Promise.all(rounds.map(async round => {
+      try {
+        const response = await fetch(`/api/pension?round=${round}`, {cache:'no-store'});
+        const result = await response.json();
+        return [round, result?.returnValue === 'success' ? result : null];
+      } catch (_) {
+        return [round, null];
+      }
+    }));
+    results.forEach(([round, result]) => {
+      if (!result) return;
+      (picks[round]?.games || []).forEach(game => {
+        const rank = getPensionRecommendationRank(game, result);
+        if (rank) counts[rank]++;
+      });
+    });
+  } catch (_) {}
+  const items = ['1','2','3','4','5','6','7','bonus'];
+  return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+    <div style="font-size:11px;font-weight:900;color:var(--text-dark);margin-bottom:7px;">LottoBank 추천 적중 이력</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+      ${items.map(rank => `<div style="text-align:center;background:var(--bg-light);border-radius:7px;padding:7px 4px;">
+        <div style="font-size:9px;color:var(--text-muted);font-weight:800;">${rank === 'bonus' ? '보너스' : rank + '등'}</div>
+        <div style="font-size:14px;color:#16a34a;font-weight:900;margin-top:1px;">${counts[rank]}번</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
 function renderFortune() {
   // LottoBank 번호 레이더 — 탭 구성 (레이더/추천이력/연금복권)
   const el = $('fortune-content');
@@ -6537,7 +6584,7 @@ function renderFortunePension() {
   switchRadarType('pension');
 }
 
-function renderPensionRadar(data) {
+async function renderPensionRadar(data) {
   // 연금복권 레이더 분석 — 최신 결과 + 5게임 추천
   const el = $('pension-sub-radar');
   if (!el) return;
@@ -6581,6 +6628,8 @@ function renderPensionRadar(data) {
   }
   const recGames = allPPicks[nextDrw].games;
   syncRadarRecommendation('pension', nextDrw, recGames);
+  const latestResultRound = Math.max(1, nextDrw - 1);
+  const pensionHitStatsHtml = await getPensionRadarHitStatsHtml(latestResultRound);
 
   const numDigitBalls = (numStr, gameIndex=0) => numStr.split('').map((d,digitIndex)=>
     `<span class="radar-number-ball" style="--ball-delay:${150+gameIndex*65+digitIndex*35}ms;width:24px;height:30px;border-radius:5px;background:#16a34a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;">${d}</span>`
@@ -6630,7 +6679,7 @@ function renderPensionRadar(data) {
         <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">연금 720+ 번호 구성 분석 · 매주 추천 번호 자동 저장</div>
       </div>
     </div>
-    ${getRadarHitStatsHtml('pension', data)}
+    ${pensionHitStatsHtml}
 
     <!-- ⭐ 추천 5게임 -->
     <div class="radar-recommendation" style="--scan-color:22,163,74;background:var(--paper-white);border:2px solid #16a34a;border-radius:8px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;">
@@ -6645,7 +6694,7 @@ function renderPensionRadar(data) {
         </div>`).join('')}
       <div class="radar-history-link" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-dashed);font-size:10px;color:var(--text-muted);">
         <button type="button" onclick="openFortuneHistory('pension')" style="display:flex;align-items:center;gap:5px;border:0;background:none;padding:0;color:var(--text-dark);font:800 11px inherit;cursor:pointer;">${svgIcon('history',13,'currentColor')} 연금 720+ 추천 이력 · 당첨 결과 보기</button>
-        <small>최근 결과 제 ${data.drwNo}회</small>
+        <small>최근 결과 제 ${latestResultRound}회</small>
       </div>
     </div>
 
@@ -6729,21 +6778,9 @@ async function renderPensionHistory() {
       let resultLabel = isPending ? '추첨 전' : isTabulating ? '집계 중' : '';
       let resultColor = isPending ? '#94a3b8' : isTabulating ? '#94a3b8' : '#94a3b8';
       if (result) {
-        const selected = String(g.num || '').padStart(6,'0');
-        const winning = String(result.wnRnkVl || '').padStart(6,'0');
-        const bonus = String(result.bnsRnkVl || '').padStart(6,'0');
-        if (Number(g.jo) === Number(result.wnBndNo) && selected === winning) {
-          resultLabel = '1등'; resultColor = '#dc2626';
-        } else if (selected === winning) {
-          resultLabel = '2등'; resultColor = '#dc2626';
-        } else if (selected === bonus) {
-          resultLabel = '보너스'; resultColor = '#16a34a';
-        } else {
-          const suffixRank = [[5,3],[4,4],[3,5],[2,6],[1,7]]
-            .find(([digits]) => selected.slice(-digits) === winning.slice(-digits));
-          resultLabel = suffixRank ? `${suffixRank[1]}등` : '낙첨';
-          resultColor = suffixRank ? '#16a34a' : '#94a3b8';
-        }
+        const rank = getPensionRecommendationRank(g, result);
+        resultLabel = rank ? (rank === 'bonus' ? '보너스' : `${rank}등`) : '낙첨';
+        resultColor = rank === '1' || rank === '2' ? '#dc2626' : rank ? '#16a34a' : '#94a3b8';
       }
       return `
       <div style="display:flex;align-items:center;gap:6px;padding:5px 0;${gi<games.length-1?'border-bottom:1px dashed var(--border-dashed);':''}">
