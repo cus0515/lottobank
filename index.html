@@ -3122,7 +3122,7 @@ function parseQRUrl(url) {
     }
 
     // 연금복권 720+ 포맷: {4}j{2조}{6번호}
-    const pensionFmt = v.match(/^(\d{4})j(\d{2})(\d{6})/);
+    const pensionFmt = v.match(/^p?(\d{4})j(\d{2})(\d{6})/i);
     if (pensionFmt) {
       const round = parseInt(pensionFmt[1]);
       const jo    = parseInt(pensionFmt[2]);
@@ -3136,6 +3136,18 @@ function parseQRUrl(url) {
 
 function ticketLotteryType(ticket) {
   return ticket?.result === 'pension' || ticket?.lottery_type === 'pension' ? 'pension' : 'lotto';
+}
+
+function restorePensionTicketFromQr(ticket) {
+  if (ticketLotteryType(ticket) !== 'pension' || ticket.pension_number) return ticket;
+  const parsed = parseQRUrl(ticket.qr_url);
+  if (!parsed || parsed.type !== 'pension') return ticket;
+  return {
+    ...ticket,
+    pension_group: ticket.pension_group ?? parsed.jo ?? null,
+    pension_number: ticket.pension_number || (parsed.no ? String(parsed.no).padStart(6, '0') : null),
+    serial_meta: ticket.serial_meta || parsed.serialMeta || null,
+  };
 }
 
 // =====================================================
@@ -4039,9 +4051,11 @@ async function renderNumberHistory() {
   }
   const savedSets = await loadSavedNumberSets();
   const qrTickets = (result.data || []).map(ticket => {
-    const restored = ticketLotteryType(ticket) === 'lotto' && (!ticket.game_numbers?.length || ticket.game_numbers.length < (ticket.game_count || 1))
+    const type = ticketLotteryType(ticket);
+    const restored = type === 'lotto' && (!ticket.game_numbers?.length || ticket.game_numbers.length < (ticket.game_count || 1))
       ? parseQRUrl(ticket.qr_url) : null;
-    return { ...ticket, lottery_type:ticketLotteryType(ticket), game_numbers:restored?.games || ticket.game_numbers || [] };
+    const base = { ...ticket, lottery_type:type, game_numbers:restored?.games || ticket.game_numbers || [] };
+    return type === 'pension' ? restorePensionTicketFromQr(base) : base;
   });
   const { data: stores } = await sb.from('lottery_stores').select('id,name,address,region,lat,lng').order('name').limit(5000);
   window._lotteryStoreOptions = stores || [];
