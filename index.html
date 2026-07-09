@@ -2046,11 +2046,11 @@ textarea {
         <div id="qr-register-view">
         <div id="qr-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:14px;margin-bottom:10px;">
           <div class="qr-source-tabs">
-            <button id="qr-source-url-tab" class="qr-source-tab on" type="button" onclick="setQrSourceMode('url')">실물 QR</button>
+            <button id="qr-source-url-tab" class="qr-source-tab on" type="button" onclick="setQrSourceMode('url')">QR 코드</button>
             <button id="qr-source-online-tab" class="qr-source-tab" type="button" onclick="setQrSourceMode('online')">인터넷 구매</button>
           </div>
           <div id="qr-url-source">
-          <div style="font-size:12px;font-weight:900;color:var(--lotto-red);margin-bottom:8px;">실물 복권 QR 등록</div>
+          <div style="font-size:12px;font-weight:900;color:var(--lotto-red);margin-bottom:8px;">QR 코드 등록</div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
             <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted);">
               <span style="width:18px;height:18px;border-radius:50%;background:#dc2626;color:#fff;font-size:9px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>
@@ -2102,32 +2102,6 @@ textarea {
             <div id="online-capture-result"></div>
           </div>
         </div>
-        <!-- QR 등록 가이드 -->
-        <details style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:0;margin-bottom:10px;overflow:hidden;">
-          <summary style="padding:11px 14px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text-dark);list-style:none;display:flex;justify-content:space-between;align-items:center;">
-            <span>QR 등록 방법</span>
-            <span style="font-size:10px;color:var(--text-muted);font-weight:500;">실물 QR · 인터넷 캡처</span>
-          </summary>
-          <div style="padding:0 14px 12px;border-top:1px solid var(--border-dashed);">
-            <div style="display:flex;flex-direction:column;gap:10px;padding-top:10px;">
-              <div style="display:flex;gap:10px;align-items:flex-start;">
-                <div style="min-width:22px;height:22px;border-radius:50%;background:#dc2626;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
-                <div><div style="font-size:12px;font-weight:700;color:var(--text-dark);">실물 복권</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">복권 용지의 QR 코드를 카메라로 촬영하거나 QR URL 입력</div></div>
-              </div>
-              <div style="display:flex;gap:10px;align-items:flex-start;">
-                <div style="min-width:22px;height:22px;border-radius:50%;background:#f59e0b;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
-                <div><div style="font-size:12px;font-weight:700;color:var(--text-dark);">인터넷 구매</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">동행복권 구매내역에서 돋보기 버튼을 눌러 티켓 보기 열기</div></div>
-              </div>
-              <div style="display:flex;gap:10px;align-items:flex-start;">
-                <div style="min-width:22px;height:22px;border-radius:50%;background:#10b981;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
-                <div><div style="font-size:12px;font-weight:700;color:var(--text-dark);">캡처 등록</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">티켓 전체와 하단 고유 코드가 보이게 캡처 후 인터넷 구매 탭에서 선택</div></div>
-              </div>
-            </div>
-            <div style="margin-top:10px;padding:8px;background:var(--amber-bg,#fef3c7);border-radius:6px;font-size:11px;color:var(--amber-text,#92400e);">
-              연금복권은 발행 시각과 1~5조 번호를 함께 확인해 중복 등록을 방지합니다.
-            </div>
-          </div>
-        </details>
         </div>
         <div id="qr-history-view" style="display:none;">
           <div class="ticket-history-filter">
@@ -2235,7 +2209,7 @@ textarea {
     </div>
     <div style="display:flex; flex-direction:column; height:calc(100% - 49px);">
       <div class="chat-messages" id="chat-box">
-        <div class="chat-row"><div class="chat-identity"><span class="badge b-system">공지</span><span class="chat-user">LottoBank</span></div><span class="chat-text">실물 QR과 인터넷 구매 캡처로 구매 이력과 전적을 관리하세요.</span></div>
+        <div class="chat-row"><div class="chat-identity"><span class="badge b-system">공지</span><span class="chat-user">LottoBank</span></div><span class="chat-text">QR 코드와 인터넷 구매 캡처로 구매 이력과 전적을 관리하세요.</span></div>
         <div class="chat-row"><div class="chat-identity"><span class="badge b-guest">팁</span><span class="chat-user">번호수집가</span></div><span class="chat-text">인터넷 구매는 동행복권 티켓 보기 화면을 캡처해 등록할 수 있습니다.</span></div>
       </div>
       <div class="chat-input-area">
@@ -3023,7 +2997,7 @@ async function registerOnlineTicket() {
       <div class="qr-warn-title">인터넷 구매 과거 회차 등록 불가</div>
       <div class="qr-warn-desc">제 ${parsed.round}회는 이미 추첨이 완료된 회차입니다.<br>
       인터넷 구매 캡처는 <b>현재 진행 중인 회차(제 ${_curLatest + 1}회)</b>만 등록할 수 있습니다.<br>
-      <span style="font-size:10px;color:var(--text-muted);">※ 실물 QR 스캔으로는 과거 회차 등록이 가능합니다.</span></div></div></div>`;
+      <span style="font-size:10px;color:var(--text-muted);">※ QR 코드 스캔으로는 과거 회차 등록이 가능합니다.</span></div></div></div>`;
     return;
   }
   // (3) 위변조 패턴 탐지: 로또 시리얼 30자리 / 연금 6자리 형식 교차 검증
@@ -3345,7 +3319,7 @@ function renderHomeLive() {
         </div>
         <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;">
           <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;">2</div>
-          <div><div style="font-size:12px;font-weight:700;">구매내역 등록</div><div style="font-size:10px;opacity:.5;margin-top:1px;">실물 QR 또는 인터넷 구매 캡처</div></div>
+          <div><div style="font-size:12px;font-weight:700;">구매내역 등록</div><div style="font-size:10px;opacity:.5;margin-top:1px;">QR 코드 또는 인터넷 구매 캡처</div></div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;">
           <div style="width:28px;height:28px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;">3</div>
