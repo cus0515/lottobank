@@ -1674,6 +1674,7 @@ textarea {
       <button id="m-rank" class="menu-btn" onclick="go('rank')">랭킹</button>
       <button id="m-map" class="menu-btn" onclick="go('map')">지도</button>
       <button id="m-fortune" class="menu-btn" onclick="go('fortune')">레이더</button>
+      <button id="m-lab" class="menu-btn" onclick="go('lab')">연구소</button>
       <button id="m-stats" class="menu-btn auth-member-tab" onclick="go('stats')" style="display:none;">나의 전적</button>
       <button id="m-ticket" class="menu-btn auth-member-tab" onclick="go('ticket')" style="display:none;">QR 인증</button>
     </div>
@@ -1737,6 +1738,7 @@ textarea {
   <button class="mob-menu-item" onclick="go('rank');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> 랭킹</button>
   <button class="mob-menu-item" onclick="go('map');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 지도</button>
   <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()">레이더</button>
+  <button class="mob-menu-item" onclick="go('lab');closeMobMenu()">연구소</button>
   <div id="mob-auth-section" style="display:none;border-top:2px solid var(--border-dashed);margin-top:4px;">
     <div style="padding:10px 4px 4px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.5px;">내 계정</div>
     <button class="mob-menu-item auth-member-tab" onclick="go('stats');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적</button>
@@ -2123,6 +2125,11 @@ textarea {
         <div id="fortune-content">
           <div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:12px;">데이터 로딩 중...</div>
         </div>
+      </div>
+
+      <!-- 4-2. 연구소 -->
+      <div id="pg-lab" class="page-content" style="display:none;">
+        <div id="lab-content"></div>
       </div>
 
       <!-- 5. 전적 -->
@@ -4907,7 +4914,7 @@ async function doAuth() {
 }
 
 function updateHeaderUser(nick, badgeText) {
-  $('user-name').innerHTML = getIdentityHtml(window._systemRankTitle || badgeText, getActiveMonthlyBadges(), nick);
+  $('user-name').innerHTML = getIdentityHtml(getDisplayVerifiedTitle(), getActiveMonthlyBadges(), nick);
   $('dd-nick').textContent = nick;
   $('dd-badge').textContent = '';
   $('dd-badge').style.display = 'none';
@@ -4941,7 +4948,7 @@ function applyLoginUI(user) {
     window._isAppAdmin = data === true;
   }).catch(() => {});
   const nick = user.user_metadata?.nickname || user.email.split('@')[0];
-  updateHeaderUser(nick, myVerifiedTitle || '');
+  updateHeaderUser(nick, getDisplayVerifiedTitle() || '');
   $('btn-auth').style.display = 'none';
   $('user-profile').style.display = 'flex';
   const mobSec = $('mob-auth-section'); if (mobSec) mobSec.style.display = '';
@@ -5103,7 +5110,11 @@ function getActiveMonthlyBadges() {
   const badges = Array.isArray(window._selectedMonthlyRankBadges)
     ? window._selectedMonthlyRankBadges
     : (window._monthlyRankBadges || []);
-  return badges.slice(0, 1);
+  return badges.filter(id => MONTHLY_BADGE_META[id]).slice(0, 1);
+}
+
+function getDisplayVerifiedTitle() {
+  return window._systemRankTitle || null;
 }
 
 function getIdentityHtml(title, monthlyBadges, nickname) {
@@ -5163,7 +5174,7 @@ async function sendChat() {
     const chatPayload = {
       user_id: currentUser.id,
       nickname: nick,
-      verified_title: window._systemRankTitle || myVerifiedTitle || null,
+      verified_title: getDisplayVerifiedTitle(),
       monthly_badges: getActiveMonthlyBadges(),
       message: msg
     };
@@ -5210,14 +5221,14 @@ async function syncDailyVisitAndSystemTitle() {
     }, { onConflict:'user_id,visit_date' });
     await sb.rpc('refresh_monthly_rankings');
     await sb.rpc('refresh_all_time_rankings');
-    const { data } = await sb.from('user_system_titles')
-      .select('title,title_type,lottery_type,prize_rank,expires_at')
+    const { data } = await sb.from('tickets')
+      .select('lottery_type,result,prize_rank')
       .eq('user_id', currentUser.id)
-      .eq('active', true)
-      .order('prize_rank', { ascending:true })
-      .order('awarded_at', { ascending:false })
-      .limit(10);
-    window._systemRankTitle = computeBestTitle(data || []);
+      .in('prize_rank', [1,2]);
+    window._systemRankTitle = computeBestTitle((data || []).map(ticket => ({
+      lottery_type: ticket.lottery_type === 'pension' || ticket.result === 'pension' ? 'pension' : 'lotto',
+      prize_rank: ticket.prize_rank,
+    })));
     const periodKey = visitDate.slice(0, 7);
     const { data: monthlyRows } = await sb.from('ranking_snapshots')
       .select('ranking_type')
@@ -5234,11 +5245,11 @@ async function syncDailyVisitAndSystemTitle() {
         .single();
       if (!profileBadgeError && Array.isArray(profileBadgeData?.selected_rank_badges)) {
         window._selectedMonthlyRankBadges = profileBadgeData.selected_rank_badges
-          .filter(id => window._monthlyRankBadges.includes(id))
+          .filter(id => window._monthlyRankBadges.includes(id) && MONTHLY_BADGE_META[id])
           .slice(0, 1);
       } else if (Array.isArray(localSelected)) {
         window._selectedMonthlyRankBadges = localSelected
-          .filter(id => window._monthlyRankBadges.includes(id))
+          .filter(id => window._monthlyRankBadges.includes(id) && MONTHLY_BADGE_META[id])
           .slice(0, 1);
       }
     } catch (_) {}
@@ -5303,7 +5314,7 @@ async function loadUserDataFromDB() {
     // 닉네임: profiles DB 우선, 없으면 user_metadata, 없으면 이메일 앞
     const nick2 = profile?.nickname || currentUser?.user_metadata?.nickname || currentUser?.email?.split('@')[0] || '?';
     window._profileNickname = nick2;
-    updateHeaderUser(nick2, myVerifiedTitle || '');
+    updateHeaderUser(nick2, getDisplayVerifiedTitle() || '');
     updateBadgeUI();
     checkAndAwardBadges();
     updateDropdownStats();
@@ -5321,7 +5332,7 @@ async function loadUserDataFromDB() {
       }
     }
     window._attendanceStats = { total:visitDates.length, streak:visitStreak };
-    updateHeaderUser(nick2, window._systemRankTitle || myVerifiedTitle || '');
+    updateHeaderUser(nick2, getDisplayVerifiedTitle() || '');
   } catch (e) {
     console.warn('loadUserDataFromDB:', e.message);
   }
@@ -5640,7 +5651,7 @@ function go(id) {
   pg.classList.add('ui-motion-enter');
   const mBtn = $('m-' + id);
   if (mBtn) mBtn.classList.add('on');
-  ['home','result','ticket','stats','fortune','rank','map','community'].forEach(k => {
+  ['home','result','ticket','stats','fortune','lab','rank','map','community'].forEach(k => {
     const btn = $('mob-btn-' + k);
     if (btn) btn.classList.toggle('on', k === id);
   });
@@ -5649,6 +5660,7 @@ function go(id) {
     result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="qr-tab-register" class="qr-inner-tab on" onclick="switchQrView(\'register\')">QR 인증</button><button id="qr-tab-history" class="qr-inner-tab" onclick="switchQrView(\'history\')">번호 이력</button></div>',
     fortune:   `<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="fortune-tab-btn-radar" class="qr-inner-tab on" onclick="switchFortuneTab('radar')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('radar',13,'currentColor')} 레이더</button><button id="fortune-tab-btn-history" class="qr-inner-tab" onclick="switchFortuneTab('history')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('history',13,'currentColor')} 추천이력</button></div>`,
+    lab:       '<div class="qr-inner-tabs" style="grid-template-columns:repeat(4,1fr);width:100%;margin:0;"><button id="lab-tab-tax" class="qr-inner-tab on" onclick="switchLabTab(\'tax\')">실수령액 계산</button><button id="lab-tab-future" class="qr-inner-tab" onclick="switchLabTab(\'future\')">미래가치 시뮬</button><button id="lab-tab-reality" class="qr-inner-tab" onclick="switchLabTab(\'reality\')">현실자각</button><button id="lab-tab-history" class="qr-inner-tab" onclick="switchLabTab(\'history\')">번호 전적</button></div>',
     stats:     '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="stats-tab-all" class="qr-inner-tab on" onclick="setStatsLotteryMode(\'all\')">Total</button><button id="stats-tab-lotto" class="qr-inner-tab" onclick="setStatsLotteryMode(\'lotto\')">로또</button><button id="stats-tab-pension" class="qr-inner-tab" onclick="setStatsLotteryMode(\'pension\')">연금</button></div>',
     rank:      '<div class="rank-view-tabs" style="width:100%;margin-bottom:0;"><button id="rank-view-ranking" class="rank-view-btn on" onclick="setRankView(\'ranking\')">랭킹</button><button id="rank-view-hall" class="rank-view-btn" onclick="setRankView(\'hall\')">명예의 전당</button></div>',
     map:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 내 주변 판매점',
@@ -5659,7 +5671,7 @@ function go(id) {
   const mainLayout = $('main-content');
   if (mainLayout) mainLayout.dataset.activePage = id;
   // 페이지 타이틀 동적 업데이트
-  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', rank:'랭킹', map:'내 주변 판매점', profile:'내 프로필', home:'실시간 피드' };
+  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', rank:'랭킹', map:'내 주변 판매점', profile:'내 프로필', home:'실시간 피드', lab:'연구소', fortune:'레이더' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
@@ -5670,6 +5682,7 @@ function go(id) {
       if ($('pg-fortune')?.style.display !== 'none') renderFortune();
     });
   }
+  if (id === 'lab') renderLab();
   if (id === 'stats') {
     $('stats-content').innerHTML = '<div class="skel-card"><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div></div></div>';
     loadStatsView();
@@ -5796,6 +5809,144 @@ async function loadMyNumberStats() {
       <div style="font-size:10px;color:#94a3b8;margin-top:8px;text-align:center;">※ 실제 구매 QR 등록 기준 · 나만의 번호 선택 패턴</div>
     </div>`;
   } catch(e) { wrap.innerHTML = ''; }
+}
+
+let labTab = 'tax';
+function switchLabTab(tab) {
+  labTab = tab || 'tax';
+  ['tax','future','reality','history'].forEach(key => {
+    const btn = $('lab-tab-' + key);
+    if (btn) btn.classList.toggle('on', key === labTab);
+  });
+  renderLabBody();
+}
+function calcTakeHomePrize(amount) {
+  amount = Math.max(0, Number(amount) || 0);
+  if (amount <= 2000000) return { tax:0, net:amount, rate:0 };
+  const rate = amount <= 300000000 ? 0.22 : 0.33;
+  return { tax:Math.floor(amount * rate), net:Math.floor(amount * (1 - rate)), rate };
+}
+function renderLab() {
+  const wrap = $('lab-content');
+  if (!wrap) return;
+  wrap.innerHTML = `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
+    <div style="font-size:9px;color:var(--lotto-red);font-weight:900;letter-spacing:1.5px;margin-bottom:3px;">LOTTOBANK LAB</div>
+    <div style="font-size:18px;font-weight:900;color:var(--text-dark);">연구소</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.6;">세금, 복리, 확률, 번호 이력을 로그인 없이 바로 계산해보세요.</div>
+  </div><div id="lab-body"></div>`;
+  switchLabTab(labTab || 'tax');
+}
+function labCard(title, body) {
+  return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">${title ? `<div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">${title}</div>` : ''}${body}</div>`;
+}
+function renderLabBody() {
+  const body = $('lab-body');
+  if (!body) return;
+  if (labTab === 'tax') {
+    body.innerHTML = labCard('실수령액 계산기', `<div style="display:grid;grid-template-columns:1fr 120px;gap:8px;margin-bottom:10px;">
+      <input id="lab-tax-amount" class="input-custom" type="number" value="2000000000" min="0" step="10000" oninput="updateLabTax()" placeholder="당첨금 입력">
+      <select id="lab-tax-type" class="input-custom" onchange="updateLabTax()"><option value="lotto">로또</option><option value="pension">연금 1등</option></select>
+    </div><div id="lab-tax-result"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;">
+      <button class="qr-inner-tab" onclick="$('lab-tax-amount').value=50000;updateLabTax()">5만원</button>
+      <button class="qr-inner-tab" onclick="$('lab-tax-amount').value=300000000;updateLabTax()">3억원</button>
+      <button class="qr-inner-tab" onclick="$('lab-tax-type').value='pension';updateLabTax()">연금 1등</button>
+    </div>`);
+    updateLabTax();
+    return;
+  }
+  if (labTab === 'future') {
+    body.innerHTML = labCard('미래가치 시뮬레이터', `<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">연금복권 5개 조 세트 당첨 기준, 세후 월 858만원을 20년간 받는 상황입니다.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <label style="font-size:11px;font-weight:800;color:var(--text-dark);">월 저축/투자액<input id="lab-future-save" class="input-custom" type="number" value="8580000" oninput="updateLabFuture()" style="margin-top:5px;"></label>
+      <label style="font-size:11px;font-weight:800;color:var(--text-dark);">예상 연수익률 %<input id="lab-future-rate" class="input-custom" type="number" value="5" step="0.1" oninput="updateLabFuture()" style="margin-top:5px;"></label>
+    </div><div id="lab-future-result"></div>`);
+    updateLabFuture();
+    return;
+  }
+  if (labTab === 'reality') {
+    body.innerHTML = labCard('현실 자각 시뮬레이터', `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <label style="font-size:11px;font-weight:800;color:var(--text-dark);">매주 구매 금액<input id="lab-real-weekly" class="input-custom" type="number" value="10000" step="1000" style="margin-top:5px;"></label>
+      <label style="font-size:11px;font-weight:800;color:var(--text-dark);">반복 기간<input id="lab-real-years" class="input-custom" type="number" value="10" min="1" max="50" style="margin-top:5px;"></label>
+    </div><button class="btn-action" style="width:100%;background:var(--lotto-red);" onclick="runLabReality()">1초 모의 추첨 실행</button><div id="lab-reality-result" style="margin-top:10px;"></div>`);
+    runLabReality();
+    return;
+  }
+  body.innerHTML = labCard('최애 번호 전적 조회기', `<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:10px;">
+    ${Array.from({length:6},(_,i)=>`<input id="lab-num-${i}" class="input-custom" type="number" min="1" max="45" value="${[3,8,14,22,31,45][i]}" oninput="updateLabHistory()" style="text-align:center;padding:9px 4px;">`).join('')}
+  </div><button class="btn-action" style="width:100%;background:var(--lotto-red);" onclick="updateLabHistory()">번호 전적 조회</button><div id="lab-history-result" style="margin-top:10px;"></div>`);
+  updateLabHistory();
+}
+function updateLabTax() {
+  const amountInput = $('lab-tax-amount');
+  const result = $('lab-tax-result');
+  if (!amountInput || !result) return;
+  if ($('lab-tax-type')?.value === 'pension') amountInput.value = 7000000;
+  const amount = Number(amountInput.value || 0);
+  const calc = calcTakeHomePrize(amount);
+  result.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+    <div class="kpi-box"><div class="kpi-label">세전 당첨금</div><div class="kpi-value" style="font-size:18px;">${fmtMFull(amount)}</div></div>
+    <div class="kpi-box"><div class="kpi-label">예상 세금</div><div class="kpi-value" style="font-size:18px;color:#dc2626;">${fmtMFull(calc.tax)}</div><div class="kpi-sub">${Math.round(calc.rate*100)}%</div></div>
+    <div class="kpi-box"><div class="kpi-label">실수령액</div><div class="kpi-value" style="font-size:18px;color:#059669;">${fmtMFull(calc.net)}</div></div>
+  </div>${$('lab-tax-type')?.value === 'pension' ? `<div style="margin-top:10px;padding:12px;border-radius:8px;background:#ecfdf5;border:1px solid #86efac;color:#047857;font-size:13px;font-weight:900;">연금복권 1등은 세후 월 546만원, 20년간 수령 기준입니다.<br><span style="font-size:11px;color:#64748b;">직장인 연봉 환산 시 세전 약 9,000만원 수준입니다.</span></div>` : ''}`;
+}
+function updateLabFuture() {
+  const monthly = Math.max(0, Number($('lab-future-save')?.value || 0));
+  const annual = Math.max(0, Number($('lab-future-rate')?.value || 0)) / 100;
+  const monthRate = Math.pow(1 + annual, 1 / 12) - 1;
+  let total = 0;
+  for (let i=0;i<240;i++) total = (total + monthly) * (1 + monthRate);
+  const principal = monthly * 240;
+  const pct = total ? Math.min(100, principal / total * 100) : 0;
+  $('lab-future-result').innerHTML = `<div class="kpi-box" style="margin-bottom:10px;"><div class="kpi-label">20년 뒤 예상 자산</div><div class="kpi-value" style="font-size:24px;color:#059669;">${fmtMFull(total)}</div><div class="kpi-sub">원금 ${fmtMFull(principal)} · 복리 수익 ${fmtMFull(total-principal)}</div></div>
+    <div style="height:18px;border-radius:999px;background:#dcfce7;overflow:hidden;"><div style="height:100%;width:${pct}%;background:#10b981;"></div></div>`;
+}
+function runLabReality() {
+  const weekly = Math.max(0, Number($('lab-real-weekly')?.value || 0));
+  const years = Math.max(1, Number($('lab-real-years')?.value || 1));
+  const games = Math.min(200000, Math.floor(weekly / 1000) * Math.floor(years * 52));
+  const counts = {1:0,2:0,3:0,4:0,5:0};
+  for (let i=0;i<games;i++) {
+    const r = Math.random();
+    if (r < 1/8145060) counts[1]++;
+    else if (r < 1/1357510) counts[2]++;
+    else if (r < 1/35724) counts[3]++;
+    else if (r < 1/733) counts[4]++;
+    else if (r < 1/45) counts[5]++;
+  }
+  const prize = counts[1]*2000000000 + counts[2]*50000000 + counts[3]*1500000 + counts[4]*50000 + counts[5]*5000;
+  const spent = games * 1000;
+  const roi = spent ? ((prize - spent) / spent * 100) : 0;
+  $('lab-reality-result').innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+    <div class="kpi-box"><div class="kpi-label">총 투자금</div><div class="kpi-value" style="font-size:17px;">${fmtMFull(spent)}</div></div>
+    <div class="kpi-box"><div class="kpi-label">총 당첨금</div><div class="kpi-value" style="font-size:17px;color:#059669;">${fmtMFull(prize)}</div></div>
+    <div class="kpi-box"><div class="kpi-label">수익률</div><div class="kpi-value" style="font-size:17px;color:${roi>=0?'#059669':'#dc2626'};">${roi.toFixed(1)}%</div></div>
+  </div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">${[1,2,3,4,5].map(r=>`<div style="text-align:center;background:var(--bg-light);border-radius:7px;padding:8px 4px;"><div style="font-size:10px;color:var(--text-muted);font-weight:800;">${r}등</div><div style="font-size:15px;font-weight:900;">${counts[r]}회</div></div>`).join('')}</div>`;
+}
+function updateLabHistory() {
+  const nums = Array.from({length:6},(_,i)=>Number($(`lab-num-${i}`)?.value || 0)).filter(n=>n>=1&&n<=45);
+  const result = $('lab-history-result');
+  if (!result) return;
+  if (new Set(nums).size !== 6) {
+    result.innerHTML = `<div style="padding:16px;text-align:center;color:#dc2626;font-size:12px;">서로 다른 번호 6개를 입력해주세요.</div>`;
+    return;
+  }
+  let best = 0, prize = 0, matches = [];
+  Object.values(recentData || {}).forEach(draw => {
+    if (!draw?.nums) return;
+    const hit = nums.filter(n => draw.nums.includes(n)).length;
+    const bonus = nums.includes(draw.bonus);
+    let rank = 0, pay = 0;
+    if (hit === 6) { rank = 1; pay = 2000000000; }
+    else if (hit === 5 && bonus) { rank = 2; pay = 50000000; }
+    else if (hit === 5) { rank = 3; pay = 1500000; }
+    else if (hit === 4) { rank = 4; pay = 50000; }
+    else if (hit === 3) { rank = 5; pay = 5000; }
+    if (rank) { best = best ? Math.min(best, rank) : rank; prize += pay; matches.push({round:draw.round, rank, pay}); }
+  });
+  const title = !best ? '본전도 못 찾은 번호' : best <= 2 ? '조상님이 도운 번호' : best <= 4 ? '감이 살아있는 번호' : '소소하게 웃은 번호';
+  result.innerHTML = `<div class="kpi-box" style="margin-bottom:10px;"><div class="kpi-label">${title}</div><div class="kpi-value" style="font-size:22px;">${best ? best + '등' : '-'}</div><div class="kpi-sub">보유 당첨번호 데이터 ${Object.keys(recentData||{}).length}회차 기준 · 누적 ${fmtMFull(prize)}</div></div>
+    ${matches.slice(0,5).map(item=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--border-dashed);font-size:12px;"><b>${item.round}회</b><span>${item.rank}등 · ${fmtMFull(item.pay)}</span></div>`).join('') || '<div style="padding:12px;text-align:center;color:var(--text-muted);font-size:12px;">일치 이력이 없습니다.</div>'}`;
 }
 
 // ── QR 입력 미리보기 ──
@@ -9432,7 +9583,7 @@ async function changeNickname() {
     await sb.auth.updateUser({ data: { nickname: newNick } });
     // 3) 헤더 & 드롭다운 즉시 반영
     currentUser.user_metadata = { ...(currentUser.user_metadata || {}), nickname: newNick };
-    updateHeaderUser(newNick, myVerifiedTitle || '');
+    updateHeaderUser(newNick, getDisplayVerifiedTitle() || '');
     toast('✅ 닉네임이 변경되었습니다');
     renderProfile();
   } catch(e) {
@@ -9479,7 +9630,7 @@ async function toggleProfileRankBadge(id) {
     }
   }
   window._rankBadgePickerOpen = true;
-  updateHeaderUser(currentNickname(), window._systemRankTitle || myVerifiedTitle || '');
+  updateHeaderUser(currentNickname(), getDisplayVerifiedTitle() || '');
   renderProfile();
 }
 
@@ -9489,7 +9640,7 @@ function renderProfile() {
   const qrCount = usedQrKeys.length;
   const earnedCount = BADGE_DEFS.filter(b => b.cond()).length;
   const email = currentUser?.email || '-';
-  const earnedRankBadges = window._monthlyRankBadges || [];
+  const earnedRankBadges = (window._monthlyRankBadges || []).filter(id => MONTHLY_BADGE_META[id]);
   const selectedRankBadges = getActiveMonthlyBadges();
   $('profile-content').innerHTML = `
     <div class="profile-hero">
@@ -9502,11 +9653,11 @@ function renderProfile() {
         <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
           ${earnedRankBadges.length ? earnedRankBadges.map(id => {
             const meta = MONTHLY_BADGE_META[id];
-            return meta ? `<button class="profile-badge-choice ${selectedRankBadges.includes(id)?'on':''}" onclick="toggleProfileRankBadge('${id}')">${meta.icon} ${meta.label}</button>` : '';
+            return meta ? `<button class="profile-badge-choice ${selectedRankBadges.includes(id)?'on':''}" onclick="toggleProfileRankBadge('${id}')">${rankingCategoryIcon(id,13)} ${meta.label}</button>` : '';
           }).join('') : '<span style="font-size:11px;color:var(--text-muted);">월간 1위 뱃지를 획득하면 설정할 수 있습니다.</span>'}
         </div>
       </div>
-      <div class="profile-nick identity-line">${getIdentityHtml(window._systemRankTitle || myVerifiedTitle, selectedRankBadges, nick)}</div>
+      <div class="profile-nick identity-line">${getIdentityHtml(getDisplayVerifiedTitle(), selectedRankBadges, nick)}</div>
       <div class="profile-sub-text">LottoBank 회원</div>
     </div>
     <div class="profile-stats-strip">
