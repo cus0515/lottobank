@@ -3440,12 +3440,14 @@ let penCurrentIdx = 0;
 async function initPensionTab() {
   const sel = $('pen-sel');
   if (!sel) return;
-  if (penRounds.length > 0) { _updatePenBtns(); loadPensionResult(); return; }
-  // 연금복권 720+ 1회: 2020-05-07 (목요일) 기준 매주 목요일 추첨
+  // 날짜 기반 최신 회차 계산 (매주 목요일)
   const base = new Date('2020-05-07');
   const now = new Date();
   const weeks = Math.floor((now - base) / (7 * 24 * 3600 * 1000));
-  let latest = weeks + 1;
+  let calcLatest = weeks + 1;
+  // 이미 초기화된 경우: 계산 회차 이상이면 캐시 재사용, 아니면 새 회차 감지해 재초기화
+  if (penRounds.length > 0 && penRounds[0] >= calcLatest) { _updatePenBtns(); loadPensionResult(); return; }
+  let latest = calcLatest;
   // 실제 API로 최신 회차 검증 (최대 2회차 뒤로)
   for (let r = latest; r >= latest - 2; r--) {
     try {
