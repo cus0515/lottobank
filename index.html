@@ -3451,7 +3451,7 @@ async function initPensionTab() {
   // 실제 API로 최신 회차 검증 (최대 2회차 뒤로)
   for (let r = latest; r >= latest - 2; r--) {
     try {
-      const res = await fetch(`/api/pension?round=${r}`);
+      const res = await fetch(`/api/pension?round=${r}`, {cache:'no-store'});
       const d = await res.json();
       if (d.returnValue === 'success') { latest = r; break; }
     } catch(_) {}
