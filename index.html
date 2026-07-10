@@ -5672,7 +5672,7 @@ function go(id) {
     result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="qr-tab-register" class="qr-inner-tab on" onclick="switchQrView(\'register\')">QR 인증</button><button id="qr-tab-history" class="qr-inner-tab" onclick="switchQrView(\'history\')">번호 이력</button></div>',
     fortune:   `<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="fortune-tab-btn-radar" class="qr-inner-tab on" onclick="switchFortuneTab('radar')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('radar',13,'currentColor')} 레이더</button><button id="fortune-tab-btn-history" class="qr-inner-tab" onclick="switchFortuneTab('history')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('history',13,'currentColor')} 추천이력</button></div>`,
-    lab:       '<div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);width:100%;margin:0;"><button id="lab-tab-backtest" class="qr-inner-tab on" onclick="switchLabTab(\'backtest\')">복권 백테스터</button><button id="lab-tab-tax" class="qr-inner-tab" onclick="switchLabTab(\'tax\')">세금 계산기</button></div>',
+    lab:       '<div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);width:100%;margin:0;"><button id="lab-tab-backtest" class="qr-inner-tab on" onclick="switchLabTab(\'backtest\')">복권 백테스터</button><button id="lab-tab-vault" class="qr-inner-tab" onclick="switchLabTab(\'vault\')">번호 저장고</button></div>',
     stats:     '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="stats-tab-all" class="qr-inner-tab on" onclick="setStatsLotteryMode(\'all\')">Total</button><button id="stats-tab-lotto" class="qr-inner-tab" onclick="setStatsLotteryMode(\'lotto\')">로또</button><button id="stats-tab-pension" class="qr-inner-tab" onclick="setStatsLotteryMode(\'pension\')">연금</button></div>',
     rank:      '<div class="rank-view-tabs" style="width:100%;margin-bottom:0;"><button id="rank-view-ranking" class="rank-view-btn on" onclick="setRankView(\'ranking\')">랭킹</button><button id="rank-view-hall" class="rank-view-btn" onclick="setRankView(\'hall\')">명예의 전당</button></div>',
     map:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 내 주변 판매점',
@@ -5825,22 +5825,17 @@ async function loadMyNumberStats() {
 
 let labTab = 'backtest';
 let labBackType = 'lotto';
+let labVaultView = 'lotto';
 let labLottoPick = [];
 let labPensionGroup = 1;
 let labPensionDigits = ['','','','','',''];
 const LAB_VAULT_KEY = 'lottobank_lab_saved_numbers_v1';
+const LAB_QUERY_KEY = 'lottobank_lab_backtest_queries_v1';
 
 function switchLabTab(tab) {
   labTab = tab || 'backtest';
-  ['backtest','tax'].forEach(key => $('lab-tab-' + key)?.classList.toggle('on', key === labTab));
+  ['backtest','vault'].forEach(key => $('lab-tab-' + key)?.classList.toggle('on', key === labTab));
   renderLabBody();
-}
-
-function calcTakeHomePrize(amount) {
-  amount = Math.max(0, Number(amount) || 0);
-  if (amount <= 2000000) return { tax:0, net:amount, rate:0 };
-  const rate = amount <= 300000000 ? 0.22 : 0.33;
-  return { tax:Math.floor(amount * rate), net:Math.floor(amount * (1 - rate)), rate };
 }
 
 function renderLab() {
@@ -5858,33 +5853,65 @@ function labCard(title, body) {
   return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">${title ? `<div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">${title}</div>` : ''}${body}</div>`;
 }
 
-function labMoneyBox(label, value, color='var(--text-dark)', sub='') {
-  return `<div class="kpi-box" style="min-width:0;"><div class="kpi-label">${label}</div><div class="kpi-value" style="font-size:clamp(16px,2.1vw,22px);line-height:1.15;color:${color};overflow-wrap:anywhere;">${value}</div>${sub ? `<div class="kpi-sub">${sub}</div>` : ''}</div>`;
+function isLabPremiumUser() {
+  return window._isPremiumUser === true || window._membership === 'premium';
+}
+
+function getLabQueryRound(type) {
+  return type === 'pension' ? (window._latestPenRound || 321) : (latestRound || getLatestRound());
+}
+
+function getLabQueryState() {
+  try { return JSON.parse(localStorage.getItem(LAB_QUERY_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function setLabQueryState(state) {
+  localStorage.setItem(LAB_QUERY_KEY, JSON.stringify(state));
+}
+
+function consumeLabQuery(type) {
+  const round = getLabQueryRound(type);
+  if (isLabPremiumUser()) return { ok:true, round, left:'무제한' };
+  const state = getLabQueryState();
+  const key = `${type}:${round}`;
+  const used = Number(state[key] || 0);
+  if (used >= 5) return { ok:false, round, left:0 };
+  state[key] = used + 1;
+  setLabQueryState(state);
+  return { ok:true, round, left:5 - state[key] };
+}
+
+function labQueryUsageLabel(type) {
+  if (isLabPremiumUser()) return '프리미엄 무제한 조회';
+  const round = getLabQueryRound(type);
+  const used = Number(getLabQueryState()[`${type}:${round}`] || 0);
+  return `무료 조회 ${Math.min(used,5)}/5 · ${round}회차 기준`;
 }
 
 function renderLabBody() {
   const body = $('lab-body');
   if (!body) return;
-  body.innerHTML = labTab === 'tax' ? renderLabTax() : renderLabBacktester();
-  if (labTab === 'tax') updateLabTax();
-  else {
-    renderLabBackType();
-    renderLabVault();
-  }
+  body.innerHTML = labTab === 'vault' ? renderLabVaultPage() : renderLabBacktester();
+  if (labTab === 'vault') renderLabVault();
+  else renderLabBackType();
 }
 
 function renderLabBacktester() {
   return `${labCard('복권 백테스터', `<div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 12px;">
     <button id="lab-back-lotto" class="qr-inner-tab ${labBackType==='lotto'?'on':''}" onclick="switchLabBackType('lotto')">로또 6/45</button>
     <button id="lab-back-pension" class="qr-inner-tab ${labBackType==='pension'?'on':''}" onclick="switchLabBackType('pension')">연금 720+</button>
-  </div><div id="lab-back-body"></div>`)}
-  ${labCard('스마트 번호 저장고', `<div id="lab-vault"></div>`)}`;
+  </div><div id="lab-back-body"></div>`)}`;
+}
+
+function renderLabVaultPage() {
+  return labCard('번호 저장고', `<div id="lab-vault"></div>`);
 }
 
 function switchLabBackType(type) {
   labBackType = type === 'pension' ? 'pension' : 'lotto';
+  labVaultView = labBackType;
   renderLabBackType();
-  renderLabVault();
 }
 
 function renderLabBackType() {
@@ -5897,14 +5924,34 @@ function renderLabBackType() {
 
 function renderLabLottoMarker() {
   const picked = new Set(labLottoPick);
-  return `<div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">번호 6개를 마킹하면 추가 선택이 잠깁니다.</div>
-  <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-bottom:12px;">
-    ${Array.from({length:45},(_,i)=>i+1).map(n=>`<button type="button" onclick="toggleLabLotto(${n})" style="height:38px;border-radius:7px;border:1px solid ${picked.has(n)?'#0f172a':'var(--border-dashed)'};background:${picked.has(n)?'linear-gradient(135deg,#0f172a,#16a34a)':'var(--paper-white)'};color:${picked.has(n)?'#fff':'var(--text-dark)'};font-size:13px;font-weight:900;cursor:pointer;font-family:inherit;">${String(n).padStart(2,'0')}</button>`).join('')}
+  const targetRound = latestRound ? latestRound + 1 : getLatestRound();
+  return `<div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">번호 6개를 컴퓨터용 사인펜처럼 마킹하세요. 역대 전적 조회는 무료 기준 회차당 5회까지 가능합니다.</div>
+  <div style="max-width:520px;margin:0 auto 12px;background:#fffdfb;border:1.5px solid #fb7185;border-radius:4px;box-shadow:0 3px 12px rgba(15,23,42,.08);padding:12px;color:#e11d48;">
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+      <div style="writing-mode:vertical-rl;text-orientation:mixed;font-size:20px;font-weight:900;line-height:1;color:#e11d48;">Lotto 6/45</div>
+      <div style="flex:1;border:1.5px solid #fb7185;border-radius:2px;padding:8px;background:#fff;">
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #fb7185;margin-bottom:8px;padding-bottom:5px;">
+          <b style="font-size:16px;color:#e11d48;">A</b>
+          <span style="font-size:11px;font-weight:900;">1,000원</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;">
+          ${Array.from({length:45},(_,i)=>i+1).map(n=>`<button type="button" onclick="toggleLabLotto(${n})" title="${n}번" style="position:relative;height:30px;border:1px solid #fecdd3;border-radius:4px;background:#fff;color:#e11d48;font-size:11px;font-weight:900;cursor:pointer;font-family:inherit;overflow:hidden;">
+            ${picked.has(n)?'<span style="position:absolute;inset:4px;border-radius:999px;background:#111827;box-shadow:inset 0 0 0 2px rgba(255,255,255,.12),0 0 0 1px rgba(17,24,39,.3);"></span>':''}
+            <span style="position:relative;z-index:1;color:${picked.has(n)?'#fff':'#e11d48'};">${String(n).padStart(2,'0')}</span>
+          </button>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 130px;gap:8px;align-items:center;">
+      <div style="font-size:11px;font-weight:800;color:#e11d48;">선택 번호 ${labLottoPick.length}/6 · ${labLottoPick.map(n=>String(n).padStart(2,'0')).join(' · ') || '마킹 대기'}</div>
+      <input id="lab-save-round" class="input-custom" type="number" value="${targetRound}" min="1" style="height:34px;text-align:center;border-color:#fb7185;color:#e11d48;font-weight:900;" title="저장 회차">
+    </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
     <button class="btn-action" style="background:var(--lotto-red);" onclick="runLabLottoBacktest()">역대 전적 조회</button>
-    <button class="qr-inner-tab" onclick="saveLabNumber()">현재 번호 저장하기</button>
+    <button class="qr-inner-tab" onclick="saveLabNumber()">이 회차 번호 저장</button>
   </div>
+  <div style="font-size:10px;color:var(--text-muted);text-align:right;margin:-4px 0 8px;">${labQueryUsageLabel('lotto')}</div>
   <div id="lab-back-result"></div>`;
 }
 
@@ -5916,7 +5963,7 @@ function toggleLabLotto(n) {
 }
 
 function renderLabPensionMarker() {
-  return `<div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">조를 선택하고 6자리 번호를 각 자리별로 마킹하세요.</div>
+  return `<div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">조를 선택하고 6자리 번호를 각 자리별로 마킹하세요. 역대 전적 조회는 무료 기준 회차당 5회까지 가능합니다.</div>
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px;">
     ${[1,2,3,4,5].map(g=>`<button type="button" onclick="setLabPensionGroup(${g})" class="qr-inner-tab ${labPensionGroup===g?'on':''}" style="${labPensionGroup===g?'background:#16a34a;border-color:#16a34a;color:#fff;':''}">${g}조</button>`).join('')}
   </div>
@@ -5930,6 +5977,7 @@ function renderLabPensionMarker() {
     <button class="btn-action" style="background:#16a34a;" onclick="runLabPensionBacktest()">역대 전적 조회</button>
     <button class="qr-inner-tab" onclick="saveLabNumber()">현재 번호 저장하기</button>
   </div>
+  <div style="font-size:10px;color:var(--text-muted);text-align:right;margin:-4px 0 8px;">${labQueryUsageLabel('pension')}</div>
   <div id="lab-back-result"></div>`;
 }
 
@@ -5955,13 +6003,14 @@ function setLabVault(vault) {
 function saveLabNumber() {
   const vault = getLabVault();
   const type = labBackType;
-  if ((vault[type] || []).length >= 5) {
-    alert('🔮 무료 등급에서는 최대 5개까지 번호를 보관할 수 있습니다. 로또뱅크 정식 앱 출시 후 프리미엄 멤버십(월 390원)을 이용하시면 제한 없는 무제한 저장고가 열립니다!');
-    return;
-  }
   if (type === 'lotto') {
     if (labLottoPick.length !== 6) { toast('번호 6개를 먼저 선택해주세요'); return; }
-    vault.lotto.push({ nums:[...labLottoPick], date:new Date().toLocaleDateString('ko-KR') });
+    const round = Math.max(1, Number($('lab-save-round')?.value || (latestRound ? latestRound + 1 : getLatestRound())));
+    if (vault.lotto.some(item => Number(item.round) === round)) {
+      alert('이미 저장된 회차입니다. 무료 저장고는 회차 기준으로 보관되며 삭제는 프리미엄 기능에서 제공됩니다.');
+      return;
+    }
+    vault.lotto.push({ round, nums:[...labLottoPick], date:new Date().toLocaleDateString('ko-KR') });
   } else {
     if (labPensionDigits.some(v => v === '')) { toast('연금 번호 6자리를 모두 선택해주세요'); return; }
     vault.pension.push({ jo:labPensionGroup, no:labPensionDigits.join(''), date:new Date().toLocaleDateString('ko-KR') });
@@ -5977,14 +6026,13 @@ function loadLabSaved(type, index) {
   if (type === 'lotto') labLottoPick = [...item.nums];
   else { labPensionGroup = Number(item.jo); labPensionDigits = String(item.no).padStart(6,'0').split(''); }
   labBackType = type;
+  labVaultView = type;
   renderLabBackType();
   renderLabVault();
 }
 
-function deleteLabSaved(type, index) {
-  const vault = getLabVault();
-  vault[type].splice(index, 1);
-  setLabVault(vault);
+function switchLabVault(type) {
+  labVaultView = type === 'pension' ? 'pension' : 'lotto';
   renderLabVault();
 }
 
@@ -5992,15 +6040,36 @@ function renderLabVault() {
   const wrap = $('lab-vault');
   if (!wrap) return;
   const vault = getLabVault();
-  const renderList = (type, rows) => rows.length ? rows.map((item,i)=>`<div style="display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--border-dashed);font-size:12px;">
-    <b>${type==='lotto' ? item.nums.map(n=>String(n).padStart(2,'0')).join(' · ') : `${item.jo}조 ${String(item.no).padStart(6,'0')}`}</b>
-    <button class="qr-inner-tab" style="min-height:28px;padding:4px 8px;" onclick="loadLabSaved('${type}',${i})">불러오기</button>
-    <button class="qr-inner-tab" style="min-height:28px;padding:4px 8px;color:#dc2626;" onclick="deleteLabSaved('${type}',${i})">삭제</button>
-  </div>`).join('') : '<div style="padding:12px;text-align:center;color:var(--text-muted);font-size:11px;">저장된 번호가 없습니다.</div>';
-  wrap.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-    <div><div style="font-size:12px;font-weight:900;margin-bottom:6px;">로또 보관함 <span style="color:var(--text-muted);font-size:10px;">${vault.lotto.length}/5</span></div>${renderList('lotto', vault.lotto)}</div>
-    <div><div style="font-size:12px;font-weight:900;margin-bottom:6px;">연금 보관함 <span style="color:var(--text-muted);font-size:10px;">${vault.pension.length}/5</span></div>${renderList('pension', vault.pension)}</div>
-  </div>`;
+  const rows = vault[labVaultView] || [];
+  const renderSlip = (item, i) => labVaultView === 'lotto'
+    ? `<div class="ticket-slip">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111827;padding-bottom:8px;margin-bottom:4px;">
+          <div><b style="font-size:22px;">Lotto <small>6/45</small></b><div style="font-size:11px;color:#64748b;margin-top:2px;">제 ${item.round || '-'}회</div></div>
+          <div style="text-align:right;"><span style="font-size:11px;color:#64748b;">1게임</span><br><b style="font-size:15px;">1,000원</b></div>
+        </div>
+        <div class="ticket-slip-games">
+          <div class="ticket-slip-game" style="grid-template-columns:20px minmax(0,1fr);">
+            <b class="ticket-game-label">A</b><div class="ticket-slip-nums">${(item.nums||[]).map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>
+          </div>
+        </div>
+        <button class="qr-inner-tab" style="width:100%;margin-top:10px;min-height:34px;" onclick="loadLabSaved('lotto',${i})">이 번호 불러오기</button>
+      </div>`
+    : `<div class="ticket-slip pension">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2f855a;padding-bottom:8px;margin-bottom:12px;">
+          <div><b style="font-size:22px;">연금복권 <span style="color:#22a55b;">720+</span></b><div style="font-size:11px;color:#64748b;margin-top:2px;">저장 번호</div></div>
+          <b style="font-size:14px;">1,000원</b>
+        </div>
+        <div class="pension-ticket-row" style="grid-template-columns:minmax(0,1fr);border-bottom:0;">
+          <div class="pension-ticket-numbers"><span style="background:#22a55b;color:#fff;border-radius:5px;padding:7px 9px;font-weight:900;">${item.jo}조</span>${String(item.no).padStart(6,'0').split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('')}</div>
+        </div>
+        <button class="qr-inner-tab" style="width:100%;margin-top:10px;min-height:34px;" onclick="loadLabSaved('pension',${i})">이 번호 불러오기</button>
+      </div>`;
+  wrap.innerHTML = `<div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 10px;">
+    <button class="qr-inner-tab ${labVaultView==='lotto'?'on':''}" onclick="switchLabVault('lotto')">로또 저장고 ${vault.lotto.length}</button>
+    <button class="qr-inner-tab ${labVaultView==='pension'?'on':''}" onclick="switchLabVault('pension')">연금 저장고 ${vault.pension.length}</button>
+  </div>
+  <div style="font-size:10px;color:var(--text-muted);line-height:1.5;margin-bottom:8px;">저장한 번호는 연구소에서 다시 불러올 수 있습니다. 역대 전적 조회 제한은 저장고가 아니라 조회 실행 횟수 기준입니다.</div>
+  ${rows.length ? rows.map(renderSlip).join('') : '<div style="padding:18px;text-align:center;color:var(--text-muted);font-size:11px;border:1px dashed var(--border-dashed);border-radius:8px;">저장된 번호가 없습니다.</div>'}`;
 }
 
 function labLottoRank(hit, bonus) {
@@ -6016,6 +6085,11 @@ async function runLabLottoBacktest() {
   const result = $('lab-back-result');
   if (labLottoPick.length !== 6) { result.innerHTML = '<div style="padding:14px;text-align:center;color:#dc2626;font-size:12px;">번호 6개를 먼저 선택해주세요.</div>'; return; }
   const latest = latestRound || getLatestRound();
+  const allowance = consumeLabQuery('lotto');
+  if (!allowance.ok) {
+    result.innerHTML = `<div style="padding:16px;text-align:center;color:#dc2626;font-size:12px;border:1px solid #fecdd3;border-radius:8px;background:#fff1f2;">무료 조회 5회를 모두 사용했습니다.<br>로또 회차가 변경되면 다시 5회 조회할 수 있고, 프리미엄은 무제한 조회가 제공됩니다.</div>`;
+    return;
+  }
   result.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-muted);font-size:12px;">로또 6/45 제 ${latest}회부터 1회까지 조회 중입니다...</div>`;
   for (let start = latest; start >= 1; start -= 20) {
     const batch = [];
@@ -6066,6 +6140,11 @@ async function runLabPensionBacktest() {
   const result = $('lab-back-result');
   if (labPensionDigits.some(v => v === '')) { result.innerHTML = '<div style="padding:14px;text-align:center;color:#dc2626;font-size:12px;">연금 번호 6자리를 모두 선택해주세요.</div>'; return; }
   const latest = window._latestPenRound || 321;
+  const allowance = consumeLabQuery('pension');
+  if (!allowance.ok) {
+    result.innerHTML = `<div style="padding:16px;text-align:center;color:#dc2626;font-size:12px;border:1px solid #bbf7d0;border-radius:8px;background:#f0fdf4;">무료 조회 5회를 모두 사용했습니다.<br>연금 회차가 변경되면 다시 5회 조회할 수 있고, 프리미엄은 무제한 조회가 제공됩니다.</div>`;
+    return;
+  }
   const userNo = labPensionDigits.join('');
   result.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-muted);font-size:12px;">연금 720+ 제 ${latest}회부터 1회까지 조회 중입니다...</div>`;
   const rows = [];
@@ -6096,43 +6175,6 @@ function renderLabResultList(title, rows, totalRounds) {
       <b>${row.round}회차</b><span style="font-weight:900;color:${row.rank<=2?'var(--lotto-red)':'var(--text-dark)'};">${row.label} <em style="font-style:normal;color:var(--text-muted);font-weight:700;">(${row.hit}${row.bonus?'+보너스':''})</em></span><strong>${fmtMFull(row.pay)}</strong>
     </div>`).join('')}</div>` : `<div style="padding:22px 12px;text-align:center;color:var(--text-muted);font-size:12px;">당첨 이력이 없습니다.</div>`}
   </div>`;
-}
-
-function renderLabTax() {
-  return labCard('당첨금 세금 계산기', `<div style="display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:8px;margin-bottom:10px;">
-    <input id="lab-tax-amount" class="input-custom" type="number" value="2000000000" min="0" step="10000" oninput="updateLabTax()" placeholder="당첨금 입력">
-    <select id="lab-tax-type" class="input-custom" onchange="updateLabTax()"><option value="lotto">로또 직접 입력</option><option value="pension1">연금 1등 월 700만원</option><option value="pension2">연금 2등·보너스 월 100만원</option></select>
-  </div><div id="lab-tax-result"></div>`);
-}
-
-function updateLabTax() {
-  const result = $('lab-tax-result');
-  const type = $('lab-tax-type')?.value || 'lotto';
-  const amountInput = $('lab-tax-amount');
-  if (!result || !amountInput) return;
-  if (type === 'pension1') amountInput.value = 7000000;
-  if (type === 'pension2') amountInput.value = 1000000;
-  const amount = Number(amountInput.value || 0);
-  const calc = calcTakeHomePrize(amount);
-  if (type === 'pension1' || type === 'pension2') {
-    const years = type === 'pension1' ? 20 : 10;
-    const months = years * 12;
-    const tip = type === 'pension1'
-      ? '1등은 월 700만원이 200만원을 초과해 22% 세금이 적용됩니다.'
-      : '2등과 보너스등은 월 100만원이라 200만원 이하 비과세로 전액 수령합니다.';
-    result.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
-      ${labMoneyBox('매월 실수령액', fmtMFull(calc.net), '#059669', `${years}년간 지급`)}
-      ${labMoneyBox('매월 세금', fmtMFull(calc.tax), '#dc2626', `${Math.round(calc.rate*100)}% 적용`)}
-      ${labMoneyBox('총 실수령액', fmtMFull(calc.net * months), '#059669')}
-      ${labMoneyBox('총 세금', fmtMFull(calc.tax * months), '#dc2626')}
-    </div><div style="margin-top:10px;padding:12px;border-radius:8px;background:#ecfdf5;border:1px solid #86efac;color:#047857;font-size:12px;font-weight:900;line-height:1.7;">${tip}</div>`;
-    return;
-  }
-  result.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;">
-    ${labMoneyBox('세전 당첨금', fmtMFull(amount), 'var(--text-dark)')}
-    ${labMoneyBox('예상 세금', fmtMFull(calc.tax), '#dc2626', `${Math.round(calc.rate*100)}% 적용`)}
-    ${labMoneyBox('실수령액', fmtMFull(calc.net), '#059669', '내 통장 입금 예상액')}
-  </div><div style="margin-top:10px;padding:12px;border-radius:8px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:11px;font-weight:800;line-height:1.6;">200만원 이하는 비과세, 200만원 초과~3억원 이하는 22%, 3억원 초과는 33% 기준으로 단순 계산합니다.</div>`;
 }
 
 // ── QR 입력 미리보기 ──
