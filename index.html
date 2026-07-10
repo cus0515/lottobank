@@ -207,19 +207,19 @@ main.chat-hidden .chat-panel { display: none; }
 .lab-omr-brand { writing-mode:vertical-rl; text-orientation:mixed; font-size:20px; font-weight:900; line-height:1; color:#e11d48; letter-spacing:.5px; }
 .lab-omr-panel { flex:1; min-width:0; border:1.5px solid #fb7185; border-radius:2px; padding:8px; background:rgba(255,255,255,.82); }
 .lab-omr-head { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #fb7185; margin-bottom:8px; padding-bottom:5px; color:#e11d48; }
-.lab-omr-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; justify-items:center; }
+.lab-omr-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; justify-items:center; }
 .lab-omr-check { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; padding:0; margin:-1px; }
-.lab-omr-slot { width:26px; height:34px; position:relative; display:flex; align-items:center; justify-content:center; border:1.5px solid #fecdd3; border-radius:4px; background:#fff; color:rgba(0,0,0,.7); font:700 9px ui-monospace,SFMono-Regular,Consolas,monospace; cursor:pointer; user-select:none; box-sizing:border-box; transition:border-color .1s ease; }
-.lab-omr-slot::before { content:''; position:absolute; width:13px; height:21px; border-radius:50%; background:transparent; transition:background .1s ease; pointer-events:none; }
+.lab-omr-slot { width:44px; height:36px; position:relative; display:flex; align-items:center; justify-content:center; border:1.5px solid #fecdd3; border-radius:4px; background:#fff; color:rgba(0,0,0,.72); font:700 10px ui-monospace,SFMono-Regular,Consolas,monospace; cursor:pointer; user-select:none; box-sizing:border-box; transition:border-color .1s ease; }
+.lab-omr-slot::before { content:''; position:absolute; width:20px; height:28px; border-radius:50%; background:transparent; transition:background .1s ease; pointer-events:none; }
 .lab-omr-slot.marked::before { background:#1a1a1a; }
-.lab-omr-slot.marked { color:rgba(0,0,0,.15); }
+.lab-omr-slot.marked { color:rgba(0,0,0,.12); }
 .lab-omr-slot:hover { border-color:#fb7185; }
 .lab-omr-num { position:relative; z-index:1; line-height:1; }
 [data-theme="dark"] .lab-omr-slip { background:linear-gradient(180deg,#2a1820 0%,#21161b 100%); border-color:#9f334c; box-shadow:0 3px 12px rgba(0,0,0,.28); }
 [data-theme="dark"] .lab-omr-panel { background:rgba(15,23,42,.46); border-color:#9f334c; }
 [data-theme="dark"] .lab-omr-head { border-color:#9f334c; color:#fb7185; }
 [data-theme="dark"] .lab-omr-brand { color:#fb7185; }
-[data-theme="dark"] .lab-omr-slot { background:rgba(15,23,42,.4); border-color:rgba(251,113,133,.4); color:rgba(255,255,255,.7); }
+[data-theme="dark"] .lab-omr-slot { background:rgba(15,23,42,.4); border-color:rgba(251,113,133,.4); color:rgba(255,255,255,.72); }
 [data-theme="dark"] .lab-omr-slot.marked::before { background:#e11d48; }
 [data-theme="dark"] .lab-omr-slot.marked { color:rgba(255,255,255,.1); }
 
@@ -1865,7 +1865,7 @@ textarea {
             <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
               <span style="font-size:9px;font-weight:800;color:#16a34a;letter-spacing:.5px;">연금복권 720+</span>
             </div>
-            <div style="font-size:9px;color:var(--text-muted);opacity:.7;margin-bottom:6px;">목요일 오전 10시 · <span id="pen-next-round-label">-</span>회</div>
+            <div style="font-size:9px;color:var(--text-muted);opacity:.7;margin-bottom:6px;">목요일 오후 7시 5분 · <span id="pen-next-round-label">-</span>회</div>
             <div style="display:flex;gap:3px;align-items:center;">
               <div style="text-align:center;"><div id="pen-cd-d" style="font-size:16px;font-weight:900;color:#16a34a;line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">일</div></div>
               <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
@@ -5998,9 +5998,6 @@ function renderLabLottoMarker() {
         </div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr;gap:8px;align-items:center;">
-      <div style="font-size:11px;font-weight:800;color:#e11d48;">선택 번호 ${labLottoPick.length}/6 · ${labLottoPick.map(n=>String(n).padStart(2,'0')).join(' · ') || '마킹 대기'}</div>
-    </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
     <button class="btn-action" style="background:var(--lotto-red);" onclick="runLabLottoBacktest()">역대 전적 조회</button>
@@ -7473,7 +7470,7 @@ function renderPensionSection() {
       <div style="text-align:right;">
         <div style="font-size:9px;opacity:.4;margin-bottom:2px;">다음 추첨</div>
         <div style="font-size:12px;font-weight:900;color:#c4b5fd;">${pd}일 ${ph}시 ${pm}분</div>
-        <div style="font-size:9px;opacity:.4;">목요일 오전 10시</div>
+        <div style="font-size:9px;opacity:.4;">목요일 오후 7시 5분</div>
       </div>
     </div>
 
