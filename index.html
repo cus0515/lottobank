@@ -5033,6 +5033,7 @@ function toggleChat() {
       btn.innerHTML = chatVisible ? '✕' : svgIcon('chat',14,'currentColor');
       btn.title = chatVisible ? '채팅 닫기' : '채팅 열기';
     }
+    if (chatVisible) keepChatAtBottom();
     return;
   }
   chatVisible = !chatVisible;
@@ -5040,6 +5041,7 @@ function toggleChat() {
     main.classList.remove('chat-hidden');
     btn.textContent = '✕';
     btn.title = '채팅 숨기기';
+    keepChatAtBottom();
   } else {
     main.classList.add('chat-hidden');
     btn.innerHTML = svgIcon('chat',14,'currentColor');
@@ -5056,6 +5058,15 @@ function toggleChat() {
 // 채팅 (Supabase Realtime)
 // =====================================================
 let chatChannel = null;
+
+function keepChatAtBottom() {
+  const box = $('chat-box');
+  if (!box) return;
+  const move = () => { box.scrollTop = box.scrollHeight; };
+  move();
+  requestAnimationFrame(move);
+  setTimeout(move, 80);
+}
 
 function getChatBadgeHtml(verifiedTitle) {
   if (!verifiedTitle) return `<span class="badge b-guest">일반</span>`;
@@ -5134,7 +5145,7 @@ function appendChatRow(msg) {
     row.innerHTML = `<div class="chat-identity">${getIdentityHtml(msg.verified_title, msg.monthly_badges, msg.nickname)}</div><span class="chat-text">${esc(msg.message)}</span>`;
   }
   box.appendChild(row);
-  box.scrollTop = box.scrollHeight;
+  keepChatAtBottom();
 }
 
 async function loadRecentChats() {
@@ -5147,6 +5158,7 @@ async function loadRecentChats() {
       .limit(200);
     if (data && data.length) data.reverse().forEach(appendChatRow);
   } catch(e) { console.warn('loadRecentChats:', e.message); }
+  keepChatAtBottom();
 }
 
 function subscribeChat() {
@@ -5832,33 +5844,31 @@ function renderLab() {
   wrap.innerHTML = `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
     <div style="font-size:9px;color:var(--lotto-red);font-weight:900;letter-spacing:1.5px;margin-bottom:3px;">LOTTOBANK LAB</div>
     <div style="font-size:18px;font-weight:900;color:var(--text-dark);">연구소</div>
-    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.6;">세금, 복리, 확률, 번호 이력을 로그인 없이 바로 계산해보세요.</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.6;">실수령액, 연금복권 세트 미래가치, 현실 확률, 내 번호 전적을 로그인 없이 바로 확인하세요.</div>
   </div><div id="lab-body"></div>`;
   switchLabTab(labTab || 'tax');
 }
 function labCard(title, body) {
   return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">${title ? `<div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">${title}</div>` : ''}${body}</div>`;
 }
+function labMoneyBox(label, value, color='var(--text-dark)', sub='') {
+  return `<div class="kpi-box" style="min-width:0;"><div class="kpi-label">${label}</div><div class="kpi-value" style="font-size:clamp(16px,2.1vw,22px);line-height:1.15;color:${color};overflow-wrap:anywhere;">${value}</div>${sub ? `<div class="kpi-sub">${sub}</div>` : ''}</div>`;
+}
 function renderLabBody() {
   const body = $('lab-body');
   if (!body) return;
   if (labTab === 'tax') {
-    body.innerHTML = labCard('실수령액 계산기', `<div style="display:grid;grid-template-columns:1fr 120px;gap:8px;margin-bottom:10px;">
+    body.innerHTML = labCard('복권 당첨금 실수령액 계산기', `<div style="display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:8px;margin-bottom:10px;">
       <input id="lab-tax-amount" class="input-custom" type="number" value="2000000000" min="0" step="10000" oninput="updateLabTax()" placeholder="당첨금 입력">
-      <select id="lab-tax-type" class="input-custom" onchange="updateLabTax()"><option value="lotto">로또</option><option value="pension">연금 1등</option></select>
-    </div><div id="lab-tax-result"></div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;">
-      <button class="qr-inner-tab" onclick="$('lab-tax-amount').value=50000;updateLabTax()">5만원</button>
-      <button class="qr-inner-tab" onclick="$('lab-tax-amount').value=300000000;updateLabTax()">3억원</button>
-      <button class="qr-inner-tab" onclick="$('lab-tax-type').value='pension';updateLabTax()">연금 1등</button>
-    </div>`);
+      <select id="lab-tax-type" class="input-custom" onchange="updateLabTax()"><option value="lotto">로또 6/45</option><option value="pension">연금 720+ 1등</option></select>
+    </div><div style="font-size:10px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">200만원 이하는 비과세, 200만원 초과부터 3억원 이하는 22%, 3억원 초과분은 33% 기준으로 계산합니다.</div><div id="lab-tax-result"></div>`);
     updateLabTax();
     return;
   }
   if (labTab === 'future') {
-    body.innerHTML = labCard('미래가치 시뮬레이터', `<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">연금복권 5개 조 세트 당첨 기준, 세후 월 858만원을 20년간 받는 상황입니다.</div>
+    body.innerHTML = labCard('연금복권 세트 구매 미래가치', `<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.6;">연금 720+ 5개 조 세트 당첨 기준, 세후 월 858만원을 20년간 받는 상황으로 계산합니다.</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-      <label style="font-size:11px;font-weight:800;color:var(--text-dark);">월 저축/투자액<input id="lab-future-save" class="input-custom" type="number" value="8580000" oninput="updateLabFuture()" style="margin-top:5px;"></label>
+      <label style="font-size:11px;font-weight:800;color:var(--text-dark);">월 저축/투자액<input id="lab-future-save" class="input-custom" type="number" value="5000000" oninput="updateLabFuture()" style="margin-top:5px;"></label>
       <label style="font-size:11px;font-weight:800;color:var(--text-dark);">예상 연수익률 %<input id="lab-future-rate" class="input-custom" type="number" value="5" step="0.1" oninput="updateLabFuture()" style="margin-top:5px;"></label>
     </div><div id="lab-future-result"></div>`);
     updateLabFuture();
@@ -5884,11 +5894,14 @@ function updateLabTax() {
   if ($('lab-tax-type')?.value === 'pension') amountInput.value = 7000000;
   const amount = Number(amountInput.value || 0);
   const calc = calcTakeHomePrize(amount);
-  result.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-    <div class="kpi-box"><div class="kpi-label">세전 당첨금</div><div class="kpi-value" style="font-size:18px;">${fmtMFull(amount)}</div></div>
-    <div class="kpi-box"><div class="kpi-label">예상 세금</div><div class="kpi-value" style="font-size:18px;color:#dc2626;">${fmtMFull(calc.tax)}</div><div class="kpi-sub">${Math.round(calc.rate*100)}%</div></div>
-    <div class="kpi-box"><div class="kpi-label">실수령액</div><div class="kpi-value" style="font-size:18px;color:#059669;">${fmtMFull(calc.net)}</div></div>
-  </div>${$('lab-tax-type')?.value === 'pension' ? `<div style="margin-top:10px;padding:12px;border-radius:8px;background:#ecfdf5;border:1px solid #86efac;color:#047857;font-size:13px;font-weight:900;">연금복권 1등은 세후 월 546만원, 20년간 수령 기준입니다.<br><span style="font-size:11px;color:#64748b;">직장인 연봉 환산 시 세전 약 9,000만원 수준입니다.</span></div>` : ''}`;
+  const isPension = $('lab-tax-type')?.value === 'pension';
+  const yearlyGross = Math.round(calc.net * 12 / 0.728);
+  result.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
+    ${labMoneyBox('내 통장 입금액', fmtMFull(calc.net), '#059669', isPension ? '매월 수령액' : '세후 예상 수령액')}
+    ${labMoneyBox('떼이는 세금', fmtMFull(calc.tax), '#dc2626', `${Math.round(calc.rate*100)}% 적용`)}
+    ${labMoneyBox('세전 당첨금', fmtMFull(amount), 'var(--text-dark)')}
+    ${labMoneyBox('직장인 연봉 환산', isPension ? fmtMFull(yearlyGross) : '-', '#7c3aed', isPension ? '세전 기준 추정' : '연금 선택 시 표시')}
+  </div>${isPension ? `<div style="margin-top:10px;padding:12px;border-radius:8px;background:#ecfdf5;border:1px solid #86efac;color:#047857;font-size:12px;font-weight:900;line-height:1.7;">연금 720+ 1등은 세후 월 ${fmtMFull(calc.net)}을 20년간 받습니다.<br><span style="color:#64748b;">20년 총 실수령액은 ${fmtMFull(calc.net * 240)}입니다.</span></div>` : `<div style="margin-top:10px;padding:12px;border-radius:8px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:11px;font-weight:800;line-height:1.6;">3억원 초과 당첨금은 전체 금액 기준 33%로 단순 계산합니다. 실제 지급 기준과 원 단위 절사는 운영 정책에 따라 달라질 수 있습니다.</div>`}`;
 }
 function updateLabFuture() {
   const monthly = Math.max(0, Number($('lab-future-save')?.value || 0));
@@ -5898,8 +5911,14 @@ function updateLabFuture() {
   for (let i=0;i<240;i++) total = (total + monthly) * (1 + monthRate);
   const principal = monthly * 240;
   const pct = total ? Math.min(100, principal / total * 100) : 0;
-  $('lab-future-result').innerHTML = `<div class="kpi-box" style="margin-bottom:10px;"><div class="kpi-label">20년 뒤 예상 자산</div><div class="kpi-value" style="font-size:24px;color:#059669;">${fmtMFull(total)}</div><div class="kpi-sub">원금 ${fmtMFull(principal)} · 복리 수익 ${fmtMFull(total-principal)}</div></div>
-    <div style="height:18px;border-radius:999px;background:#dcfce7;overflow:hidden;"><div style="height:100%;width:${pct}%;background:#10b981;"></div></div>`;
+  const freedom = total >= 2000000000 ? '파이어족 후보' : total >= 1000000000 ? '준비된 은퇴 자금' : '복리 체감 구간';
+  $('lab-future-result').innerHTML = `<div class="kpi-box" style="margin-bottom:10px;"><div class="kpi-label">${freedom}</div><div class="kpi-value" style="font-size:clamp(20px,2.5vw,26px);line-height:1.15;color:#059669;overflow-wrap:anywhere;">${fmtMFull(total)}</div><div class="kpi-sub">원금 ${fmtMFull(principal)} · 복리 수익 ${fmtMFull(total-principal)}</div></div>
+    <div style="height:18px;border-radius:999px;background:#dcfce7;overflow:hidden;margin-bottom:8px;"><div style="height:100%;width:${pct}%;background:#10b981;"></div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;">
+      ${labMoneyBox('세후 월 수령', fmtMFull(8580000), '#059669')}
+      ${labMoneyBox('월 투자', fmtMFull(monthly), 'var(--text-dark)')}
+      ${labMoneyBox('20년 납입', fmtMFull(principal), 'var(--text-dark)')}
+    </div>`;
 }
 function runLabReality() {
   const weekly = Math.max(0, Number($('lab-real-weekly')?.value || 0));
@@ -5917,10 +5936,12 @@ function runLabReality() {
   const prize = counts[1]*2000000000 + counts[2]*50000000 + counts[3]*1500000 + counts[4]*50000 + counts[5]*5000;
   const spent = games * 1000;
   const roi = spent ? ((prize - spent) / spent * 100) : 0;
-  $('lab-reality-result').innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
-    <div class="kpi-box"><div class="kpi-label">총 투자금</div><div class="kpi-value" style="font-size:17px;">${fmtMFull(spent)}</div></div>
-    <div class="kpi-box"><div class="kpi-label">총 당첨금</div><div class="kpi-value" style="font-size:17px;color:#059669;">${fmtMFull(prize)}</div></div>
-    <div class="kpi-box"><div class="kpi-label">수익률</div><div class="kpi-value" style="font-size:17px;color:${roi>=0?'#059669':'#dc2626'};">${roi.toFixed(1)}%</div></div>
+  const headline = counts[1] ? '현실을 뚫은 세계관' : counts[2] ? '상위권 행운 발생' : counts[3] ? '꽤 강한 운' : '확률의 벽 체감';
+  $('lab-reality-result').innerHTML = `<div style="padding:10px 12px;border-radius:8px;background:${roi>=0?'#ecfdf5':'#fff7ed'};border:1px solid ${roi>=0?'#86efac':'#fed7aa'};font-size:12px;font-weight:900;color:${roi>=0?'#047857':'#9a3412'};margin-bottom:10px;">${headline} · ${games.toLocaleString()}게임을 1초 안에 모의 추첨했습니다.</div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px;">
+    ${labMoneyBox('총 투자금', fmtMFull(spent), 'var(--text-dark)')}
+    ${labMoneyBox('총 당첨금', fmtMFull(prize), '#059669')}
+    ${labMoneyBox('수익률', `${roi.toFixed(1)}%`, roi>=0?'#059669':'#dc2626')}
   </div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">${[1,2,3,4,5].map(r=>`<div style="text-align:center;background:var(--bg-light);border-radius:7px;padding:8px 4px;"><div style="font-size:10px;color:var(--text-muted);font-weight:800;">${r}등</div><div style="font-size:15px;font-weight:900;">${counts[r]}회</div></div>`).join('')}</div>`;
 }
 function updateLabHistory() {
@@ -5945,7 +5966,9 @@ function updateLabHistory() {
     if (rank) { best = best ? Math.min(best, rank) : rank; prize += pay; matches.push({round:draw.round, rank, pay}); }
   });
   const title = !best ? '본전도 못 찾은 번호' : best <= 2 ? '조상님이 도운 번호' : best <= 4 ? '감이 살아있는 번호' : '소소하게 웃은 번호';
-  result.innerHTML = `<div class="kpi-box" style="margin-bottom:10px;"><div class="kpi-label">${title}</div><div class="kpi-value" style="font-size:22px;">${best ? best + '등' : '-'}</div><div class="kpi-sub">보유 당첨번호 데이터 ${Object.keys(recentData||{}).length}회차 기준 · 누적 ${fmtMFull(prize)}</div></div>
+  const spent = Object.keys(recentData||{}).length * 1000;
+  const net = prize - spent;
+  result.innerHTML = `<div class="kpi-box" style="margin-bottom:10px;"><div class="kpi-label">${title}</div><div class="kpi-value" style="font-size:clamp(18px,2.4vw,24px);">${best ? best + '등' : '-'}</div><div class="kpi-sub">보유 당첨번호 데이터 ${Object.keys(recentData||{}).length}회차 기준 · 누적 ${fmtMFull(prize)} · 손익 ${fmtMFull(net)}</div></div>
     ${matches.slice(0,5).map(item=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--border-dashed);font-size:12px;"><b>${item.round}회</b><span>${item.rank}등 · ${fmtMFull(item.pay)}</span></div>`).join('') || '<div style="padding:12px;text-align:center;color:var(--text-muted);font-size:12px;">일치 이력이 없습니다.</div>'}`;
 }
 
@@ -8612,7 +8635,7 @@ async function renderBadge() {
 const MONTHLY_RANKINGS = [
   { id:'purchase', label:'구매', desc:'이번 달 QR 인증 구매 금액이 많은 순서' },
   { id:'accuracy', label:'저격', desc:'이번 달 당첨번호 적중 개수가 많은 순서' },
-  { id:'efficiency', label:'수익', desc:'이번 달 투자금 대비 당첨금 비율이 높은 순서' },
+  { id:'efficiency', label:'수익', desc:'이번 달 당첨금이 많은 순서' },
   { id:'miss', label:'똥손', desc:'이번 달 당첨번호가 하나도 맞지 않은 게임이 많은 순서' },
 ];
 const ALL_TIME_RANKINGS = [
@@ -8620,10 +8643,10 @@ const ALL_TIME_RANKINGS = [
   { id:'attendance', label:'출석왕', desc:'서로 다른 날짜에 접속한 누적 일수가 많은 순서' },
   { id:'streak', label:'개근왕', desc:'하루도 빠지지 않고 연속 접속한 최장 일수 순서' },
   { id:'scan', label:'스캔왕', desc:'QR과 인터넷 구매 인증 티켓 수가 많은 순서' },
-  { id:'auto', label:'자동왕', desc:'자동 선택으로 인증한 누적 게임이 많은 순서' },
-  { id:'manual', label:'수동왕', desc:'수동 선택으로 인증한 누적 게임이 많은 순서' },
   { id:'rank4', label:'4등 콜렉터', desc:'누적 4등 당첨 인증이 많은 순서' },
   { id:'rank5', label:'5등 콜렉터', desc:'누적 5등 당첨 인증이 많은 순서' },
+  { id:'rank6', label:'6등 콜렉터', desc:'연금 720+ 누적 6등 당첨 인증이 많은 순서' },
+  { id:'rank7', label:'7등 콜렉터', desc:'연금 720+ 누적 7등 당첨 인증이 많은 순서' },
 ];
 function rankingCategoryIcon(id, size=20) {
   const common = `width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"`;
@@ -8636,12 +8659,17 @@ function rankingCategoryIcon(id, size=20) {
     attendance:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/><path d="m9 16 2 2 4-4"/>',
     streak:'<path d="M12 22c4 0 7-3 7-7 0-3-2-5-4-7 0 3-2 4-3 4 1-4-1-7-4-10 0 5-3 7-3 11 0 5 3 9 7 9z"/>',
     scan:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/>',
-    auto:'<path d="M20 7h-5V2"/><path d="M20 2v5a9 9 0 1 1-2.6-3.6"/><circle cx="12" cy="12" r="3"/>',
-    manual:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
     rank4:'<circle cx="12" cy="14" r="6"/><path d="M12 8V2M9 2h6"/><text x="12" y="17" text-anchor="middle" fill="currentColor" stroke="none" font-size="8">4</text>',
     rank5:'<circle cx="12" cy="14" r="6"/><path d="M12 8V2M9 2h6"/><text x="12" y="17" text-anchor="middle" fill="currentColor" stroke="none" font-size="8">5</text>',
+    rank6:'<circle cx="12" cy="14" r="6"/><path d="M12 8V2M9 2h6"/><text x="12" y="17" text-anchor="middle" fill="currentColor" stroke="none" font-size="8">6</text>',
+    rank7:'<circle cx="12" cy="14" r="6"/><path d="M12 8V2M9 2h6"/><text x="12" y="17" text-anchor="middle" fill="currentColor" stroke="none" font-size="8">7</text>',
   };
   return `<svg xmlns="http://www.w3.org/2000/svg" ${common}>${paths[id] || paths.purchase}</svg>`;
+}
+function formatRankingScore(category, score) {
+  const value = Number(score || 0);
+  if (category === 'efficiency' || category === 'donor' || category === 'purchase') return fmtMFull(value);
+  return value.toLocaleString();
 }
 let rankViewMode = 'ranking';
 let rankingScope = 'monthly';
@@ -8728,7 +8756,7 @@ async function renderRankingHub() {
       ? `<div>${rows.map(r=>`<div style="display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-dashed);">
           <b style="text-align:center;color:${r.rank===1?'#f59e0b':'var(--text-muted)'};">${r.rank}</b>
           <div style="min-width:0;display:flex;align-items:center;gap:5px;"><span class="monthly-rank-badge" title="${selected.label} 랭킹">${rankingCategoryIcon(selected.id,14)}</span><b style="font-size:12px;">${rnickMap[r.user_id]||'익명'}</b></div>
-          <strong style="font-size:12px;color:var(--lotto-red);">${Number(r.score).toLocaleString()}</strong>
+          <strong style="font-size:12px;color:var(--lotto-red);">${formatRankingScore(selected.id, r.score)}</strong>
         </div>`).join('')}</div>`
       : `<div style="padding:26px 14px;text-align:center;color:var(--text-muted);font-size:11px;">아직 등록된 랭킹 기록이 없습니다.</div>`);
   } catch (_) {

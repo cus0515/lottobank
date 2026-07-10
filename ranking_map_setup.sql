@@ -364,7 +364,7 @@ begin
     cross join lateral (values
       ('purchase', spent),
       ('accuracy', matches),
-      ('efficiency', case when spent > 0 then round(prize * 100 / spent, 4) else 0 end),
+      ('efficiency', prize),
       ('miss', misses)
     ) as metric(ranking_type, score)
     where metric.score > 0
@@ -409,7 +409,7 @@ as $$
 begin
   delete from public.ranking_snapshots
   where period_key = 'all'
-    and ranking_type in ('donor','attendance','streak','scan','auto','manual','rank3','rank4','rank5');
+    and ranking_type in ('donor','attendance','streak','scan','rank4','rank5','rank6','rank7');
 
   insert into public.ranking_snapshots
     (period_key, ranking_type, user_id, rank, score, title, badge_icon, border_color)
@@ -430,7 +430,15 @@ begin
       case when jsonb_array_length(coalesce(ticket.game_results, '[]'::jsonb)) > 0
         then (select count(*)::numeric from jsonb_array_elements(ticket.game_results) item where (item ->> 'rank')::integer = 5)
         else case when ticket.prize_rank = 5 then 1 else 0 end::numeric
-      end as rank5_count
+      end as rank5_count,
+      case when jsonb_array_length(coalesce(ticket.game_results, '[]'::jsonb)) > 0
+        then (select count(*)::numeric from jsonb_array_elements(ticket.game_results) item where (item ->> 'rank')::integer = 6)
+        else case when ticket.prize_rank = 6 then 1 else 0 end::numeric
+      end as rank6_count,
+      case when jsonb_array_length(coalesce(ticket.game_results, '[]'::jsonb)) > 0
+        then (select count(*)::numeric from jsonb_array_elements(ticket.game_results) item where (item ->> 'rank')::integer = 7)
+        else case when ticket.prize_rank = 7 then 1 else 0 end::numeric
+      end as rank7_count
     from public.tickets ticket
   ),
   ticket_base as (
@@ -439,11 +447,11 @@ begin
       count(*)::numeric as scans,
       sum(games * 1000)::numeric as spent,
       sum(prize)::numeric as prize,
-      sum(case when purchase_mode = 'auto' then games else 0 end)::numeric as auto_games,
-      sum(case when purchase_mode = 'manual' then games else 0 end)::numeric as manual_games,
       sum(rank3_count)::numeric as rank3_count,
       sum(rank4_count)::numeric as rank4_count,
-      sum(rank5_count)::numeric as rank5_count
+      sum(rank5_count)::numeric as rank5_count,
+      sum(rank6_count)::numeric as rank6_count,
+      sum(rank7_count)::numeric as rank7_count
     from ticket_scored
     group by user_id
   ),
@@ -479,11 +487,10 @@ begin
     cross join lateral (values
       ('donor', greatest(spent - prize, 0)),
       ('scan', scans),
-      ('auto', auto_games),
-      ('manual', manual_games),
-      ('rank3', rank3_count),
       ('rank4', rank4_count),
-      ('rank5', rank5_count)
+      ('rank5', rank5_count),
+      ('rank6', rank6_count),
+      ('rank7', rank7_count)
     ) as metric(ranking_type, score)
     where metric.score > 0
 
@@ -518,11 +525,10 @@ begin
       when 'attendance' then '출석왕'
       when 'streak' then '개근왕'
       when 'scan' then '스캔왕'
-      when 'auto' then '자동왕'
-      when 'manual' then '수동왕'
-      when 'rank3' then '3등 콜렉터'
       when 'rank4' then '4등 콜렉터'
-      else '5등 콜렉터'
+      when 'rank5' then '5등 콜렉터'
+      when 'rank6' then '6등 콜렉터'
+      else '7등 콜렉터'
     end,
     null,
     '#f5c451'
