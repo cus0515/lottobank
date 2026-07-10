@@ -209,22 +209,22 @@ main.chat-hidden .chat-panel { display: none; }
 .lab-omr-head { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #fb7185; margin-bottom:8px; padding-bottom:5px; color:#e11d48; }
 .lab-omr-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; justify-items:center; }
 .lab-omr-check { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; padding:0; margin:-1px; }
-/* OMR [ ] 브래킷 — 숫자(상단) + 타원마킹(하단) 절대 포지셔닝 */
-.lab-omr-slot { width:42px; height:44px; position:relative; border:none; background:transparent; cursor:pointer; user-select:none; box-sizing:border-box; }
+/* OMR [ ] 브래킷 — 세로 타원이 숫자를 덮는 마킹 */
+.lab-omr-slot { width:34px; height:38px; position:relative; display:flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; user-select:none; box-sizing:border-box; }
 .lab-omr-slot::before { content:''; position:absolute; left:0; top:0; bottom:0; width:5px; border-left:1.8px solid #fca5a5; border-top:1.8px solid #fca5a5; border-bottom:1.8px solid #fca5a5; transition:border-color .12s; }
 .lab-omr-slot::after { content:''; position:absolute; right:0; top:0; bottom:0; width:5px; border-right:1.8px solid #fca5a5; border-top:1.8px solid #fca5a5; border-bottom:1.8px solid #fca5a5; transition:border-color .12s; }
-.lab-omr-num { position:absolute; top:5px; left:0; right:0; text-align:center; font:700 8.5px ui-monospace,SFMono-Regular,Consolas,monospace; color:rgba(220,38,38,.85); pointer-events:none; z-index:1; }
-.lab-omr-mark { position:absolute; bottom:7px; left:50%; transform:translateX(-50%); width:24px; height:13px; border-radius:50%; border:1.5px solid #fca5a5; background:transparent; transition:background .12s,border-color .12s; pointer-events:none; z-index:1; }
+.lab-omr-num { position:absolute; top:50%; left:0; right:0; transform:translateY(-50%); text-align:center; font:700 9px ui-monospace,SFMono-Regular,Consolas,monospace; color:rgba(220,38,38,.85); pointer-events:none; z-index:1; line-height:1; }
+.lab-omr-mark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:16px; height:26px; border-radius:50%; border:1.2px solid rgba(252,165,165,.6); background:transparent; transition:background .12s,border-color .12s; pointer-events:none; z-index:2; }
 .lab-omr-slot.marked .lab-omr-mark { background:#1c1c2e; border-color:#1c1c2e; }
 .lab-omr-slot:hover:not(.marked)::before,.lab-omr-slot:hover:not(.marked)::after { border-color:#f87171; }
-.lab-omr-slot:hover:not(.marked) .lab-omr-mark { border-color:#f87171; background:rgba(248,113,113,.1); }
+.lab-omr-slot:hover:not(.marked) .lab-omr-mark { border-color:#f87171; background:rgba(248,113,113,.12); }
 [data-theme="dark"] .lab-omr-slip { background:linear-gradient(180deg,#2a1820 0%,#21161b 100%); border-color:#9f334c; box-shadow:0 3px 12px rgba(0,0,0,.28); }
 [data-theme="dark"] .lab-omr-panel { background:rgba(15,23,42,.46); border-color:#9f334c; }
 [data-theme="dark"] .lab-omr-head { border-color:#9f334c; color:#fb7185; }
 [data-theme="dark"] .lab-omr-brand { color:#fb7185; }
-[data-theme="dark"] .lab-omr-slot::before,[data-theme="dark"] .lab-omr-slot::after { border-color:rgba(251,113,133,.45); }
+[data-theme="dark"] .lab-omr-slot::before,[data-theme="dark"] .lab-omr-slot::after { border-color:rgba(251,113,133,.4); }
 [data-theme="dark"] .lab-omr-num { color:rgba(251,113,133,.9); }
-[data-theme="dark"] .lab-omr-mark { border-color:rgba(251,113,133,.45); }
+[data-theme="dark"] .lab-omr-mark { border-color:rgba(251,113,133,.4); }
 [data-theme="dark"] .lab-omr-slot.marked .lab-omr-mark { background:#be123c; border-color:#be123c; }
 [data-theme="dark"] .lab-omr-slot:hover:not(.marked)::before,[data-theme="dark"] .lab-omr-slot:hover:not(.marked)::after { border-color:#fb7185; }
 [data-theme="dark"] .lab-omr-slot:hover:not(.marked) .lab-omr-mark { border-color:#fb7185; background:rgba(251,113,133,.1); }
