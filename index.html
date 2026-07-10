@@ -213,7 +213,7 @@ main.chat-hidden .chat-panel { display: none; }
 .lab-omr-slot { width:28px; height:22px; position:relative; display:flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; user-select:none; box-sizing:border-box; }
 .lab-omr-slot::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; border-left:1.8px solid #fca5a5; border-top:1.8px solid #fca5a5; border-bottom:1.8px solid #fca5a5; transition:border-color .12s; }
 .lab-omr-slot::after { content:''; position:absolute; right:0; top:0; bottom:0; width:4px; border-right:1.8px solid #fca5a5; border-top:1.8px solid #fca5a5; border-bottom:1.8px solid #fca5a5; transition:border-color .12s; }
-.lab-omr-num { position:absolute; top:50%; left:0; right:0; transform:translateY(-50%); text-align:center; font:700 9px ui-monospace,SFMono-Regular,Consolas,monospace; color:rgba(220,38,38,.85); pointer-events:none; z-index:1; line-height:1; }
+.lab-omr-num { position:absolute; top:50%; left:0; right:0; transform:translateY(-50%); text-align:center; font:700 11px ui-monospace,SFMono-Regular,Consolas,monospace; color:rgba(220,38,38,.85); pointer-events:none; z-index:1; line-height:1; }
 .lab-omr-mark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:14px; height:18px; border-radius:50%; border:none; background:transparent; transition:background .12s; pointer-events:none; z-index:2; }
 .lab-omr-slot.marked .lab-omr-mark { background:#1c1c2e; }
 .lab-omr-slot:hover:not(.marked)::before,.lab-omr-slot:hover:not(.marked)::after { border-color:#f87171; }
@@ -5913,6 +5913,7 @@ function setLabQueryState(state) {
 }
 
 function consumeLabQuery(type) {
+  if (!isLoggedIn) { toast('로그인 후 이용할 수 있습니다'); showAuthModal(); return; }
   const round = getLabQueryRound(type);
   if (isLabPremiumUser()) return { ok:true, round, left:'무제한' };
   const state = getLabQueryState();
@@ -6014,6 +6015,7 @@ function renderLabLottoMarker() {
 }
 
 function toggleLabLotto(n) {
+  if (!isLoggedIn) { toast('로그인 후 이용할 수 있습니다'); showAuthModal(); return; }
   if (labLottoPick.includes(n)) labLottoPick = labLottoPick.filter(v => v !== n);
   else if (labLottoPick.length < 6) labLottoPick.push(n);
   labLottoPick.sort((a,b)=>a-b);
@@ -6040,11 +6042,13 @@ function renderLabPensionMarker() {
 }
 
 function setLabPensionGroup(group) {
+  if (!isLoggedIn) { toast('로그인 후 이용할 수 있습니다'); showAuthModal(); return; }
   labPensionGroup = group;
   renderLabBackType();
 }
 
 function setLabPensionDigit(pos, digit) {
+  if (!isLoggedIn) { toast('로그인 후 이용할 수 있습니다'); showAuthModal(); return; }
   labPensionDigits[pos] = String(digit);
   renderLabBackType();
 }
@@ -6059,6 +6063,7 @@ function setLabVault(vault) {
 }
 
 function saveLabNumber() {
+  if (!isLoggedIn) { toast('로그인 후 이용할 수 있습니다'); showAuthModal(); return; }
   const vault = getLabVault();
   const type = labBackType;
   // 무료 저장 5회 제한
