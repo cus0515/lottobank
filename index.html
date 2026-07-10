@@ -3700,6 +3700,7 @@ function resNavStep(delta) {
 }
 
 let _resSelectorBase = null;
+let _resLoadSeq = 0;
 function resNavPage(delta) {
   // Move selector window by 20 rounds
   const sel = $('res-sel');
@@ -3711,7 +3712,7 @@ function resNavPage(delta) {
 
 async function initRoundSelector(base) {
   // base 파라미터 없으면 최신 회차 사용
-  base = base || getLatestRound();
+  base = base || latestRound || getLatestRound();
   _resSelectorBase = base;
   const sel = $('res-sel');
   sel.innerHTML = '';
@@ -3731,11 +3732,13 @@ async function initRoundSelector(base) {
 }
 
 async function chgRes() {
+  const seq = ++_resLoadSeq;
   const round = parseInt($('res-sel').value);
   if (!round) return;
   $('res-balls').innerHTML = '<span style="color:var(--text-muted);font-size:12px;">조회 중...</span>';
   $('res-list').innerHTML = '';
   const d = await fetchLotto(round);
+  if (seq !== _resLoadSeq) return;
   if (!d) {
     $('res-balls').innerHTML = '<span style="color:var(--b-red);font-size:12px;">추첨 전이거나 당첨 정보를 불러오지 못했습니다.</span>';
     // 다음 회차 버튼 비활성화 (결과 없는 회차)
@@ -6112,21 +6115,23 @@ async function runLabLottoBacktest() {
     return;
   }
   result.innerHTML = renderLabProgress(`로또 6/45 제 ${latest}회부터 조회 중`, 0, latest, 'var(--lotto-red)');
+  const labDraws = [];
   for (let start = latest; start >= 1; start -= 50) {
     const batch = [];
     for (let r = start; r >= Math.max(1, start - 49); r--) {
-      if (!recentData[r]) batch.push(fetchLotto(r).then(d => { if (d) recentData[r] = d; }));
+      if (recentData[r]) labDraws.push(recentData[r]);
+      else batch.push(fetchLotto(r).then(d => { if (d) labDraws.push(d); }));
     }
     await Promise.allSettled(batch);
     const checked = latest - Math.max(1,start - 49) + 1;
     result.innerHTML = renderLabProgress(`로또 6/45 역대 전적 조회 중`, checked, latest, 'var(--lotto-red)');
   }
-  const rows = Object.values(recentData).filter(d=>d?.nums).map(draw => {
+  const rows = labDraws.filter(d=>d?.nums).map(draw => {
     const hit = labLottoPick.filter(n => draw.nums.includes(n)).length;
     const info = labLottoRank(hit, labLottoPick.includes(draw.bonus));
     return info ? { ...info, round:draw.round, hit, bonus:labLottoPick.includes(draw.bonus) } : null;
   }).filter(Boolean);
-  result.innerHTML = renderLabResultList('로또 6/45 역대 전적', rows, Object.keys(recentData).length);
+  result.innerHTML = renderLabResultList('로또 6/45 역대 전적', rows, labDraws.length);
 }
 
 function labPensionRank(userGroup, userNo, draw) {
@@ -6226,13 +6231,17 @@ function qrInputPreview(val) {
 async function ensureRecentData() {
   const rounds = Object.keys(recentData).map(Number);
   if (rounds.length >= 20) return;
+  if (window._ensureRecentDataPromise) return window._ensureRecentDataPromise;
   const base = latestRound || getLatestRound();
   const fetches = [];
   for (let r = base; r >= Math.max(1, base - 49); r--) {
     if (!recentData[r]) fetches.push(fetchLotto(r).then(d => { if (d) recentData[r] = d; }));
     if (fetches.length >= 30) break;
   }
-  await Promise.allSettled(fetches);
+  window._ensureRecentDataPromise = Promise.allSettled(fetches).finally(() => {
+    window._ensureRecentDataPromise = null;
+  });
+  await window._ensureRecentDataPromise;
 }
 
 function saveFortuneSet(numsJson) {
@@ -6402,13 +6411,18 @@ async function getPensionRadarHitStatsHtml(latestResultRound) {
 function renderFortune() {
   // LottoBank 번호 레이더 — 탭 구성 (레이더/추천이력/연금복권)
   const el = $('fortune-content');
+  if (!el) return;
   const d = latestData;
   const rounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
 
   if (!d || rounds.length < 5) {
-    ensureRecentData().then(() => {
-      if ($('pg-fortune')?.style.display !== 'none') renderFortune();
-    });
+    if (!window._radarDataRetrying) {
+      window._radarDataRetrying = true;
+      ensureRecentData().finally(() => {
+        window._radarDataRetrying = false;
+        if ($('pg-fortune')?.style.display !== 'none') renderFortune();
+      });
+    }
     el.innerHTML = `<div style="text-align:center;padding:48px 20px;color:var(--text-muted);">
       <svg viewBox="0 0 60 60" width="48" height="48" style="display:block;margin:0 auto 12px;">
         <circle cx="30" cy="30" r="28" fill="none" stroke="#e11d4844" stroke-width="1.5"/>
@@ -6421,7 +6435,6 @@ function renderFortune() {
       <div style="font-size:14px;font-weight:800;margin-bottom:6px;">레이더 수신 중...</div>
       <div style="font-size:11px;opacity:.6;">회차 데이터를 불러오고 있습니다</div>
     </div>`;
-    setTimeout(()=>{ if($('fortune-content')) renderFortune(); }, 2500);
     return;
   }
 
