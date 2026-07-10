@@ -207,19 +207,27 @@ main.chat-hidden .chat-panel { display: none; }
 .lab-omr-brand { writing-mode:vertical-rl; text-orientation:mixed; font-size:20px; font-weight:900; line-height:1; color:#e11d48; letter-spacing:.5px; }
 .lab-omr-panel { flex:1; min-width:0; border:1.5px solid #fb7185; border-radius:2px; padding:8px; background:rgba(255,255,255,.82); }
 .lab-omr-head { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #fb7185; margin-bottom:8px; padding-bottom:5px; color:#e11d48; }
-.lab-omr-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px 5px; justify-items:center; }
+.lab-omr-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; justify-items:center; }
 .lab-omr-check { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; padding:0; margin:-1px; }
-.lab-omr-slot { width:40px; height:28px; display:flex; align-items:center; justify-content:center; border:1.5px solid #fca5a5; border-radius:50%; background:#fff; color:rgba(220,38,38,.85); font:700 9.5px ui-monospace,SFMono-Regular,Consolas,monospace; cursor:pointer; user-select:none; box-sizing:border-box; transition:background .12s ease,color .12s ease,border-color .12s ease; }
-.lab-omr-slot.marked { background:#1c1209; border-color:#1c1209; color:transparent; }
-.lab-omr-slot:hover:not(.marked) { border-color:#f87171; background:rgba(254,202,202,.25); }
-.lab-omr-num { line-height:1; pointer-events:none; }
+/* OMR [ ] 브래킷 — 숫자(위) + 타원 마킹(아래) */
+.lab-omr-slot { width:44px; height:46px; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:5px 8px; border:none; background:transparent; cursor:pointer; user-select:none; box-sizing:border-box; }
+.lab-omr-slot::before { content:''; position:absolute; left:0; top:0; bottom:0; width:6px; border-left:2px solid #fca5a5; border-top:2px solid #fca5a5; border-bottom:2px solid #fca5a5; transition:border-color .15s ease; }
+.lab-omr-slot::after { content:''; position:absolute; right:0; top:0; bottom:0; width:6px; border-right:2px solid #fca5a5; border-top:2px solid #fca5a5; border-bottom:2px solid #fca5a5; transition:border-color .15s ease; }
+.lab-omr-num { font:700 9px ui-monospace,SFMono-Regular,Consolas,monospace; color:rgba(220,38,38,.85); line-height:1; pointer-events:none; position:relative; z-index:1; }
+.lab-omr-mark { width:24px; height:15px; border-radius:50%; border:1.5px solid #fca5a5; background:transparent; transition:background .15s ease,border-color .15s ease; pointer-events:none; position:relative; z-index:1; flex-shrink:0; }
+.lab-omr-slot.marked .lab-omr-mark { background:#1a1a2e; border-color:#1a1a2e; }
+.lab-omr-slot:hover:not(.marked)::before,.lab-omr-slot:hover:not(.marked)::after { border-color:#f87171; }
+.lab-omr-slot:hover:not(.marked) .lab-omr-mark { border-color:#f87171; background:rgba(248,113,113,.1); }
 [data-theme="dark"] .lab-omr-slip { background:linear-gradient(180deg,#2a1820 0%,#21161b 100%); border-color:#9f334c; box-shadow:0 3px 12px rgba(0,0,0,.28); }
 [data-theme="dark"] .lab-omr-panel { background:rgba(15,23,42,.46); border-color:#9f334c; }
 [data-theme="dark"] .lab-omr-head { border-color:#9f334c; color:#fb7185; }
 [data-theme="dark"] .lab-omr-brand { color:#fb7185; }
-[data-theme="dark"] .lab-omr-slot { background:rgba(15,23,42,.3); border-color:rgba(251,113,133,.45); color:rgba(251,113,133,.85); }
-[data-theme="dark"] .lab-omr-slot.marked { background:#e11d48; border-color:#e11d48; color:transparent; }
-[data-theme="dark"] .lab-omr-slot:hover:not(.marked) { border-color:#fb7185; background:rgba(225,29,72,.15); }
+[data-theme="dark"] .lab-omr-slot::before,[data-theme="dark"] .lab-omr-slot::after { border-color:rgba(251,113,133,.5); }
+[data-theme="dark"] .lab-omr-num { color:rgba(251,113,133,.9); }
+[data-theme="dark"] .lab-omr-mark { border-color:rgba(251,113,133,.5); }
+[data-theme="dark"] .lab-omr-slot.marked .lab-omr-mark { background:#be123c; border-color:#be123c; }
+[data-theme="dark"] .lab-omr-slot:hover:not(.marked)::before,[data-theme="dark"] .lab-omr-slot:hover:not(.marked)::after { border-color:#fb7185; }
+[data-theme="dark"] .lab-omr-slot:hover:not(.marked) .lab-omr-mark { border-color:#fb7185; }
 
 .ticket-slip { max-width:440px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
@@ -5992,6 +6000,7 @@ function renderLabLottoMarker() {
           ${Array.from({length:45},(_,i)=>i+1).map(n=>`<label class="lab-omr-slot ${picked.has(n)?'marked':''}" title="${n}번">
             <input class="lab-omr-check" type="checkbox" ${picked.has(n)?'checked':''} onchange="toggleLabLotto(${n})" aria-label="${n}번 선택">
             <span class="lab-omr-num">${String(n).padStart(2,'0')}</span>
+            <span class="lab-omr-mark"></span>
           </label>`).join('')}
         </div>
       </div>
