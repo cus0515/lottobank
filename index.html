@@ -2321,9 +2321,9 @@ function bH(n, isMatch = false) {
 
 // 최신 회차 계산 (2002-12-07 = 1회 추첨일 기준)
 function getLatestRound() {
-  const start = new Date('2002-12-07');
+  const start = new Date('2002-12-07T20:45:00+09:00');
   const now = new Date();
-  return Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000)) + 1;
+  return Math.max(1, Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000)) + 1);
 }
 
 // 단일 회차 조회 — Cloudflare Pages Function 프록시 사용
@@ -5954,11 +5954,9 @@ function renderLabLottoMarker() {
           <span style="font-size:11px;font-weight:900;">1,000원</span>
         </div>
         <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;">
-          ${Array.from({length:45},(_,i)=>i+1).map(n=>`<button type="button" onclick="toggleLabLotto(${n})" title="${n}번" style="position:relative;height:30px;border:1px solid #fecdd3;border-radius:4px;background:#fff;color:#e11d48;font-size:11px;font-weight:900;cursor:pointer;font-family:inherit;overflow:hidden;">
-            <span style="display:flex;align-items:center;justify-content:center;gap:3px;position:relative;z-index:1;">
-              <span style="width:10px;height:10px;border:1.5px solid #fb7185;border-radius:2px;background:${picked.has(n)?'#111827':'#fff'};box-shadow:${picked.has(n)?'inset 0 0 0 1px #111827,0 0 0 1px rgba(17,24,39,.18)':'none'};"></span>
-              <span>${String(n).padStart(2,'0')}</span>
-            </span>
+          ${Array.from({length:45},(_,i)=>i+1).map(n=>`<button type="button" onclick="toggleLabLotto(${n})" title="${n}번" style="position:relative;height:24px;border:0;border-bottom:1px solid #fecdd3;background:#fff;color:#f43f5e;font-size:11px;font-weight:900;cursor:pointer;font-family:inherit;overflow:hidden;padding:0 2px;">
+            <span style="position:absolute;left:3px;top:50%;width:8px;height:13px;border-radius:999px;border:1px solid #fda4af;background:${picked.has(n)?'#111827':'transparent'};transform:translateY(-50%);box-shadow:${picked.has(n)?'0 0 0 1px rgba(17,24,39,.18)':'none'};"></span>
+            <span style="position:relative;z-index:1;margin-left:8px;letter-spacing:.2px;">${String(n).padStart(2,'0')}</span>
           </button>`).join('')}
         </div>
       </div>
@@ -6408,6 +6406,9 @@ function renderFortune() {
   const rounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
 
   if (!d || rounds.length < 5) {
+    ensureRecentData().then(() => {
+      if ($('pg-fortune')?.style.display !== 'none') renderFortune();
+    });
     el.innerHTML = `<div style="text-align:center;padding:48px 20px;color:var(--text-muted);">
       <svg viewBox="0 0 60 60" width="48" height="48" style="display:block;margin:0 auto 12px;">
         <circle cx="30" cy="30" r="28" fill="none" stroke="#e11d4844" stroke-width="1.5"/>
@@ -7849,6 +7850,9 @@ async function init() {
     renderHomeLive();
     updateGlobalStats();
     rList();
+    const activePage = $('main-content')?.dataset.activePage;
+    if (activePage === 'result') initRoundSelector(latestRound);
+    if (activePage === 'fortune') renderFortune();
 
     for (let r = latestRound - 1; r >= Math.max(1, latestRound - 9); r--) {
       fetchLotto(r).then(d => {
