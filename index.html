@@ -5889,6 +5889,26 @@ function labQueryUsageLabel(type) {
   return `무료 조회 ${Math.min(used,5)}/5 · ${round}회차 기준`;
 }
 
+function getLabSaveRound(type) {
+  return type === 'pension'
+    ? ((window._latestPenRound || 321) + 1)
+    : ((latestRound || getLatestRound()) + 1);
+}
+
+function renderLabProgress(label, checked, total, color) {
+  const pct = Math.max(2, Math.min(100, Math.round((checked / Math.max(1,total)) * 100)));
+  return `<div style="border:1px solid var(--border-dashed);border-radius:10px;background:var(--paper-white);padding:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
+      <b style="font-size:12px;color:var(--text-dark);">${label}</b>
+      <span style="font-size:10px;color:var(--text-muted);">${checked.toLocaleString()} / ${total.toLocaleString()}회차</span>
+    </div>
+    <div style="height:8px;border-radius:999px;background:var(--bg-light);overflow:hidden;">
+      <div style="width:${pct}%;height:100%;border-radius:999px;background:${color};box-shadow:0 0 14px ${color};transition:width .18s ease;"></div>
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:var(--text-muted);">최근 회차부터 빠르게 대조하고 있습니다.</div>
+  </div>`;
+}
+
 function renderLabBody() {
   const body = $('lab-body');
   if (!body) return;
@@ -5924,7 +5944,6 @@ function renderLabBackType() {
 
 function renderLabLottoMarker() {
   const picked = new Set(labLottoPick);
-  const targetRound = latestRound ? latestRound + 1 : getLatestRound();
   return `<div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">번호 6개를 컴퓨터용 사인펜처럼 마킹하세요. 역대 전적 조회는 무료 기준 회차당 5회까지 가능합니다.</div>
   <div style="max-width:520px;margin:0 auto 12px;background:#fffdfb;border:1.5px solid #fb7185;border-radius:4px;box-shadow:0 3px 12px rgba(15,23,42,.08);padding:12px;color:#e11d48;">
     <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
@@ -5936,15 +5955,16 @@ function renderLabLottoMarker() {
         </div>
         <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;">
           ${Array.from({length:45},(_,i)=>i+1).map(n=>`<button type="button" onclick="toggleLabLotto(${n})" title="${n}번" style="position:relative;height:30px;border:1px solid #fecdd3;border-radius:4px;background:#fff;color:#e11d48;font-size:11px;font-weight:900;cursor:pointer;font-family:inherit;overflow:hidden;">
-            ${picked.has(n)?'<span style="position:absolute;inset:4px;border-radius:999px;background:#111827;box-shadow:inset 0 0 0 2px rgba(255,255,255,.12),0 0 0 1px rgba(17,24,39,.3);"></span>':''}
-            <span style="position:relative;z-index:1;color:${picked.has(n)?'#fff':'#e11d48'};">${String(n).padStart(2,'0')}</span>
+            <span style="display:flex;align-items:center;justify-content:center;gap:3px;position:relative;z-index:1;">
+              <span style="width:10px;height:10px;border:1.5px solid #fb7185;border-radius:2px;background:${picked.has(n)?'#111827':'#fff'};box-shadow:${picked.has(n)?'inset 0 0 0 1px #111827,0 0 0 1px rgba(17,24,39,.18)':'none'};"></span>
+              <span>${String(n).padStart(2,'0')}</span>
+            </span>
           </button>`).join('')}
         </div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 130px;gap:8px;align-items:center;">
+    <div style="display:grid;grid-template-columns:1fr;gap:8px;align-items:center;">
       <div style="font-size:11px;font-weight:800;color:#e11d48;">선택 번호 ${labLottoPick.length}/6 · ${labLottoPick.map(n=>String(n).padStart(2,'0')).join(' · ') || '마킹 대기'}</div>
-      <input id="lab-save-round" class="input-custom" type="number" value="${targetRound}" min="1" style="height:34px;text-align:center;border-color:#fb7185;color:#e11d48;font-weight:900;" title="저장 회차">
     </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
@@ -6005,7 +6025,7 @@ function saveLabNumber() {
   const type = labBackType;
   if (type === 'lotto') {
     if (labLottoPick.length !== 6) { toast('번호 6개를 먼저 선택해주세요'); return; }
-    const round = Math.max(1, Number($('lab-save-round')?.value || (latestRound ? latestRound + 1 : getLatestRound())));
+    const round = getLabSaveRound('lotto');
     if (vault.lotto.some(item => Number(item.round) === round)) {
       alert('이미 저장된 회차입니다. 무료 저장고는 회차 기준으로 보관되며 삭제는 프리미엄 기능에서 제공됩니다.');
       return;
@@ -6013,7 +6033,7 @@ function saveLabNumber() {
     vault.lotto.push({ round, nums:[...labLottoPick], date:new Date().toLocaleDateString('ko-KR') });
   } else {
     if (labPensionDigits.some(v => v === '')) { toast('연금 번호 6자리를 모두 선택해주세요'); return; }
-    vault.pension.push({ jo:labPensionGroup, no:labPensionDigits.join(''), date:new Date().toLocaleDateString('ko-KR') });
+    vault.pension.push({ round:getLabSaveRound('pension'), jo:labPensionGroup, no:labPensionDigits.join(''), date:new Date().toLocaleDateString('ko-KR') });
   }
   setLabVault(vault);
   renderLabVault();
@@ -6025,10 +6045,12 @@ function loadLabSaved(type, index) {
   if (!item) return;
   if (type === 'lotto') labLottoPick = [...item.nums];
   else { labPensionGroup = Number(item.jo); labPensionDigits = String(item.no).padStart(6,'0').split(''); }
+  labTab = 'backtest';
   labBackType = type;
   labVaultView = type;
-  renderLabBackType();
-  renderLabVault();
+  $('lab-tab-backtest')?.classList.add('on');
+  $('lab-tab-vault')?.classList.remove('on');
+  renderLabBody();
 }
 
 function switchLabVault(type) {
@@ -6048,21 +6070,22 @@ function renderLabVault() {
           <div style="text-align:right;"><span style="font-size:11px;color:#64748b;">1게임</span><br><b style="font-size:15px;">1,000원</b></div>
         </div>
         <div class="ticket-slip-games">
-          <div class="ticket-slip-game" style="grid-template-columns:20px minmax(0,1fr);">
+          <div class="ticket-slip-game">
             <b class="ticket-game-label">A</b><div class="ticket-slip-nums">${(item.nums||[]).map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>
+            <button class="qr-inner-tab" style="min-height:30px;font-size:11px;padding:0 6px;" onclick="loadLabSaved('lotto',${i})">불러오기</button>
           </div>
         </div>
-        <button class="qr-inner-tab" style="width:100%;margin-top:10px;min-height:34px;" onclick="loadLabSaved('lotto',${i})">이 번호 불러오기</button>
       </div>`
     : `<div class="ticket-slip pension">
         <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2f855a;padding-bottom:8px;margin-bottom:12px;">
           <div><b style="font-size:22px;">연금복권 <span style="color:#22a55b;">720+</span></b><div style="font-size:11px;color:#64748b;margin-top:2px;">저장 번호</div></div>
           <b style="font-size:14px;">1,000원</b>
         </div>
-        <div class="pension-ticket-row" style="grid-template-columns:minmax(0,1fr);border-bottom:0;">
+        <div style="font-size:11px;color:#64748b;margin:-4px 0 8px;">제 ${item.round || '-'}회 저장</div>
+        <div class="pension-ticket-row" style="border-bottom:0;">
           <div class="pension-ticket-numbers"><span style="background:#22a55b;color:#fff;border-radius:5px;padding:7px 9px;font-weight:900;">${item.jo}조</span>${String(item.no).padStart(6,'0').split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('')}</div>
+          <button class="qr-inner-tab" style="min-height:30px;font-size:11px;padding:0 6px;" onclick="loadLabSaved('pension',${i})">불러오기</button>
         </div>
-        <button class="qr-inner-tab" style="width:100%;margin-top:10px;min-height:34px;" onclick="loadLabSaved('pension',${i})">이 번호 불러오기</button>
       </div>`;
   wrap.innerHTML = `<div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 10px;">
     <button class="qr-inner-tab ${labVaultView==='lotto'?'on':''}" onclick="switchLabVault('lotto')">로또 저장고 ${vault.lotto.length}</button>
@@ -6090,20 +6113,21 @@ async function runLabLottoBacktest() {
     result.innerHTML = `<div style="padding:16px;text-align:center;color:#dc2626;font-size:12px;border:1px solid #fecdd3;border-radius:8px;background:#fff1f2;">무료 조회 5회를 모두 사용했습니다.<br>로또 회차가 변경되면 다시 5회 조회할 수 있고, 프리미엄은 무제한 조회가 제공됩니다.</div>`;
     return;
   }
-  result.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-muted);font-size:12px;">로또 6/45 제 ${latest}회부터 1회까지 조회 중입니다...</div>`;
-  for (let start = latest; start >= 1; start -= 20) {
+  result.innerHTML = renderLabProgress(`로또 6/45 제 ${latest}회부터 조회 중`, 0, latest, 'var(--lotto-red)');
+  for (let start = latest; start >= 1; start -= 50) {
     const batch = [];
-    for (let r = start; r >= Math.max(1, start - 19); r--) {
+    for (let r = start; r >= Math.max(1, start - 49); r--) {
       if (!recentData[r]) batch.push(fetchLotto(r).then(d => { if (d) recentData[r] = d; }));
     }
     await Promise.allSettled(batch);
-    if (start % 100 === 0 || start === latest) result.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-muted);font-size:12px;">조회 중... ${Math.max(1,start-19)}회까지 확인</div>`;
+    const checked = latest - Math.max(1,start - 49) + 1;
+    result.innerHTML = renderLabProgress(`로또 6/45 역대 전적 조회 중`, checked, latest, 'var(--lotto-red)');
   }
   const rows = Object.values(recentData).filter(d=>d?.nums).map(draw => {
     const hit = labLottoPick.filter(n => draw.nums.includes(n)).length;
     const info = labLottoRank(hit, labLottoPick.includes(draw.bonus));
     return info ? { ...info, round:draw.round, hit, bonus:labLottoPick.includes(draw.bonus) } : null;
-  }).filter(Boolean).sort((a,b)=>a.rank-b.rank || b.round-a.round);
+  }).filter(Boolean);
   result.innerHTML = renderLabResultList('로또 6/45 역대 전적', rows, Object.keys(recentData).length);
 }
 
@@ -6146,11 +6170,11 @@ async function runLabPensionBacktest() {
     return;
   }
   const userNo = labPensionDigits.join('');
-  result.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-muted);font-size:12px;">연금 720+ 제 ${latest}회부터 1회까지 조회 중입니다...</div>`;
+  result.innerHTML = renderLabProgress(`연금 720+ 제 ${latest}회부터 조회 중`, 0, latest, '#16a34a');
   const rows = [];
-  for (let start = latest; start >= 1; start -= 12) {
+  for (let start = latest; start >= 1; start -= 24) {
     const batch = [];
-    for (let r = start; r >= Math.max(1, start - 11); r--) {
+    for (let r = start; r >= Math.max(1, start - 23); r--) {
       batch.push(fetchLabPension(r).then(d => {
         if (!d) return;
         const info = labPensionRank(labPensionGroup, userNo, d);
@@ -6158,20 +6182,21 @@ async function runLabPensionBacktest() {
       }));
     }
     await Promise.allSettled(batch);
-    result.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-muted);font-size:12px;">조회 중... ${Math.max(1,start-11)}회까지 확인</div>`;
+    const checked = latest - Math.max(1,start - 23) + 1;
+    result.innerHTML = renderLabProgress(`연금 720+ 역대 전적 조회 중`, checked, latest, '#16a34a');
   }
-  rows.sort((a,b)=>(a.rank===8?3:a.rank)-(b.rank===8?3:b.rank) || b.round-a.round);
   result.innerHTML = renderLabResultList('연금 720+ 역대 전적', rows, latest);
 }
 
 function renderLabResultList(title, rows, totalRounds) {
-  const totalPay = rows.reduce((sum,row)=>sum + (row.pay || 0), 0);
+  const sortedRows = [...rows].sort((a,b)=>Number(b.round || 0)-Number(a.round || 0));
+  const totalPay = sortedRows.reduce((sum,row)=>sum + (row.pay || 0), 0);
   return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;overflow:hidden;">
     <div style="padding:12px 14px;border-bottom:1px solid var(--border-dashed);display:flex;justify-content:space-between;gap:10px;align-items:center;">
       <div><b style="font-size:13px;color:var(--text-dark);">${title}</b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${totalRounds.toLocaleString()}개 회차 데이터 기준</div></div>
       <strong style="font-size:12px;color:var(--lotto-red);">${fmtMFull(totalPay)}</strong>
     </div>
-    ${rows.length ? `<div style="max-height:260px;overflow:auto;">${rows.map(row=>`<div style="display:grid;grid-template-columns:80px 1fr auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px dashed var(--border-dashed);font-size:12px;">
+    ${sortedRows.length ? `<div style="max-height:260px;overflow:auto;">${sortedRows.map(row=>`<div style="display:grid;grid-template-columns:80px 1fr auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px dashed var(--border-dashed);font-size:12px;">
       <b>${row.round}회차</b><span style="font-weight:900;color:${row.rank<=2?'var(--lotto-red)':'var(--text-dark)'};">${row.label} <em style="font-style:normal;color:var(--text-muted);font-weight:700;">(${row.hit}${row.bonus?'+보너스':''})</em></span><strong>${fmtMFull(row.pay)}</strong>
     </div>`).join('')}</div>` : `<div style="padding:22px 12px;text-align:center;color:var(--text-muted);font-size:12px;">당첨 이력이 없습니다.</div>`}
   </div>`;
