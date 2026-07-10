@@ -209,24 +209,22 @@ main.chat-hidden .chat-panel { display: none; }
 .lab-omr-head { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #fb7185; margin-bottom:8px; padding-bottom:5px; color:#e11d48; }
 .lab-omr-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; justify-items:center; }
 .lab-omr-check { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; padding:0; margin:-1px; }
-.lab-omr-slot { width:44px; height:36px; position:relative; display:flex; align-items:center; justify-content:center; border:1px solid #fca5a5; border-radius:3px; background:#fff; color:rgba(220,38,38,.85); font:700 9.5px ui-monospace,SFMono-Regular,Consolas,monospace; cursor:pointer; user-select:none; box-sizing:border-box; transition:border-color .1s ease; }
-.lab-omr-slot::before { content:''; position:absolute; width:28px; height:22px; border-radius:50%; background:transparent; transition:background .1s ease; pointer-events:none; }
-.lab-omr-slot.marked::before { background:#1c1209; }
-.lab-omr-slot.marked { color:rgba(220,38,38,.1); }
-.lab-omr-slot:hover { border-color:#f87171; }
-.lab-omr-num { position:relative; z-index:1; line-height:1; }
+.lab-omr-slot { width:44px; height:34px; display:flex; align-items:center; justify-content:center; border:1.5px solid #fca5a5; border-radius:4px; background:#fff; color:rgba(220,38,38,.85); font:700 10px ui-monospace,SFMono-Regular,Consolas,monospace; cursor:pointer; user-select:none; box-sizing:border-box; transition:background .12s ease,color .12s ease,border-color .12s ease; }
+.lab-omr-slot.marked { background:#1c1209; border-color:#1c1209; color:transparent; }
+.lab-omr-slot:hover:not(.marked) { border-color:#f87171; background:rgba(254,202,202,.2); }
+.lab-omr-num { line-height:1; }
 [data-theme="dark"] .lab-omr-slip { background:linear-gradient(180deg,#2a1820 0%,#21161b 100%); border-color:#9f334c; box-shadow:0 3px 12px rgba(0,0,0,.28); }
 [data-theme="dark"] .lab-omr-panel { background:rgba(15,23,42,.46); border-color:#9f334c; }
 [data-theme="dark"] .lab-omr-head { border-color:#9f334c; color:#fb7185; }
 [data-theme="dark"] .lab-omr-brand { color:#fb7185; }
-[data-theme="dark"] .lab-omr-slot { background:rgba(30,14,5,.5); border-color:rgba(251,113,133,.45); color:rgba(251,113,133,.85); }
-[data-theme="dark"] .lab-omr-slot.marked::before { background:#e11d48; }
-[data-theme="dark"] .lab-omr-slot.marked { color:rgba(255,255,255,.1); }
+[data-theme="dark"] .lab-omr-slot { background:rgba(15,23,42,.3); border-color:rgba(251,113,133,.45); color:rgba(251,113,133,.85); }
+[data-theme="dark"] .lab-omr-slot.marked { background:#e11d48; border-color:#e11d48; color:transparent; }
+[data-theme="dark"] .lab-omr-slot:hover:not(.marked) { border-color:#fb7185; background:rgba(225,29,72,.15); }
 
 .ticket-slip { max-width:440px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
 .ticket-slip-games { display:grid; gap:0; }
-.ticket-slip-game { display:grid; grid-template-columns:20px minmax(0,1fr) 84px; gap:10px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
+.ticket-slip-game { display:grid; grid-template-columns:20px minmax(0,1fr) 120px; gap:10px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
 .ticket-game-label { font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace; color:#111827; text-align:left; }
 .ticket-slip-nums { display:grid; grid-template-columns:repeat(6,minmax(24px,1fr)); gap:7px; min-width:0; text-align:center; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; font-variant-numeric:tabular-nums; }
 .pension-ticket-row { display:grid; grid-template-columns:minmax(0,1fr) 88px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
@@ -404,7 +402,7 @@ main.chat-hidden .chat-panel { display: none; }
 .hall-card.silver { border:1px solid #cbd5e1; box-shadow:0 0 8px rgba(148,163,184,.3), inset 0 0 8px rgba(148,163,184,.08); }
 .map-frame { width:100%; height:320px; border:0; display:block; background:var(--bg-light); }
 @media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}#qr-purchase-meta{grid-template-columns:1fr!important;}}
-@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:16px minmax(0,1fr) 74px;gap:6px;min-height:36px;padding:6px 0}.ticket-slip-nums{grid-template-columns:repeat(6,minmax(20px,1fr));gap:3px}.ticket-slip-nums,.ticket-game-label{font-size:11px}.store-picker-trigger{width:74px;max-width:74px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 74px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
+@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:16px minmax(0,1fr) 110px;gap:6px;min-height:36px;padding:6px 0}.ticket-slip-nums{grid-template-columns:repeat(6,minmax(20px,1fr));gap:3px}.ticket-slip-nums,.ticket-game-label{font-size:11px}.store-picker-trigger{width:74px;max-width:74px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 74px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
 @media(max-width:700px){.stats-login-notice{grid-template-columns:1fr auto}.stats-login-notice span{grid-column:1/-1;grid-row:2}.stats-share-btn span{display:none}.stats-share-btn{width:30px;justify-content:center;padding:5px}.stats-section-head{margin-top:2px}.stats-kpi-grid{grid-template-columns:1fr 1fr}}
 .rank-tab-pill { display:inline-block;padding:5px 14px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;margin-right:4px;white-space:nowrap; }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
@@ -6094,12 +6092,13 @@ function loadLabSaved(type, index) {
 }
 
 function deleteLabSaved(type, idx) {
+  if (!confirm('삭제한 번호는 복구할 수 없습니다. 삭제하시겠습니까?')) return;
   const vault = getLabVault();
   if (!vault[type] || !vault[type][idx]) return;
   vault[type].splice(idx, 1);
   setLabVault(vault);
   renderLabVault();
-  toast('번호가 삭제되었습니다');
+  toast('번호가 영구 삭제되었습니다');
 }
 
 function switchLabVault(type) {
@@ -6121,7 +6120,7 @@ function renderLabVault() {
         <div class="ticket-slip-games">
           <div class="ticket-slip-game">
             <b class="ticket-game-label">A</b><div class="ticket-slip-nums">${(item.nums||[]).map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>
-            <div style="display:flex;gap:4px;"><button class="qr-inner-tab" style="min-height:30px;font-size:11px;padding:0 8px;" onclick="loadLabSaved('lotto',${i})">불러오기</button><button class="qr-inner-tab" style="min-height:30px;font-size:11px;padding:0 8px;border-color:#fca5a5;color:#dc2626;" onclick="deleteLabSaved('lotto',${i})">삭제</button></div>
+            <div style="display:flex;gap:4px;flex-shrink:0;"><button class="qr-inner-tab" style="min-height:28px;font-size:11px;padding:0 9px;white-space:nowrap;" onclick="loadLabSaved('lotto',${i})">불러오기</button><button class="qr-inner-tab" style="min-height:28px;font-size:11px;padding:0 9px;border-color:#fca5a5;color:#dc2626;white-space:nowrap;" onclick="deleteLabSaved('lotto',${i})">삭제</button></div>
           </div>
         </div>
       </div>`
@@ -6133,7 +6132,7 @@ function renderLabVault() {
         <div style="font-size:11px;color:#64748b;margin:-4px 0 8px;">제 ${item.round || '-'}회 저장</div>
         <div class="pension-ticket-row" style="border-bottom:0;">
           <div class="pension-ticket-numbers"><span style="background:#22a55b;color:#fff;border-radius:5px;padding:7px 9px;font-weight:900;">${item.jo}조</span>${String(item.no).padStart(6,'0').split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('')}</div>
-<div style="display:flex;gap:4px;"><button class="qr-inner-tab" style="min-height:30px;font-size:11px;padding:0 8px;" onclick="loadLabSaved('pension',${i})">불러오기</button><button class="qr-inner-tab" style="min-height:30px;font-size:11px;padding:0 8px;border-color:#86efac;color:#16a34a;" onclick="deleteLabSaved('pension',${i})">삭제</button></div>
+<div style="display:flex;gap:4px;flex-shrink:0;"><button class="qr-inner-tab" style="min-height:28px;font-size:11px;padding:0 9px;white-space:nowrap;" onclick="loadLabSaved('pension',${i})">불러오기</button><button class="qr-inner-tab" style="min-height:28px;font-size:11px;padding:0 9px;border-color:#86efac;color:#16a34a;white-space:nowrap;" onclick="deleteLabSaved('pension',${i})">삭제</button></div>
         </div>
       </div>`;
   wrap.innerHTML = `<div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 10px;">
