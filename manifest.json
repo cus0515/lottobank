@@ -2,12 +2,23 @@
   "name": "LottoBank",
   "short_name": "LottoBank",
   "description": "로또 QR 기반 구매 이력 인증 및 전적 관리",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#d61c4e",
   "orientation": "portrait-primary",
+  "lang": "ko-KR",
+  "categories": ["utilities", "finance"],
+  "prefer_related_applications": false,
   "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
