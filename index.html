@@ -1380,6 +1380,22 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   border-radius:var(--ui-radius-card);
   font-size:var(--ui-text-body);
 }
+.input-custom,
+.select-custom,
+.qr-source-tab,
+.btn-action {
+  min-height:var(--ui-control-height);
+  border-radius:var(--ui-radius-card);
+  font-size:var(--ui-text-body);
+}
+.btn-action {
+  padding:9px 12px;
+  box-shadow:none;
+}
+.select-custom,
+.input-custom {
+  margin-bottom:8px;
+}
 .rank-tab-pill {
   min-height:32px;
   padding:6px 12px;
@@ -2326,7 +2342,6 @@ textarea {
     <div style="display:flex; flex-direction:column; height:calc(100% - 49px);">
       <div class="chat-messages" id="chat-box">
         <div class="chat-row"><div class="chat-identity"><span class="badge b-system">공지</span><span class="chat-user">LottoBank</span></div><span class="chat-text">QR 코드와 인터넷 구매 캡처로 구매 이력과 전적을 관리하세요.</span></div>
-        <div class="chat-row"><div class="chat-identity"><span class="badge b-guest">팁</span><span class="chat-user">번호수집가</span></div><span class="chat-text">인터넷 구매는 동행복권 티켓 보기 화면을 캡처해 등록할 수 있습니다.</span></div>
       </div>
       <div class="chat-input-area">
         <input type="text" id="chat-input" class="chat-input" placeholder="로그인 후 실시간 대화에 참여해보세요." maxlength="200" onkeyup="if(event.key==='Enter')sendChat()" disabled>
@@ -2339,7 +2354,7 @@ textarea {
 <footer class="site-footer">
   <div class="site-footer-inner">
     <div class="footer-links">
-      <a href="javascript:void(0)" onclick="go('home')">실시간 피드</a>
+      <a href="javascript:void(0)" onclick="go('home')">홈</a>
       <a href="javascript:void(0)" onclick="go('rank')">랭킹</a>
       <span style="color:var(--border-dashed);">|</span>
       <a href="https://dhlottery.co.kr" target="_blank" rel="noopener">동행복권</a>
@@ -6843,7 +6858,7 @@ function renderFortune() {
       <!-- 이번 회차 당첨번호 요약 -->
       <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
         <div style="margin-bottom:10px;">
-          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 645 제 ${latestRound}회 당첨번호</h4>
+          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 6/45 제 ${latestRound}회 당첨번호</h4>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">이번 회차 당첨번호의 패턴 분석입니다.</div>
         </div>
         <div style="display:flex;align-items:center;gap:5px;margin-bottom:12px;flex-wrap:wrap;">
@@ -6859,30 +6874,10 @@ function renderFortune() {
         </div>
       </div>
 
-      <!-- AI 패턴 분석 -->
-      <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div>
-            <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">AI 패턴 분석</h4>
-            <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${latestRound}회 · 최근 10회 추세 기반</div>
-          </div>
-          <span style="font-size:8px;font-weight:800;color:#fff;background:#6366f1;padding:2px 8px;border-radius:10px;letter-spacing:.5px;">AI</span>
-        </div>
-        <div style="background:var(--bg-light,#f1f5f9);border-radius:8px;padding:9px 12px;margin-bottom:10px;font-size:12px;font-weight:800;color:var(--text-dark);letter-spacing:.3px;">${_ai.aiLine}</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-          ${sPill('홀짝', _ai.oddGrade, `${oddCnt}홀 ${6-oddCnt}짝`, oddCnt>=4?'#dc2626':(6-oddCnt)>=4?'#1d4ed8':'#047857')}
-          ${sPill('구간', _ai.zoneGrade, `저${lowCnt}·중${midCnt}·고${hiCnt}`, hiCnt>=3?'#dc2626':lowCnt>=3?'#d97706':'#1d4ed8')}
-          ${sPill('합계', sum, `${_ai.sumGrade}`, _ai.sumGrade==='높음'?'#dc2626':_ai.sumGrade==='낮음'?'#1d4ed8':'#047857')}
-          ${sPill('연속번호', _ai.consecGrade, `${_ai.consecPairs}쌍`, _ai.consecPairs>=2?'#7c3aed':'var(--text-dark)')}
-          ${sPill('번호 범위', sorted[5]-sorted[0], `${sorted[0]}~${sorted[5]}`, 'var(--text-dark)')}
-          ${sPill('10회 추세', _ai.trendZone, '최근 10회차', '#6366f1')}
-        </div>
-      </div>
-
       <!-- 번호 지형도 -->
       <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
         <div style="margin-bottom:8px;">
-          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 645 번호 지형도</h4>
+          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 6/45 번호 지형도</h4>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.5;"><b style="color:#1e40af;">파란색</b>=오랫동안 안 나온 번호 · <b style="color:#991b1b;">붉은색</b>=최근 나온 번호 · 클릭하면 상세 정보 확인</div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-bottom:8px;">
@@ -6899,7 +6894,7 @@ function renderFortune() {
       <!-- 주목할 번호 -->
       <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
         <div style="margin-bottom:10px;">
-          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 645 주목할 번호 통계</h4>
+          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 6/45 주목할 번호 통계</h4>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">오랫동안 안 나온 번호와 최근 자주 나온 번호입니다. 로또는 매 회차 독립 시행으로 과거 패턴이 당첨을 보장하지 않습니다.</div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
@@ -6917,7 +6912,7 @@ function renderFortune() {
       <!-- 최근 10회차 구간 흐름 -->
       <div class="market-analysis-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;">
         <div style="margin-bottom:8px;">
-          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 645 최근 10회차 구간 흐름 분석</h4>
+          <h4 style="margin:0;font-size:13px;font-weight:900;color:var(--text-dark);">로또 6/45 최근 10회차 구간 흐름 분석</h4>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">저(1~15) · 중(16~30) · 고(31~45) 번호가 각 회차에서 몇 개씩 당첨됐는지 시각화합니다.</div>
         </div>
         <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">
@@ -6931,7 +6926,7 @@ function renderFortune() {
       <!-- 내부 링크 그물망 — SEO 순회 & 사용자 탐색 동선 -->
       <nav aria-label="관련 분석 바로가기" style="margin-top:12px;padding:10px 12px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;font-size:11px;color:var(--text-muted);line-height:2;">
         <span style="font-weight:700;color:var(--text-dark);display:block;margin-bottom:4px;">📌 관련 페이지 바로가기</span>
-        <button type="button" onclick="openFortuneHistory('lotto')" style="background:none;border:none;color:var(--lotto-red);cursor:pointer;font-size:11px;padding:0;margin-right:14px;">📋 로또 645 추천이력 보기</button>
+        <button type="button" onclick="openFortuneHistory('lotto')" style="background:none;border:none;color:var(--lotto-red);cursor:pointer;font-size:11px;padding:0;margin-right:14px;">📋 로또 6/45 추천이력 보기</button>
         <button type="button" onclick="switchRadarType('pension')" style="background:none;border:none;color:#16a34a;cursor:pointer;font-size:11px;padding:0;margin-right:14px;">🏦 연금복권 720+ 레이더</button>
         <button type="button" onclick="navigateTo('result')" style="background:none;border:none;color:#1d4ed8;cursor:pointer;font-size:11px;padding:0;margin-right:14px;">🔍 역대 당첨번호 조회</button>
         <button type="button" onclick="navigateTo('ranking')" style="background:none;border:none;color:#7c3aed;cursor:pointer;font-size:11px;padding:0;">🏆 전국 랭킹</button>
