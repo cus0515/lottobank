@@ -572,6 +572,35 @@ async function renderOperationsPanel() {
       <div id="ops-admin-list" style="margin-top:12px;"></div>
     </div>
 
+    <div class="admin-form" style="border:1px solid #a5b4fc;">
+      <div class="table-title" style="color:#3730a3;">💎 Plus / Group 권한 관리</div>
+      <div style="font-size:12px;color:var(--muted);margin:6px 0 12px;line-height:1.7;">
+        회원의 멤버십 등급을 직접 설정합니다.<br>
+        <b>free</b> — 무료 / <b>plus</b> — Plus 구독자 / <b>group</b> — Group 구독자
+      </div>
+      <div class="form-grid">
+        <div>
+          <label class="form-label">회원 이메일</label>
+          <input class="form-input" id="mem-email" type="email" placeholder="member@example.com">
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top:10px;flex-wrap:wrap;gap:8px;">
+        <button class="btn-refresh" onclick="searchMembership()">🔍 조회</button>
+        <button class="btn-save" onclick="setMembership('plus')" style="background:#7c3aed;">💎 Plus 부여</button>
+        <button class="btn-save" onclick="setMembership('group')" style="background:#0f766e;">👥 Group 부여</button>
+        <button class="btn-del" onclick="setMembership('free')">🔓 Free 해제</button>
+      </div>
+      <div class="form-result" id="mem-result" style="margin-top:8px;"></div>
+      <div id="mem-user-info" style="margin-top:10px;font-size:12px;"></div>
+      <div style="margin-top:16px;">
+        <div style="font-size:12px;font-weight:800;margin-bottom:8px;">현재 Plus · Group 회원</div>
+        <div id="mem-list" style="font-size:12px;color:var(--muted);">불러오는 중...</div>
+      </div>
+      <div class="form-actions" style="margin-top:8px;">
+        <button class="btn-refresh" onclick="loadMembershipList()">목록 새로고침</button>
+      </div>
+    </div>
+
     <div class="admin-form" style="border:1px solid #fef08a;">
       <div class="table-title" style="color:#854d0e;">🎖️ 내 계정 칭호 · 뱃지 직접 삭제</div>
       <div style="font-size:12px;color:var(--muted);margin:6px 0 10px;line-height:1.7;">
@@ -626,6 +655,7 @@ async function renderOperationsPanel() {
       <div style="margin-top:10px;font-size:11px;color:var(--muted);">현재 관리자 주소 <code>${location.pathname}</code></div>
     </div>`;
   await loadOperationStatus();
+  await loadMembershipList();
   checkMyAuth();
 }
 
@@ -659,6 +689,60 @@ async function loadOperationStatus() {
     ? `<div style="font-size:12px;color:var(--red);">${error.message}</div>`
     : `<div style="font-size:12px;font-weight:800;margin-bottom:6px;">현재 관리자 ${admins?.length || 0}명</div>${(admins || []).map(admin => `
       <div style="padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;">${admin.email}</div>`).join('')}`;
+}
+
+// ── Plus / Group 권한 관리 ──
+async function searchMembership() {
+  const email = document.getElementById('mem-email').value.trim();
+  const info = document.getElementById('mem-user-info');
+  const result = document.getElementById('mem-result');
+  if (!email) { result.style.color='var(--red)'; result.textContent='이메일을 입력하세요.'; return; }
+  result.style.color='var(--muted)'; result.textContent='조회 중...'; info.innerHTML='';
+  const { data, error } = await sb.from('profiles').select('id,nickname,email,membership,is_plus,created_at').eq('email', email).single();
+  if (error || !data) { result.style.color='var(--red)'; result.textContent='회원을 찾을 수 없습니다.'; return; }
+  result.textContent='';
+  const badge = data.membership === 'group' ? '👥 Group' : data.membership === 'plus' ? '💎 Plus' : '🔓 Free';
+  info.innerHTML = `<div style="padding:10px 12px;background:var(--surface2,#f8fafc);border-radius:8px;border:1px solid var(--border);">
+    <b>${data.nickname || '(닉네임 없음)'}</b>
+    <span style="margin-left:8px;font-size:11px;color:var(--muted);">${data.email || email}</span>
+    <span style="margin-left:10px;font-weight:800;">${badge}</span>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;">가입 ${new Date(data.created_at).toLocaleDateString('ko-KR')} · ID: ${data.id.slice(0,8)}…</div>
+  </div>`;
+}
+
+async function setMembership(tier) {
+  const email = document.getElementById('mem-email').value.trim();
+  const result = document.getElementById('mem-result');
+  if (!email) { result.style.color='var(--red)'; result.textContent='이메일을 입력하세요.'; return; }
+  result.style.color='var(--muted)'; result.textContent='변경 중...';
+  const isPlus = tier !== 'free';
+  const { error } = await sb.from('profiles').update({
+    membership: tier,
+    is_plus: isPlus,
+    membership_updated_at: new Date().toISOString()
+  }).eq('email', email);
+  if (error) { result.style.color='var(--red)'; result.textContent=error.message; return; }
+  result.style.color='var(--green)';
+  const labels = { free:'Free로 해제', plus:'Plus 부여', group:'Group 부여' };
+  result.textContent=`${labels[tier] || tier} 완료.`;
+  await searchMembership();
+  await loadMembershipList();
+}
+
+async function loadMembershipList() {
+  const listEl = document.getElementById('mem-list');
+  if (!listEl) return;
+  const { data, error } = await sb.from('profiles').select('id,nickname,email,membership,is_plus,membership_updated_at').neq('membership','free').order('membership_updated_at', { ascending:false });
+  if (error) { listEl.innerHTML=`<span style="color:var(--red);">${error.message}</span>`; return; }
+  if (!data || !data.length) { listEl.textContent='현재 유료 회원이 없습니다.'; return; }
+  listEl.innerHTML = data.map(u => {
+    const badge = u.membership==='group' ? '<span style="color:#0f766e;font-weight:800;">👥 Group</span>' : '<span style="color:#7c3aed;font-weight:800;">💎 Plus</span>';
+    const updated = u.membership_updated_at ? new Date(u.membership_updated_at).toLocaleDateString('ko-KR') : '-';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+      <span>${u.nickname||'(닉네임 없음)'} <span style="color:var(--muted);font-size:10px;">${u.email||''}</span></span>
+      <span>${badge} <span style="color:var(--muted);font-size:10px;margin-left:6px;">${updated}</span></span>
+    </div>`;
+  }).join('');
 }
 
 async function setAdminAccount(enabled) {

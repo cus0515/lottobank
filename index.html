@@ -6136,26 +6136,46 @@ function showGroupComingSoon() {
   toast('모임 기능은 현재 검증 모드로 제공 중입니다.');
 }
 
-const GROUP_STORE_KEY = 'lottobank_groups_v1';
+// ── 모임 Supabase 상태 ──
 let selectedGroupId = null;
+let _groupCache = null; // { groups:[], members:{gid:[]}, tickets:{gid:[]} }
 
-function groupStoreKey() {
-  return `${GROUP_STORE_KEY}_${currentUser?.id || 'guest'}`;
-}
-
-function getGroupRecords() {
-  try {
-    const raw = localStorage.getItem(groupStoreKey());
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (_) {
-    return [];
+// DB에서 전체 모임 데이터 로드
+async function loadGroupsFromDB() {
+  if (!isLoggedIn || !currentUser || !sb) return { groups: [], members: {}, tickets: {} };
+  const uid = currentUser.id;
+  const { data: gRows } = await sb.from('lotto_groups').select('*').eq('owner_id', uid).order('created_at', { ascending: false });
+  const gids = (gRows || []).map(g => g.id);
+  const members = {};
+  const tickets = {};
+  if (gids.length) {
+    const { data: mRows } = await sb.from('lotto_group_members').select('*').in('group_id', gids).order('created_at', { ascending: true });
+    const { data: tRows } = await sb.from('lotto_group_tickets').select('*').in('group_id', gids).order('created_at', { ascending: false });
+    (mRows || []).forEach(m => { (members[m.group_id] = members[m.group_id] || []).push(m); });
+    (tRows || []).forEach(t => { (tickets[t.group_id] = tickets[t.group_id] || []).push(t); });
   }
+  _groupCache = { groups: gRows || [], members, tickets };
+  return _groupCache;
 }
 
-function saveGroupRecords(groups) {
-  localStorage.setItem(groupStoreKey(), JSON.stringify(groups || []));
+// DB 캐시 → 기존 renderGroup이 쓰는 형태로 변환
+function getGroupRecords() {
+  if (!_groupCache) return [];
+  return _groupCache.groups.map(g => ({
+    id: g.id,
+    name: g.name,
+    createdAt: g.created_at,
+    members: (_groupCache.members[g.id] || []).map(m => ({
+      id: m.id, name: m.name, contribution: Math.round((m.share_weight || 1) * 1000)
+    })),
+    tickets: (_groupCache.tickets[g.id] || []).map(t => ({
+      id: t.id, type: t.lottery_type, round: t.round_no,
+      amount: t.amount, prize: t.prize_amount, memo: t.memo, createdAt: t.created_at
+    }))
+  }));
 }
+
+function saveGroupRecords() {} // DB 기반 — 직접 저장 없음
 
 function groupId(prefix) {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -6183,7 +6203,7 @@ function groupTotals(group) {
   return { members, tickets, spent, prize, balance: prize - spent, perMemberPrize };
 }
 
-function renderGroup() {
+async function renderGroup() {
   const root = $('group-content');
   if (!root) return;
   if (!isLoggedIn) {
@@ -6194,6 +6214,8 @@ function renderGroup() {
     </div>`;
     return;
   }
+  root.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">모임 불러오는 중…</div>';
+  await loadGroupsFromDB();
   const groups = getGroupRecords();
   const group = ensureSelectedGroup(groups);
   const listHtml = groups.length ? groups.map(g => {
@@ -6276,24 +6298,16 @@ function renderGroupDetail(group) {
   <div style="margin-top:6px;">${ticketRows}</div>`;
 }
 
-function updateSelectedGroup(mutator) {
-  const groups = getGroupRecords();
-  const idx = groups.findIndex(g => g.id === selectedGroupId);
-  if (idx < 0) return null;
-  mutator(groups[idx], groups);
-  saveGroupRecords(groups);
-  renderGroup();
-  return groups[idx];
-}
+// updateSelectedGroup: DB 방식 이후 미사용 — stub 유지
+function updateSelectedGroup() {}
 
-function createLottoGroup() {
+async function createLottoGroup() {
+  if (!isLoggedIn || !sb) return toast('로그인이 필요합니다.');
   const name = ($('group-name-input')?.value || '').trim();
   if (!name) return toast('모임 이름을 입력해주세요.');
-  const groups = getGroupRecords();
-  const group = { id: groupId('grp'), name, createdAt: new Date().toISOString(), members: [], tickets: [] };
-  groups.unshift(group);
-  selectedGroupId = group.id;
-  saveGroupRecords(groups);
+  const { data, error } = await sb.from('lotto_groups').insert({ owner_id: currentUser.id, name }).select().single();
+  if (error) return toast('모임 생성 실패: ' + error.message);
+  selectedGroupId = data.id;
   renderGroup();
 }
 
@@ -6302,48 +6316,57 @@ function selectLottoGroup(id) {
   renderGroup();
 }
 
-function deleteLottoGroup(id) {
+async function deleteLottoGroup(id) {
   if (!confirm('이 모임을 삭제할까요?')) return;
-  const groups = getGroupRecords().filter(g => g.id !== id);
-  selectedGroupId = groups[0]?.id || null;
-  saveGroupRecords(groups);
+  if (!sb) return;
+  const { error } = await sb.from('lotto_groups').delete().eq('id', id);
+  if (error) return toast('삭제 실패: ' + error.message);
+  if (selectedGroupId === id) selectedGroupId = null;
   renderGroup();
 }
 
-function addLottoGroupMember() {
+async function addLottoGroupMember() {
+  if (!isLoggedIn || !sb) return toast('로그인이 필요합니다.');
+  if (!selectedGroupId) return toast('모임을 먼저 선택해주세요.');
   const name = ($('group-member-name')?.value || '').trim();
   const contribution = Number($('group-member-contribution')?.value || 0);
   if (!name) return toast('멤버 이름을 입력해주세요.');
-  updateSelectedGroup(group => {
-    group.members = group.members || [];
-    group.members.push({ id: groupId('mem'), name, contribution });
-  });
+  const shareWeight = contribution > 0 ? contribution / 1000 : 1;
+  const { error } = await sb.from('lotto_group_members').insert({ group_id: selectedGroupId, name, share_weight: shareWeight });
+  if (error) return toast('멤버 추가 실패: ' + error.message);
+  renderGroup();
 }
 
-function deleteLottoGroupMember(id) {
-  updateSelectedGroup(group => {
-    group.members = (group.members || []).filter(m => m.id !== id);
-  });
+async function deleteLottoGroupMember(id) {
+  if (!sb) return;
+  const { error } = await sb.from('lotto_group_members').delete().eq('id', id);
+  if (error) return toast('삭제 실패: ' + error.message);
+  renderGroup();
 }
 
-function addLottoGroupTicket() {
-  const type = $('group-ticket-type')?.value || 'lotto';
-  const round = Number($('group-ticket-round')?.value || 0);
+async function addLottoGroupTicket() {
+  if (!isLoggedIn || !sb) return toast('로그인이 필요합니다.');
+  if (!selectedGroupId) return toast('모임을 먼저 선택해주세요.');
+  const lottery_type = $('group-ticket-type')?.value || 'lotto';
+  const round_no = Number($('group-ticket-round')?.value || 0);
   const amount = Number($('group-ticket-amount')?.value || 0);
-  const prize = Number($('group-ticket-prize')?.value || 0);
+  const prize_amount = Number($('group-ticket-prize')?.value || 0);
   const memo = ($('group-ticket-memo')?.value || '').trim();
-  if (!round || round < 1) return toast('회차를 입력해주세요.');
-  if (amount < 0 || prize < 0) return toast('금액을 확인해주세요.');
-  updateSelectedGroup(group => {
-    group.tickets = group.tickets || [];
-    group.tickets.unshift({ id: groupId('tkt'), type, round, amount, prize, memo, createdAt: new Date().toISOString() });
+  if (!round_no || round_no < 1) return toast('회차를 입력해주세요.');
+  if (amount < 0 || prize_amount < 0) return toast('금액을 확인해주세요.');
+  const { error } = await sb.from('lotto_group_tickets').insert({
+    group_id: selectedGroupId, created_by: currentUser.id,
+    lottery_type, round_no, amount, prize_amount, memo: memo || null
   });
+  if (error) return toast('기록 실패: ' + error.message);
+  renderGroup();
 }
 
-function deleteLottoGroupTicket(id) {
-  updateSelectedGroup(group => {
-    group.tickets = (group.tickets || []).filter(t => t.id !== id);
-  });
+async function deleteLottoGroupTicket(id) {
+  if (!sb) return;
+  const { error } = await sb.from('lotto_group_tickets').delete().eq('id', id);
+  if (error) return toast('삭제 실패: ' + error.message);
+  renderGroup();
 }
 
 function shareLottoGroup() {
