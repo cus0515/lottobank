@@ -19,9 +19,11 @@ create table if not exists public.lotto_groups (
 create table if not exists public.lotto_group_members (
   id uuid primary key default gen_random_uuid(),
   group_id uuid not null references public.lotto_groups(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete cascade,
   name text not null,
   email text,
   share_weight numeric not null default 1,
+  status text not null default 'accepted',
   created_at timestamptz not null default now()
 );
 
@@ -29,6 +31,7 @@ create table if not exists public.lotto_group_tickets (
   id uuid primary key default gen_random_uuid(),
   group_id uuid not null references public.lotto_groups(id) on delete cascade,
   created_by uuid references auth.users(id) on delete set null,
+  ticket_id uuid references public.tickets(id) on delete cascade,
   lottery_type text not null default 'lotto',
   round_no integer,
   ticket_code text,
@@ -38,6 +41,37 @@ create table if not exists public.lotto_group_tickets (
   created_at timestamptz not null default now()
 );
 
+alter table public.lotto_group_members
+  add column if not exists user_id uuid references auth.users(id) on delete cascade,
+  add column if not exists status text not null default 'accepted';
+
+alter table public.lotto_group_tickets
+  add column if not exists ticket_id uuid references public.tickets(id) on delete cascade;
+
+create unique index if not exists lotto_group_members_group_user_uidx
+  on public.lotto_group_members(group_id, user_id)
+  where user_id is not null;
+
+create unique index if not exists lotto_group_tickets_group_ticket_uidx
+  on public.lotto_group_tickets(group_id, ticket_id)
+  where ticket_id is not null;
+
+create or replace function public.is_lotto_group_member(p_group_id uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.lotto_groups g
+    where g.id = p_group_id and g.owner_id = auth.uid()
+  )
+  or exists (
+    select 1 from public.lotto_group_members m
+    where m.group_id = p_group_id and m.user_id = auth.uid()
+  );
+$$;
+
 alter table public.lotto_groups enable row level security;
 alter table public.lotto_group_members enable row level security;
 alter table public.lotto_group_tickets enable row level security;
@@ -45,29 +79,24 @@ alter table public.lotto_group_tickets enable row level security;
 drop policy if exists "group owners manage groups" on public.lotto_groups;
 create policy "group owners manage groups"
   on public.lotto_groups for all to authenticated
-  using (owner_id = auth.uid())
+  using (public.is_lotto_group_member(id))
   with check (owner_id = auth.uid());
 
 drop policy if exists "group owners manage members" on public.lotto_group_members;
 create policy "group owners manage members"
   on public.lotto_group_members for all to authenticated
-  using (exists (
-    select 1 from public.lotto_groups g
-    where g.id = lotto_group_members.group_id and g.owner_id = auth.uid()
-  ))
-  with check (exists (
-    select 1 from public.lotto_groups g
-    where g.id = lotto_group_members.group_id and g.owner_id = auth.uid()
-  ));
+  using (public.is_lotto_group_member(group_id))
+  with check (public.is_lotto_group_member(group_id));
 
 drop policy if exists "group owners manage tickets" on public.lotto_group_tickets;
 create policy "group owners manage tickets"
   on public.lotto_group_tickets for all to authenticated
-  using (exists (
-    select 1 from public.lotto_groups g
-    where g.id = lotto_group_tickets.group_id and g.owner_id = auth.uid()
-  ))
-  with check (exists (
-    select 1 from public.lotto_groups g
-    where g.id = lotto_group_tickets.group_id and g.owner_id = auth.uid()
+  using (public.is_lotto_group_member(group_id))
+  with check (public.is_lotto_group_member(group_id)
+  and (
+    created_by = auth.uid()
+    or exists (
+      select 1 from public.lotto_groups g
+      where g.id = lotto_group_tickets.group_id and g.owner_id = auth.uid()
+    )
   ));

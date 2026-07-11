@@ -6285,14 +6285,32 @@ async function loadGroupsFromDB() {
   if (!isLoggedIn || !currentUser || !sb) return { groups: [], members: {}, tickets: {} };
   const uid = currentUser.id;
   try {
-    const { data: gRows, error: gErr } = await sb.from('lotto_groups').select('*').eq('owner_id', uid).order('created_at', { ascending: false });
-    if (gErr) throw gErr;
-    const gids = (gRows || []).map(g => g.id);
+    const { data: ownedRows, error: ownedErr } = await sb.from('lotto_groups').select('*').eq('owner_id', uid).order('created_at', { ascending: false });
+    if (ownedErr) throw ownedErr;
+    let memberGroupIds = [];
+    const { data: myMemberships } = await sb.from('lotto_group_members').select('group_id').eq('user_id', uid);
+    memberGroupIds = [...new Set((myMemberships || []).map(m => m.group_id).filter(Boolean))];
+    let memberGroups = [];
+    if (memberGroupIds.length) {
+      const { data } = await sb.from('lotto_groups').select('*').in('id', memberGroupIds).order('created_at', { ascending: false });
+      memberGroups = data || [];
+    }
+    const byId = new Map();
+    [...(ownedRows || []), ...memberGroups].forEach(g => byId.set(g.id, g));
+    const gRows = [...byId.values()].sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    const gids = gRows.map(g => g.id);
     const members = {};
     const tickets = {};
     if (gids.length) {
       const { data: mRows } = await sb.from('lotto_group_members').select('*').in('group_id', gids).order('created_at', { ascending: true });
-      const { data: tRows } = await sb.from('lotto_group_tickets').select('*').in('group_id', gids).order('created_at', { ascending: false });
+      let { data: tRows, error: tErr } = await sb.from('lotto_group_tickets')
+        .select('*, ticket:tickets(id,user_id,round_no,lottery_type,game_count,prize_rank,prize_amount,purchase_date,created_at)')
+        .in('group_id', gids)
+        .order('created_at', { ascending: false });
+      if (tErr) {
+        const fallback = await sb.from('lotto_group_tickets').select('*').in('group_id', gids).order('created_at', { ascending: false });
+        tRows = fallback.data || [];
+      }
       (mRows || []).forEach(m => { (members[m.group_id] = members[m.group_id] || []).push(m); });
       (tRows || []).forEach(t => { (tickets[t.group_id] = tickets[t.group_id] || []).push(t); });
     }
@@ -6306,13 +6324,14 @@ async function loadGroupsFromDB() {
     const tickets = {};
     lsGroups.forEach(g => {
       members[g.id] = (g.members || []).map((m,i) => ({
-        id: m.id || ('lm_'+i), group_id: g.id, name: m.name,
+        id: m.id || ('lm_'+i), group_id: g.id, user_id: m.userId || null, name: m.name,
         share_weight: (m.contribution || 1000) / 1000, created_at: g.createdAt
       }));
       tickets[g.id] = (g.tickets || []).map((t,i) => ({
         id: t.id || ('lt_'+i), group_id: g.id, created_by: uid,
-        lottery_type: t.type || 'lotto', round_no: t.round, amount: t.amount,
-        prize_amount: t.prize, memo: t.memo, created_at: t.createdAt
+        ticket_id: t.ticketId || null, lottery_type: t.type || 'lotto', round_no: t.round, amount: t.amount,
+        prize_amount: t.prize, memo: t.memo, created_at: t.createdAt,
+        ticket: t.ticketId ? { id:t.ticketId, user_id:t.ownerId || uid, lottery_type:t.type || 'lotto', round_no:t.round, game_count:Math.max(1, Math.round(Number(t.amount || 1000) / 1000)), prize_amount:t.prize || 0, purchase_date:t.purchaseDate || null } : null
       }));
     });
     _groupCache = {
@@ -6331,11 +6350,20 @@ function getGroupRecords() {
     name: g.name,
     createdAt: g.created_at,
     members: (_groupCache.members[g.id] || []).map(m => ({
-      id: m.id, name: m.name, contribution: Math.round((m.share_weight || 1) * 1000)
+      id: m.id, userId: m.user_id || null, name: m.name, contribution: Math.round((m.share_weight || 1) * 1000)
     })),
     tickets: (_groupCache.tickets[g.id] || []).map(t => ({
-      id: t.id, type: t.lottery_type, round: t.round_no,
-      amount: t.amount, prize: t.prize_amount, memo: t.memo, createdAt: t.created_at
+      id: t.id,
+      ticketId: t.ticket_id || t.ticket?.id || null,
+      ownerId: t.ticket?.user_id || t.created_by || null,
+      type: t.ticket?.lottery_type || t.lottery_type,
+      round: t.ticket?.round_no || t.round_no,
+      amount: Number(t.amount || ((t.ticket?.game_count || 1) * 1000)),
+      prize: Number(t.ticket?.prize_amount ?? t.prize_amount ?? 0),
+      rank: t.ticket?.prize_rank || null,
+      purchaseDate: t.ticket?.purchase_date || null,
+      memo: t.memo,
+      createdAt: t.created_at
     }))
   }));
 }
@@ -6379,6 +6407,32 @@ function groupTotals(group) {
   return { members, tickets, spent, prize, balance: prize - spent, perMemberPrize, roi, bestPrize, winRounds, settlement };
 }
 
+async function loadMyGroupTickets() {
+  if (!isLoggedIn || !currentUser || !sb) return [];
+  if (Array.isArray(window._groupMyTickets)) return window._groupMyTickets;
+  try {
+    const { data, error } = await sb.from('tickets')
+      .select('id,round_no,lottery_type,game_count,prize_rank,prize_amount,purchase_date,created_at')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending:false })
+      .limit(200);
+    if (error) throw error;
+    window._groupMyTickets = data || [];
+  } catch (error) {
+    console.warn('loadMyGroupTickets:', error.message);
+    window._groupMyTickets = [];
+  }
+  return window._groupMyTickets;
+}
+
+function groupTicketLabel(ticket) {
+  const type = ticket.lottery_type === 'pension' ? '연금 720+' : '로또 6/45';
+  const games = Number(ticket.game_count || 1);
+  const prize = Number(ticket.prize_amount || 0);
+  const result = prize > 0 ? `${fmtMFull(prize)} 당첨` : '미당첨';
+  return `${type} ${ticket.round_no || '-'}회 · ${games}게임 · ${result}`;
+}
+
 async function renderGroup() {
   const root = $('group-content');
   if (!root) return;
@@ -6391,7 +6445,9 @@ async function renderGroup() {
     return;
   }
   root.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">모임 불러오는 중…</div>';
+  window._groupMyTickets = null;
   await loadGroupsFromDB();
+  await loadMyGroupTickets();
   const groups = getGroupRecords();
   const group = ensureSelectedGroup(groups);
   const tab = window._groupTab || 'dashboard';
@@ -6512,13 +6568,13 @@ function renderGroupTabContent(group, tab) {
     }).join('') : '<div style="padding:16px 0;font-size:12px;color:var(--text-muted);">등록된 멤버가 없습니다.</div>';
     return `${rows}
     <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-dashed);">
-      <div style="font-size:12px;font-weight:800;color:var(--text-dark);margin-bottom:8px;">멤버 추가</div>
+      <div style="font-size:12px;font-weight:800;color:var(--text-dark);margin-bottom:8px;">닉네임으로 멤버 초대</div>
       <div style="display:grid;grid-template-columns:1fr 80px auto;gap:6px;">
-        <input id="group-member-name" class="input-custom" placeholder="이름" style="margin:0;font-size:12px;">
+        <input id="group-member-name" class="input-custom" placeholder="LottoBank 닉네임" style="margin:0;font-size:12px;">
         <input id="group-member-pct" class="input-custom" type="number" min="1" max="100" step="1" placeholder="지분%" style="margin:0;font-size:12px;">
-        <button class="btn-premium" style="padding:0 12px;font-size:12px;white-space:nowrap;" onclick="addLottoGroupMember()">추가</button>
+        <button class="btn-premium" style="padding:0 12px;font-size:12px;white-space:nowrap;" onclick="addLottoGroupMember()">초대</button>
       </div>
-      <div style="font-size:10px;color:var(--text-muted);margin-top:6px;">지분(%)은 당첨금 배분 비율입니다. 합이 100이 되도록 설정하세요.</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:6px;">닉네임이 일치하면 해당 계정이 등록한 QR 티켓을 이 모임에 연결할 수 있습니다. 지분은 당첨금 배분 비율입니다.</div>
     </div>`;
   }
 
@@ -6529,30 +6585,32 @@ function renderGroupTabContent(group, tab) {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
             <b style="font-size:13px;">${tk.type==='pension'?'연금복권 720+':'로또 6/45'} ${tk.round}회</b>
-            ${tk.memo?`<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">${groupSafe(tk.memo)}</span>`:''}
+            ${tk.ownerId ? `<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">QR 인증 티켓</span>` : ''}
           </div>
           <button onclick="deleteLottoGroupTicket('${tk.id}')" style="padding:3px 8px;font-size:11px;font-weight:700;color:#dc2626;background:none;border:1px solid #fecaca;border-radius:6px;cursor:pointer;font-family:inherit;flex-shrink:0;">삭제</button>
         </div>
         <div style="display:flex;gap:12px;margin-top:5px;font-size:11px;">
           <span style="color:var(--text-muted);">구매 <b style="color:var(--text-dark);">${fmtMFull(Number(tk.amount||0))}</b></span>
           <span style="color:var(--text-muted);">당첨 <b style="color:${isPrize?'#059669':'#94a3b8'};">${isPrize?fmtMFull(Number(tk.prize)):'낙첨'}</b></span>
-          <span style="color:var(--text-muted);">${new Date(tk.createdAt||Date.now()).toLocaleDateString('ko-KR',{month:'short',day:'numeric'})}</span>
+          <span style="color:var(--text-muted);">${tk.purchaseDate || new Date(tk.createdAt||Date.now()).toLocaleDateString('ko-KR',{month:'short',day:'numeric'})}</span>
         </div>
       </div>`;
     }).join('') : '<div style="padding:16px 0;font-size:12px;color:var(--text-muted);">기록이 없습니다.</div>';
+    const linkedTicketIds = new Set(t.tickets.map(tk => String(tk.ticketId || '')).filter(Boolean));
+    const myOptions = (window._groupMyTickets || [])
+      .filter(ticket => !linkedTicketIds.has(String(ticket.id)))
+      .map(ticket => `<option value="${ticket.id}">${groupSafe(groupTicketLabel(ticket))}</option>`)
+      .join('');
     return `${rows}
     <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-dashed);">
-      <div style="font-size:12px;font-weight:800;color:var(--text-dark);margin-bottom:8px;">구매 기록 추가</div>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:6px;">
-        <select id="group-ticket-type" class="input-custom" style="margin:0;font-size:12px;"><option value="lotto">로또 6/45</option><option value="pension">연금 720+</option></select>
-        <input id="group-ticket-round" class="input-custom" type="number" min="1" placeholder="회차" style="margin:0;font-size:12px;">
-        <input id="group-ticket-amount" class="input-custom" type="number" min="0" step="1000" placeholder="구매금액(원)" style="margin:0;font-size:12px;">
-        <input id="group-ticket-prize" class="input-custom" type="number" min="0" step="1000" placeholder="당첨금(원, 없으면 0)" style="margin:0;font-size:12px;">
-      </div>
+      <div style="font-size:12px;font-weight:800;color:var(--text-dark);margin-bottom:8px;">내 QR 인증 티켓 연결</div>
       <div style="display:grid;grid-template-columns:1fr auto;gap:6px;">
-        <input id="group-ticket-memo" class="input-custom" placeholder="메모 (선택)" maxlength="30" style="margin:0;font-size:12px;">
-        <button class="btn-premium" style="padding:0 14px;font-size:12px;white-space:nowrap;" onclick="addLottoGroupTicket()">추가</button>
+        <select id="group-ticket-id" class="input-custom" style="margin:0;font-size:12px;">
+          ${myOptions || '<option value="">연결 가능한 QR 인증 티켓이 없습니다.</option>'}
+        </select>
+        <button class="btn-premium" style="padding:0 14px;font-size:12px;white-space:nowrap;" onclick="addLottoGroupTicket()">연결</button>
       </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:6px;">각 멤버는 자기 계정에서 QR 인증 후 이 모임에 티켓을 연결하면 됩니다.</div>
     </div>`;
   }
 
@@ -6636,18 +6694,36 @@ async function addLottoGroupMember() {
   if (!selectedGroupId) return toast('모임을 먼저 선택해주세요.');
   const name = ($('group-member-name')?.value || '').trim();
   const pct = Number($('group-member-pct')?.value || 0);
-  if (!name) return toast('멤버 이름을 입력해주세요.');
+  if (!name) return toast('초대할 닉네임을 입력해주세요.');
   const shareWeight = pct > 0 ? pct : 1;
+  let matchedProfile = null;
+  try {
+    const { data } = await sb.from('profiles').select('id,nickname,email').eq('nickname', name).maybeSingle();
+    matchedProfile = data || null;
+  } catch (_) {}
   if (window._groupLocalMode || String(selectedGroupId).startsWith('local_')) {
     const groups = _grpLoadLS();
     const g = groups.find(x => x.id === selectedGroupId);
     if (!g) return toast('모임을 찾을 수 없습니다.');
     g.members = g.members || [];
-    g.members.push({ id: 'lm_'+Date.now(), name, contribution: shareWeight * 1000 });
+    g.members.push({ id: 'lm_'+Date.now(), userId: matchedProfile?.id || null, name: matchedProfile?.nickname || name, contribution: shareWeight * 1000 });
     _grpSaveLS(groups); renderGroup(); return;
   }
-  const { error } = await sb.from('lotto_group_members').insert({ group_id: selectedGroupId, name, share_weight: shareWeight });
+  const payload = {
+    group_id: selectedGroupId,
+    user_id: matchedProfile?.id || null,
+    name: matchedProfile?.nickname || name,
+    email: matchedProfile?.email || null,
+    share_weight: shareWeight,
+    status: matchedProfile ? 'accepted' : 'pending'
+  };
+  let { error } = await sb.from('lotto_group_members').insert(payload);
+  if (error && /column|schema cache/i.test(error.message || '')) {
+    const legacyPayload = { group_id: selectedGroupId, name: payload.name, share_weight: shareWeight };
+    ({ error } = await sb.from('lotto_group_members').insert(legacyPayload));
+  }
   if (error) return toast('멤버 추가 실패: ' + error.message);
+  toast(matchedProfile ? '멤버를 연결했습니다.' : '닉네임과 일치하는 계정이 없어 이름만 등록했습니다.');
   renderGroup();
 }
 
@@ -6666,26 +6742,34 @@ async function deleteLottoGroupMember(id) {
 async function addLottoGroupTicket() {
   if (!isLoggedIn) return toast('로그인이 필요합니다.');
   if (!selectedGroupId) return toast('모임을 먼저 선택해주세요.');
-  const lottery_type = $('group-ticket-type')?.value || 'lotto';
-  const round_no = Number($('group-ticket-round')?.value || 0);
-  const amount = Number($('group-ticket-amount')?.value || 0);
-  const prize_amount = Number($('group-ticket-prize')?.value || 0);
-  const memo = ($('group-ticket-memo')?.value || '').trim();
-  if (!round_no || round_no < 1) return toast('회차를 입력해주세요.');
-  if (amount < 0 || prize_amount < 0) return toast('금액을 확인해주세요.');
+  const ticketId = $('group-ticket-id')?.value || '';
+  if (!ticketId) return toast('연결할 QR 인증 티켓을 선택해주세요.');
+  const ticket = (window._groupMyTickets || []).find(t => String(t.id) === String(ticketId));
+  if (!ticket) return toast('선택한 티켓을 찾지 못했습니다.');
+  const lottery_type = ticket.lottery_type || 'lotto';
+  const round_no = Number(ticket.round_no || 0);
+  const amount = Number(ticket.game_count || 1) * 1000;
+  const prize_amount = Number(ticket.prize_amount || 0);
   if (window._groupLocalMode || String(selectedGroupId).startsWith('local_')) {
     const groups = _grpLoadLS();
     const g = groups.find(x => x.id === selectedGroupId);
     if (!g) return toast('모임을 찾을 수 없습니다.');
     g.tickets = g.tickets || [];
-    g.tickets.unshift({ id:'lt_'+Date.now(), type:lottery_type, round:round_no, amount, prize:prize_amount, memo, createdAt:new Date().toISOString() });
+    if (g.tickets.some(t => String(t.ticketId) === String(ticketId))) return toast('이미 연결된 티켓입니다.');
+    g.tickets.unshift({ id:'lt_'+Date.now(), ticketId, ownerId:currentUser.id, type:lottery_type, round:round_no, amount, prize:prize_amount, purchaseDate:ticket.purchase_date, createdAt:new Date().toISOString() });
     _grpSaveLS(groups); renderGroup(); return;
   }
-  const { error } = await sb.from('lotto_group_tickets').insert({
+  const payload = {
     group_id: selectedGroupId, created_by: currentUser.id,
-    lottery_type, round_no, amount, prize_amount, memo: memo || null
-  });
+    ticket_id: ticketId, lottery_type, round_no, amount, prize_amount, memo: null
+  };
+  let { error } = await sb.from('lotto_group_tickets').insert(payload);
+  if (error && /column|schema cache/i.test(error.message || '')) {
+    const legacyPayload = { group_id: selectedGroupId, created_by: currentUser.id, lottery_type, round_no, amount, prize_amount, memo: 'QR 인증 티켓' };
+    ({ error } = await sb.from('lotto_group_tickets').insert(legacyPayload));
+  }
   if (error) return toast('기록 실패: ' + error.message);
+  toast('QR 인증 티켓을 모임에 연결했습니다.');
   renderGroup();
 }
 
