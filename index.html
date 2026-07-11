@@ -94,6 +94,8 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-floor); col
 
 header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
 .nav-container { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 64px; }
+.logo-area { flex: 1; display: flex; align-items: center; }
+.auth-zone-wrap { flex: 1; display: flex; justify-content: flex-end; }
 .logo-title { font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; display:flex; align-items:center; }
 .logo-title .logo-brand { font-size:22px; font-weight:900; line-height:1; }
 .logo-title .logo-tagline { font-size:11px; color:var(--text-muted); font-weight:400; }
@@ -102,7 +104,7 @@ header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); positio
 .menu-btn:hover:not(.on) { color: var(--lotto-red); }
 .menu-btn.on { color: var(--lotto-red); font-weight: 700; }
 .menu-btn.on::after { content: ''; position: absolute; bottom: 0; left: 8px; right: 8px; height: 3px; background: var(--lotto-red); border-radius: 2px 2px 0 0; }
-.auth-zone { display: flex; align-items: center; gap: 10px; }
+.auth-zone { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
 .btn-login { padding: 7px 18px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg,#e11d48,#be123c); color: #fff; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(225,29,72,.4); transition: filter .15s,transform .1s; letter-spacing:.2px; }
 .btn-login:hover { filter:brightness(1.1); transform:translateY(-1px); }
 .user-profile { display: none; align-items: center; position: relative; }
@@ -1713,6 +1715,19 @@ textarea {
     padding:12px !important;
   }
 }
+
+/* ── 구독 페이지 ── */
+#subscription-content .plus-chip { font-size:11px; }
+#subscription-content .group-chip { font-size:11px; }
+
+/* ── 프로필 블록 hover ── */
+.profile-block:hover { box-shadow: 0 2px 8px rgba(15,23,42,.08) !important; }
+
+/* ── 계정 삭제 버튼 ── */
+.danger-zone button:hover { background:#fff0f0 !important; }
+
+/* ── Nav 로고 영역 flex 보정 ── */
+.logo-area { flex:1; min-width:0; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -2359,6 +2374,11 @@ textarea {
           </div>
         </div>
         <div id="community-content"></div>
+      </div>
+
+      <!-- 10. 멤버십 구독 -->
+      <div id="pg-subscription" class="page-content" style="display:none;">
+        <div id="subscription-content"></div>
       </div>
 
       <!-- 9. 프로필 -->
@@ -5905,12 +5925,13 @@ function go(id) {
     map:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 내 주변 판매점',
     community: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 커뮤니티',
     profile:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필',
+    subscription: '💎 멤버십',
   };
   $('mid-title').innerHTML = titles[id] || '';
   const mainLayout = $('main-content');
   if (mainLayout) mainLayout.dataset.activePage = id;
   // 페이지 타이틀 동적 업데이트
-  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', rank:'랭킹', map:'내 주변 판매점', profile:'내 프로필', home:'실시간 피드', lab:'연구소', group:'로또 모임', fortune:'레이더' };
+  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', rank:'랭킹', map:'내 주변 판매점', profile:'내 프로필', home:'실시간 피드', lab:'연구소', group:'로또 모임', fortune:'레이더', subscription:'멤버십' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
@@ -5944,6 +5965,7 @@ function go(id) {
     renderCommunity();
   }
   if (id === 'profile')   { renderProfile(); if(isLoggedIn && !window._ltbTickets) loadProfileRecentTickets(); }
+  if (id === 'subscription') renderSubscription();
 }
 
 // =====================================================
@@ -6126,6 +6148,120 @@ function renderGroupUpsell() {
       <span>모임 공유 카드</span>
     </div>
   </div>`;
+}
+
+function renderSubscription() {
+  const wrap = $('subscription-content');
+  if (!wrap) return;
+  const tier = window._membership || 'free';
+  const isPlusMember = tier === 'plus';
+  const isGroupMember = tier === 'group';
+
+  const tierBadge = isGroupMember
+    ? '<span class="group-chip">Group</span>'
+    : isPlusMember
+      ? '<span class="plus-chip">Plus</span>'
+      : '<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;letter-spacing:.4px;">FREE</span>';
+
+  const planCard = (color, bg, border, chipHtml, name, price, desc, features, cta, ctaFn, isCurrent) => `
+    <div style="border-radius:16px;padding:20px;background:${bg};border:2px solid ${border};position:relative;${isCurrent ? 'box-shadow:0 0 0 3px ' + color + '33;' : ''}">
+      ${isCurrent ? '<div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:' + color + ';color:#fff;font-size:10px;font-weight:800;padding:3px 12px;border-radius:99px;letter-spacing:.5px;">현재 플랜</div>' : ''}
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+        <div>
+          ${chipHtml}
+          <div style="font-size:20px;font-weight:900;color:var(--text-dark);margin-top:8px;">${name}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">${desc}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:22px;font-weight:900;color:${color};">${price}</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px;">
+        ${features.map(f => `<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dark);">
+          <span style="color:${color};font-size:14px;flex-shrink:0;">${f.icon}</span>${f.text}
+        </div>`).join('')}
+      </div>
+      <button onclick="${ctaFn}" style="width:100%;padding:11px;background:${isCurrent ? '#f1f5f9' : color};color:${isCurrent ? '#64748b' : '#fff'};border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .15s;">${cta}</button>
+    </div>`;
+
+  wrap.innerHTML = `
+    <div style="background:linear-gradient(135deg,#0c1a2e,#1e1b4b);border-radius:16px;padding:22px 20px;margin-bottom:16px;color:#fff;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;opacity:.5;margin-bottom:6px;">MEMBERSHIP</div>
+      <div style="font-size:22px;font-weight:900;margin-bottom:4px;">멤버십 플랜</div>
+      <div style="font-size:12px;opacity:.6;line-height:1.6;">현재 플랜 ${tierBadge} &nbsp;·&nbsp; 앱 출시 후 Google Play 결제로 전환됩니다.</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      ${planCard(
+        '#64748b', 'var(--paper-white)', '#e2e8f0',
+        '<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;">FREE</span>',
+        '무료',
+        '₩0',
+        '기본 기능 무제한 이용',
+        [
+          {icon:'✅', text:'QR 인증 · 번호 이력 조회'},
+          {icon:'✅', text:'기본 전적 통계 (최근 10건)'},
+          {icon:'✅', text:'랭킹 · 뱃지 · 커뮤니티'},
+          {icon:'✅', text:'실시간 채팅'},
+          {icon:'❌', text:'<span style="color:var(--text-muted);">연구소 조회 제한 (월 5회)</span>'},
+          {icon:'❌', text:'<span style="color:var(--text-muted);">번호 저장 제한 (5개)</span>'},
+        ],
+        tier === 'free' ? '현재 이용 중' : '기본 플랜',
+        tier === 'free' ? '' : "go('profile')",
+        tier === 'free'
+      )}
+
+      ${planCard(
+        '#7c3aed', 'rgba(124,58,237,.04)', 'rgba(124,58,237,.25)',
+        '<span class="plus-chip">Plus</span>',
+        'Plus',
+        '월 ₩1,500',
+        '광고 없이, 제한 없이 이용하세요',
+        [
+          {icon:'✅', text:'무료 플랜 전체 포함'},
+          {icon:'💎', text:'광고 완전 제거'},
+          {icon:'💎', text:'역대 전적 무제한 조회'},
+          {icon:'💎', text:'번호 저장 무제한'},
+          {icon:'💎', text:'연구소 조회 무제한'},
+          {icon:'💎', text:'티켓 당첨 알림 (앱 출시 후)'},
+        ],
+        isPlusMember ? '현재 이용 중' : (isGroupMember ? '포함됨' : '준비 중'),
+        isPlusMember ? '' : 'showPlusComingSoon()',
+        isPlusMember
+      )}
+
+      ${planCard(
+        '#0f766e', 'rgba(15,118,110,.04)', 'rgba(15,118,110,.25)',
+        '<span class="group-chip">Group</span>',
+        'Group',
+        '월 ₩3,900',
+        'Plus 전체 + 공동 구매 모임 관리',
+        [
+          {icon:'✅', text:'Plus 플랜 전체 포함'},
+          {icon:'👥', text:'로또 모임 생성 · 관리'},
+          {icon:'👥', text:'멤버별 분담금 정산'},
+          {icon:'👥', text:'당첨금 1/N 자동 계산'},
+          {icon:'👥', text:'모임 공유 카드 생성'},
+          {icon:'👥', text:'공동 QR 등록 기록'},
+        ],
+        isGroupMember ? '현재 이용 중' : '준비 중',
+        isGroupMember ? '' : 'showPlusComingSoon()',
+        isGroupMember
+      )}
+    </div>
+
+    <div style="margin-top:16px;padding:14px;background:var(--bg-light);border-radius:12px;border:1px solid var(--border-dashed);">
+      <div style="font-size:11px;font-weight:800;color:var(--text-dark);margin-bottom:6px;">자주 묻는 질문</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.8;">
+        <b>결제는 언제부터?</b> Google Play 앱 출시 후 인앱 결제로 제공됩니다. 현재는 관리자 권한으로 검증 중입니다.<br>
+        <b>환불 정책?</b> 앱 출시 후 구체적인 환불 정책이 안내될 예정입니다.<br>
+        <b>Group은 Plus를 포함하나요?</b> 네, Group 플랜은 Plus의 모든 기능을 포함합니다.
+      </div>
+    </div>
+
+    <div style="margin-top:10px;text-align:center;">
+      <button onclick="go('profile')" style="font-size:12px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:8px 16px;font-family:inherit;">← 프로필로 돌아가기</button>
+    </div>`;
 }
 
 function showPlusComingSoon() {
@@ -10518,9 +10654,17 @@ function renderProfile() {
     </div>
     <div class="profile-block">
       <div class="profile-block-title">멤버십</div>
-      ${renderPlusUpsell(isLabPremiumUser() ? '현재 LottoBank Plus 이용 중입니다.' : '현재 무료 멤버십입니다.')}
-      ${renderGroupUpsell()}
-      <div style="font-size:10px;color:var(--text-muted);line-height:1.5;margin-top:8px;">Google Play 출시 후 Plus 결제가 열립니다. 개발 중에는 관리자 설정으로 권한 검증이 가능합니다.</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
+        <div>
+          <div style="font-size:14px;font-weight:900;color:var(--text-dark);">
+            ${window._membership === 'group' ? '<span class="group-chip">Group</span>' : window._membership === 'plus' ? '<span class="plus-chip">Plus</span>' : '<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;">FREE</span>'}
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+            ${window._membership === 'group' ? 'Group 플랜 이용 중' : window._membership === 'plus' ? 'Plus 플랜 이용 중' : '무료 플랜 이용 중'}
+          </div>
+        </div>
+        <button onclick="go('subscription')" style="padding:8px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">플랜 보기</button>
+      </div>
     </div>
     <div class="profile-block">
       <div class="profile-block-title">출석 기록</div>
@@ -10528,53 +10672,7 @@ function renderProfile() {
       <div class="profile-row"><span>현재 연속 출석</span><span class="profile-row-val">${window._attendanceStats?.streak||0}일</span></div>
       <div class="profile-row"><span>가입 후 이용 기간</span><span class="profile-row-val">${currentUser?.created_at?Math.max(1,Math.floor((Date.now()-new Date(currentUser.created_at))/86400000)+1):0}일</span></div>
     </div>
-    ${isLoggedIn ? `
-    <div class="profile-block" style="background:linear-gradient(135deg,rgba(225,29,72,.04),rgba(124,58,237,.04));border-color:rgba(225,29,72,.15);">
-      <div class="profile-block-title" style="color:var(--lotto-red);">🎂 LottoBank 가입 기념일</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div>
-          <div style="font-size:22px;font-weight:900;color:var(--text-dark);letter-spacing:-1px;">
-            ${currentUser?.created_at ? Math.floor((Date.now() - new Date(currentUser.created_at)) / 86400000) : 0}
-            <span style="font-size:13px;font-weight:600;color:var(--text-muted);">일째</span>
-          </div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">
-            가입일: ${currentUser?.created_at ? new Date(currentUser.created_at).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}) : '-'}
-          </div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:10px;color:var(--text-muted);">다음 기념일까지</div>
-          <div style="font-size:16px;font-weight:900;color:var(--lotto-red);">
-            ${currentUser?.created_at ? (()=>{ const j=new Date(currentUser.created_at); const n=new Date(); const ny=new Date(j); ny.setFullYear(n.getFullYear()); if(ny<n)ny.setFullYear(n.getFullYear()+1); return Math.ceil((ny-n)/86400000); })() : '?'} 일 후
-          </div>
-        </div>
-      </div>
-      <div style="background:var(--bg-light);border-radius:99px;height:6px;overflow:hidden;">
-        <div style="height:100%;background:linear-gradient(90deg,#e11d48,#7c3aed);border-radius:99px;transition:width .6s;width:${currentUser?.created_at ? Math.min(Math.round(((365-(()=>{ const j=new Date(currentUser.created_at); const n=new Date(); const ny=new Date(j); ny.setFullYear(n.getFullYear()); if(ny<n)ny.setFullYear(n.getFullYear()+1); return Math.ceil((ny-n)/86400000); })())/365)*100),100) : 0}%;"></div>
-      </div>
-    </div>
-    ${(window._ltbTickets && window._ltbTickets.length > 0) ? `
-    <div class="profile-block">
-      <div class="profile-block-title" style="display:flex;justify-content:space-between;">📱 최근 QR 등록 이력 <span style="font-weight:600;color:var(--text-muted);font-size:10px;">최근 ${Math.min(window._ltbTickets.length,5)}건</span></div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        ${window._ltbTickets.slice(0,5).map((t,i) => {
-          const isPension = t.result === 'pension';
-          const nums = Array.isArray(t.numbers) ? t.numbers : (t.nums || []);
-          const won = isPension ? '🏦 연금복권' : (t.prize_rank ? t.prize_rank+'등' : '낙첨');
-          const wonColor = isPension ? '#7c3aed' : (t.prize_rank ? (t.prize_rank<=2?'#dc2626':'#059669') : '#94a3b8');
-          const dateStr = t.purchase_date ? new Date(t.purchase_date).toLocaleDateString('ko-KR',{month:'short',day:'numeric'}) : '-';
-          const numDisplay = isPension
-            ? `<span style="font-size:11px;color:#7c3aed;font-weight:700;">720+ 연금복권</span>`
-            : nums.slice(0,6).map(n=>bH(n)).join('');
-          return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;${i>0?'border-top:1px solid var(--border-dashed)':''}">
-            <div style="font-size:10px;color:var(--text-muted);font-weight:700;min-width:32px;">${dateStr}</div>
-            <div style="display:flex;gap:3px;align-items:center;flex:1;">${numDisplay}</div>
-            <div style="font-size:11px;font-weight:700;color:${wonColor};">${won}</div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>
-    ` : ''}
-    ` : ''}
+
     ${isLoggedIn ? `
     <div class="profile-block">
       <div class="profile-block-title">닉네임 변경</div>
@@ -10600,12 +10698,12 @@ function renderProfile() {
       <div style="font-size:11px;color:var(--text-muted);">8자 이상 입력하세요. 변경 후 재로그인이 필요할 수 있습니다.</div>
     </div>
     <div class="profile-block danger-zone" style="border-color:#fecaca;">
-      <div class="profile-block-title" style="color:#dc2626;">위험 구역</div>
-      <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">탈퇴 시 QR 인증 기록, 전적, 뱃지, 게시글이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</p>
+      <div class="profile-block-title" style="color:#dc2626;">계정 삭제</div>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">계정을 삭제하면 QR 인증 기록, 전적, 뱃지, 게시글이 모두 영구 삭제됩니다. 삭제 후에는 복구할 수 없으니 신중하게 결정해 주세요.</p>
       <button onclick="deleteAccount()"
         style="width:100%;padding:9px;background:var(--comm-hot-bg,#fff5f5);border:1.5px solid #fecaca;border-radius:6px;font-size:13px;font-weight:700;color:#dc2626;cursor:pointer;font-family:inherit;">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-        회원 탈퇴
+        계정 영구 삭제
       </button>
     </div>
     <div style="margin-top:8px;">
