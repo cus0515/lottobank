@@ -5172,7 +5172,8 @@ function updateHeaderUser(nick, badgeText) {
       memBtn.textContent = 'Group';
       memBtn.style.cssText = 'display:inline-block;padding:2px 7px;font-size:10px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.4;background:rgba(15,118,110,.12);color:#0f766e;';
     } else {
-      memBtn.style.display = 'none';
+      memBtn.textContent = '무료';
+      memBtn.style.cssText = 'display:inline-block;padding:2px 7px;font-size:10px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.4;background:#f1f5f9;color:#64748b;';
     }
   }
 }
@@ -5942,7 +5943,7 @@ function go(id) {
     map:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 내 주변 판매점',
     community: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 커뮤니티',
     profile:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필',
-    subscription: '💎 멤버십',
+    subscription: '멤버십 플랜',
   };
   $('mid-title').innerHTML = titles[id] || '';
   const mainLayout = $('main-content');
