@@ -800,6 +800,12 @@ input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px
 .btn-premium { background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 2px 8px rgba(220,38,38,.3); }
 .btn-premium:hover { box-shadow: 0 4px 16px rgba(220,38,38,.4); transform: translateY(-1px); }
 .btn-premium:active { transform: scale(0.97); }
+.plus-card { border:1px solid rgba(225,29,72,.22); border-radius:12px; background:linear-gradient(135deg,rgba(225,29,72,.08),rgba(245,158,11,.07)); padding:14px; }
+.plus-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:999px; background:#fff7ed; border:1px solid #fed7aa; color:#c2410c; font-size:10px; font-weight:900; }
+.plus-benefits { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:10px; }
+.plus-benefits span { min-height:34px; display:flex; align-items:center; gap:6px; padding:8px 9px; border:1px solid rgba(226,232,240,.85); border-radius:8px; background:var(--paper-white); color:var(--text-dark); font-size:11px; font-weight:800; }
+[data-theme="dark"] .plus-card { background:linear-gradient(135deg,rgba(225,29,72,.16),rgba(245,158,11,.1)); border-color:rgba(251,113,133,.32); }
+[data-theme="dark"] .plus-chip { background:#2a1606; border-color:#9a3412; color:#fdba74; }
 
 /* 닉네임 입력 개선 */
 #nick-input { background: var(--paper-white); color: var(--text-dark); }
@@ -5137,12 +5143,12 @@ function applyLoginUI(user) {
   const mobSec = $('mob-auth-section'); if (mobSec) mobSec.style.display = '';
   $('chat-input').disabled = false;
   $('chat-input').placeholder = '실시간 메시지를 입력해 보세요.';
-  // 로그인 시 채팅 닉네임 미리 로드
-  if (!window._profileNickname) {
-    sb.from('profiles').select('nickname').eq('id', currentUser.id).single().then(({data}) => {
-      if (data?.nickname) window._profileNickname = data.nickname;
-    }).catch(()=>{});
-  }
+  // 로그인 시 프로필과 멤버십 상태 미리 로드
+  sb.from('profiles').select('*').eq('id', currentUser.id).single().then(({data}) => {
+    if (data?.nickname) window._profileNickname = data.nickname;
+    applyMembershipProfile(data);
+    updateHeaderUser(currentNickname(), getDisplayVerifiedTitle() || '');
+  }).catch(()=>{});
   // stats/ticket 버튼은 항상 표시 상태 유지
   updateBadgeUI();
   loadUserDataFromDB();
@@ -6023,6 +6029,49 @@ let labPensionGroup = 1;
 let labPensionDigits = ['','','','','',''];
 const LAB_VAULT_KEY = 'lottobank_lab_saved_numbers_v1';
 const LAB_QUERY_KEY = 'lottobank_lab_backtest_queries_v1';
+const LTB_PLUS_PLAN = {
+  id: 'lottobank_plus',
+  name: 'LottoBank Plus',
+  monthlyPrice: 1500,
+  yearlyPrice: 14900,
+};
+
+function isPlusTier(value) {
+  return ['plus','premium','pro','group'].includes(String(value || '').toLowerCase());
+}
+
+function applyMembershipProfile(profile) {
+  const tier = profile?.subscription_tier || profile?.membership || profile?.plan || '';
+  window._membership = isPlusTier(tier) || profile?.is_plus === true ? 'plus' : 'free';
+  window._isPremiumUser = window._membership === 'plus';
+}
+
+function getMembershipLabel() {
+  return isLabPremiumUser() ? 'Plus' : '무료';
+}
+
+function renderPlusUpsell(reason) {
+  return `<div class="plus-card">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+      <div>
+        <span class="plus-chip">Plus</span>
+        <div style="font-size:16px;font-weight:900;color:var(--text-dark);margin-top:7px;">${reason || 'LottoBank Plus로 제한 없이 이용하세요.'}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">월 ${LTB_PLUS_PLAN.monthlyPrice.toLocaleString()}원 · 연 ${LTB_PLUS_PLAN.yearlyPrice.toLocaleString()}원 예정.</div>
+      </div>
+      <button class="btn-premium" style="padding:9px 13px;font-size:12px;white-space:nowrap;" onclick="showPlusComingSoon()">준비 중</button>
+    </div>
+    <div class="plus-benefits">
+      <span>광고 제거</span>
+      <span>역대 전적 무제한</span>
+      <span>번호 저장 확장</span>
+      <span>티켓 당첨 알림</span>
+    </div>
+  </div>`;
+}
+
+function showPlusComingSoon() {
+  toast('Plus는 앱 출시 후 Google Play 결제로 제공할 예정입니다.');
+}
 
 function switchLabTab(tab) {
   labTab = tab || 'backtest';
@@ -6046,7 +6095,7 @@ function labCard(title, body) {
 }
 
 function isLabPremiumUser() {
-  return window._isPremiumUser === true || window._membership === 'premium';
+  return window._isPremiumUser === true || isPlusTier(window._membership);
 }
 
 function getLabQueryRound(type) {
@@ -6076,7 +6125,7 @@ function consumeLabQuery(type) {
 }
 
 function labQueryUsageLabel(type) {
-  if (isLabPremiumUser()) return '프리미엄 무제한 조회';
+  if (isLabPremiumUser()) return 'Plus 무제한 조회';
   const round = getLabQueryRound(type);
   const used = Number(getLabQueryState()[`${type}:${round}`] || 0);
   return `무료 조회 ${Math.min(used,5)}/5 · ${round}회차 기준`;
@@ -6220,7 +6269,7 @@ function saveLabNumber() {
   if (!isLabPremiumUser()) {
     const saved = (vault[type] || []).length;
     if (saved >= 5) {
-      toast(`무료 저장 한도 초과 (${saved}/5) — 저장고에서 삭제 후 이용하세요`);
+      toast(`무료 저장 한도 초과 (${saved}/5) · Plus에서 저장고가 확장됩니다`);
       return;
     }
   }
@@ -6321,7 +6370,7 @@ async function runLabLottoBacktest() {
   const latest = latestRound || getLatestRound();
   const allowance = consumeLabQuery('lotto');
   if (!allowance.ok) {
-    result.innerHTML = `<div style="padding:16px;text-align:center;color:#dc2626;font-size:12px;border:1px solid #fecdd3;border-radius:8px;background:#fff1f2;">무료 조회 5회를 모두 사용했습니다.<br>로또 회차가 변경되면 다시 5회 조회할 수 있고, 프리미엄은 무제한 조회가 제공됩니다.</div>`;
+    result.innerHTML = renderPlusUpsell('무료 조회 5회를 모두 사용했습니다.');
     return;
   }
   result.innerHTML = renderLabProgress(`로또 6/45 제 ${latest}회부터 조회 중`, 0, latest, 'var(--lotto-red)');
@@ -6386,7 +6435,7 @@ async function runLabPensionBacktest() {
   const latest = window._latestPenRound || 321;
   const allowance = consumeLabQuery('pension');
   if (!allowance.ok) {
-    result.innerHTML = `<div style="padding:16px;text-align:center;color:#dc2626;font-size:12px;border:1px solid #bbf7d0;border-radius:8px;background:#f0fdf4;">무료 조회 5회를 모두 사용했습니다.<br>연금 회차가 변경되면 다시 5회 조회할 수 있고, 프리미엄은 무제한 조회가 제공됩니다.</div>`;
+    result.innerHTML = renderPlusUpsell('무료 조회 5회를 모두 사용했습니다.');
     return;
   }
   const userNo = labPensionDigits.join('');
@@ -10158,6 +10207,11 @@ function renderProfile() {
       <div class="profile-row"><span>이메일</span><span class="profile-row-val" style="font-size:12px;">${email}</span></div>
       <div class="profile-row"><span>가입 방식</span><span class="profile-row-val">이메일 로그인</span></div>
       <div class="profile-row"><span>가입일</span><span class="profile-row-val" style="font-size:12px;">${currentUser?.created_at ? new Date(currentUser.created_at).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}) : '-'}</span></div>
+    </div>
+    <div class="profile-block">
+      <div class="profile-block-title">멤버십</div>
+      ${renderPlusUpsell(isLabPremiumUser() ? '현재 LottoBank Plus 이용 중입니다.' : '현재 무료 멤버십입니다.')}
+      <div style="font-size:10px;color:var(--text-muted);line-height:1.5;margin-top:8px;">Google Play 출시 후 Plus 결제가 열립니다. 개발 중에는 관리자 설정으로 권한 검증이 가능합니다.</div>
     </div>
     <div class="profile-block">
       <div class="profile-block-title">출석 기록</div>
