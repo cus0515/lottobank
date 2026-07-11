@@ -1857,7 +1857,10 @@ textarea {
       <!-- 로그인 후 유저 드롭다운 -->
       <div id="user-profile" class="user-profile" onclick="toggleUserDropdown()">
         <div class="header-user-meta">
-          <span id="user-name" style="font-size:13px;font-weight:700;color:var(--text-dark);line-height:1.2;"></span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span id="user-name" style="font-size:13px;font-weight:700;color:var(--text-dark);line-height:1.2;"></span>
+            <button id="header-membership-btn" onclick="event.stopPropagation();closeUserDropdown();go('subscription')" style="display:none;padding:2px 7px;font-size:10px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.4;"></button>
+          </div>
           <span id="header-badge-chip" style="font-size:10px;color:#dc2626;font-weight:700;white-space:nowrap;display:none;"></span>
         </div>
         <span style="font-size:10px;color:#94a3b8;flex-shrink:0;">▼</span>
@@ -5158,6 +5161,20 @@ function updateHeaderUser(nick, badgeText) {
   $('dd-badge').style.display = 'none';
   const chip = $('header-badge-chip');
   if (chip) chip.style.display = 'none';
+  // 멤버십 버튼 업데이트
+  const memBtn = $('header-membership-btn');
+  if (memBtn) {
+    const t = window._membership || 'free';
+    if (t === 'plus') {
+      memBtn.textContent = 'Plus';
+      memBtn.style.cssText = 'display:inline-block;padding:2px 7px;font-size:10px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.4;background:rgba(124,58,237,.12);color:#7c3aed;';
+    } else if (t === 'group') {
+      memBtn.textContent = 'Group';
+      memBtn.style.cssText = 'display:inline-block;padding:2px 7px;font-size:10px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.4;background:rgba(15,118,110,.12);color:#0f766e;';
+    } else {
+      memBtn.style.display = 'none';
+    }
+  }
 }
 function currentNickname() {
   return window._profileNickname || currentUser?.user_metadata?.nickname || currentUser?.email?.split('@')[0] || '익명';
@@ -6163,104 +6180,72 @@ function renderSubscription() {
       ? '<span class="plus-chip">Plus</span>'
       : '<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;letter-spacing:.4px;">FREE</span>';
 
-  const planCard = (color, bg, border, chipHtml, name, price, desc, features, cta, ctaFn, isCurrent) => `
-    <div style="border-radius:16px;padding:20px;background:${bg};border:2px solid ${border};position:relative;${isCurrent ? 'box-shadow:0 0 0 3px ' + color + '33;' : ''}">
-      ${isCurrent ? '<div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:' + color + ';color:#fff;font-size:10px;font-weight:800;padding:3px 12px;border-radius:99px;letter-spacing:.5px;">현재 플랜</div>' : ''}
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
-        <div>
-          ${chipHtml}
-          <div style="font-size:20px;font-weight:900;color:var(--text-dark);margin-top:8px;">${name}</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">${desc}</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:22px;font-weight:900;color:${color};">${price}</div>
-        </div>
+  const chkSvg  = c => `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const xSvg    = c => `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  const starSvg = c => `<svg width="13" height="13" viewBox="0 0 24 24" fill="${c}" stroke="${c}" stroke-width="1" style="flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+  const usrSvg  = c => `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
+
+  const row = (icon, text, muted) => `<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:${muted?'var(--text-muted)':'var(--text-dark)'};">${icon}${text}</div>`;
+
+  const planCard = (color, bg, border, chipHtml, name, price, rows, cta, ctaFn, isCurrent) =>
+    `<div style="border-radius:14px;padding:18px;background:${bg};border:2px solid ${border};position:relative;${isCurrent?'box-shadow:0 0 0 3px '+color+'33;':''}">
+      ${isCurrent?`<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:${color};color:#fff;font-size:10px;font-weight:800;padding:2px 12px;border-radius:99px;">현재 플랜</div>`:''}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;">
+        <div style="display:flex;align-items:center;gap:8px;">${chipHtml}<span style="font-size:17px;font-weight:900;color:var(--text-dark);">${name}</span></div>
+        <span style="font-size:18px;font-weight:900;color:${color};">${price}</span>
       </div>
-      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px;">
-        ${features.map(f => `<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dark);">
-          <span style="color:${color};font-size:14px;flex-shrink:0;">${f.icon}</span>${f.text}
-        </div>`).join('')}
-      </div>
-      <button onclick="${ctaFn}" style="width:100%;padding:11px;background:${isCurrent ? '#f1f5f9' : color};color:${isCurrent ? '#64748b' : '#fff'};border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .15s;">${cta}</button>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;">${rows}</div>
+      <button onclick="${ctaFn}" style="width:100%;padding:10px;background:${isCurrent?'#f1f5f9':color};color:${isCurrent?'#64748b':'#fff'};border:none;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">${cta}</button>
     </div>`;
 
   wrap.innerHTML = `
-    <div style="background:linear-gradient(135deg,#0c1a2e,#1e1b4b);border-radius:16px;padding:22px 20px;margin-bottom:16px;color:#fff;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;opacity:.5;margin-bottom:6px;">MEMBERSHIP</div>
-      <div style="font-size:22px;font-weight:900;margin-bottom:4px;">멤버십 플랜</div>
-      <div style="font-size:12px;opacity:.6;line-height:1.6;">현재 플랜 ${tierBadge} &nbsp;·&nbsp; 앱 출시 후 Google Play 결제로 전환됩니다.</div>
+    <div style="background:linear-gradient(135deg,#0c1a2e,#1e1b4b);border-radius:14px;padding:20px;margin-bottom:14px;color:#fff;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;opacity:.5;margin-bottom:5px;">MEMBERSHIP</div>
+      <div style="font-size:21px;font-weight:900;margin-bottom:4px;">멤버십 플랜</div>
+      <div style="font-size:12px;opacity:.6;line-height:1.6;">현재 플랜 ${tierBadge} &nbsp;·&nbsp; 앱 출시 후 Google Play 결제</div>
     </div>
-
     <div style="display:flex;flex-direction:column;gap:12px;">
-      ${planCard(
-        '#64748b', 'var(--paper-white)', '#e2e8f0',
+      ${planCard('#64748b','var(--paper-white)','#e2e8f0',
         '<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;">FREE</span>',
-        '무료',
-        '₩0',
-        '기본 기능 무제한 이용',
-        [
-          {icon:'✅', text:'QR 인증 · 번호 이력 조회'},
-          {icon:'✅', text:'기본 전적 통계 (최근 10건)'},
-          {icon:'✅', text:'랭킹 · 뱃지 · 커뮤니티'},
-          {icon:'✅', text:'실시간 채팅'},
-          {icon:'❌', text:'<span style="color:var(--text-muted);">연구소 조회 제한 (월 5회)</span>'},
-          {icon:'❌', text:'<span style="color:var(--text-muted);">번호 저장 제한 (5개)</span>'},
-        ],
-        tier === 'free' ? '현재 이용 중' : '기본 플랜',
-        tier === 'free' ? '' : "go('profile')",
-        tier === 'free'
-      )}
-
-      ${planCard(
-        '#7c3aed', 'rgba(124,58,237,.04)', 'rgba(124,58,237,.25)',
+        '무료','₩0',
+        row(chkSvg('#059669'),'QR 인증 · 번호 이력 조회')+
+        row(chkSvg('#059669'),'기본 전적 통계 (최근 10건)')+
+        row(chkSvg('#059669'),'랭킹 · 뱃지 · 커뮤니티')+
+        row(xSvg('#94a3b8'),'연구소 조회 제한 (월 5회)',true)+
+        row(xSvg('#94a3b8'),'번호 저장 제한 (5개)',true),
+        tier==='free'?'현재 이용 중':'기본 플랜',
+        tier==='free'?'':'go(\'profile\')',tier==='free')}
+      ${planCard('#7c3aed','rgba(124,58,237,.04)','rgba(124,58,237,.25)',
         '<span class="plus-chip">Plus</span>',
-        'Plus',
-        '월 ₩1,500',
-        '광고 없이, 제한 없이 이용하세요',
-        [
-          {icon:'✅', text:'무료 플랜 전체 포함'},
-          {icon:'💎', text:'광고 완전 제거'},
-          {icon:'💎', text:'역대 전적 무제한 조회'},
-          {icon:'💎', text:'번호 저장 무제한'},
-          {icon:'💎', text:'연구소 조회 무제한'},
-          {icon:'💎', text:'티켓 당첨 알림 (앱 출시 후)'},
-        ],
-        isPlusMember ? '현재 이용 중' : (isGroupMember ? '포함됨' : '준비 중'),
-        isPlusMember ? '' : 'showPlusComingSoon()',
-        isPlusMember
-      )}
-
-      ${planCard(
-        '#0f766e', 'rgba(15,118,110,.04)', 'rgba(15,118,110,.25)',
+        'Plus','월 ₩1,500',
+        row(chkSvg('#059669'),'무료 플랜 전체 포함')+
+        row(starSvg('#7c3aed'),'광고 완전 제거')+
+        row(starSvg('#7c3aed'),'역대 전적 무제한 조회')+
+        row(starSvg('#7c3aed'),'번호 저장 무제한')+
+        row(starSvg('#7c3aed'),'연구소 조회 무제한')+
+        row(starSvg('#7c3aed'),'티켓 당첨 알림 (앱 출시 후)'),
+        isPlusMember?'현재 이용 중':(isGroupMember?'포함됨':'준비 중'),
+        isPlusMember?'':'showPlusComingSoon()',isPlusMember)}
+      ${planCard('#0f766e','rgba(15,118,110,.04)','rgba(15,118,110,.25)',
         '<span class="group-chip">Group</span>',
-        'Group',
-        '월 ₩3,900',
-        'Plus 전체 + 공동 구매 모임 관리',
-        [
-          {icon:'✅', text:'Plus 플랜 전체 포함'},
-          {icon:'👥', text:'로또 모임 생성 · 관리'},
-          {icon:'👥', text:'멤버별 분담금 정산'},
-          {icon:'👥', text:'당첨금 1/N 자동 계산'},
-          {icon:'👥', text:'모임 공유 카드 생성'},
-          {icon:'👥', text:'공동 QR 등록 기록'},
-        ],
-        isGroupMember ? '현재 이용 중' : '준비 중',
-        isGroupMember ? '' : 'showPlusComingSoon()',
-        isGroupMember
-      )}
+        'Group','월 ₩3,900',
+        row(chkSvg('#059669'),'Plus 플랜 전체 포함')+
+        row(usrSvg('#0f766e'),'로또 모임 생성 · 관리')+
+        row(usrSvg('#0f766e'),'멤버별 지분율 정산')+
+        row(usrSvg('#0f766e'),'당첨금 자동 분배 계산')+
+        row(usrSvg('#0f766e'),'모임 공유 카드'),
+        isGroupMember?'현재 이용 중':'준비 중',
+        isGroupMember?'':'showPlusComingSoon()',isGroupMember)}
     </div>
-
-    <div style="margin-top:16px;padding:14px;background:var(--bg-light);border-radius:12px;border:1px solid var(--border-dashed);">
-      <div style="font-size:11px;font-weight:800;color:var(--text-dark);margin-bottom:6px;">자주 묻는 질문</div>
-      <div style="font-size:12px;color:var(--text-muted);line-height:1.8;">
-        <b>결제는 언제부터?</b> Google Play 앱 출시 후 인앱 결제로 제공됩니다. 현재는 관리자 권한으로 검증 중입니다.<br>
-        <b>환불 정책?</b> 앱 출시 후 구체적인 환불 정책이 안내될 예정입니다.<br>
-        <b>Group은 Plus를 포함하나요?</b> 네, Group 플랜은 Plus의 모든 기능을 포함합니다.
+    <div style="margin-top:14px;padding:14px;background:var(--bg-light);border-radius:12px;border:1px solid var(--border-dashed);">
+      <div style="font-size:11px;font-weight:800;color:var(--text-dark);margin-bottom:7px;">자주 묻는 질문</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.9;">
+        <b style="color:var(--text-dark);">결제는 언제부터?</b> Google Play 앱 출시 후 인앱 결제로 제공됩니다.<br>
+        <b style="color:var(--text-dark);">Group은 Plus를 포함하나요?</b> 네, Group 플랜은 Plus의 모든 기능을 포함합니다.
       </div>
     </div>
-
     <div style="margin-top:10px;text-align:center;">
-      <button onclick="go('profile')" style="font-size:12px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:8px 16px;font-family:inherit;">← 프로필로 돌아가기</button>
+      <button onclick="go('profile')" style="font-size:12px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:8px;font-family:inherit;">← 프로필로 돌아가기</button>
     </div>`;
 }
 
@@ -6276,21 +6261,56 @@ function showGroupComingSoon() {
 let selectedGroupId = null;
 let _groupCache = null; // { groups:[], members:{gid:[]}, tickets:{gid:[]} }
 
-// DB에서 전체 모임 데이터 로드
+// localStorage 폴백 키
+function _grpLsKey() { return 'ltb_groups_v2_' + (currentUser?.id || 'guest'); }
+
+function _grpLoadLS() {
+  try { return JSON.parse(localStorage.getItem(_grpLsKey()) || '[]'); } catch { return []; }
+}
+function _grpSaveLS(groups) { localStorage.setItem(_grpLsKey(), JSON.stringify(groups)); }
+
+// DB에서 전체 모임 데이터 로드 (실패 시 localStorage 폴백)
 async function loadGroupsFromDB() {
+  window._groupDbError = null;
+  window._groupLocalMode = false;
   if (!isLoggedIn || !currentUser || !sb) return { groups: [], members: {}, tickets: {} };
   const uid = currentUser.id;
-  const { data: gRows } = await sb.from('lotto_groups').select('*').eq('owner_id', uid).order('created_at', { ascending: false });
-  const gids = (gRows || []).map(g => g.id);
-  const members = {};
-  const tickets = {};
-  if (gids.length) {
-    const { data: mRows } = await sb.from('lotto_group_members').select('*').in('group_id', gids).order('created_at', { ascending: true });
-    const { data: tRows } = await sb.from('lotto_group_tickets').select('*').in('group_id', gids).order('created_at', { ascending: false });
-    (mRows || []).forEach(m => { (members[m.group_id] = members[m.group_id] || []).push(m); });
-    (tRows || []).forEach(t => { (tickets[t.group_id] = tickets[t.group_id] || []).push(t); });
+  try {
+    const { data: gRows, error: gErr } = await sb.from('lotto_groups').select('*').eq('owner_id', uid).order('created_at', { ascending: false });
+    if (gErr) throw gErr;
+    const gids = (gRows || []).map(g => g.id);
+    const members = {};
+    const tickets = {};
+    if (gids.length) {
+      const { data: mRows } = await sb.from('lotto_group_members').select('*').in('group_id', gids).order('created_at', { ascending: true });
+      const { data: tRows } = await sb.from('lotto_group_tickets').select('*').in('group_id', gids).order('created_at', { ascending: false });
+      (mRows || []).forEach(m => { (members[m.group_id] = members[m.group_id] || []).push(m); });
+      (tRows || []).forEach(t => { (tickets[t.group_id] = tickets[t.group_id] || []).push(t); });
+    }
+    _groupCache = { groups: gRows || [], members, tickets };
+  } catch(err) {
+    window._groupDbError = err.message;
+    window._groupLocalMode = true;
+    // localStorage 데이터를 DB 형식으로 변환
+    const lsGroups = _grpLoadLS();
+    const members = {};
+    const tickets = {};
+    lsGroups.forEach(g => {
+      members[g.id] = (g.members || []).map((m,i) => ({
+        id: m.id || ('lm_'+i), group_id: g.id, name: m.name,
+        share_weight: (m.contribution || 1000) / 1000, created_at: g.createdAt
+      }));
+      tickets[g.id] = (g.tickets || []).map((t,i) => ({
+        id: t.id || ('lt_'+i), group_id: g.id, created_by: uid,
+        lottery_type: t.type || 'lotto', round_no: t.round, amount: t.amount,
+        prize_amount: t.prize, memo: t.memo, created_at: t.createdAt
+      }));
+    });
+    _groupCache = {
+      groups: lsGroups.map(g => ({ id: g.id, owner_id: uid, name: g.name, memo: '', created_at: g.createdAt })),
+      members, tickets
+    };
   }
-  _groupCache = { groups: gRows || [], members, tickets };
   return _groupCache;
 }
 
@@ -6335,8 +6355,19 @@ function groupTotals(group) {
   const tickets = group?.tickets || [];
   const spent = tickets.reduce((sum, t) => sum + Number(t.amount || 0), 0);
   const prize = tickets.reduce((sum, t) => sum + Number(t.prize || 0), 0);
+  const totalWeight = members.reduce((s,m) => s + Number(m.contribution||1000)/1000, 0) || 1;
   const perMemberPrize = members.length ? Math.floor(prize / members.length) : 0;
-  return { members, tickets, spent, prize, balance: prize - spent, perMemberPrize };
+  const roi = spent > 0 ? ((prize - spent) / spent * 100).toFixed(1) : '0.0';
+  const bestPrize = tickets.reduce((max,t) => Math.max(max, Number(t.prize||0)), 0);
+  const winRounds = tickets.filter(t => Number(t.prize||0) > 0).length;
+  const settlement = members.map(m => {
+    const w = Number(m.contribution||1000) / 1000;
+    const ratio = w / totalWeight;
+    const mSpent = Math.round(spent * ratio);
+    const mPrize = Math.round(prize * ratio);
+    return { ...m, ratio: (ratio*100).toFixed(1), mSpent, mPrize, mRoi: mSpent>0?((mPrize-mSpent)/mSpent*100).toFixed(1):'0.0' };
+  });
+  return { members, tickets, spent, prize, balance: prize - spent, perMemberPrize, roi, bestPrize, winRounds, settlement };
 }
 
 async function renderGroup() {
@@ -6354,93 +6385,222 @@ async function renderGroup() {
   await loadGroupsFromDB();
   const groups = getGroupRecords();
   const group = ensureSelectedGroup(groups);
+  const tab = window._groupTab || 'dashboard';
+
+  const dbBanner = window._groupDbError ? `
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;margin-bottom:10px;font-size:11px;color:#92400e;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span><b>로컬 모드:</b> Supabase에서 <code>subscription_groups_setup.sql</code>을 실행하면 데이터가 서버에 저장됩니다.</span>
+    </div>` : '';
+
   const listHtml = groups.length ? groups.map(g => {
     const t = groupTotals(g);
+    const roi = Number(t.roi);
+    const roiColor = roi > 0 ? '#059669' : roi < 0 ? '#dc2626' : 'var(--text-muted)';
     return `<button class="group-list-item ${g.id === selectedGroupId ? 'on' : ''}" onclick="selectLottoGroup('${g.id}')">
-      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;">
-        <b style="font-size:13px;">${groupSafe(g.name)}</b>
-        <span style="font-size:10px;color:var(--text-muted);">${t.members.length}명</span>
+      <div style="display:flex;justify-content:space-between;gap:6px;align-items:center;">
+        <b style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${groupSafe(g.name)}</b>
+        <span style="font-size:10px;font-weight:800;color:${roiColor};flex-shrink:0;">${roi>0?'+':''}${t.roi}%</span>
       </div>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">투자 ${fmtMFull(t.spent)} · 당첨 ${fmtMFull(t.prize)}</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">${t.members.length}명 · ${t.tickets.length}회차</div>
     </button>`;
-  }).join('') : `<div style="font-size:12px;color:var(--text-muted);line-height:1.6;padding:12px 4px;">아직 모임이 없습니다. 첫 모임을 만들어 공동 구매를 기록해보세요.</div>`;
-  root.innerHTML = `<div class="group-card" style="margin-top:0;">
-    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
-      <div>
-        <span class="group-chip">Group</span>
-        <div style="font-size:18px;font-weight:900;color:var(--text-dark);margin-top:7px;">로또 모임 관리</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">공동 구매 기록, 멤버 정산, 예상 1/N 수령액을 관리합니다.</div>
+  }).join('') : `<div style="font-size:12px;color:var(--text-muted);line-height:1.7;padding:12px 4px;">아직 모임이 없습니다.<br>첫 모임을 만들어보세요.</div>`;
+
+  root.innerHTML = `
+    ${dbBanner}
+    <div class="group-grid" style="margin-top:0;">
+      <div class="group-list-card">
+        <div style="font-size:11px;font-weight:900;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">내 모임</div>
+        <div class="group-form" style="margin-top:0;">
+          <input id="group-name-input" class="input-custom" placeholder="모임 이름" maxlength="20" style="margin:0;font-size:12px;">
+          <button class="btn-premium" style="padding:0 12px;font-size:12px;white-space:nowrap;" onclick="createLottoGroup()">생성</button>
+        </div>
+        <div style="margin-top:8px;">${listHtml}</div>
+        ${group ? `<button onclick="deleteLottoGroup('${group.id}')" style="width:100%;margin-top:10px;padding:7px;font-size:11px;font-weight:700;color:#dc2626;background:none;border:1px solid #fecaca;border-radius:8px;cursor:pointer;font-family:inherit;">모임 삭제</button>` : ''}
       </div>
-      <button class="qr-inner-tab" style="width:auto;padding:8px 12px;font-size:12px;" onclick="shareLottoGroup()">공유</button>
-    </div>
-  </div>
-  <div class="group-grid" style="margin-top:12px;">
-    <div class="group-list-card">
-      <div style="font-size:13px;font-weight:900;color:var(--text-dark);">내 모임</div>
-      <div class="group-form">
-        <input id="group-name-input" class="input-custom" placeholder="모임 이름" maxlength="20" style="margin:0;">
-        <button class="btn-premium" style="padding:0 12px;font-size:12px;" onclick="createLottoGroup()">생성</button>
+      <div class="group-detail-card" style="padding:14px;">
+        ${group ? renderGroupDetail(group, tab) : '<div style="text-align:center;padding:40px 10px;color:var(--text-muted);font-size:12px;">왼쪽에서 모임을 선택하거나 새로 만드세요.</div>'}
       </div>
-      ${listHtml}
-    </div>
-    <div class="group-detail-card">
-      ${group ? renderGroupDetail(group) : '<div style="text-align:center;padding:35px 10px;color:var(--text-muted);font-size:12px;">왼쪽에서 모임을 생성하세요.</div>'}
-    </div>
-  </div>`;
+    </div>`;
 }
 
-function renderGroupDetail(group) {
+function switchGroupTab(tab) {
+  window._groupTab = tab;
+  ['dashboard','members','history','settlement'].forEach(t => {
+    const btn = $('grp-tab-'+t);
+    if (btn) btn.classList.toggle('on', t===tab);
+  });
+  const group = ensureSelectedGroup(getGroupRecords());
+  if (!group) return;
+  const detail = $('group-detail-inner');
+  if (detail) detail.innerHTML = renderGroupTabContent(group, tab);
+}
+
+function renderGroupDetail(group, tab) {
   const t = groupTotals(group);
-  const memberRows = t.members.length ? t.members.map(m => `<div class="group-row">
-    <span><b>${groupSafe(m.name)}</b><span style="color:var(--text-muted);margin-left:6px;">분담 ${fmtMFull(Number(m.contribution || 0))}</span></span>
-    <button class="qr-inner-tab" style="width:auto;padding:5px 9px;font-size:11px;" onclick="deleteLottoGroupMember('${m.id}')">삭제</button>
-  </div>`).join('') : '<div style="font-size:12px;color:var(--text-muted);padding:10px 0;">등록된 멤버가 없습니다.</div>';
-  const ticketRows = t.tickets.length ? t.tickets.map(ticket => `<div class="group-row">
-    <span>
-      <b>${ticket.type === 'pension' ? '연금 720+' : '로또 6/45'} · ${groupSafe(ticket.round || '-')}회</b>
-      <span style="display:block;color:var(--text-muted);font-size:11px;margin-top:2px;">구매 ${fmtMFull(Number(ticket.amount || 0))} · 당첨 ${fmtMFull(Number(ticket.prize || 0))}${ticket.memo ? ' · ' + groupSafe(ticket.memo) : ''}</span>
-    </span>
-    <button class="qr-inner-tab" style="width:auto;padding:5px 9px;font-size:11px;" onclick="deleteLottoGroupTicket('${ticket.id}')">삭제</button>
-  </div>`).join('') : '<div style="font-size:12px;color:var(--text-muted);padding:10px 0;">등록된 공동 구매 기록이 없습니다.</div>';
-  return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-    <div>
+  const roi = Number(t.roi);
+  const roiColor = roi > 0 ? '#059669' : roi < 0 ? '#dc2626' : 'var(--text-muted)';
+  const tabs = [
+    ['dashboard','대시보드'],['members','멤버'],['history','기록'],['settlement','정산']
+  ];
+  return `
+    <div style="margin-bottom:12px;">
       <div style="font-size:17px;font-weight:900;color:var(--text-dark);">${groupSafe(group.name)}</div>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">${new Date(group.createdAt).toLocaleDateString('ko-KR')} 생성</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">생성 ${new Date(group.createdAt||Date.now()).toLocaleDateString('ko-KR')} · 멤버 ${t.members.length}명 · ${t.tickets.length}회차 참여</div>
     </div>
-    <button class="qr-inner-tab" style="width:auto;padding:6px 10px;font-size:11px;color:#ef4444;" onclick="deleteLottoGroup('${group.id}')">모임 삭제</button>
-  </div>
-  <div class="group-summary">
-    <div class="group-summary-cell"><span style="font-size:10px;color:var(--text-muted);font-weight:800;">멤버</span><b>${t.members.length}명</b></div>
-    <div class="group-summary-cell"><span style="font-size:10px;color:var(--text-muted);font-weight:800;">투자금</span><b>${fmtMFull(t.spent)}</b></div>
-    <div class="group-summary-cell"><span style="font-size:10px;color:var(--text-muted);font-weight:800;">당첨금</span><b>${fmtMFull(t.prize)}</b></div>
-    <div class="group-summary-cell"><span style="font-size:10px;color:var(--text-muted);font-weight:800;">1/N 예상</span><b>${fmtMFull(t.perMemberPrize)}</b></div>
-  </div>
-  <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-top:14px;">멤버</div>
-  <div class="group-form" style="grid-template-columns:1fr 100px auto;">
-    <input id="group-member-name" class="input-custom" placeholder="닉네임" style="margin:0;">
-    <input id="group-member-contribution" class="input-custom" type="number" min="0" step="1000" placeholder="분담금" style="margin:0;">
-    <button class="qr-inner-tab" style="padding:0 12px;font-size:12px;" onclick="addLottoGroupMember()">추가</button>
-  </div>
-  <div style="margin-top:6px;">${memberRows}</div>
-  <div style="font-size:13px;font-weight:900;color:var(--text-dark);margin-top:16px;">공동 구매 기록</div>
-  <div class="group-actions" style="margin-top:8px;">
-    <select id="group-ticket-type" class="input-custom" style="margin:0;"><option value="lotto">로또 6/45</option><option value="pension">연금 720+</option></select>
-    <input id="group-ticket-round" class="input-custom" type="number" min="1" placeholder="회차" style="margin:0;">
-    <input id="group-ticket-amount" class="input-custom" type="number" min="0" step="1000" placeholder="구매금액" style="margin:0;">
-    <input id="group-ticket-prize" class="input-custom" type="number" min="0" step="1000" placeholder="당첨금" style="margin:0;">
-    <input id="group-ticket-memo" class="input-custom" placeholder="메모" maxlength="30" style="margin:0;">
-    <button class="btn-premium" style="padding:0 12px;font-size:12px;" onclick="addLottoGroupTicket()">기록</button>
-  </div>
-  <div style="margin-top:6px;">${ticketRows}</div>`;
+    <div class="qr-inner-tabs" style="grid-template-columns:repeat(4,1fr);width:100%;margin:0 0 14px;">
+      ${tabs.map(([k,v])=>`<button id="grp-tab-${k}" class="qr-inner-tab${k===tab?' on':''}" onclick="switchGroupTab('${k}')" style="font-size:11px;">${v}</button>`).join('')}
+    </div>
+    <div id="group-detail-inner">${renderGroupTabContent(group, tab)}</div>`;
 }
 
-// updateSelectedGroup: DB 방식 이후 미사용 — stub 유지
+function renderGroupTabContent(group, tab) {
+  const t = groupTotals(group);
+  const roi = Number(t.roi);
+  const roiColor = roi > 0 ? '#059669' : roi < 0 ? '#dc2626' : 'var(--text-muted)';
+
+  if (tab === 'dashboard') {
+    const kpi = (label, val, color) => `<div style="border:1px solid var(--border-dashed);border-radius:10px;padding:10px;background:var(--bg-light);">
+      <div style="font-size:10px;color:var(--text-muted);font-weight:700;margin-bottom:3px;">${label}</div>
+      <div style="font-size:15px;font-weight:900;color:${color||'var(--text-dark)'};">${val}</div>
+    </div>`;
+    const recent = t.tickets.slice(0,5).map(tk => {
+      const isPrize = Number(tk.prize||0) > 0;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-dashed);font-size:12px;">
+        <span><b>${tk.type==='pension'?'연금':'로또'} ${tk.round}회</b> <span style="color:var(--text-muted);font-size:11px;">${fmtMFull(Number(tk.amount||0))} 구매</span></span>
+        <span style="font-weight:700;color:${isPrize?'#059669':'#94a3b8'};">${isPrize?fmtMFull(Number(tk.prize))+'당첨':'낙첨'}</span>
+      </div>`;
+    }).join('');
+    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      ${kpi('멤버 수', t.members.length+'명')}
+      ${kpi('회차 참여', t.tickets.length+'회')}
+      ${kpi('총 투자금', fmtMFull(t.spent))}
+      ${kpi('총 당첨금', fmtMFull(t.prize), t.prize>0?'#059669':'var(--text-dark)')}
+      ${kpi('수익금', fmtMFull(t.balance), t.balance>=0?'#059669':'#dc2626')}
+      ${kpi('ROI', (roi>0?'+':'')+t.roi+'%', roiColor)}
+    </div>
+    ${t.tickets.length ? `<div style="font-size:12px;font-weight:800;color:var(--text-dark);margin-bottom:6px;">최근 구매 기록</div>${recent}` : '<div style="text-align:center;padding:20px;font-size:12px;color:var(--text-muted);">아직 구매 기록이 없습니다.</div>'}
+    <button onclick="shareLottoGroup()" style="width:100%;margin-top:12px;padding:9px;background:none;border:1.5px solid var(--border-dashed);border-radius:9px;font-size:12px;font-weight:700;color:var(--text-dark);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      모임 결과 공유
+    </button>`;
+  }
+
+  if (tab === 'members') {
+    const totalWeight = t.members.reduce((s,m)=>s+Number(m.contribution||1000)/1000,0)||1;
+    const rows = t.members.length ? t.members.map(m => {
+      const w = Number(m.contribution||1000)/1000;
+      const pct = (w/totalWeight*100).toFixed(0);
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border-dashed);">
+        <div>
+          <b style="font-size:13px;">${groupSafe(m.name)}</b>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">지분 ${pct}%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="text-align:right;font-size:11px;">
+            <div style="color:var(--text-muted);">투자 ${fmtMFull(Math.round(t.spent*w/totalWeight))}</div>
+            <div style="color:#059669;">당첨 ${fmtMFull(Math.round(t.prize*w/totalWeight))}</div>
+          </div>
+          <button onclick="deleteLottoGroupMember('${m.id}')" style="padding:4px 8px;font-size:11px;font-weight:700;color:#dc2626;background:none;border:1px solid #fecaca;border-radius:6px;cursor:pointer;font-family:inherit;">삭제</button>
+        </div>
+      </div>`;
+    }).join('') : '<div style="padding:16px 0;font-size:12px;color:var(--text-muted);">등록된 멤버가 없습니다.</div>';
+    return `${rows}
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-dashed);">
+      <div style="font-size:12px;font-weight:800;color:var(--text-dark);margin-bottom:8px;">멤버 추가</div>
+      <div style="display:grid;grid-template-columns:1fr 80px auto;gap:6px;">
+        <input id="group-member-name" class="input-custom" placeholder="이름" style="margin:0;font-size:12px;">
+        <input id="group-member-pct" class="input-custom" type="number" min="1" max="100" step="1" placeholder="지분%" style="margin:0;font-size:12px;">
+        <button class="btn-premium" style="padding:0 12px;font-size:12px;white-space:nowrap;" onclick="addLottoGroupMember()">추가</button>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:6px;">지분(%)은 당첨금 배분 비율입니다. 합이 100이 되도록 설정하세요.</div>
+    </div>`;
+  }
+
+  if (tab === 'history') {
+    const rows = t.tickets.length ? t.tickets.map(tk => {
+      const isPrize = Number(tk.prize||0) > 0;
+      return `<div style="padding:10px 0;border-bottom:1px solid var(--border-dashed);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <b style="font-size:13px;">${tk.type==='pension'?'연금복권 720+':'로또 6/45'} ${tk.round}회</b>
+            ${tk.memo?`<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">${groupSafe(tk.memo)}</span>`:''}
+          </div>
+          <button onclick="deleteLottoGroupTicket('${tk.id}')" style="padding:3px 8px;font-size:11px;font-weight:700;color:#dc2626;background:none;border:1px solid #fecaca;border-radius:6px;cursor:pointer;font-family:inherit;flex-shrink:0;">삭제</button>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:5px;font-size:11px;">
+          <span style="color:var(--text-muted);">구매 <b style="color:var(--text-dark);">${fmtMFull(Number(tk.amount||0))}</b></span>
+          <span style="color:var(--text-muted);">당첨 <b style="color:${isPrize?'#059669':'#94a3b8'};">${isPrize?fmtMFull(Number(tk.prize)):'낙첨'}</b></span>
+          <span style="color:var(--text-muted);">${new Date(tk.createdAt||Date.now()).toLocaleDateString('ko-KR',{month:'short',day:'numeric'})}</span>
+        </div>
+      </div>`;
+    }).join('') : '<div style="padding:16px 0;font-size:12px;color:var(--text-muted);">기록이 없습니다.</div>';
+    return `${rows}
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-dashed);">
+      <div style="font-size:12px;font-weight:800;color:var(--text-dark);margin-bottom:8px;">구매 기록 추가</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:6px;">
+        <select id="group-ticket-type" class="input-custom" style="margin:0;font-size:12px;"><option value="lotto">로또 6/45</option><option value="pension">연금 720+</option></select>
+        <input id="group-ticket-round" class="input-custom" type="number" min="1" placeholder="회차" style="margin:0;font-size:12px;">
+        <input id="group-ticket-amount" class="input-custom" type="number" min="0" step="1000" placeholder="구매금액(원)" style="margin:0;font-size:12px;">
+        <input id="group-ticket-prize" class="input-custom" type="number" min="0" step="1000" placeholder="당첨금(원, 없으면 0)" style="margin:0;font-size:12px;">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:6px;">
+        <input id="group-ticket-memo" class="input-custom" placeholder="메모 (선택)" maxlength="30" style="margin:0;font-size:12px;">
+        <button class="btn-premium" style="padding:0 14px;font-size:12px;white-space:nowrap;" onclick="addLottoGroupTicket()">추가</button>
+      </div>
+    </div>`;
+  }
+
+  if (tab === 'settlement') {
+    if (!t.members.length) return '<div style="padding:24px 0;text-align:center;font-size:12px;color:var(--text-muted);">멤버를 먼저 추가하세요.</div>';
+    const rows = t.settlement.map(m => {
+      const roi = Number(m.mRoi);
+      const roiColor = roi > 0 ? '#059669' : roi < 0 ? '#dc2626' : 'var(--text-muted)';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-dashed);">
+        <div>
+          <b style="font-size:13px;">${groupSafe(m.name)}</b>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">지분 ${m.ratio}%</div>
+        </div>
+        <div style="text-align:right;font-size:11px;">
+          <div style="color:var(--text-muted);">투자 ${fmtMFull(m.mSpent)}</div>
+          <div style="color:#059669;font-weight:700;">수령 ${fmtMFull(m.mPrize)}</div>
+          <div style="color:${roiColor};font-weight:800;">ROI ${roi>0?'+':''}${m.mRoi}%</div>
+        </div>
+      </div>`;
+    }).join('');
+    return `
+    <div style="padding:12px;background:var(--bg-light);border-radius:10px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;">
+        <span style="color:var(--text-muted);">총 투자금</span><b>${fmtMFull(t.spent)}</b>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px;">
+        <span style="color:var(--text-muted);">총 당첨금</span><b style="color:#059669;">${fmtMFull(t.prize)}</b>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px;">
+        <span style="color:var(--text-muted);">전체 ROI</span><b style="color:${roiColor};">${roi>0?'+':''}${t.roi}%</b>
+      </div>
+    </div>
+    ${rows}`;
+  }
+  return '';
+}
+
+
 function updateSelectedGroup() {}
 
 async function createLottoGroup() {
-  if (!isLoggedIn || !sb) return toast('로그인이 필요합니다.');
+  if (!isLoggedIn) return toast('로그인이 필요합니다.');
   const name = ($('group-name-input')?.value || '').trim();
   if (!name) return toast('모임 이름을 입력해주세요.');
+  if (window._groupLocalMode) {
+    const groups = _grpLoadLS();
+    const g = { id: 'local_'+Date.now(), name, createdAt: new Date().toISOString(), members: [], tickets: [] };
+    groups.unshift(g);
+    _grpSaveLS(groups);
+    selectedGroupId = g.id;
+    renderGroup();
+    return;
+  }
   const { data, error } = await sb.from('lotto_groups').insert({ owner_id: currentUser.id, name }).select().single();
   if (error) return toast('모임 생성 실패: ' + error.message);
   selectedGroupId = data.id;
@@ -6454,7 +6614,12 @@ function selectLottoGroup(id) {
 
 async function deleteLottoGroup(id) {
   if (!confirm('이 모임을 삭제할까요?')) return;
-  if (!sb) return;
+  if (window._groupLocalMode || String(id).startsWith('local_')) {
+    const groups = _grpLoadLS().filter(g => g.id !== id);
+    _grpSaveLS(groups);
+    if (selectedGroupId === id) selectedGroupId = null;
+    renderGroup(); return;
+  }
   const { error } = await sb.from('lotto_groups').delete().eq('id', id);
   if (error) return toast('삭제 실패: ' + error.message);
   if (selectedGroupId === id) selectedGroupId = null;
@@ -6462,26 +6627,39 @@ async function deleteLottoGroup(id) {
 }
 
 async function addLottoGroupMember() {
-  if (!isLoggedIn || !sb) return toast('로그인이 필요합니다.');
+  if (!isLoggedIn) return toast('로그인이 필요합니다.');
   if (!selectedGroupId) return toast('모임을 먼저 선택해주세요.');
   const name = ($('group-member-name')?.value || '').trim();
-  const contribution = Number($('group-member-contribution')?.value || 0);
+  const pct = Number($('group-member-pct')?.value || 0);
   if (!name) return toast('멤버 이름을 입력해주세요.');
-  const shareWeight = contribution > 0 ? contribution / 1000 : 1;
+  const shareWeight = pct > 0 ? pct : 1;
+  if (window._groupLocalMode || String(selectedGroupId).startsWith('local_')) {
+    const groups = _grpLoadLS();
+    const g = groups.find(x => x.id === selectedGroupId);
+    if (!g) return toast('모임을 찾을 수 없습니다.');
+    g.members = g.members || [];
+    g.members.push({ id: 'lm_'+Date.now(), name, contribution: shareWeight * 1000 });
+    _grpSaveLS(groups); renderGroup(); return;
+  }
   const { error } = await sb.from('lotto_group_members').insert({ group_id: selectedGroupId, name, share_weight: shareWeight });
   if (error) return toast('멤버 추가 실패: ' + error.message);
   renderGroup();
 }
 
 async function deleteLottoGroupMember(id) {
-  if (!sb) return;
+  if (window._groupLocalMode || String(id).startsWith('lm_')) {
+    const groups = _grpLoadLS();
+    const g = groups.find(x => x.id === selectedGroupId);
+    if (g) { g.members = (g.members||[]).filter(m => m.id !== id); _grpSaveLS(groups); }
+    renderGroup(); return;
+  }
   const { error } = await sb.from('lotto_group_members').delete().eq('id', id);
   if (error) return toast('삭제 실패: ' + error.message);
   renderGroup();
 }
 
 async function addLottoGroupTicket() {
-  if (!isLoggedIn || !sb) return toast('로그인이 필요합니다.');
+  if (!isLoggedIn) return toast('로그인이 필요합니다.');
   if (!selectedGroupId) return toast('모임을 먼저 선택해주세요.');
   const lottery_type = $('group-ticket-type')?.value || 'lotto';
   const round_no = Number($('group-ticket-round')?.value || 0);
@@ -6490,6 +6668,14 @@ async function addLottoGroupTicket() {
   const memo = ($('group-ticket-memo')?.value || '').trim();
   if (!round_no || round_no < 1) return toast('회차를 입력해주세요.');
   if (amount < 0 || prize_amount < 0) return toast('금액을 확인해주세요.');
+  if (window._groupLocalMode || String(selectedGroupId).startsWith('local_')) {
+    const groups = _grpLoadLS();
+    const g = groups.find(x => x.id === selectedGroupId);
+    if (!g) return toast('모임을 찾을 수 없습니다.');
+    g.tickets = g.tickets || [];
+    g.tickets.unshift({ id:'lt_'+Date.now(), type:lottery_type, round:round_no, amount, prize:prize_amount, memo, createdAt:new Date().toISOString() });
+    _grpSaveLS(groups); renderGroup(); return;
+  }
   const { error } = await sb.from('lotto_group_tickets').insert({
     group_id: selectedGroupId, created_by: currentUser.id,
     lottery_type, round_no, amount, prize_amount, memo: memo || null
@@ -6499,7 +6685,12 @@ async function addLottoGroupTicket() {
 }
 
 async function deleteLottoGroupTicket(id) {
-  if (!sb) return;
+  if (window._groupLocalMode || String(id).startsWith('lt_')) {
+    const groups = _grpLoadLS();
+    const g = groups.find(x => x.id === selectedGroupId);
+    if (g) { g.tickets = (g.tickets||[]).filter(t => t.id !== id); _grpSaveLS(groups); }
+    renderGroup(); return;
+  }
   const { error } = await sb.from('lotto_group_tickets').delete().eq('id', id);
   if (error) return toast('삭제 실패: ' + error.message);
   renderGroup();
@@ -6509,9 +6700,10 @@ function shareLottoGroup() {
   const group = ensureSelectedGroup(getGroupRecords());
   if (!group) return toast('공유할 모임이 없습니다.');
   const t = groupTotals(group);
-  const text = `[LottoBank 모임] ${group.name}\n멤버 ${t.members.length}명\n투자 ${fmtMFull(t.spent)} / 당첨 ${fmtMFull(t.prize)}\n1/N 예상 ${fmtMFull(t.perMemberPrize)}`;
+  const memberLines = t.settlement.map(m => `  ${m.name} (${m.ratio}%) — 투자 ${fmtMFull(m.mSpent)} / 수령 ${fmtMFull(m.mPrize)}`).join('\n');
+  const text = `[LottoBank 모임] ${group.name}\n멤버 ${t.members.length}명 · ${t.tickets.length}회차\n총 투자 ${fmtMFull(t.spent)} / 총 당첨 ${fmtMFull(t.prize)} / ROI ${t.roi}%\n\n[정산]\n${memberLines||'  멤버 없음'}\n\nhttps://lottobank.pages.dev`;
   if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(text).then(() => toast('모임 요약을 복사했습니다.'));
+    navigator.clipboard.writeText(text).then(() => toast('모임 요약을 클립보드에 복사했습니다.'));
   } else {
     toast('모임 요약을 확인했습니다.');
   }
@@ -10551,8 +10743,19 @@ async function deleteAccount() {
 async function changeNickname() {
   if (!isLoggedIn || !currentUser) return;
   const newNick = $('nick-input').value.trim();
-  if (newNick.length < 2 || newNick.length > 12) { toast('⚠️ 닉네임은 2~12자'); return; }
-  if (!/^[가-힣a-zA-Z0-9]+$/.test(newNick)) { toast('⚠️ 한글/영문/숫자만 사용 가능'); return; }
+  if (newNick.length < 2 || newNick.length > 12) { toast('닉네임은 2~12자로 입력해 주세요.'); return; }
+  if (!/^[가-힣a-zA-Z0-9]+$/.test(newNick)) { toast('한글/영문/숫자만 사용할 수 있습니다.'); return; }
+  // 월 1회 제한
+  const limitKey = 'ltb_nick_changed_' + currentUser.id;
+  const lastChange = localStorage.getItem(limitKey);
+  if (lastChange) {
+    const last = new Date(lastChange);
+    const now = new Date();
+    if (last.getFullYear() === now.getFullYear() && last.getMonth() === now.getMonth()) {
+      toast('닉네임은 매월 1회만 변경할 수 있습니다. 다음 달에 다시 시도해 주세요.');
+      return;
+    }
+  }
   const btn = $('nick-save-btn');
   btn.disabled = true; btn.textContent = '저장 중...';
   try {
@@ -10564,7 +10767,8 @@ async function changeNickname() {
     // 3) 헤더 & 드롭다운 즉시 반영
     currentUser.user_metadata = { ...(currentUser.user_metadata || {}), nickname: newNick };
     updateHeaderUser(newNick, getDisplayVerifiedTitle() || '');
-    toast('✅ 닉네임이 변경되었습니다');
+    localStorage.setItem(limitKey, new Date().toISOString());
+    toast('닉네임이 변경되었습니다.');
     renderProfile();
   } catch(e) {
     toast('❌ 저장 실패: ' + (e.message || ''));
@@ -10683,7 +10887,7 @@ function renderProfile() {
         <button id="nick-save-btn" onclick="changeNickname()"
           style="padding:9px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">저장</button>
       </div>
-      <div style="font-size:11px;color:var(--text-muted);">2~12자, 한글/영문/숫자 사용 가능</div>
+      <div id="nick-change-hint" style="font-size:11px;color:var(--text-muted);">2~12자, 한글/영문/숫자 사용 가능 · 월 1회 변경 가능</div>
     </div>
     <div class="profile-block">
       <div class="profile-block-title">비밀번호 변경</div>
