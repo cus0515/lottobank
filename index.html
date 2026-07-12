@@ -1843,7 +1843,8 @@ textarea {
       <button id="m-map" class="menu-btn" onclick="go('map')">지도</button>
       <button id="m-fortune" class="menu-btn" onclick="go('fortune')">레이더</button>
       <button id="m-lab" class="menu-btn" onclick="go('lab')">연구소</button>
-      <button id="m-group" class="menu-btn" onclick="go('group')">모임</button>
+      <button id="m-community" class="menu-btn" onclick="go('community')">커뮤니티</button>
+      <button id="m-group" class="menu-btn" onclick="go('group')" style="display:none;">모임</button>
       <button id="m-stats" class="menu-btn" onclick="go('stats')">나의 전적</button>
       <button id="m-ticket" class="menu-btn" onclick="go('ticket')">QR 인증</button>
     </div>
@@ -1912,7 +1913,7 @@ textarea {
   <button class="mob-menu-item" onclick="go('map');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg> 지도</button>
   <button class="mob-menu-item" onclick="go('fortune');closeMobMenu()">레이더</button>
   <button class="mob-menu-item" onclick="go('lab');closeMobMenu()">연구소</button>
-  <button class="mob-menu-item" onclick="go('group');closeMobMenu()">모임</button>
+  <button class="mob-menu-item" onclick="go('community');closeMobMenu()">커뮤니티</button>
   <div id="mob-auth-section" style="display:none;border-top:2px solid var(--border-dashed);margin-top:4px;">
     <div style="padding:10px 4px 4px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:0.5px;">내 계정</div>
     <button class="mob-menu-item" onclick="go('stats');closeMobMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적</button>
@@ -2332,13 +2333,15 @@ textarea {
       <div id="pg-community" class="page-content" style="display:none;">
         <div style="background:linear-gradient(135deg,#0c1a2e,#1e3a5f);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 16px rgba(30,58,95,.4);">
           <div style="font-size:10px;opacity:.4;font-weight:700;letter-spacing:1px;margin-bottom:3px;">COMMUNITY</div>
-          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">💬 커뮤니티</div>
-          <div style="font-size:11px;opacity:.5;">로또 경험을 나누고 당첨을 인증하세요</div>
+          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">커뮤니티</div>
+          <div style="font-size:11px;opacity:.5;">추천 번호를 공유하고 당첨 인증과 운영 문의를 남기세요</div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div class="comm-tab-row" style="margin-bottom:0;">
             <button class="comm-tab-btn on" id="ct-free" onclick="commTab('free')">자유게시판</button>
+            <button class="comm-tab-btn" id="ct-recommend" onclick="commTab('recommend')">추천번호</button>
             <button class="comm-tab-btn" id="ct-verify" onclick="commTab('verify')">인증게시판</button>
+            <button class="comm-tab-btn" id="ct-feedback" onclick="commTab('feedback')">문의/건의</button>
             <button class="comm-tab-btn" id="ct-mine" onclick="commTab('mine')" style="display:none;">내 글</button>
           </div>
           <div style="display:flex;gap:4px;">
@@ -2364,7 +2367,10 @@ textarea {
             <button class="post-tag-btn" onclick="selectPostTag(this,'일반')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">일반</button>
             <button class="post-tag-btn" onclick="selectPostTag(this,'후기')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">후기</button>
             <button class="post-tag-btn" onclick="selectPostTag(this,'당첨')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--comm-hot-border,#fecaca);border-radius:10px;background:var(--comm-hot-bg,#fff5f5);color:var(--comm-hot-text,#dc2626);cursor:pointer;">🎉 당첨</button>
+            <button class="post-tag-btn" onclick="selectPostTag(this,'번호')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">번호</button>
             <button class="post-tag-btn" onclick="selectPostTag(this,'분석')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--comm-analysis-border,#ddd6fe);border-radius:10px;background:var(--comm-analysis-bg,#f5f3ff);color:var(--comm-analysis-text,#7c3aed);cursor:pointer;">분석</button>
+            <button class="post-tag-btn" onclick="selectPostTag(this,'오류')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">오류</button>
+            <button class="post-tag-btn" onclick="selectPostTag(this,'건의')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">건의</button>
             <button class="post-tag-btn" onclick="selectPostTag(this,'유머')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">😄 유머</button>
           </div>
           <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid var(--border-dashed);border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:var(--text-dark);background:var(--paper-white);" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'" oninput="const c=$('post-body-count');if(c){c.textContent=this.value.length+'/2000';c.style.color=this.value.length>1800?'#dc2626':'var(--text-muted)'}"></textarea>
@@ -5169,11 +5175,11 @@ function updateHeaderUser(nick, badgeText) {
     const t = window._membership || 'free';
     let label, css, navCss;
     if (t === 'plus') {
-      label = 'Plus';
+      label = 'Light';
       css = 'display:inline-block;padding:2px 7px;font-size:10px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.4;background:rgba(124,58,237,.12);color:#7c3aed;';
       navCss = 'display:block;height:30px;padding:0 12px;font-size:11px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;letter-spacing:.2px;background:rgba(124,58,237,.12);color:#7c3aed;border:1.5px solid rgba(124,58,237,.25);';
     } else if (t === 'group') {
-      label = 'Group';
+      label = 'VIP';
       css = 'display:inline-block;padding:2px 7px;font-size:10px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.4;background:rgba(15,118,110,.12);color:#0f766e;';
       navCss = 'display:block;height:30px;padding:0 12px;font-size:11px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;letter-spacing:.2px;background:rgba(15,118,110,.12);color:#0f766e;border:1.5px solid rgba(15,118,110,.25);';
     } else {
@@ -6110,13 +6116,13 @@ const LAB_VAULT_KEY = 'lottobank_lab_saved_numbers_v1';
 const LAB_QUERY_KEY = 'lottobank_lab_backtest_queries_v1';
 const LTB_PLUS_PLAN = {
   id: 'lottobank_plus',
-  name: 'LottoBank Plus',
+  name: 'LottoBank Light',
   monthlyPrice: 1500,
   yearlyPrice: 14900,
 };
 const LTB_GROUP_PLAN = {
-  id: 'lottobank_group',
-  name: 'LottoBank Group',
+  id: 'lottobank_vip',
+  name: 'LottoBank VIP',
   monthlyPrice: 3900,
 };
 
@@ -6125,7 +6131,7 @@ function isPlusTier(value) {
 }
 
 function isGroupTier(value) {
-  return ['group','premium'].includes(String(value || '').toLowerCase());
+  return ['group','vip','premium'].includes(String(value || '').toLowerCase());
 }
 
 function applyMembershipProfile(profile) {
@@ -6135,24 +6141,24 @@ function applyMembershipProfile(profile) {
 }
 
 function getMembershipLabel() {
-  return window._membership === 'group' ? 'Group' : (isLabPremiumUser() ? 'Plus' : '무료');
+  return window._membership === 'group' ? 'VIP' : (isLabPremiumUser() ? 'Light' : '무료');
 }
 
 function renderPlusUpsell(reason) {
   return `<div class="plus-card">
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
       <div>
-        <span class="plus-chip">Plus</span>
-        <div style="font-size:16px;font-weight:900;color:var(--text-dark);margin-top:7px;">${reason || 'LottoBank Plus로 제한 없이 이용하세요.'}</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">월 ${LTB_PLUS_PLAN.monthlyPrice.toLocaleString()}원 · 연 ${LTB_PLUS_PLAN.yearlyPrice.toLocaleString()}원 예정.</div>
+        <span class="plus-chip">Light</span>
+        <div style="font-size:16px;font-weight:900;color:var(--text-dark);margin-top:7px;">${reason || 'LottoBank Light로 광고 없이 이용하세요.'}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">월 ${LTB_PLUS_PLAN.monthlyPrice.toLocaleString()}원 예정 · 앱 출시 후 Google Play 결제로 제공됩니다.</div>
       </div>
       <button class="btn-premium" style="padding:9px 13px;font-size:12px;white-space:nowrap;" onclick="showPlusComingSoon()">준비 중</button>
     </div>
     <div class="plus-benefits">
       <span>광고 제거</span>
-      <span>역대 전적 무제한</span>
-      <span>번호 저장 확장</span>
-      <span>티켓 당첨 알림</span>
+      <span>기본 기능 유지</span>
+      <span>VIP 추천 제외</span>
+      <span>당첨 알림 제외</span>
     </div>
   </div>`;
 }
@@ -6161,17 +6167,17 @@ function renderGroupUpsell() {
   return `<div class="group-card">
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
       <div>
-        <span class="group-chip">Group</span>
-        <div style="font-size:15px;font-weight:900;color:var(--text-dark);margin-top:7px;">친구·직장 동료와 공동 구매를 관리하세요.</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">월 ${LTB_GROUP_PLAN.monthlyPrice.toLocaleString()}원 예정 · 개발 검증 기간에는 화면을 바로 확인할 수 있습니다.</div>
+        <span class="group-chip">VIP</span>
+        <div style="font-size:15px;font-weight:900;color:var(--text-dark);margin-top:7px;">상위 추천번호와 당첨 알림을 준비 중입니다.</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">모임은 유료 상품이 아니라 추후 무료 유입 기능으로 다시 정리합니다.</div>
       </div>
-      <button class="qr-inner-tab" style="padding:8px 12px;font-size:12px;white-space:nowrap;" onclick="go('group')">모임 열기</button>
+      <button class="qr-inner-tab" style="padding:8px 12px;font-size:12px;white-space:nowrap;" onclick="go('subscription')">멤버십 보기</button>
     </div>
     <div class="plus-benefits">
-      <span>공동 구매 QR 기록</span>
-      <span>멤버별 분담금</span>
-      <span>당첨금 1/N 계산</span>
-      <span>모임 공유 카드</span>
+      <span>광고 제거 포함</span>
+      <span>추천번호 성과 추적</span>
+      <span>상위 전적 추천 모아보기</span>
+      <span>티켓 당첨 알림</span>
     </div>
   </div>`;
 }
@@ -6184,9 +6190,9 @@ function renderSubscription() {
   const isGroupMember = tier === 'group';
 
   const tierBadge = isGroupMember
-    ? '<span class="group-chip">Group</span>'
+    ? '<span class="group-chip">VIP</span>'
     : isPlusMember
-      ? '<span class="plus-chip">Plus</span>'
+      ? '<span class="plus-chip">Light</span>'
       : '<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;letter-spacing:.4px;">FREE</span>';
 
   const chkSvg  = c => `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -6219,30 +6225,31 @@ function renderSubscription() {
         '무료','₩0',
         row(chkSvg('#059669'),'QR 인증 · 번호 이력 조회')+
         row(chkSvg('#059669'),'기본 전적 통계 (최근 10건)')+
-        row(chkSvg('#059669'),'랭킹 · 뱃지 · 커뮤니티')+
+        row(chkSvg('#059669'),'자유게시판 · 추천번호 공유')+
+        row(chkSvg('#059669'),'문의/건의 비공개 접수')+
         row(xSvg('#94a3b8'),'연구소 조회 제한 (월 5회)',true)+
-        row(xSvg('#94a3b8'),'번호 저장 제한 (5개)',true),
+        row(xSvg('#94a3b8'),'광고 노출',true),
         tier==='free'?'현재 이용 중':'기본 플랜',
         tier==='free'?'':'go(\'profile\')',tier==='free')}
       ${planCard('#7c3aed','rgba(124,58,237,.04)','rgba(124,58,237,.25)',
-        '<span class="plus-chip">Plus</span>',
-        'Plus','월 ₩1,500',
+        '<span class="plus-chip">Light</span>',
+        'Light','월 ₩1,500',
         row(chkSvg('#059669'),'무료 플랜 전체 포함')+
-        row(starSvg('#7c3aed'),'광고 완전 제거')+
-        row(starSvg('#7c3aed'),'역대 전적 무제한 조회')+
-        row(starSvg('#7c3aed'),'번호 저장 무제한')+
-        row(starSvg('#7c3aed'),'연구소 조회 무제한')+
-        row(starSvg('#7c3aed'),'티켓 당첨 알림 (앱 출시 후)'),
+        row(starSvg('#7c3aed'),'광고 제거만 제공')+
+        row(xSvg('#94a3b8'),'VIP 추천번호 모아보기 제외',true)+
+        row(xSvg('#94a3b8'),'추천 성과 추적 제외',true)+
+        row(xSvg('#94a3b8'),'당첨 알림 제외',true),
         isPlusMember?'현재 이용 중':(isGroupMember?'포함됨':'준비 중'),
         isPlusMember?'':'showPlusComingSoon()',isPlusMember)}
       ${planCard('#0f766e','rgba(15,118,110,.04)','rgba(15,118,110,.25)',
-        '<span class="group-chip">Group</span>',
-        'Group','월 ₩3,900',
-        row(chkSvg('#059669'),'Plus 플랜 전체 포함')+
-        row(usrSvg('#0f766e'),'로또 모임 생성 · 관리')+
-        row(usrSvg('#0f766e'),'멤버별 지분율 정산')+
-        row(usrSvg('#0f766e'),'당첨금 자동 분배 계산')+
-        row(usrSvg('#0f766e'),'모임 공유 카드'),
+        '<span class="group-chip">VIP</span>',
+        'VIP','월 ₩3,900',
+        row(chkSvg('#059669'),'Light 광고 제거 포함')+
+        row(starSvg('#0f766e'),'상위 전적 유저 추천번호 모아보기')+
+        row(starSvg('#0f766e'),'추천번호 성과 자동 추적')+
+        row(starSvg('#0f766e'),'많이 저장된 번호와 인기 추천글')+
+        row(starSvg('#0f766e'),'VIP 게시글 강조와 뱃지')+
+        row(starSvg('#0f766e'),'티켓 당첨 알림 (앱 출시 후)'),
         isGroupMember?'현재 이용 중':'준비 중',
         isGroupMember?'':'showPlusComingSoon()',isGroupMember)}
     </div>
@@ -6250,7 +6257,8 @@ function renderSubscription() {
       <div style="font-size:11px;font-weight:800;color:var(--text-dark);margin-bottom:7px;">자주 묻는 질문</div>
       <div style="font-size:12px;color:var(--text-muted);line-height:1.9;">
         <b style="color:var(--text-dark);">결제는 언제부터?</b> Google Play 앱 출시 후 인앱 결제로 제공됩니다.<br>
-        <b style="color:var(--text-dark);">Group은 Plus를 포함하나요?</b> 네, Group 플랜은 Plus의 모든 기능을 포함합니다.
+        <b style="color:var(--text-dark);">VIP는 Light를 포함하나요?</b> 네, VIP는 광고 제거를 포함합니다.<br>
+        <b style="color:var(--text-dark);">모임 기능은 어디로 갔나요?</b> 모임은 유료 상품이 아니라 추후 무료 유입 기능으로 다시 정리합니다.
       </div>
     </div>
     <div style="margin-top:10px;text-align:center;">
@@ -6259,11 +6267,11 @@ function renderSubscription() {
 }
 
 function showPlusComingSoon() {
-  toast('Plus는 앱 출시 후 Google Play 결제로 제공할 예정입니다.');
+  toast('Light/VIP는 앱 출시 후 Google Play 결제로 제공할 예정입니다.');
 }
 
 function showGroupComingSoon() {
-  toast('모임 기능은 현재 검증 모드로 제공 중입니다.');
+  toast('모임 기능은 무료 유입 기능으로 다시 정리 중입니다.');
 }
 
 // ── 모임 Supabase 상태 ──
@@ -10348,7 +10356,7 @@ async function renderRank(catId) {
 // 커뮤니티 페이지
 // =====================================================
 let curCommTab = 'free';
-let commPosts = { free: [], verify: [] };
+let commPosts = { free: [], recommend: [], verify: [], feedback: [] };
 let commDisplayLimit = 20;
 let myLikedPostIds = new Set();
 let commChannel = null;
@@ -10374,12 +10382,15 @@ let curCommSort = 'newest';
 let commSearchQuery = '';
 
 function commTab(tab) {
-  if (tab === 'mine' && !isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
+  if ((tab === 'mine' || tab === 'feedback') && !isLoggedIn) { toast('로그인이 필요합니다'); return; }
   curCommTab = tab;
   commDisplayLimit = 20;
   $('ct-free').classList.toggle('on', tab==='free');
+  if ($('ct-recommend')) $('ct-recommend').classList.toggle('on', tab==='recommend');
   $('ct-verify').classList.toggle('on', tab==='verify');
+  if ($('ct-feedback')) $('ct-feedback').classList.toggle('on', tab==='feedback');
   if ($('ct-mine')) $('ct-mine').classList.toggle('on', tab==='mine');
+  collapsePostForm();
   renderCommunityList();
 }
 
@@ -10417,7 +10428,7 @@ function parsePostTag(title) {
 }
 function tagChip(tag) {
   if (!tag) return '';
-  const colors = { '일반':'#3b82f6','후기':'#10b981','당첨':'#dc2626','분석':'#8b5cf6','유머':'#f59e0b' };
+  const colors = { '일반':'#3b82f6','후기':'#10b981','당첨':'#dc2626','번호':'#0ea5e9','분석':'#8b5cf6','오류':'#ef4444','건의':'#14b8a6','유머':'#f59e0b' };
   const c = colors[tag] || '#64748b';
   const _dm = document.documentElement.getAttribute('data-theme')==='dark';
   const bg = _dm ? c+'30' : c+'18';
@@ -10429,7 +10440,7 @@ function renderCommunityList() {
   let posts;
   if (curCommTab === 'mine') {
     // 내 글: 모든 탭에서 내 글 합산
-    const allPosts = [...(commPosts['free']||[]), ...(commPosts['verify']||[])];
+    const allPosts = [...(commPosts['free']||[]), ...(commPosts['recommend']||[]), ...(commPosts['verify']||[]), ...(commPosts['feedback']||[])];
     posts = isLoggedIn && currentUser ? allPosts.filter(p => p.user_id === currentUser.id) : [];
   } else {
     posts = [...(commPosts[curCommTab] || [])];
@@ -10449,14 +10460,14 @@ function renderCommunityList() {
     $('community-content').innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
       <div style="margin-bottom:10px;"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
       <div style="font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">${isSearch ? '검색 결과가 없습니다' : curCommTab==='mine' ? '아직 작성한 글이 없습니다' : '아직 게시글이 없습니다'}</div>
-      <div style="font-size:12px;">${isSearch ? '다른 키워드로 검색해보세요' : curCommTab==='mine' ? '자유게시판이나 인증게시판에 글을 작성해보세요!' : '첫 번째 글을 작성해보세요!'}</div>
+      <div style="font-size:12px;">${isSearch ? '다른 키워드로 검색해보세요' : curCommTab==='mine' ? '커뮤니티에 글을 작성해보세요!' : curCommTab==='feedback' ? '문의나 건의사항을 남기면 작성자와 관리자만 확인합니다.' : '첫 번째 글을 작성해보세요!'}</div>
     </div>`;
     return;
   }
   const heartSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
   const chatSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
   // 인기 태그 집계 (모든 게시글 기준)
-  const allTagPosts = [...(commPosts['free']||[]), ...(commPosts['verify']||[])];
+  const allTagPosts = [...(commPosts['free']||[]), ...(commPosts['recommend']||[]), ...(commPosts['verify']||[])];
   const tagCount = {};
   allTagPosts.forEach(p => {
     const { tag } = parsePostTag(p.title || '');
@@ -10504,7 +10515,7 @@ function renderCommunityList() {
     const titleHl = commSearchQuery ? hlSearch(cleanTitle, commSearchQuery) : cleanTitle.replace(/</g,'&lt;');
     return `<div class="post-card" onclick="openPostDetail('${p.id}')" style="${isHot?'border-color:var(--comm-hot-border,#fecaca);background:linear-gradient(to right,var(--paper-white),var(--comm-hot-bg,rgba(255,245,245,.5)));':''}">
       <div class="post-card-top">
-        <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='free'?'자유':'인증'}</span>
+        <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='recommend'?'추천':p.tag==='verify'?'인증':p.tag==='feedback'?'문의':'자유'}</span>
         ${tagChip(tag)}<span class="post-card-title">${titleHl}</span>
         ${isHot ? '<span style="font-size:9px;font-weight:700;color:var(--comm-hot-text,#dc2626);background:var(--comm-hot-bg,#fff5f5);border:1px solid var(--comm-hot-border,#fecaca);border-radius:10px;padding:1px 6px;margin-left:4px;">🔥인기</span>' : ''}
         ${isNew ? '<span style="font-size:9px;font-weight:700;color:#059669;background:var(--comm-new-bg,#f0fdf4);border:1px solid var(--comm-new-border,#86efac);border-radius:10px;padding:1px 6px;margin-left:4px;">NEW</span>' : ''}
@@ -10523,13 +10534,15 @@ function renderCommunityList() {
 async function likePost(postId, btn) {
   if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
   const already = myLikedPostIds.has(postId);
+  const allPosts = [...(commPosts.free||[]),...(commPosts.recommend||[]),...(commPosts.verify||[]),...(commPosts.feedback||[])];
+  const targetPost = allPosts.find(p => String(p.id) === String(postId));
   if (already) {
     await sb.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
-    await sb.from('posts').update({ likes: Math.max(0, (commPosts[curCommTab].find(p=>p.id===postId)?.likes||1)-1) }).eq('id', postId);
+    await sb.from('posts').update({ likes: Math.max(0, (targetPost?.likes||1)-1) }).eq('id', postId);
     myLikedPostIds.delete(postId);
   } else {
     await sb.from('post_likes').insert({ post_id: postId, user_id: currentUser.id });
-    await sb.from('posts').update({ likes: (commPosts[curCommTab].find(p=>p.id===postId)?.likes||0)+1 }).eq('id', postId);
+    await sb.from('posts').update({ likes: (targetPost?.likes||0)+1 }).eq('id', postId);
     myLikedPostIds.add(postId);
   }
   await loadCommunityPosts();
@@ -10543,12 +10556,14 @@ async function writePost() {
   const body = bodyInp ? bodyInp.value.trim() : '';
   if (!text) { toast('⚠️ 제목을 입력해주세요'); return; }
   const nick = currentNickname();
+  if (curCommTab === 'feedback' && !body) { toast('문의/건의 내용은 본문을 입력해주세요.'); return; }
   const postTagPrefix = (_selectedPostTag && _selectedPostTag !== '') ? `[${_selectedPostTag}] ` : '';
+  const saveTag = ['free','recommend','verify','feedback'].includes(curCommTab) ? curCommTab : 'free';
   _ownPostTs = Date.now(); // Realtime 중복 알림 억제
   const { error } = await sb.from('posts').insert({
     user_id: currentUser.id,
     nickname: nick,
-    tag: curCommTab,
+    tag: saveTag,
     title: postTagPrefix + text,
     body: body || null,
     likes: 0,
@@ -10567,8 +10582,12 @@ async function loadCommunityPosts() {
       .order('created_at', { ascending: false })
       .limit(100);
     if (data) {
-      commPosts.free   = data.filter(p => p.tag === 'free');
-      commPosts.verify = data.filter(p => p.tag === 'verify');
+      const canSeeFeedback = p => p.tag !== 'feedback' || (isLoggedIn && currentUser && (window._isAppAdmin || p.user_id === currentUser.id));
+      const visible = data.filter(canSeeFeedback);
+      commPosts.free = visible.filter(p => p.tag === 'free' || !['recommend','verify','feedback'].includes(p.tag));
+      commPosts.recommend = visible.filter(p => p.tag === 'recommend');
+      commPosts.verify = visible.filter(p => p.tag === 'verify');
+      commPosts.feedback = visible.filter(p => p.tag === 'feedback');
     }
     if (isLoggedIn && currentUser) {
       const { data: likes } = await sb.from('post_likes').select('post_id').eq('user_id', currentUser.id);
@@ -10587,9 +10606,13 @@ let currentPostId = null;
 
 async function openPostDetail(postId) {
   currentPostId = postId;
-  const all = [...(commPosts.free || []), ...(commPosts.verify || [])];
+  const all = [...(commPosts.free || []), ...(commPosts.recommend || []), ...(commPosts.verify || []), ...(commPosts.feedback || [])];
   const post = all.find(p => String(p.id) === String(postId));
   if (!post) return;
+  if (post.tag === 'feedback' && !(isLoggedIn && currentUser && (window._isAppAdmin || post.user_id === currentUser.id))) {
+    toast('작성자와 관리자만 볼 수 있는 문의입니다.');
+    return;
+  }
   const liked = myLikedPostIds.has(postId);
   const heartSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="${liked?'var(--lotto-red)':'none'}" stroke="${liked?'var(--lotto-red)':'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
   const backSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
@@ -10601,7 +10624,7 @@ async function openPostDetail(postId) {
     </div>
     <div class="post-detail-wrap" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:16px;margin-bottom:12px;">
       <div style="margin-bottom:6px;">
-        <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}">${post.tag==='free'?'자유':'인증'}</span>
+        <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}">${post.tag==='recommend'?'추천':post.tag==='verify'?'인증':post.tag==='feedback'?'문의':'자유'}</span>
       </div>
       <div class="post-detail-title">${(()=>{const {tag,cleanTitle}=parsePostTag(post.title||'');return (tag?tagChip(tag):'')+cleanTitle.replace(/</g,'&lt;');})()}</div>
       ${post.body ? `<div style="font-size:13px;color:var(--text-dark);line-height:1.7;margin:12px 0;white-space:pre-wrap;opacity:.85;">${post.body.replace(/</g,'&lt;')}</div>` : ''}
@@ -10643,7 +10666,9 @@ async function deletePost(postId) {
     if (error) throw error;
     toast('게시글이 삭제되었습니다');
     commPosts.free = (commPosts.free||[]).filter(p => String(p.id) !== String(postId));
+    commPosts.recommend = (commPosts.recommend||[]).filter(p => String(p.id) !== String(postId));
     commPosts.verify = (commPosts.verify||[]).filter(p => String(p.id) !== String(postId));
+    commPosts.feedback = (commPosts.feedback||[]).filter(p => String(p.id) !== String(postId));
     closePostDetail();
   } catch(e) {
     toast('❌ 삭제 실패: ' + e.message);
@@ -10702,7 +10727,7 @@ async function submitComment(postId) {
   try {
     await sb.from('comments').insert({ post_id: postId, user_id: currentUser.id, nickname: nick, body });
     // 게시글 comment_count 증가
-    const cur = [...(commPosts.free||[]),...(commPosts.verify||[])].find(p=>String(p.id)===String(postId));
+    const cur = [...(commPosts.free||[]),...(commPosts.recommend||[]),...(commPosts.verify||[]),...(commPosts.feedback||[])].find(p=>String(p.id)===String(postId));
     if (cur) await sb.from('posts').update({ comment_count: (cur.comment_count||0)+1 }).eq('id', postId);
     if (inp) { inp.value = ''; const cc=$('cmt-char-cnt');if(cc)cc.textContent='0/200'; }
     await loadComments(postId);
@@ -10717,7 +10742,7 @@ async function submitComment(postId) {
 async function likePostDetail(postId) {
   if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
   const already = myLikedPostIds.has(postId);
-  const all = [...(commPosts.free||[]),...(commPosts.verify||[])];
+  const all = [...(commPosts.free||[]),...(commPosts.recommend||[]),...(commPosts.verify||[]),...(commPosts.feedback||[])];
   const post = all.find(p=>String(p.id)===String(postId));
   if (!post) return;
   if (already) {
@@ -10736,7 +10761,7 @@ async function likePostDetail(postId) {
 
 async function renderCommunity() {
   const pinput = $('post-input');
-  if (pinput) { pinput.disabled = !isLoggedIn; pinput.placeholder = isLoggedIn ? '클릭하여 글쓰기...' : '로그인 후 글 작성 가능합니다'; }
+  if (pinput) { pinput.disabled = !isLoggedIn; pinput.placeholder = isLoggedIn ? '추천 번호나 로또 이야기를 남겨보세요...' : '로그인 후 글 작성 가능합니다'; }
   collapsePostForm();
   await loadCommunityPosts();
   subscribeComm();
@@ -10744,9 +10769,13 @@ async function renderCommunity() {
 
 function updateCommTabCounts() {
   const fBtn = $('ct-free');
+  const rBtn = $('ct-recommend');
   const vBtn = $('ct-verify');
+  const qBtn = $('ct-feedback');
   if (fBtn) fBtn.textContent = `자유게시판 (${(commPosts.free||[]).length})`;
+  if (rBtn) rBtn.textContent = `추천번호 (${(commPosts.recommend||[]).length})`;
   if (vBtn) vBtn.textContent = `인증게시판 (${(commPosts.verify||[]).length})`;
+  if (qBtn) qBtn.textContent = `문의/건의 (${(commPosts.feedback||[]).length})`;
 }
 
 let _selectedPostTag = '';
@@ -10770,7 +10799,22 @@ function expandPostForm() {
   const bar = $('post-write-bar-collapsed');
   const exp = $('post-write-expanded');
   if (bar) bar.style.display = 'none';
-  if (exp) { exp.style.display = ''; const t = $('post-input-title'); if(t) t.focus(); }
+  if (exp) {
+    exp.style.display = '';
+    const t = $('post-input-title');
+    const b = $('post-input-body');
+    if (t) {
+      t.placeholder = curCommTab === 'recommend' ? '예: 1234회차 추천번호 03 11 18 27 34 42' : curCommTab === 'feedback' ? '문의 또는 건의 제목을 입력하세요' : '제목을 입력하세요...';
+      t.focus();
+    }
+    if (b) {
+      b.placeholder = curCommTab === 'recommend'
+        ? '추천 이유나 제외 번호를 함께 적어주세요.'
+        : curCommTab === 'feedback'
+          ? '오류 상황, 개선 의견, 계정 문의 내용을 구체적으로 적어주세요. 작성자와 관리자만 확인합니다.'
+          : '본문을 입력하세요 (선택)';
+    }
+  }
 }
 
 function collapsePostForm() {
@@ -10950,10 +10994,10 @@ function renderProfile() {
       <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
         <div>
           <div style="font-size:14px;font-weight:900;color:var(--text-dark);">
-            ${window._membership === 'group' ? '<span class="group-chip">Group</span>' : window._membership === 'plus' ? '<span class="plus-chip">Plus</span>' : '<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;">FREE</span>'}
+            ${window._membership === 'group' ? '<span class="group-chip">VIP</span>' : window._membership === 'plus' ? '<span class="plus-chip">Light</span>' : '<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;">FREE</span>'}
           </div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
-            ${window._membership === 'group' ? 'Group 플랜 이용 중' : window._membership === 'plus' ? 'Plus 플랜 이용 중' : '무료 플랜 이용 중'}
+            ${window._membership === 'group' ? 'VIP 플랜 이용 중' : window._membership === 'plus' ? 'Light 플랜 이용 중' : '무료 플랜 이용 중'}
           </div>
         </div>
         <button onclick="go('subscription')" style="padding:8px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">플랜 보기</button>
