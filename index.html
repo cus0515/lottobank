@@ -1320,7 +1320,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-board-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;}
 .community-recommend-picker{display:none;margin:8px 0 10px;padding:10px;border:1px dashed rgba(225,29,72,.35);border-radius:10px;background:rgba(225,29,72,.035);}
 .community-recommend-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
-.community-rec-slip{border:1px solid rgba(226,232,240,.9);border-radius:8px;background:#fffdf7;padding:10px;box-shadow:0 1px 4px rgba(15,23,42,.05);}
+.community-rec-slip{max-width:470px;margin:0 auto;border:1px solid rgba(226,232,240,.9);border-radius:8px;background:#fffdf7;padding:10px;box-shadow:0 1px 4px rgba(15,23,42,.05);}
 .community-rec-slip.skin-gold{background:linear-gradient(135deg,#fff9db,#fffdf7);border-color:#facc15;box-shadow:0 0 0 1px rgba(250,204,21,.22),0 6px 18px rgba(250,204,21,.12);}
 .community-rec-slip.skin-midnight{background:linear-gradient(135deg,#0f172a,#1e293b);border-color:#64748b;color:#fff;}
 .community-rec-slip.skin-midnight *{color:inherit!important;}
@@ -2844,14 +2844,15 @@ function ticketGameStatus(ticket, gameIndex = 0) {
   const games = ticket?.game_numbers?.length ? ticket.game_numbers : (ticket?.numbers?.length ? [ticket.numbers] : []);
   const canUseTicketRank = type === 'pension' || games.length <= 1;
   const rawRank = perGame?.rank ?? (canUseTicketRank ? ticket?.prize_rank : null);
+  const hasRank = rawRank !== null && rawRank !== undefined && rawRank !== '';
   const rank = Number(rawRank);
-  const checked = ticket?.result === 'checked' || (canUseTicketRank && Number.isFinite(rank));
-  if (Number.isFinite(rank)) {
+  const checked = (ticket?.result === 'checked' && (Boolean(perGame) || canUseTicketRank)) || (canUseTicketRank && hasRank && Number.isFinite(rank));
+  if (hasRank && Number.isFinite(rank)) {
     const maxRank = type === 'pension' ? 7 : 5;
     if (rank >= 1 && rank <= maxRank) return `${rank}등`;
     if (type === 'pension' && rank === 8) return '보너스';
   }
-  if (perGame && (!Number.isFinite(rank) || rank > (type === 'pension' ? 7 : 5))) return '낙첨';
+  if (perGame && (!hasRank || !Number.isFinite(rank) || rank > (type === 'pension' ? 7 : 5))) return '낙첨';
   if (checked) return '낙첨';
   return '추첨중';
 }
@@ -10613,46 +10614,90 @@ function renderCommunityRecSlip(rec) {
   </div>`;
 }
 
-function ticketToVerifyMeta(ticket) {
-  if (!ticket) return null;
-  const type = ticketLotteryType(ticket);
-  const games = type === 'lotto'
-    ? (ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []))
-    : [];
+function verifyTicketGroupKey(ticket) {
+  return `${ticketLotteryType(ticket)}-${ticket.round_no || ticket.round || 0}`;
+}
+
+function ticketsToVerifyMeta(group) {
+  const list = Array.isArray(group) ? group : [group].filter(Boolean);
+  if (!list.length) return null;
+  const first = list[0];
+  const type = ticketLotteryType(first);
+  if (type === 'pension') {
+    const rows = list.map(ticket => ({
+      id: ticket.id || '',
+      jo: ticket.jo ?? ticket.pension_group ?? null,
+      no: ticket.no ?? ticket.pension_number ?? null,
+      status: ticketGameStatus(ticket, 0),
+      prize_rank: ticket.prize_rank || null,
+      prize_amount: ticket.prize_amount || 0,
+    }));
+    const bestRank = rows.map(row => Number(row.prize_rank)).filter(rank => Number.isFinite(rank) && rank > 0).sort((a,b)=>a-b)[0] || null;
+    return {
+      id: verifyTicketGroupKey(first),
+      ticket_ids: rows.map(row => row.id).filter(Boolean),
+      type,
+      round: first.round_no || first.round || '-',
+      result: rows.every(row => row.status === '추첨중') ? 'pending' : 'checked',
+      prize_rank: bestRank,
+      prize_amount: rows.reduce((sum, row) => sum + (Number(row.prize_amount) || 0), 0),
+      pensionRows: rows,
+    };
+  }
+  const games = [];
+  const gameResults = [];
+  list.forEach(ticket => {
+    const ticketGames = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
+    const results = Array.isArray(ticket.game_results) ? ticket.game_results : [];
+    ticketGames.forEach((nums, index) => {
+      games.push(nums);
+      gameResults.push(results[index] || null);
+    });
+  });
+  const bestRank = gameResults.map(row => Number(row?.rank)).filter(rank => Number.isFinite(rank) && rank > 0).sort((a,b)=>a-b)[0] || null;
   return {
-    id: ticket.id || '',
+    id: verifyTicketGroupKey(first),
+    ticket_ids: list.map(ticket => ticket.id).filter(Boolean),
     type,
-    round: ticket.round_no || ticket.round || '-',
-    qr: ticket.qr_url || '',
-    result: ticket.result || '',
-    prize_rank: ticket.prize_rank || null,
-    prize_amount: ticket.prize_amount || 0,
-    game_results: Array.isArray(ticket.game_results) ? ticket.game_results : [],
+    round: first.round_no || first.round || '-',
+    result: gameResults.length && gameResults.every(Boolean) ? 'checked' : (first.result || ''),
+    prize_rank: bestRank,
+    prize_amount: list.reduce((sum, ticket) => sum + (Number(ticket.prize_amount) || 0), 0),
+    game_results: gameResults,
     games,
-    jo: ticket.jo ?? ticket.pension_group ?? null,
-    no: ticket.no ?? ticket.pension_number ?? null,
-    serial_meta: ticket.serial_meta || ticket.serialMeta || '',
   };
+}
+
+function verifyMetaStatus(meta) {
+  if (!meta) return '추첨중';
+  const statuses = meta.type === 'pension'
+    ? (meta.pensionRows || []).map(row => row.status)
+    : (meta.games || []).map((_, index) => ticketGameStatus(meta, index));
+  if (!statuses.length || statuses.every(status => status === '추첨중')) return '추첨중';
+  const win = statuses.find(status => status !== '낙첨' && status !== '추첨중');
+  return win || '낙첨';
 }
 
 function renderCommunityVerifySlip(meta) {
   if (!meta) return '';
   if (meta.type === 'pension') {
-    const number = meta.no ? String(meta.no).padStart(6, '0') : '';
-    const ticket = { ...meta, lottery_type:'pension', result:meta.result, prize_rank:meta.prize_rank, game_results:meta.game_results };
+    const rows = meta.pensionRows?.length ? meta.pensionRows : [{ jo:meta.jo, no:meta.no, status:ticketGameStatus({ ...meta, lottery_type:'pension' }, 0) }];
     return `<div class="community-rec-slip">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #16a34a;padding-bottom:7px;">
         <div><b style="font-size:17px;">연금복권 <span style="color:#16a34a;">720+</span></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${meta.round || '-'}회 인증</div></div>
         <b style="font-size:12px;">${fmtMFull(meta.prize_amount || 0)}</b>
       </div>
-      <div class="pension-ticket-row" style="border-bottom:0;padding:10px 0 0;">
+      ${rows.map((row, index) => {
+        const number = row.no ? String(row.no).padStart(6, '0') : '';
+        return `<div class="pension-ticket-row" style="${index === rows.length - 1 ? 'border-bottom:0;' : ''}padding:10px 0 0;">
         <div class="pension-ticket-numbers">
-          <span style="background:#16a34a;color:#fff;border-radius:5px;padding:6px 8px;font-size:12px;font-weight:900;">${meta.jo || '-'}조</span>
+          <span style="background:#16a34a;color:#fff;border-radius:5px;padding:6px 8px;font-size:12px;font-weight:900;">${row.jo || '-'}조</span>
           ${number ? number.split('').map(n=>`<span class="pension-number-ball" style="width:24px;height:28px;font-size:14px;">${n}</span>`).join('') : '<span style="font-size:12px;color:var(--text-muted);">번호 미등록</span>'}
         </div>
-        ${ticketStatusPill(ticketGameStatus(ticket, 0))}
+        ${ticketStatusPill(row.status || '추첨중')}
         <span></span>
-      </div>
+      </div>`;
+      }).join('')}
     </div>`;
   }
   const games = meta.games?.length ? meta.games : [];
@@ -10718,14 +10763,18 @@ async function renderCommunityRecommendPicker() {
   if (curCommTab === 'verify') {
     wrap.innerHTML = `<div style="font-size:12px;color:var(--text-muted);padding:12px;text-align:center;">QR 인증 이력을 불러오는 중...</div>`;
     const items = await loadCommunityVerifyTickets();
+    const grouped = Object.values(items.reduce((map, ticket) => {
+      const key = verifyTicketGroupKey(ticket);
+      (map[key] ||= []).push(ticket);
+      return map;
+    }, {})).map(ticketsToVerifyMeta).filter(Boolean);
     const selectedId = commAttachedVerify?.id || '';
     wrap.innerHTML = `<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;">
       <b style="font-size:12px;color:var(--text-dark);">QR 인증 이력 첨부</b>
       <button type="button" class="qr-inner-tab" style="font-size:11px;padding:5px 10px;" onclick="go('qr')">번호 이력 열기</button>
     </div>
-    ${items.length ? `<div class="community-recommend-grid" style="grid-template-columns:1fr;">${items.map(ticket => {
-      const meta = ticketToVerifyMeta(ticket);
-      return `<button type="button" onclick="selectCommunityVerify('${ticket.id}')" style="text-align:left;background:${selectedId===ticket.id?'rgba(225,29,72,.06)':'transparent'};border:1px solid ${selectedId===ticket.id?'var(--lotto-red)':'var(--border-dashed)'};border-radius:10px;padding:8px;cursor:pointer;font-family:inherit;">${renderCommunityVerifySlip(meta)}</button>`;
+    ${grouped.length ? `<div class="community-recommend-grid" style="grid-template-columns:1fr;">${grouped.map(meta => {
+      return `<button type="button" onclick="selectCommunityVerify('${meta.id}')" style="text-align:left;background:${selectedId===meta.id?'rgba(225,29,72,.06)':'transparent'};border:1px solid ${selectedId===meta.id?'var(--lotto-red)':'var(--border-dashed)'};border-radius:10px;padding:8px;cursor:pointer;font-family:inherit;">${renderCommunityVerifySlip(meta)}</button>`;
     }).join('')}</div>` : `<div style="font-size:12px;color:var(--text-muted);padding:12px;text-align:center;">QR 인증으로 등록한 복권이 없습니다.</div>`}`;
     return;
   }
@@ -10752,12 +10801,17 @@ async function renderCommunityRecommendPicker() {
 
 async function selectCommunityVerify(ticketId) {
   const items = await loadCommunityVerifyTickets();
-  const ticket = items.find(item => String(item.id) === String(ticketId));
-  if (!ticket) { toast('인증 이력을 찾지 못했습니다.'); return; }
-  commAttachedVerify = ticketToVerifyMeta(ticket);
+  const grouped = Object.values(items.reduce((map, ticket) => {
+    const key = verifyTicketGroupKey(ticket);
+    (map[key] ||= []).push(ticket);
+    return map;
+  }, {})).map(ticketsToVerifyMeta).filter(Boolean);
+  const meta = grouped.find(item => String(item.id) === String(ticketId));
+  if (!meta) { toast('인증 이력을 찾지 못했습니다.'); return; }
+  commAttachedVerify = meta;
   const title = $('post-input-title');
-  const status = ticketGameStatus(ticket, 0);
-  if (title && !title.value.trim()) title.value = `제 ${ticket.round_no || '-'}회 ${status} 인증`;
+  const status = verifyMetaStatus(meta);
+  if (title && !title.value.trim()) title.value = `제 ${meta.round || '-'}회 ${status} 인증`;
   renderCommunityRecommendPicker();
 }
 
