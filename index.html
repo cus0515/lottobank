@@ -2351,13 +2351,13 @@ textarea {
         <div class="community-board-head">
           <div class="community-board-title">
             <div><b id="comm-board-title">자유게시판</b><span id="comm-board-desc" style="display:block;margin-top:2px;">로또 이야기와 질문을 자유롭게 남겨보세요.</span></div>
-            <button class="post-write-btn" onclick="expandPostForm()">글쓰기</button>
+            <button type="button" class="post-write-btn" onclick="expandPostForm()">글쓰기</button>
           </div>
           <div class="comm-tab-row" style="margin-bottom:0;">
-            <button class="comm-tab-btn on" id="ct-free" onclick="commTab('free')">자유게시판</button>
-            <button class="comm-tab-btn" id="ct-recommend" onclick="commTab('recommend')">추천번호</button>
-            <button class="comm-tab-btn" id="ct-verify" onclick="commTab('verify')">인증게시판</button>
-            <button class="comm-tab-btn" id="ct-feedback" onclick="commTab('feedback')">문의/건의</button>
+            <button type="button" class="comm-tab-btn on" id="ct-free" onclick="commTab('free')">자유게시판</button>
+            <button type="button" class="comm-tab-btn" id="ct-recommend" onclick="commTab('recommend')">추천번호</button>
+            <button type="button" class="comm-tab-btn" id="ct-verify" onclick="commTab('verify')">인증게시판</button>
+            <button type="button" class="comm-tab-btn" id="ct-feedback" onclick="commTab('feedback')">문의/건의</button>
           </div>
           <div class="community-board-tools" style="margin-top:10px;">
             <div style="position:relative;">
@@ -2365,14 +2365,10 @@ textarea {
               <input type="text" id="comm-search-input" placeholder="현재 게시판에서 검색..." oninput="commSearch(this.value)" style="width:100%;box-sizing:border-box;padding:8px 10px 8px 30px;border:1px solid var(--border-dashed);border-radius:8px;font-size:12px;outline:none;font-family:inherit;background:var(--paper-white);color:var(--text-dark);" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'">
             </div>
             <div style="display:flex;gap:4px;">
-              <button class="comm-sort-btn on" id="cs-newest" onclick="commSort('newest')">최신순</button>
-              <button class="comm-sort-btn" id="cs-popular" onclick="commSort('popular')">인기순</button>
+              <button type="button" class="comm-sort-btn on" id="cs-newest" onclick="commSort('newest')">최신순</button>
+              <button type="button" class="comm-sort-btn" id="cs-popular" onclick="commSort('popular')">인기순</button>
             </div>
           </div>
-        </div>
-        <div class="post-write-bar" id="post-write-bar-collapsed">
-          <input type="text" id="post-input" class="post-write-input" placeholder="🔒 로그인 후 글쓰기 가능..." disabled onclick="showAuthModal()">
-          <button class="post-write-btn" onclick="expandPostForm()">열기</button>
         </div>
         <div id="post-write-expanded" style="display:none;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px;margin-bottom:10px;">
           <div style="position:relative;margin-bottom:8px;">
@@ -2381,14 +2377,14 @@ textarea {
           </div>
           <div style="display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap;">
             <span style="font-size:10px;color:var(--text-muted);font-weight:600;align-self:center;">태그</span>
-            <button class="post-tag-btn" onclick="selectPostTag(this,'일반')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">일반</button>
-            <button class="post-tag-btn" onclick="selectPostTag(this,'후기')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">후기</button>
-            <button class="post-tag-btn" onclick="selectPostTag(this,'당첨')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--comm-hot-border,#fecaca);border-radius:10px;background:var(--comm-hot-bg,#fff5f5);color:var(--comm-hot-text,#dc2626);cursor:pointer;">🎉 당첨</button>
-            <button class="post-tag-btn" onclick="selectPostTag(this,'번호')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">번호</button>
-            <button class="post-tag-btn" onclick="selectPostTag(this,'분석')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--comm-analysis-border,#ddd6fe);border-radius:10px;background:var(--comm-analysis-bg,#f5f3ff);color:var(--comm-analysis-text,#7c3aed);cursor:pointer;">분석</button>
-            <button class="post-tag-btn" onclick="selectPostTag(this,'오류')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">오류</button>
-            <button class="post-tag-btn" onclick="selectPostTag(this,'건의')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">건의</button>
-            <button class="post-tag-btn" onclick="selectPostTag(this,'유머')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">😄 유머</button>
+            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'일반')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">일반</button>
+            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'후기')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">후기</button>
+            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'당첨')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--comm-hot-border,#fecaca);border-radius:10px;background:var(--comm-hot-bg,#fff5f5);color:var(--comm-hot-text,#dc2626);cursor:pointer;">당첨</button>
+            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'번호')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">번호</button>
+            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'분석')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--comm-analysis-border,#ddd6fe);border-radius:10px;background:var(--comm-analysis-bg,#f5f3ff);color:var(--comm-analysis-text,#7c3aed);cursor:pointer;">분석</button>
+            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'오류')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">오류</button>
+            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'건의')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">건의</button>
+            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'유머')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">유머</button>
           </div>
           <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid var(--border-dashed);border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:var(--text-dark);background:var(--paper-white);" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'" oninput="const c=$('post-body-count');if(c){c.textContent=this.value.length+'/2000';c.style.color=this.value.length>1800?'#dc2626':'var(--text-muted)'}"></textarea>
           <div id="community-recommend-picker" class="community-recommend-picker"></div>
@@ -2397,8 +2393,8 @@ textarea {
             <span id="post-body-count" style="font-size:11px;color:var(--text-muted);">0/2000</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
-            <button onclick="collapsePostForm()" style="padding:8px 14px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">취소</button>
-            <button onclick="writePost()" style="padding:8px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">✏️ 등록</button>
+            <button type="button" onclick="collapsePostForm()" style="padding:8px 14px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">취소</button>
+            <button type="button" onclick="writePost()" style="padding:8px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">등록</button>
           </div>
         </div>
         <div id="community-content"></div>
@@ -2529,6 +2525,12 @@ function bH(n, isMatch = false) {
 // 최신 회차 계산 (2002-12-07 = 1회 추첨일 기준)
 function getLatestRound() {
   const start = new Date('2002-12-07T20:45:00+09:00');
+  const now = new Date();
+  return Math.max(1, Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000)) + 1);
+}
+
+function getLatestPensionRound() {
+  const start = new Date('2020-05-07T19:05:00+09:00');
   const now = new Date();
   return Math.max(1, Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000)) + 1);
 }
@@ -3133,9 +3135,62 @@ async function saveOnlinePensionTickets(parsed) {
     store_name:onlineStore.name,
     store_address:onlineStore.address,
   }));
-  const { data:savedTickets, error:ticketError } = await sb.from('tickets')
+  let { data:savedTickets, error:ticketError } = await sb.from('tickets')
     .upsert(tickets, { onConflict:'qr_url' })
     .select('id,qr_url');
+  if (ticketError && /column|schema cache/i.test(ticketError.message || '')) {
+    const compatTickets = tickets.map(ticket => {
+      const copy = { ...ticket };
+      delete copy.ticket_code;
+      delete copy.qr_payload;
+      delete copy.purchase_channel;
+      delete copy.purchase_mode;
+      delete copy.game_numbers;
+      delete copy.store_id;
+      delete copy.store_name;
+      delete copy.store_address;
+      return copy;
+    });
+    ({ data:savedTickets, error:ticketError } = await sb.from('tickets')
+      .upsert(compatTickets, { onConflict:'qr_url' })
+      .select('id,qr_url'));
+  }
+  if (ticketError && /column|schema cache/i.test(ticketError.message || '')) {
+    const minimalTickets = tickets.map(ticket => ({
+      user_id:ticket.user_id,
+      qr_url:ticket.qr_url,
+      round_no:ticket.round_no,
+      numbers:[],
+      game_count:1,
+      purchase_date:ticket.purchase_date,
+      result:'pension',
+      prize_rank:null,
+      prize_amount:0,
+      lottery_type:'pension',
+      pension_group:ticket.pension_group,
+      pension_number:ticket.pension_number,
+      serial_meta:ticket.serial_meta,
+    }));
+    ({ data:savedTickets, error:ticketError } = await sb.from('tickets')
+      .upsert(minimalTickets, { onConflict:'qr_url' })
+      .select('id,qr_url'));
+  }
+  if (ticketError && /column|schema cache/i.test(ticketError.message || '')) {
+    const bareTickets = tickets.map(ticket => ({
+      user_id:ticket.user_id,
+      qr_url:ticket.qr_url,
+      round_no:ticket.round_no,
+      numbers:[],
+      game_count:1,
+      purchase_date:ticket.purchase_date,
+      result:'pension',
+      prize_rank:null,
+      prize_amount:0,
+    }));
+    ({ data:savedTickets, error:ticketError } = await sb.from('tickets')
+      .upsert(bareTickets, { onConflict:'qr_url' })
+      .select('id,qr_url'));
+  }
   if (ticketError) throw ticketError;
   const assignments = (savedTickets || []).map(ticket => ({
     ticket_id:ticket.id,
@@ -3251,9 +3306,13 @@ async function registerOnlineTicket() {
   if (!parsed || !result || !currentUser || !sb) return;
 
   // ── 인터넷 판매점 회차 보안 검증 ──────────────────────────────────────────────────
-  // (1) 회차 범위 유효성: 1000 이상, getLatestRound()+5 이하
-  const _maxAllowed = getLatestRound() + 5;
-  if (!parsed.round || parsed.round < 1000 || parsed.round > _maxAllowed) {
+  // (1) 회차 범위 유효성: 로또와 연금은 회차 체계가 다르므로 분리 검증한다.
+  const _latestByType = parsed.type === 'pension'
+    ? (window._latestPenRound || getLatestPensionRound())
+    : (latestRound || getLatestRound());
+  const _minAllowed = parsed.type === 'pension' ? 1 : 1000;
+  const _maxAllowed = _latestByType + 5;
+  if (!parsed.round || parsed.round < _minAllowed || parsed.round > _maxAllowed) {
     result.innerHTML = `<div class="qr-warn-card"><span class="qr-err-icon">⚠️</span><div>
       <div class="qr-warn-title">유효하지 않은 회차</div>
       <div class="qr-warn-desc">인식된 회차(${parsed.round || '?'})가 정상 범위를 벗어났습니다. 캡처 이미지를 다시 확인해 주세요.</div></div></div>`;
@@ -3261,7 +3320,7 @@ async function registerOnlineTicket() {
   }
   // (2) 과거 확정 회차 차단: 이미 추첨된 회차의 인터넷 구매 캡처 등록 불가
   //     → 결과 공개 후 당첨권 역추적 조작 방지
-  const _curLatest = latestRound || getLatestRound();
+  const _curLatest = _latestByType;
   if (parsed.round < _curLatest) {
     result.innerHTML = `<div class="qr-warn-card"><span class="qr-err-icon">🔒</span><div>
       <div class="qr-warn-title">인터넷 구매 과거 회차 등록 불가</div>
@@ -4698,13 +4757,13 @@ async function verifyRealQR() {
             qr_url: parsed.key,
             round_no: parsed.round || 0,
             numbers: [],
-            game_count: 0,
+            game_count: 1,
             purchase_date: meta.purchaseDate,
             result: 'pension',
             prize_rank: null,
             prize_amount: 0,
           };
-          let { error } = await sb.from('tickets').upsert({
+          const fullPensionPayload = {
             ...pensionBase,
             lottery_type:'pension',
             purchase_channel:meta.channel,
@@ -4720,7 +4779,22 @@ async function verifyRealQR() {
             pension_group:parsed.jo || null,
             pension_number:String(parsed.no || '').padStart(6, '0'),
             serial_meta:parsed.serialMeta || null,
-          }, { onConflict:'qr_url' });
+          };
+          let { error } = await sb.from('tickets').upsert(fullPensionPayload, { onConflict:'qr_url' });
+          if (error && /column|schema cache/i.test(error.message || '')) {
+            const compatPensionPayload = { ...fullPensionPayload };
+            delete compatPensionPayload.purchase_channel;
+            delete compatPensionPayload.purchase_mode;
+            delete compatPensionPayload.user_store_id;
+            delete compatPensionPayload.store_id;
+            delete compatPensionPayload.store_name;
+            delete compatPensionPayload.store_address;
+            delete compatPensionPayload.store_lat;
+            delete compatPensionPayload.store_lng;
+            delete compatPensionPayload.game_numbers;
+            delete compatPensionPayload.qr_payload;
+            ({ error } = await sb.from('tickets').upsert(compatPensionPayload, { onConflict:'qr_url' }));
+          }
           if (error && /column|schema cache/i.test(error.message || '')) {
             ({ error } = await sb.from('tickets').upsert(pensionBase, { onConflict:'qr_url' }));
           }
@@ -4885,9 +4959,7 @@ const summaryBg    = bestRank <= 2 ? (_isDmS?'#0a1f10':'#dcfce7') : bestRank <= 
   if (isWin && isLoggedIn) {
     const shareWrap = document.createElement('div');
     shareWrap.style.cssText = 'margin-top:8px;';
-    const prizeLabel = prizeAmt > 0 ? ` (${fmtMFull(prizeAmt)})` : '';
-    const defaultTitle = `${parsed.round}회차 ${rc.label}${prizeLabel} 인증합니다`;
-    shareWrap.innerHTML = `<button onclick="openCommunityShare('${bestLabel}','${parsed.round}회차')" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--lotto-red,#dc2626),#b91c1c);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:-.2px;">🎉 인증게시판에 공유하기</button>`;
+    shareWrap.innerHTML = `<button type="button" onclick="openCommunityShare('${bestLabel}','${parsed.round}회차')" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--lotto-red,#dc2626),#b91c1c);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:-.2px;">인증게시판에 공유하기</button>`;
     $('qr-result-display').appendChild(shareWrap);
   }
 }
@@ -10394,12 +10466,13 @@ let curCommSort = 'newest';
 let commSearchQuery = '';
 let commAttachedRecommend = null;
 let commRecommendSkin = 'basic';
+let commRecommendType = 'lotto';
 
 function commBoardMeta(tab) {
   const map = {
     free: ['자유게시판', '로또 이야기와 질문을 자유롭게 남겨보세요.'],
     recommend: ['추천번호', '연구소 저장 번호를 용지 형태로 첨부해 공유하세요.'],
-    verify: ['인증게시판', 'QR 인증과 당첨 후기를 공유하는 공간입니다.'],
+    verify: ['인증게시판', 'QR 인증으로 확인한 당첨 회차와 등수를 공유하는 공간입니다.'],
     feedback: ['문의/건의', '작성자와 관리자만 확인하는 비공개 문의함입니다.']
   };
   return map[tab] || map.free;
@@ -10426,6 +10499,24 @@ function splitCommBody(body) {
   let rec = null;
   try { rec = JSON.parse(decodeURIComponent(m[1])); } catch(_) {}
   return { text: raw.replace(m[0], '').trim(), rec };
+}
+
+function packCommTitle(title, body) {
+  return `${title || ''}${body ? ` [[LTB_BODY:${encodeURIComponent(body)}]]` : ''}`;
+}
+
+function splitCommTitle(title, body) {
+  const rawTitle = title || '';
+  const m = rawTitle.match(/\s*\[\[LTB_BODY:([^\]]+)\]\]/);
+  let cleanTitle = rawTitle;
+  let text = body || '';
+  if (m) {
+    cleanTitle = rawTitle.replace(m[0], '').trim();
+    if (!text) {
+      try { text = decodeURIComponent(m[1]); } catch(_) { text = ''; }
+    }
+  }
+  return { title: cleanTitle, body: text };
 }
 
 function renderCommunityRecSlip(rec) {
@@ -10466,23 +10557,30 @@ function renderCommunityRecommendPicker() {
   }
   wrap.style.display = 'block';
   const vault = getLabVault();
-  const items = [
-    ...(vault.lotto || []).map((item, idx) => ({ ...item, type:'lotto', idx })),
-    ...(vault.pension || []).map((item, idx) => ({ ...item, type:'pension', idx }))
-  ];
+  const items = (vault[commRecommendType] || []).map((item, idx) => ({ ...item, type:commRecommendType, idx }));
   const selectedKey = commAttachedRecommend ? `${commAttachedRecommend.type}_${commAttachedRecommend.idx}` : '';
   const skinRow = isVipMember() ? `<div class="community-skin-row" style="display:flex;">
     ${[['basic','기본'],['gold','골드'],['mint','민트'],['midnight','미드나잇']].map(([k,v])=>`<button class="community-skin-btn ${commRecommendSkin===k?'on':''}" onclick="setCommunitySkin('${k}')">${v}</button>`).join('')}
   </div>` : `<div style="font-size:10px;color:var(--text-muted);margin-top:8px;">VIP는 추천 용지 스킨을 선택할 수 있습니다.</div>`;
   wrap.innerHTML = `<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;">
     <b style="font-size:12px;color:var(--text-dark);">연구소 저장 번호 첨부</b>
-    <button class="qr-inner-tab" style="font-size:11px;padding:5px 10px;" onclick="go('lab')">저장고 열기</button>
+    <button type="button" class="qr-inner-tab" style="font-size:11px;padding:5px 10px;" onclick="go('lab')">저장고 열기</button>
   </div>
-  ${items.length ? `<div class="community-recommend-grid">${items.map(item => {
+  <div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 8px;">
+    <button type="button" class="qr-inner-tab ${commRecommendType==='lotto'?'on':''}" onclick="switchCommunityRecommendType('lotto')">로또</button>
+    <button type="button" class="qr-inner-tab ${commRecommendType==='pension'?'on':''}" onclick="switchCommunityRecommendType('pension')">연금</button>
+  </div>
+  ${items.length ? `<div class="community-recommend-grid" style="grid-template-columns:1fr;">${items.map(item => {
     const key = `${item.type}_${item.idx}`;
     const rec = { ...item, skin:commRecommendSkin };
     return `<button type="button" onclick="selectCommunityRecommend('${item.type}',${item.idx})" style="text-align:left;background:${selectedKey===key?'rgba(225,29,72,.06)':'transparent'};border:1px solid ${selectedKey===key?'var(--lotto-red)':'var(--border-dashed)'};border-radius:10px;padding:8px;cursor:pointer;font-family:inherit;">${renderCommunityRecSlip(rec)}</button>`;
-  }).join('')}</div>${skinRow}` : '<div style="font-size:12px;color:var(--text-muted);padding:12px;text-align:center;">연구소 번호 저장고에 저장된 번호가 없습니다.</div>'}`;
+  }).join('')}</div>${skinRow}` : `<div style="font-size:12px;color:var(--text-muted);padding:12px;text-align:center;">${commRecommendType==='lotto'?'로또':'연금'} 저장 번호가 없습니다.</div>`}`;
+}
+
+function switchCommunityRecommendType(type) {
+  commRecommendType = type === 'pension' ? 'pension' : 'lotto';
+  commAttachedRecommend = null;
+  renderCommunityRecommendPicker();
 }
 
 function selectCommunityRecommend(type, idx) {
@@ -10562,8 +10660,8 @@ function renderCommunityList() {
   let posts = [...(commPosts[curCommTab] || [])];
   if (commSearchQuery) {
     posts = posts.filter(p =>
-      (p.title || '').toLowerCase().includes(commSearchQuery) ||
-      (splitCommBody(p.body).text || '').toLowerCase().includes(commSearchQuery) ||
+      (splitCommTitle(p.title, p.body).title || '').toLowerCase().includes(commSearchQuery) ||
+      (splitCommBody(splitCommTitle(p.title, p.body).body).text || '').toLowerCase().includes(commSearchQuery) ||
       (p.nickname || '').toLowerCase().includes(commSearchQuery)
     );
   }
@@ -10585,7 +10683,8 @@ function renderCommunityList() {
   const allTagPosts = [...(commPosts['free']||[]), ...(commPosts['recommend']||[]), ...(commPosts['verify']||[])];
   const tagCount = {};
   allTagPosts.forEach(p => {
-    const { tag } = parsePostTag(p.title || '');
+    const packed = splitCommTitle(p.title, p.body);
+    const { tag } = parsePostTag(packed.title || '');
     if (tag) tagCount[tag] = (tagCount[tag] || 0) + 1;
   });
   const topTags = Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -10603,8 +10702,8 @@ function renderCommunityList() {
     return safe.replace(new RegExp('(' + safeQ + ')', 'gi'), '<mark style="background:rgba(220,38,38,.18);color:var(--lotto-red);border-radius:2px;padding:0 1px;">$1</mark>');
   }
   // 검색 시 본문 컨텍스트 스니펫: 매칭 위치 주변 80자 추출
-  function bodySnippet(body, q) {
-    const cleanBody = splitCommBody(body).text;
+  function bodySnippet(text, q) {
+    const cleanBody = text || '';
     if (!cleanBody) return '';
     if (q) {
       const idx = cleanBody.toLowerCase().indexOf(q.toLowerCase());
@@ -10624,11 +10723,13 @@ function renderCommunityList() {
   const loadMoreBtn = hasMore ? `<button onclick="commLoadMore()" style="width:100%;margin-top:8px;padding:10px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">더 보기 (${posts.length - commDisplayLimit}개 남음)</button>` : '';
   $('community-content').innerHTML = tagsHtml + visiblePosts.map((p,idx) => {
     const liked = myLikedPostIds.has(p.id);
-    const bodyPreview = bodySnippet(p.body, commSearchQuery);
-    const rec = splitCommBody(p.body).rec;
+    const packed = splitCommTitle(p.title, p.body);
+    const bodyParts = splitCommBody(packed.body);
+    const bodyPreview = bodySnippet(bodyParts.text, commSearchQuery);
+    const rec = bodyParts.rec;
     const isHot = (p.likes||0) >= 5;
     const isNew = (Date.now() - new Date(p.created_at).getTime()) < 3600000;
-    const {tag, cleanTitle} = parsePostTag(p.title||'');
+    const {tag, cleanTitle} = parsePostTag(packed.title||'');
     const titleHl = commSearchQuery ? hlSearch(cleanTitle, commSearchQuery) : cleanTitle.replace(/</g,'&lt;');
     return `<div class="post-card" onclick="openPostDetail('${p.id}')" style="${isHot?'border-color:var(--comm-hot-border,#fecaca);background:linear-gradient(to right,var(--paper-white),var(--comm-hot-bg,rgba(255,245,245,.5)));':''}">
       <div class="post-card-top">
@@ -10670,7 +10771,7 @@ async function writePost() {
   if (!isLoggedIn) { showAuthModal(); return; }
   const titleInp = $('post-input-title');
   const bodyInp  = $('post-input-body');
-  const text = (titleInp ? titleInp.value : $('post-input').value).trim();
+  const text = (titleInp ? titleInp.value : '').trim();
   const body = bodyInp ? bodyInp.value.trim() : '';
   if (!text) { toast('⚠️ 제목을 입력해주세요'); return; }
   const nick = currentNickname();
@@ -10679,13 +10780,13 @@ async function writePost() {
   const postTagPrefix = (_selectedPostTag && _selectedPostTag !== '') ? `[${_selectedPostTag}] ` : '';
   const saveTag = ['free','recommend','verify','feedback'].includes(curCommTab) ? curCommTab : 'free';
   const finalBody = (body || '') + (saveTag === 'recommend' ? encodeCommRecommend({ ...commAttachedRecommend, skin:commRecommendSkin }) : '');
+  const packedTitle = packCommTitle(postTagPrefix + text, finalBody);
   _ownPostTs = Date.now(); // Realtime 중복 알림 억제
   const { error } = await sb.from('posts').insert({
     user_id: currentUser.id,
     nickname: nick,
     tag: saveTag,
-    title: postTagPrefix + text,
-    body: finalBody || null,
+    title: packedTitle,
     likes: 0,
     comment_count: 0,
   });
@@ -10734,7 +10835,8 @@ async function openPostDetail(postId) {
     return;
   }
   const liked = myLikedPostIds.has(postId);
-  const bodyParts = splitCommBody(post.body);
+  const packed = splitCommTitle(post.title, post.body);
+  const bodyParts = splitCommBody(packed.body);
   const heartSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="${liked?'var(--lotto-red)':'none'}" stroke="${liked?'var(--lotto-red)':'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
   const backSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
 
@@ -10747,7 +10849,7 @@ async function openPostDetail(postId) {
       <div style="margin-bottom:6px;">
         <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}">${post.tag==='recommend'?'추천':post.tag==='verify'?'인증':post.tag==='feedback'?'문의':'자유'}</span>
       </div>
-      <div class="post-detail-title">${(()=>{const {tag,cleanTitle}=parsePostTag(post.title||'');return (tag?tagChip(tag):'')+cleanTitle.replace(/</g,'&lt;');})()}</div>
+      <div class="post-detail-title">${(()=>{const {tag,cleanTitle}=parsePostTag(packed.title||'');return (tag?tagChip(tag):'')+cleanTitle.replace(/</g,'&lt;');})()}</div>
       ${bodyParts.rec ? `<div style="margin:12px 0;">${renderCommunityRecSlip(bodyParts.rec)}</div>` : ''}
       ${bodyParts.text ? `<div style="font-size:13px;color:var(--text-dark);line-height:1.7;margin:12px 0;white-space:pre-wrap;opacity:.85;">${bodyParts.text.replace(/</g,'&lt;')}</div>` : ''}
       <div class="post-detail-meta">
@@ -10882,8 +10984,6 @@ async function likePostDetail(postId) {
 }
 
 async function renderCommunity() {
-  const pinput = $('post-input');
-  if (pinput) { pinput.disabled = !isLoggedIn; pinput.placeholder = isLoggedIn ? '추천 번호나 로또 이야기를 남겨보세요...' : '로그인 후 글 작성 가능합니다'; }
   updateCommunityBoardMeta();
   collapsePostForm();
   await loadCommunityPosts();
@@ -10908,20 +11008,27 @@ function selectPostTag(btn, tag) {
   btn.classList.add('on');
 }
 
-// QR 당첨 결과를 채팅 입력창에 연결하는 함수
+// QR 당첨 결과를 인증게시판 작성폼에 연결한다.
 function openCommunityShare(rankLabel, roundStr) {
   if (!isLoggedIn) { showAuthModal(); return; }
-  const input = $('chat-input');
-  if (!input) return;
-  input.value = `[${roundStr} ${rankLabel}] 당첨 인증을 완료했습니다.`;
-  input.focus();
-  toast('채팅 메시지를 확인한 뒤 전송하세요.');
+  go('community');
+  setTimeout(() => {
+    commTab('verify');
+    expandPostForm();
+    const title = $('post-input-title');
+    const body = $('post-input-body');
+    if (title) title.value = `${roundStr} ${rankLabel} 당첨 인증`;
+    if (body) {
+      body.value = `QR 인증으로 확인한 ${roundStr} ${rankLabel} 당첨 기록입니다.`;
+      const c = $('post-body-count');
+      if (c) c.textContent = body.value.length + '/2000';
+    }
+    toast('인증게시판 글 내용을 확인한 뒤 등록하세요.');
+  }, 80);
 }
 function expandPostForm() {
   if (!isLoggedIn) { showAuthModal(); return; }
-  const bar = $('post-write-bar-collapsed');
   const exp = $('post-write-expanded');
-  if (bar) bar.style.display = 'none';
   if (exp) {
     exp.style.display = '';
     const t = $('post-input-title');
@@ -10942,9 +11049,7 @@ function expandPostForm() {
 }
 
 function collapsePostForm() {
-  const bar = $('post-write-bar-collapsed');
   const exp = $('post-write-expanded');
-  if (bar) bar.style.display = '';
   if (exp) exp.style.display = 'none';
   const t = $('post-input-title'); if(t) t.value = '';
   const b = $('post-input-body'); if(b) b.value = '';
