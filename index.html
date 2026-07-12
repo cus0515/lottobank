@@ -1311,6 +1311,24 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 [data-theme='dark'] .post-card-stats .post-like-btn{border-color:#334155;}
 [data-theme='dark'] .tag-free{background:rgba(100,116,139,.2);color:#94a3b8;border-color:rgba(100,116,139,.3);}
 [data-theme='dark'] .tag-verify{background:rgba(225,29,72,.15);color:#f87171;border-color:rgba(225,29,72,.3);}
+.community-board-head{background:var(--paper-white);border:1px solid rgba(226,232,240,.85);border-radius:12px;padding:13px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(15,23,42,.04);}
+.community-board-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.community-board-title b{font-size:16px;color:var(--text-dark);}
+.community-board-title span{font-size:11px;color:var(--text-muted);}
+.community-board-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;}
+.community-recommend-picker{display:none;margin:8px 0 10px;padding:10px;border:1px dashed rgba(225,29,72,.35);border-radius:10px;background:rgba(225,29,72,.035);}
+.community-recommend-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.community-rec-slip{border:1px solid rgba(226,232,240,.9);border-radius:8px;background:#fffdf7;padding:10px;box-shadow:0 1px 4px rgba(15,23,42,.05);}
+.community-rec-slip.skin-gold{background:linear-gradient(135deg,#fff9db,#fffdf7);border-color:#facc15;box-shadow:0 0 0 1px rgba(250,204,21,.22),0 6px 18px rgba(250,204,21,.12);}
+.community-rec-slip.skin-midnight{background:linear-gradient(135deg,#0f172a,#1e293b);border-color:#64748b;color:#fff;}
+.community-rec-slip.skin-midnight *{color:inherit!important;}
+.community-rec-slip.skin-mint{background:linear-gradient(135deg,#ecfdf5,#f8fffb);border-color:#86efac;}
+.community-rec-row{display:grid;grid-template-columns:18px minmax(0,1fr);gap:8px;align-items:center;border-top:1px dashed #cbd5e1;padding-top:7px;margin-top:7px;}
+.community-rec-nums{display:grid;grid-template-columns:repeat(6,minmax(20px,1fr));gap:4px;font-size:11px;font-weight:900;text-align:center;}
+.community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
+.community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
+@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}}
 
 /* == Task #124: Profile page premium upgrade == */
 .profile-hero{text-align:center;padding:32px 20px 24px;border-bottom:none;margin-bottom:12px;background:linear-gradient(160deg,rgba(225,29,72,.08) 0%,rgba(139,92,246,.06) 50%,transparent 100%);border-radius:16px;position:relative;overflow:hidden;}
@@ -1849,7 +1867,6 @@ textarea {
       <button id="m-ticket" class="menu-btn" onclick="go('ticket')">QR 인증</button>
     </div>
     <div class="auth-zone">
-      <button id="nav-membership-btn" onclick="go('subscription')" style="display:none;height:30px;padding:0 12px;font-size:11px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1;letter-spacing:.2px;transition:all .15s;"></button>
       <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크 모드로 전환" style="width:34px;height:30px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-dashed);border-radius:6px;padding:0;cursor:pointer;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="다크 모드로 전환"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
       <button id="chat-reopen-btn" onclick="toggleChat()" title="채팅 열기"
         style="display:none;align-items:center;gap:4px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--text-muted);background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;cursor:pointer;">
@@ -2331,31 +2348,31 @@ textarea {
 
       <!-- 8. 커뮤니티 -->
       <div id="pg-community" class="page-content" style="display:none;">
-        <div style="background:linear-gradient(135deg,#0c1a2e,#1e3a5f);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:0 4px 16px rgba(30,58,95,.4);">
-          <div style="font-size:10px;opacity:.4;font-weight:700;letter-spacing:1px;margin-bottom:3px;">COMMUNITY</div>
-          <div style="font-size:16px;font-weight:900;margin-bottom:2px;">커뮤니티</div>
-          <div style="font-size:11px;opacity:.5;">추천 번호를 공유하고 당첨 인증과 운영 문의를 남기세요</div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="community-board-head">
+          <div class="community-board-title">
+            <div><b id="comm-board-title">자유게시판</b><span id="comm-board-desc" style="display:block;margin-top:2px;">로또 이야기와 질문을 자유롭게 남겨보세요.</span></div>
+            <button class="post-write-btn" onclick="expandPostForm()">글쓰기</button>
+          </div>
           <div class="comm-tab-row" style="margin-bottom:0;">
             <button class="comm-tab-btn on" id="ct-free" onclick="commTab('free')">자유게시판</button>
             <button class="comm-tab-btn" id="ct-recommend" onclick="commTab('recommend')">추천번호</button>
             <button class="comm-tab-btn" id="ct-verify" onclick="commTab('verify')">인증게시판</button>
             <button class="comm-tab-btn" id="ct-feedback" onclick="commTab('feedback')">문의/건의</button>
-            <button class="comm-tab-btn" id="ct-mine" onclick="commTab('mine')" style="display:none;">내 글</button>
           </div>
-          <div style="display:flex;gap:4px;">
-            <button class="comm-sort-btn on" id="cs-newest" onclick="commSort('newest')">최신순</button>
-            <button class="comm-sort-btn" id="cs-popular" onclick="commSort('popular')">인기순</button>
+          <div class="community-board-tools" style="margin-top:10px;">
+            <div style="position:relative;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="comm-search-input" placeholder="현재 게시판에서 검색..." oninput="commSearch(this.value)" style="width:100%;box-sizing:border-box;padding:8px 10px 8px 30px;border:1px solid var(--border-dashed);border-radius:8px;font-size:12px;outline:none;font-family:inherit;background:var(--paper-white);color:var(--text-dark);" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'">
+            </div>
+            <div style="display:flex;gap:4px;">
+              <button class="comm-sort-btn on" id="cs-newest" onclick="commSort('newest')">최신순</button>
+              <button class="comm-sort-btn" id="cs-popular" onclick="commSort('popular')">인기순</button>
+            </div>
           </div>
-        </div>
-        <div style="position:relative;margin-bottom:8px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" id="comm-search-input" placeholder="게시글 검색..." oninput="commSearch(this.value)" style="width:100%;box-sizing:border-box;padding:7px 10px 7px 30px;border:1px solid var(--border-dashed);border-radius:6px;font-size:12px;outline:none;font-family:inherit;background:var(--paper-white);color:var(--text-dark);" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'">
         </div>
         <div class="post-write-bar" id="post-write-bar-collapsed">
           <input type="text" id="post-input" class="post-write-input" placeholder="🔒 로그인 후 글쓰기 가능..." disabled onclick="showAuthModal()">
-          <button class="post-write-btn" onclick="expandPostForm()">글쓰기</button>
+          <button class="post-write-btn" onclick="expandPostForm()">열기</button>
         </div>
         <div id="post-write-expanded" style="display:none;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;padding:12px;margin-bottom:10px;">
           <div style="position:relative;margin-bottom:8px;">
@@ -2374,6 +2391,7 @@ textarea {
             <button class="post-tag-btn" onclick="selectPostTag(this,'유머')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">😄 유머</button>
           </div>
           <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid var(--border-dashed);border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:var(--text-dark);background:var(--paper-white);" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'" oninput="const c=$('post-body-count');if(c){c.textContent=this.value.length+'/2000';c.style.color=this.value.length>1800?'#dc2626':'var(--text-muted)'}"></textarea>
+          <div id="community-recommend-picker" class="community-recommend-picker"></div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
             <span style="font-size:10px;color:var(--text-muted);">※ 홍보·욕설·스팸 금지</span>
             <span id="post-body-count" style="font-size:11px;color:var(--text-muted);">0/2000</span>
@@ -5170,25 +5188,20 @@ function updateHeaderUser(nick, badgeText) {
   if (chip) chip.style.display = 'none';
   // 멤버십 버튼 업데이트
   const memBtn = $('header-membership-btn');
-  const navMemBtn = $('nav-membership-btn');
-  if (memBtn || navMemBtn) {
+  if (memBtn) {
     const t = window._membership || 'free';
-    let label, css, navCss;
+    let label, css;
     if (t === 'plus') {
       label = 'Light';
       css = 'display:inline-block;padding:2px 7px;font-size:10px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.4;background:rgba(124,58,237,.12);color:#7c3aed;';
-      navCss = 'display:block;height:30px;padding:0 12px;font-size:11px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;letter-spacing:.2px;background:rgba(124,58,237,.12);color:#7c3aed;border:1.5px solid rgba(124,58,237,.25);';
     } else if (t === 'group') {
       label = 'VIP';
       css = 'display:inline-block;padding:2px 7px;font-size:10px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.4;background:rgba(15,118,110,.12);color:#0f766e;';
-      navCss = 'display:block;height:30px;padding:0 12px;font-size:11px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;letter-spacing:.2px;background:rgba(15,118,110,.12);color:#0f766e;border:1.5px solid rgba(15,118,110,.25);';
     } else {
       label = '멤버십';
       css = 'display:inline-block;padding:2px 7px;font-size:10px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;line-height:1.4;background:#f1f5f9;color:#64748b;';
-      navCss = 'display:block;height:30px;padding:0 12px;font-size:11px;font-weight:800;border:none;border-radius:6px;cursor:pointer;font-family:inherit;letter-spacing:.2px;background:#f8fafc;color:#64748b;border:1.5px solid #e2e8f0;';
     }
     if (memBtn) { memBtn.textContent = label; memBtn.style.cssText = css; }
-    if (navMemBtn) { navMemBtn.textContent = label; navMemBtn.style.cssText = navCss; }
   }
 }
 function currentNickname() {
@@ -5653,7 +5666,6 @@ let roiChartInstance = null;
 
 function updateLeftUserPanel(buy, wins, inv, prz, roi) {
   $('left-guest').style.display = 'none';
-  if ($('ct-mine')) $('ct-mine').style.display = '';
   $('left-user').style.display  = 'block';
   const el = (id, val) => { const e = $(id); if(e) e.textContent = val; };
   el('my-total-games', fmtCnt(buy) + '게임');
@@ -10380,17 +10392,127 @@ function subscribeComm() {
 }
 let curCommSort = 'newest';
 let commSearchQuery = '';
+let commAttachedRecommend = null;
+let commRecommendSkin = 'basic';
+
+function commBoardMeta(tab) {
+  const map = {
+    free: ['자유게시판', '로또 이야기와 질문을 자유롭게 남겨보세요.'],
+    recommend: ['추천번호', '연구소 저장 번호를 용지 형태로 첨부해 공유하세요.'],
+    verify: ['인증게시판', 'QR 인증과 당첨 후기를 공유하는 공간입니다.'],
+    feedback: ['문의/건의', '작성자와 관리자만 확인하는 비공개 문의함입니다.']
+  };
+  return map[tab] || map.free;
+}
+
+function updateCommunityBoardMeta() {
+  const [title, desc] = commBoardMeta(curCommTab);
+  if ($('comm-board-title')) $('comm-board-title').textContent = title;
+  if ($('comm-board-desc')) $('comm-board-desc').textContent = desc;
+}
+
+function isVipMember() {
+  return (window._membership || 'free') === 'group';
+}
+
+function encodeCommRecommend(data) {
+  return data ? `\n\n[[LTB_REC:${encodeURIComponent(JSON.stringify(data))}]]` : '';
+}
+
+function splitCommBody(body) {
+  const raw = body || '';
+  const m = raw.match(/\[\[LTB_REC:([^\]]+)\]\]/);
+  if (!m) return { text: raw, rec: null };
+  let rec = null;
+  try { rec = JSON.parse(decodeURIComponent(m[1])); } catch(_) {}
+  return { text: raw.replace(m[0], '').trim(), rec };
+}
+
+function renderCommunityRecSlip(rec) {
+  if (!rec) return '';
+  const skin = rec.skin && isVipMember() ? rec.skin : (rec.skin || 'basic');
+  if (rec.type === 'pension') {
+    const digits = String(rec.no || '').padStart(6,'0').split('');
+    return `<div class="community-rec-slip skin-${skin}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #16a34a;padding-bottom:7px;">
+        <div><b style="font-size:17px;">연금복권 <span style="color:#16a34a;">720+</span></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${rec.round || '-'}회 추천</div></div>
+        <b style="font-size:12px;">1,000원</b>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;justify-content:center;padding-top:10px;">
+        <span style="background:#16a34a;color:#fff;border-radius:5px;padding:6px 8px;font-size:12px;font-weight:900;">${rec.jo || '-'}조</span>
+        ${digits.map(n=>`<span class="pension-number-ball" style="width:24px;height:28px;font-size:14px;">${n}</span>`).join('')}
+      </div>
+    </div>`;
+  }
+  const nums = (rec.nums || []).map(n => String(n).padStart(2,'0'));
+  return `<div class="community-rec-slip skin-${skin}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111827;padding-bottom:7px;">
+      <div><b style="font-size:17px;">Lotto <small>6/45</small></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${rec.round || '-'}회 추천</div></div>
+      <b style="font-size:12px;">1,000원</b>
+    </div>
+    <div class="community-rec-row">
+      <b>A</b><div class="community-rec-nums">${nums.map(n=>`<span>${n}</span>`).join('')}</div>
+    </div>
+  </div>`;
+}
+
+function renderCommunityRecommendPicker() {
+  const wrap = $('community-recommend-picker');
+  if (!wrap) return;
+  if (curCommTab !== 'recommend') {
+    wrap.style.display = 'none';
+    commAttachedRecommend = null;
+    return;
+  }
+  wrap.style.display = 'block';
+  const vault = getLabVault();
+  const items = [
+    ...(vault.lotto || []).map((item, idx) => ({ ...item, type:'lotto', idx })),
+    ...(vault.pension || []).map((item, idx) => ({ ...item, type:'pension', idx }))
+  ];
+  const selectedKey = commAttachedRecommend ? `${commAttachedRecommend.type}_${commAttachedRecommend.idx}` : '';
+  const skinRow = isVipMember() ? `<div class="community-skin-row" style="display:flex;">
+    ${[['basic','기본'],['gold','골드'],['mint','민트'],['midnight','미드나잇']].map(([k,v])=>`<button class="community-skin-btn ${commRecommendSkin===k?'on':''}" onclick="setCommunitySkin('${k}')">${v}</button>`).join('')}
+  </div>` : `<div style="font-size:10px;color:var(--text-muted);margin-top:8px;">VIP는 추천 용지 스킨을 선택할 수 있습니다.</div>`;
+  wrap.innerHTML = `<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;">
+    <b style="font-size:12px;color:var(--text-dark);">연구소 저장 번호 첨부</b>
+    <button class="qr-inner-tab" style="font-size:11px;padding:5px 10px;" onclick="go('lab')">저장고 열기</button>
+  </div>
+  ${items.length ? `<div class="community-recommend-grid">${items.map(item => {
+    const key = `${item.type}_${item.idx}`;
+    const rec = { ...item, skin:commRecommendSkin };
+    return `<button type="button" onclick="selectCommunityRecommend('${item.type}',${item.idx})" style="text-align:left;background:${selectedKey===key?'rgba(225,29,72,.06)':'transparent'};border:1px solid ${selectedKey===key?'var(--lotto-red)':'var(--border-dashed)'};border-radius:10px;padding:8px;cursor:pointer;font-family:inherit;">${renderCommunityRecSlip(rec)}</button>`;
+  }).join('')}</div>${skinRow}` : '<div style="font-size:12px;color:var(--text-muted);padding:12px;text-align:center;">연구소 번호 저장고에 저장된 번호가 없습니다.</div>'}`;
+}
+
+function selectCommunityRecommend(type, idx) {
+  const item = (getLabVault()[type] || [])[idx];
+  if (!item) return;
+  commAttachedRecommend = { ...item, type, idx, skin:commRecommendSkin };
+  const title = $('post-input-title');
+  if (title && !title.value.trim()) title.value = type === 'pension' ? `${item.round || ''}회차 연금 추천번호` : `${item.round || ''}회차 로또 추천번호`;
+  renderCommunityRecommendPicker();
+}
+
+function setCommunitySkin(skin) {
+  if (!isVipMember()) { toast('VIP 전용 스킨입니다.'); return; }
+  commRecommendSkin = skin || 'basic';
+  if (commAttachedRecommend) commAttachedRecommend.skin = commRecommendSkin;
+  renderCommunityRecommendPicker();
+}
 
 function commTab(tab) {
-  if ((tab === 'mine' || tab === 'feedback') && !isLoggedIn) { toast('로그인이 필요합니다'); return; }
+  if (tab === 'feedback' && !isLoggedIn) { toast('로그인이 필요합니다'); return; }
   curCommTab = tab;
   commDisplayLimit = 20;
+  commSearchQuery = '';
+  if ($('comm-search-input')) $('comm-search-input').value = '';
   $('ct-free').classList.toggle('on', tab==='free');
   if ($('ct-recommend')) $('ct-recommend').classList.toggle('on', tab==='recommend');
   $('ct-verify').classList.toggle('on', tab==='verify');
   if ($('ct-feedback')) $('ct-feedback').classList.toggle('on', tab==='feedback');
-  if ($('ct-mine')) $('ct-mine').classList.toggle('on', tab==='mine');
   collapsePostForm();
+  updateCommunityBoardMeta();
   renderCommunityList();
 }
 
@@ -10437,18 +10559,11 @@ function tagChip(tag) {
 }
 
 function renderCommunityList() {
-  let posts;
-  if (curCommTab === 'mine') {
-    // 내 글: 모든 탭에서 내 글 합산
-    const allPosts = [...(commPosts['free']||[]), ...(commPosts['recommend']||[]), ...(commPosts['verify']||[]), ...(commPosts['feedback']||[])];
-    posts = isLoggedIn && currentUser ? allPosts.filter(p => p.user_id === currentUser.id) : [];
-  } else {
-    posts = [...(commPosts[curCommTab] || [])];
-  }
+  let posts = [...(commPosts[curCommTab] || [])];
   if (commSearchQuery) {
     posts = posts.filter(p =>
       (p.title || '').toLowerCase().includes(commSearchQuery) ||
-      (p.body || '').toLowerCase().includes(commSearchQuery) ||
+      (splitCommBody(p.body).text || '').toLowerCase().includes(commSearchQuery) ||
       (p.nickname || '').toLowerCase().includes(commSearchQuery)
     );
   }
@@ -10459,8 +10574,8 @@ function renderCommunityList() {
     const isSearch = !!commSearchQuery;
     $('community-content').innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
       <div style="margin-bottom:10px;"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-      <div style="font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">${isSearch ? '검색 결과가 없습니다' : curCommTab==='mine' ? '아직 작성한 글이 없습니다' : '아직 게시글이 없습니다'}</div>
-      <div style="font-size:12px;">${isSearch ? '다른 키워드로 검색해보세요' : curCommTab==='mine' ? '커뮤니티에 글을 작성해보세요!' : curCommTab==='feedback' ? '문의나 건의사항을 남기면 작성자와 관리자만 확인합니다.' : '첫 번째 글을 작성해보세요!'}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">${isSearch ? '검색 결과가 없습니다' : '아직 게시글이 없습니다'}</div>
+      <div style="font-size:12px;">${isSearch ? '다른 키워드로 검색해보세요' : curCommTab==='feedback' ? '문의나 건의사항을 남기면 작성자와 관리자만 확인합니다.' : '첫 번째 글을 작성해보세요!'}</div>
     </div>`;
     return;
   }
@@ -10489,17 +10604,18 @@ function renderCommunityList() {
   }
   // 검색 시 본문 컨텍스트 스니펫: 매칭 위치 주변 80자 추출
   function bodySnippet(body, q) {
-    if (!body) return '';
+    const cleanBody = splitCommBody(body).text;
+    if (!cleanBody) return '';
     if (q) {
-      const idx = body.toLowerCase().indexOf(q.toLowerCase());
+      const idx = cleanBody.toLowerCase().indexOf(q.toLowerCase());
       if (idx >= 0) {
         const start = Math.max(0, idx - 20);
-        const end = Math.min(body.length, idx + q.length + 60);
-        const snippet = (start > 0 ? '…' : '') + body.slice(start, end) + (end < body.length ? '…' : '');
+        const end = Math.min(cleanBody.length, idx + q.length + 60);
+        const snippet = (start > 0 ? '…' : '') + cleanBody.slice(start, end) + (end < cleanBody.length ? '…' : '');
         return hlSearch(snippet, q);
       }
     }
-    const plain = body.replace(/</g,'&lt;').slice(0,80) + (body.length > 80 ? '…' : '');
+    const plain = cleanBody.replace(/</g,'&lt;').slice(0,80) + (cleanBody.length > 80 ? '…' : '');
     return plain;
   }
 
@@ -10509,6 +10625,7 @@ function renderCommunityList() {
   $('community-content').innerHTML = tagsHtml + visiblePosts.map((p,idx) => {
     const liked = myLikedPostIds.has(p.id);
     const bodyPreview = bodySnippet(p.body, commSearchQuery);
+    const rec = splitCommBody(p.body).rec;
     const isHot = (p.likes||0) >= 5;
     const isNew = (Date.now() - new Date(p.created_at).getTime()) < 3600000;
     const {tag, cleanTitle} = parsePostTag(p.title||'');
@@ -10520,6 +10637,7 @@ function renderCommunityList() {
         ${isHot ? '<span style="font-size:9px;font-weight:700;color:var(--comm-hot-text,#dc2626);background:var(--comm-hot-bg,#fff5f5);border:1px solid var(--comm-hot-border,#fecaca);border-radius:10px;padding:1px 6px;margin-left:4px;">🔥인기</span>' : ''}
         ${isNew ? '<span style="font-size:9px;font-weight:700;color:#059669;background:var(--comm-new-bg,#f0fdf4);border:1px solid var(--comm-new-border,#86efac);border-radius:10px;padding:1px 6px;margin-left:4px;">NEW</span>' : ''}
       </div>
+      ${rec ? `<div style="margin:8px 0;">${renderCommunityRecSlip(rec)}</div>` : ''}
       ${bodyPreview ? `<div class="post-card-preview">${bodyPreview}</div>` : ''}
       <div class="post-card-stats">
         <span>${p.nickname}</span>
@@ -10557,15 +10675,17 @@ async function writePost() {
   if (!text) { toast('⚠️ 제목을 입력해주세요'); return; }
   const nick = currentNickname();
   if (curCommTab === 'feedback' && !body) { toast('문의/건의 내용은 본문을 입력해주세요.'); return; }
+  if (curCommTab === 'recommend' && !commAttachedRecommend) { toast('추천번호 게시판은 연구소 저장 번호를 첨부해주세요.'); return; }
   const postTagPrefix = (_selectedPostTag && _selectedPostTag !== '') ? `[${_selectedPostTag}] ` : '';
   const saveTag = ['free','recommend','verify','feedback'].includes(curCommTab) ? curCommTab : 'free';
+  const finalBody = (body || '') + (saveTag === 'recommend' ? encodeCommRecommend({ ...commAttachedRecommend, skin:commRecommendSkin }) : '');
   _ownPostTs = Date.now(); // Realtime 중복 알림 억제
   const { error } = await sb.from('posts').insert({
     user_id: currentUser.id,
     nickname: nick,
     tag: saveTag,
     title: postTagPrefix + text,
-    body: body || null,
+    body: finalBody || null,
     likes: 0,
     comment_count: 0,
   });
@@ -10614,6 +10734,7 @@ async function openPostDetail(postId) {
     return;
   }
   const liked = myLikedPostIds.has(postId);
+  const bodyParts = splitCommBody(post.body);
   const heartSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="${liked?'var(--lotto-red)':'none'}" stroke="${liked?'var(--lotto-red)':'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
   const backSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
 
@@ -10627,7 +10748,8 @@ async function openPostDetail(postId) {
         <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}">${post.tag==='recommend'?'추천':post.tag==='verify'?'인증':post.tag==='feedback'?'문의':'자유'}</span>
       </div>
       <div class="post-detail-title">${(()=>{const {tag,cleanTitle}=parsePostTag(post.title||'');return (tag?tagChip(tag):'')+cleanTitle.replace(/</g,'&lt;');})()}</div>
-      ${post.body ? `<div style="font-size:13px;color:var(--text-dark);line-height:1.7;margin:12px 0;white-space:pre-wrap;opacity:.85;">${post.body.replace(/</g,'&lt;')}</div>` : ''}
+      ${bodyParts.rec ? `<div style="margin:12px 0;">${renderCommunityRecSlip(bodyParts.rec)}</div>` : ''}
+      ${bodyParts.text ? `<div style="font-size:13px;color:var(--text-dark);line-height:1.7;margin:12px 0;white-space:pre-wrap;opacity:.85;">${bodyParts.text.replace(/</g,'&lt;')}</div>` : ''}
       <div class="post-detail-meta">
         <span>${post.nickname}</span>
         <span>${timeAgo(post.created_at)}</span>
@@ -10762,6 +10884,7 @@ async function likePostDetail(postId) {
 async function renderCommunity() {
   const pinput = $('post-input');
   if (pinput) { pinput.disabled = !isLoggedIn; pinput.placeholder = isLoggedIn ? '추천 번호나 로또 이야기를 남겨보세요...' : '로그인 후 글 작성 가능합니다'; }
+  updateCommunityBoardMeta();
   collapsePostForm();
   await loadCommunityPosts();
   subscribeComm();
@@ -10814,6 +10937,7 @@ function expandPostForm() {
           ? '오류 상황, 개선 의견, 계정 문의 내용을 구체적으로 적어주세요. 작성자와 관리자만 확인합니다.'
           : '본문을 입력하세요 (선택)';
     }
+    renderCommunityRecommendPicker();
   }
 }
 
@@ -10826,7 +10950,10 @@ function collapsePostForm() {
   const b = $('post-input-body'); if(b) b.value = '';
   const bc = $('post-body-count'); if(bc) { bc.textContent = '0/2000'; bc.style.color = 'var(--text-muted)'; }
   _selectedPostTag = '';
+  commAttachedRecommend = null;
+  commRecommendSkin = 'basic';
   document.querySelectorAll('.post-tag-btn').forEach(b => b.classList.remove('on'));
+  renderCommunityRecommendPicker();
 }
 
 // =====================================================
