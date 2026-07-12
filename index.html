@@ -256,10 +256,16 @@ main.chat-hidden .chat-panel { display: none; }
 .ticket-slip { max-width:440px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
 .ticket-slip-games { display:grid; gap:0; }
-.ticket-slip-game { display:grid; grid-template-columns:20px minmax(0,1fr) 120px; gap:10px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
+.ticket-slip-game { display:grid; grid-template-columns:20px minmax(0,1fr) 58px 110px; gap:8px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
 .ticket-game-label { font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace; color:#111827; text-align:left; }
 .ticket-slip-nums { display:grid; grid-template-columns:repeat(6,minmax(24px,1fr)); gap:7px; min-width:0; text-align:center; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; font-variant-numeric:tabular-nums; }
-.pension-ticket-row { display:grid; grid-template-columns:minmax(0,1fr) 88px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
+.ticket-status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:26px;border-radius:7px;font-size:10px;font-weight:900;border:1px solid #cbd5e1;background:#f8fafc;color:#64748b;white-space:nowrap;}
+.ticket-status-pill.pending{border-color:#cbd5e1;background:#f8fafc;color:#64748b;}
+.ticket-status-pill.lose{border-color:#e5e7eb;background:#f9fafb;color:#94a3b8;}
+.ticket-status-pill.win{border-color:#fecaca;background:#fff1f2;color:var(--lotto-red);}
+.ticket-status-pill.rank2{border-color:#ddd6fe;background:#f5f3ff;color:#7c3aed;}
+.ticket-status-pill.rank3{border-color:#bbf7d0;background:#f0fdf4;color:#059669;}
+.pension-ticket-row { display:grid; grid-template-columns:minmax(0,1fr) 58px 88px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
 .pension-ticket-numbers { display:flex; justify-content:center; align-items:center; gap:7px; min-width:0; }
 .pension-number-ball { width:27px; height:34px; border:1px solid #9ad5ae; border-radius:5px; background:#e9f7ed; display:inline-flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; }
 .ticket-history-filter { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
@@ -434,7 +440,7 @@ main.chat-hidden .chat-panel { display: none; }
 .hall-card.silver { border:1px solid #cbd5e1; box-shadow:0 0 8px rgba(148,163,184,.3), inset 0 0 8px rgba(148,163,184,.08); }
 .map-frame { width:100%; height:320px; border:0; display:block; background:var(--bg-light); }
 @media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}#qr-purchase-meta{grid-template-columns:1fr!important;}}
-@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:16px minmax(0,1fr) 110px;gap:6px;min-height:36px;padding:6px 0}.ticket-slip-nums{grid-template-columns:repeat(6,minmax(20px,1fr));gap:3px}.ticket-slip-nums,.ticket-game-label{font-size:11px}.store-picker-trigger{width:74px;max-width:74px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 74px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
+@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:16px minmax(0,1fr) 50px 74px;gap:6px;min-height:36px;padding:6px 0}.ticket-slip-nums{grid-template-columns:repeat(6,minmax(20px,1fr));gap:3px}.ticket-slip-nums,.ticket-game-label{font-size:11px}.ticket-status-pill{min-width:42px;height:24px;font-size:9px}.store-picker-trigger{width:74px;max-width:74px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 50px 74px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
 @media(max-width:700px){.stats-login-notice{grid-template-columns:1fr auto}.stats-login-notice span{grid-column:1/-1;grid-row:2}.stats-share-btn span{display:none}.stats-share-btn{width:30px;justify-content:center;padding:5px}.stats-section-head{margin-top:2px}.stats-kpi-grid{grid-template-columns:1fr 1fr}}
 .rank-tab-pill { display:inline-block;padding:5px 14px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;margin-right:4px;white-space:nowrap; }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
@@ -616,10 +622,6 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .rank-tab-pill.on { background:var(--lotto-red); color:#fff; }
 .comm-sort-btn { padding:4px 10px; font-size:11px; font-weight:700; border:1px solid var(--border-dashed); border-radius:4px; background:var(--paper-white); cursor:pointer; color:var(--text-muted); }
 .comm-sort-btn.on { background:#334155; color:#fff; border-color:#334155; }
-.post-tag-btn { padding:3px 9px; border:1px solid var(--border-dashed); border-radius:12px; font-size:11px; font-weight:600; cursor:pointer; background:var(--bg-light); color:var(--text-muted); font-family:inherit; transition:all .15s; }
-.post-tag-btn.on { background:#dc2626; color:#fff; border-color:#dc2626; }
-[data-theme="dark"] .post-tag-btn { background:#1e293b; color:#94a3b8; border-color:#334155; }
-[data-theme="dark"] .post-tag-btn.on { background:#dc2626; color:#fff; border-color:#dc2626; }
 [data-theme="dark"] .comm-tab-btn { background:#334155; color:#94a3b8; border-color:var(--text-muted); }
 [data-theme="dark"] .comm-tab-btn.on { background:var(--lotto-red); color:#fff; }
 [data-theme="dark"] .comm-sort-btn { background:#1e293b; color:#94a3b8; border-color:var(--text-muted); }
@@ -2375,17 +2377,6 @@ textarea {
             <input type="text" id="post-input-title" class="post-write-input" placeholder="제목을 입력하세요..." style="width:100%;box-sizing:border-box;padding-right:52px;" maxlength="100" oninput="const c=$('post-title-count');if(c){c.textContent=this.value.length+'/100';c.style.color=this.value.length>80?'#dc2626':'#94a3b8'}">
             <span id="post-title-count" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:#94a3b8;pointer-events:none;">0/100</span>
           </div>
-          <div style="display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap;">
-            <span style="font-size:10px;color:var(--text-muted);font-weight:600;align-self:center;">태그</span>
-            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'일반')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">일반</button>
-            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'후기')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">후기</button>
-            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'당첨')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--comm-hot-border,#fecaca);border-radius:10px;background:var(--comm-hot-bg,#fff5f5);color:var(--comm-hot-text,#dc2626);cursor:pointer;">당첨</button>
-            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'번호')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">번호</button>
-            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'분석')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--comm-analysis-border,#ddd6fe);border-radius:10px;background:var(--comm-analysis-bg,#f5f3ff);color:var(--comm-analysis-text,#7c3aed);cursor:pointer;">분석</button>
-            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'오류')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">오류</button>
-            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'건의')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">건의</button>
-            <button type="button" class="post-tag-btn" onclick="selectPostTag(this,'유머')" style="padding:3px 9px;font-size:10px;font-weight:700;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);color:var(--text-muted);cursor:pointer;">유머</button>
-          </div>
           <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid var(--border-dashed);border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:var(--text-dark);background:var(--paper-white);" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'" oninput="const c=$('post-body-count');if(c){c.textContent=this.value.length+'/2000';c.style.color=this.value.length>1800?'#dc2626':'var(--text-muted)'}"></textarea>
           <div id="community-recommend-picker" class="community-recommend-picker"></div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
@@ -2846,6 +2837,36 @@ function repairKnownOnlineTicketGames(ticket) {
   return fixed;
 }
 
+function ticketGameStatus(ticket, gameIndex = 0) {
+  const type = ticketLotteryType(ticket);
+  const results = Array.isArray(ticket?.game_results) ? ticket.game_results : [];
+  const perGame = results[gameIndex] || null;
+  const rawRank = perGame?.rank ?? ticket?.prize_rank ?? null;
+  const rank = Number(rawRank);
+  const checked = ticket?.result === 'checked' || Number.isFinite(rank);
+  if (Number.isFinite(rank)) {
+    const maxRank = type === 'pension' ? 7 : 5;
+    if (rank >= 1 && rank <= maxRank) return `${rank}등`;
+    if (type === 'pension' && rank === 8) return '보너스';
+  }
+  if (perGame && (!Number.isFinite(rank) || rank > (type === 'pension' ? 7 : 5))) return '낙첨';
+  if (checked) return '낙첨';
+  return '추첨중';
+}
+
+function ticketStatusClass(label) {
+  if (label === '추첨중') return 'pending';
+  if (label === '낙첨') return 'lose';
+  if (label === '2등') return 'rank2';
+  if (label === '3등' || label === '4등' || label === '5등' || label === '6등' || label === '7등' || label === '보너스') return 'rank3';
+  return 'win';
+}
+
+function ticketStatusPill(label) {
+  const safe = String(label || '추첨중').replace(/</g, '&lt;');
+  return `<span class="ticket-status-pill ${ticketStatusClass(safe)}">${safe}</span>`;
+}
+
 function renderOnlineCaptureTicket(parsed) {
   if (parsed.type !== 'pension') return renderTicketSlip(parsed);
   return `<div class="ticket-slip pension">
@@ -2859,6 +2880,8 @@ function renderOnlineCaptureTicket(parsed) {
         <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${game.jo}조</span>
         ${game.no.split('').map(number => `<span class="pension-number-ball">${number}</span>`).join('')}
       </div>
+      ${ticketStatusPill('추첨중')}
+      <span></span>
     </div>`).join('')}
   </div>`;
 }
@@ -4362,7 +4385,7 @@ async function renderNumberHistory() {
   }
   wrap.innerHTML = '<div style="padding:28px;text-align:center;color:var(--text-muted);font-size:12px;">번호 이력을 불러오는 중...</div>';
   let result = await sb.from('tickets')
-    .select('id,qr_url,round_no,lottery_type,result,numbers,game_numbers,game_count,pension_group,pension_number,serial_meta,purchase_date,prize_rank,prize_amount,created_at')
+    .select('id,qr_url,round_no,lottery_type,result,numbers,game_numbers,game_count,pension_group,pension_number,serial_meta,purchase_date,prize_rank,prize_amount,game_results,created_at')
     .eq('user_id', currentUser.id)
     .order('round_no', { ascending:false })
     .order('created_at', { ascending:false })
@@ -4445,6 +4468,7 @@ async function renderNumberHistory() {
             <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${jo}조</span>
             ${number ? number.split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('') : '<span style="font-size:12px;color:#64748b;padding:0 8px;">번호 미등록</span>'}
           </div>
+          ${ticketStatusPill(ticketGameStatus(ticket, 0))}
           ${pBtn}
         </div>`;
       }).join('');
@@ -4470,7 +4494,7 @@ async function renderNumberHistory() {
         const storeName = (stores||[]).find(s=>s.id===storeId)?.name||'판매점 지정';
         const storeBtn = ticket.id?`<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${gi},'${storeId}')">${storeName}</button>`:'';
         const gameLabel = String.fromCharCode(65 + (lottoGameIndex++ % 26));
-        lottoRows.push(`<div class="ticket-slip-game"><b class="ticket-game-label">${gameLabel}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeBtn}</div>`);
+        lottoRows.push(`<div class="ticket-slip-game"><b class="ticket-game-label">${gameLabel}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${ticketStatusPill(ticketGameStatus(ticket, gi))}${storeBtn}</div>`);
       });
     });
     return `<div class="ticket-slip">
@@ -4506,6 +4530,7 @@ function renderTicketSlip(ticket) {
             <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${group}조</span>
             ${number ? number.split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('') : '<span style="font-size:12px;color:#64748b;padding:0 8px;">번호 미등록</span>'}
           </div>
+          ${ticketStatusPill(ticketGameStatus(ticket, 0))}
           ${pensionStoreButton}
         </div>
       </div>
@@ -4527,7 +4552,7 @@ function renderTicketSlip(ticket) {
       const selectedStore = assignment?.store_id || '';
       const storeName = ticket.storeOptions?.find(store => store.id === selectedStore)?.name || '판매점 지정';
       const storeButton = ticket.id ? `<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',${index},'${selectedStore}')">${storeName}</button>` : '';
-      return `<div class="ticket-slip-game"><b class="ticket-game-label">${String.fromCharCode(65+(index%26))}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${storeButton}</div>`;
+      return `<div class="ticket-slip-game"><b class="ticket-game-label">${String.fromCharCode(65+(index%26))}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${ticketStatusPill(ticketGameStatus(ticket, index))}${storeButton}</div>`;
     }).join('')}</div>
   </div>`;
 }
@@ -7149,6 +7174,7 @@ function renderLabVault() {
         <div class="ticket-slip-games">
           <div class="ticket-slip-game">
             <b class="ticket-game-label">A</b><div class="ticket-slip-nums">${(item.nums||[]).map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>
+            <span></span>
             <div style="display:flex;gap:4px;flex-shrink:0;"><button class="qr-inner-tab" style="min-height:28px;font-size:11px;padding:0 9px;white-space:nowrap;display:flex;align-items:center;justify-content:center;" onclick="loadLabSaved('lotto',${i})">불러오기</button><button class="qr-inner-tab" style="min-height:28px;font-size:11px;padding:0 9px;border-color:#fca5a5;color:#dc2626;white-space:nowrap;display:flex;align-items:center;justify-content:center;" onclick="deleteLabSaved('lotto',${i})">삭제</button></div>
           </div>
         </div>
@@ -7161,6 +7187,7 @@ function renderLabVault() {
         <div style="font-size:11px;color:#64748b;margin:-4px 0 8px;">제 ${item.round || '-'}회 저장</div>
         <div class="pension-ticket-row" style="border-bottom:0;">
           <div class="pension-ticket-numbers"><span style="background:#22a55b;color:#fff;border-radius:5px;padding:7px 9px;font-weight:900;">${item.jo}조</span>${String(item.no).padStart(6,'0').split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('')}</div>
+<span></span>
 <div style="display:flex;gap:4px;flex-shrink:0;"><button class="qr-inner-tab" style="min-height:28px;font-size:11px;padding:0 9px;white-space:nowrap;display:flex;align-items:center;justify-content:center;" onclick="loadLabSaved('pension',${i})">불러오기</button><button class="qr-inner-tab" style="min-height:28px;font-size:11px;padding:0 9px;border-color:#86efac;color:#16a34a;white-space:nowrap;display:flex;align-items:center;justify-content:center;" onclick="deleteLabSaved('pension',${i})">삭제</button></div>
         </div>
       </div>`;
@@ -10465,6 +10492,7 @@ function subscribeComm() {
 let curCommSort = 'newest';
 let commSearchQuery = '';
 let commAttachedRecommend = null;
+let commAttachedVerify = null;
 let commRecommendSkin = 'basic';
 let commRecommendType = 'lotto';
 
@@ -10492,13 +10520,27 @@ function encodeCommRecommend(data) {
   return data ? `\n\n[[LTB_REC:${encodeURIComponent(JSON.stringify(data))}]]` : '';
 }
 
+function encodeCommVerify(data) {
+  return data ? `\n\n[[LTB_VERIFY:${encodeURIComponent(JSON.stringify(data))}]]` : '';
+}
+
 function splitCommBody(body) {
   const raw = body || '';
-  const m = raw.match(/\[\[LTB_REC:([^\]]+)\]\]/);
-  if (!m) return { text: raw, rec: null };
+  const recMatch = raw.match(/\[\[LTB_REC:([^\]]+)\]\]/);
+  const verifyMatch = raw.match(/\[\[LTB_VERIFY:([^\]]+)\]\]/);
   let rec = null;
-  try { rec = JSON.parse(decodeURIComponent(m[1])); } catch(_) {}
-  return { text: raw.replace(m[0], '').trim(), rec };
+  let verify = null;
+  if (recMatch) {
+    try { rec = JSON.parse(decodeURIComponent(recMatch[1])); } catch(_) {}
+  }
+  if (verifyMatch) {
+    try { verify = JSON.parse(decodeURIComponent(verifyMatch[1])); } catch(_) {}
+  }
+  return {
+    text: raw.replace(recMatch?.[0] || '', '').replace(verifyMatch?.[0] || '', '').trim(),
+    rec,
+    verify,
+  };
 }
 
 function packCommTitle(title, body) {
@@ -10547,15 +10589,121 @@ function renderCommunityRecSlip(rec) {
   </div>`;
 }
 
-function renderCommunityRecommendPicker() {
+function ticketToVerifyMeta(ticket) {
+  if (!ticket) return null;
+  const type = ticketLotteryType(ticket);
+  const games = type === 'lotto'
+    ? (ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []))
+    : [];
+  return {
+    id: ticket.id || '',
+    type,
+    round: ticket.round_no || ticket.round || '-',
+    qr: ticket.qr_url || '',
+    result: ticket.result || '',
+    prize_rank: ticket.prize_rank || null,
+    prize_amount: ticket.prize_amount || 0,
+    game_results: Array.isArray(ticket.game_results) ? ticket.game_results : [],
+    games,
+    jo: ticket.jo ?? ticket.pension_group ?? null,
+    no: ticket.no ?? ticket.pension_number ?? null,
+    serial_meta: ticket.serial_meta || ticket.serialMeta || '',
+  };
+}
+
+function renderCommunityVerifySlip(meta) {
+  if (!meta) return '';
+  if (meta.type === 'pension') {
+    const number = meta.no ? String(meta.no).padStart(6, '0') : '';
+    const ticket = { ...meta, lottery_type:'pension', result:meta.result, prize_rank:meta.prize_rank, game_results:meta.game_results };
+    return `<div class="community-rec-slip">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #16a34a;padding-bottom:7px;">
+        <div><b style="font-size:17px;">연금복권 <span style="color:#16a34a;">720+</span></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${meta.round || '-'}회 인증</div></div>
+        <b style="font-size:12px;">${fmtMFull(meta.prize_amount || 0)}</b>
+      </div>
+      <div class="pension-ticket-row" style="border-bottom:0;padding:10px 0 0;">
+        <div class="pension-ticket-numbers">
+          <span style="background:#16a34a;color:#fff;border-radius:5px;padding:6px 8px;font-size:12px;font-weight:900;">${meta.jo || '-'}조</span>
+          ${number ? number.split('').map(n=>`<span class="pension-number-ball" style="width:24px;height:28px;font-size:14px;">${n}</span>`).join('') : '<span style="font-size:12px;color:var(--text-muted);">번호 미등록</span>'}
+        </div>
+        ${ticketStatusPill(ticketGameStatus(ticket, 0))}
+        <span></span>
+      </div>
+    </div>`;
+  }
+  const games = meta.games?.length ? meta.games : [];
+  return `<div class="community-rec-slip">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111827;padding-bottom:7px;">
+      <div><b style="font-size:17px;">Lotto <small>6/45</small></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${meta.round || '-'}회 인증</div></div>
+      <b style="font-size:12px;">${fmtMFull(meta.prize_amount || 0)}</b>
+    </div>
+    <div class="ticket-slip-games" style="margin-top:4px;">
+      ${games.map((nums, index) => {
+        const ticket = { ...meta, lottery_type:'lotto', result:meta.result, prize_rank:meta.prize_rank, game_results:meta.game_results };
+        return `<div class="ticket-slip-game"><b class="ticket-game-label">${String.fromCharCode(65 + (index % 26))}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${ticketStatusPill(ticketGameStatus(ticket, index))}<span></span></div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+async function loadCommunityVerifyTickets() {
+  if (!isLoggedIn || !currentUser || !sb) return [];
+  let result = await sb.from('tickets')
+    .select('id,qr_url,round_no,lottery_type,result,numbers,game_numbers,game_count,pension_group,pension_number,serial_meta,prize_rank,prize_amount,game_results,created_at')
+    .eq('user_id', currentUser.id)
+    .order('round_no', { ascending:false })
+    .order('created_at', { ascending:false })
+    .limit(40);
+  if (result.error && /column|schema cache/i.test(result.error.message || '')) {
+    result = await sb.from('tickets')
+      .select('id,qr_url,round_no,lottery_type,result,numbers,game_count,pension_group,pension_number,serial_meta,prize_rank,prize_amount,created_at')
+      .eq('user_id', currentUser.id)
+      .order('round_no', { ascending:false })
+      .order('created_at', { ascending:false })
+      .limit(40);
+  }
+  if (result.error && /column|schema cache/i.test(result.error.message || '')) {
+    result = await sb.from('tickets')
+      .select('id,qr_url,round_no,lottery_type,result,numbers,game_count,prize_rank,prize_amount,created_at')
+      .eq('user_id', currentUser.id)
+      .order('round_no', { ascending:false })
+      .order('created_at', { ascending:false })
+      .limit(40);
+  }
+  if (result.error) return [];
+  return (result.data || []).map(ticket => {
+    const type = ticketLotteryType(ticket);
+    const restored = type === 'lotto' && (!ticket.game_numbers?.length || ticket.game_numbers.length < (ticket.game_count || 1))
+      ? parseQRUrl(ticket.qr_url) : null;
+    const base = { ...ticket, lottery_type:type, game_numbers:restored?.games || ticket.game_numbers || [] };
+    return type === 'pension' ? restorePensionTicketFromQr(base) : repairKnownOnlineTicketGames(base);
+  });
+}
+
+async function renderCommunityRecommendPicker() {
   const wrap = $('community-recommend-picker');
   if (!wrap) return;
-  if (curCommTab !== 'recommend') {
+  if (curCommTab !== 'recommend' && curCommTab !== 'verify') {
     wrap.style.display = 'none';
     commAttachedRecommend = null;
+    commAttachedVerify = null;
     return;
   }
   wrap.style.display = 'block';
+  if (curCommTab === 'verify') {
+    wrap.innerHTML = `<div style="font-size:12px;color:var(--text-muted);padding:12px;text-align:center;">QR 인증 이력을 불러오는 중...</div>`;
+    const items = await loadCommunityVerifyTickets();
+    const selectedId = commAttachedVerify?.id || '';
+    wrap.innerHTML = `<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;">
+      <b style="font-size:12px;color:var(--text-dark);">QR 인증 이력 첨부</b>
+      <button type="button" class="qr-inner-tab" style="font-size:11px;padding:5px 10px;" onclick="go('qr')">번호 이력 열기</button>
+    </div>
+    ${items.length ? `<div class="community-recommend-grid" style="grid-template-columns:1fr;">${items.map(ticket => {
+      const meta = ticketToVerifyMeta(ticket);
+      return `<button type="button" onclick="selectCommunityVerify('${ticket.id}')" style="text-align:left;background:${selectedId===ticket.id?'rgba(225,29,72,.06)':'transparent'};border:1px solid ${selectedId===ticket.id?'var(--lotto-red)':'var(--border-dashed)'};border-radius:10px;padding:8px;cursor:pointer;font-family:inherit;">${renderCommunityVerifySlip(meta)}</button>`;
+    }).join('')}</div>` : `<div style="font-size:12px;color:var(--text-muted);padding:12px;text-align:center;">QR 인증으로 등록한 복권이 없습니다.</div>`}`;
+    return;
+  }
   const vault = getLabVault();
   const items = (vault[commRecommendType] || []).map((item, idx) => ({ ...item, type:commRecommendType, idx }));
   const selectedKey = commAttachedRecommend ? `${commAttachedRecommend.type}_${commAttachedRecommend.idx}` : '';
@@ -10575,6 +10723,17 @@ function renderCommunityRecommendPicker() {
     const rec = { ...item, skin:commRecommendSkin };
     return `<button type="button" onclick="selectCommunityRecommend('${item.type}',${item.idx})" style="text-align:left;background:${selectedKey===key?'rgba(225,29,72,.06)':'transparent'};border:1px solid ${selectedKey===key?'var(--lotto-red)':'var(--border-dashed)'};border-radius:10px;padding:8px;cursor:pointer;font-family:inherit;">${renderCommunityRecSlip(rec)}</button>`;
   }).join('')}</div>${skinRow}` : `<div style="font-size:12px;color:var(--text-muted);padding:12px;text-align:center;">${commRecommendType==='lotto'?'로또':'연금'} 저장 번호가 없습니다.</div>`}`;
+}
+
+async function selectCommunityVerify(ticketId) {
+  const items = await loadCommunityVerifyTickets();
+  const ticket = items.find(item => String(item.id) === String(ticketId));
+  if (!ticket) { toast('인증 이력을 찾지 못했습니다.'); return; }
+  commAttachedVerify = ticketToVerifyMeta(ticket);
+  const title = $('post-input-title');
+  const status = ticketGameStatus(ticket, 0);
+  if (title && !title.value.trim()) title.value = `제 ${ticket.round_no || '-'}회 ${status} 인증`;
+  renderCommunityRecommendPicker();
 }
 
 function switchCommunityRecommendType(type) {
@@ -10679,20 +10838,7 @@ function renderCommunityList() {
   }
   const heartSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
   const chatSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
-  // 인기 태그 집계 (모든 게시글 기준)
-  const allTagPosts = [...(commPosts['free']||[]), ...(commPosts['recommend']||[]), ...(commPosts['verify']||[])];
-  const tagCount = {};
-  allTagPosts.forEach(p => {
-    const packed = splitCommTitle(p.title, p.body);
-    const { tag } = parsePostTag(packed.title || '');
-    if (tag) tagCount[tag] = (tagCount[tag] || 0) + 1;
-  });
-  const topTags = Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  const tagsHtml = topTags.length ? `<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center;">
-    <span style="font-size:10px;color:var(--text-muted);font-weight:600;">인기태그</span>
-    ${topTags.map(([t,c])=>`<button onclick="$('comm-search-input').value='[${t}]';commSearch('[${t}]')" style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:12px;padding:2px 9px;font-size:10px;font-weight:700;cursor:pointer;color:var(--text-muted);font-family:inherit;">#${t} <span style="opacity:.5;">${c}</span></button>`).join('')}
-    ${commSearchQuery?`<button onclick="$('comm-search-input').value='';commSearch('')" style="background:var(--comm-hot-bg,#fff5f5);border:1px solid var(--comm-hot-border,#fecaca);border-radius:12px;padding:2px 9px;font-size:10px;font-weight:700;cursor:pointer;color:var(--comm-hot-text,#dc2626);font-family:inherit;">✕ 초기화</button>`:''}
-  </div>` : '';
+  const tagsHtml = '';
 
   // 검색 키워드 하이라이트 헬퍼
   function hlSearch(text, q) {
@@ -10727,6 +10873,7 @@ function renderCommunityList() {
     const bodyParts = splitCommBody(packed.body);
     const bodyPreview = bodySnippet(bodyParts.text, commSearchQuery);
     const rec = bodyParts.rec;
+    const verify = bodyParts.verify;
     const isHot = (p.likes||0) >= 5;
     const isNew = (Date.now() - new Date(p.created_at).getTime()) < 3600000;
     const {tag, cleanTitle} = parsePostTag(packed.title||'');
@@ -10739,6 +10886,7 @@ function renderCommunityList() {
         ${isNew ? '<span style="font-size:9px;font-weight:700;color:#059669;background:var(--comm-new-bg,#f0fdf4);border:1px solid var(--comm-new-border,#86efac);border-radius:10px;padding:1px 6px;margin-left:4px;">NEW</span>' : ''}
       </div>
       ${rec ? `<div style="margin:8px 0;">${renderCommunityRecSlip(rec)}</div>` : ''}
+      ${verify ? `<div style="margin:8px 0;">${renderCommunityVerifySlip(verify)}</div>` : ''}
       ${bodyPreview ? `<div class="post-card-preview">${bodyPreview}</div>` : ''}
       <div class="post-card-stats">
         <span>${p.nickname}</span>
@@ -10777,19 +10925,35 @@ async function writePost() {
   const nick = currentNickname();
   if (curCommTab === 'feedback' && !body) { toast('문의/건의 내용은 본문을 입력해주세요.'); return; }
   if (curCommTab === 'recommend' && !commAttachedRecommend) { toast('추천번호 게시판은 연구소 저장 번호를 첨부해주세요.'); return; }
-  const postTagPrefix = (_selectedPostTag && _selectedPostTag !== '') ? `[${_selectedPostTag}] ` : '';
+  if (curCommTab === 'verify' && !commAttachedVerify) { toast('인증게시판은 QR 인증 이력을 첨부해주세요.'); return; }
   const saveTag = ['free','recommend','verify','feedback'].includes(curCommTab) ? curCommTab : 'free';
-  const finalBody = (body || '') + (saveTag === 'recommend' ? encodeCommRecommend({ ...commAttachedRecommend, skin:commRecommendSkin }) : '');
-  const packedTitle = packCommTitle(postTagPrefix + text, finalBody);
+  const finalBody = (body || '')
+    + (saveTag === 'recommend' ? encodeCommRecommend({ ...commAttachedRecommend, skin:commRecommendSkin }) : '')
+    + (saveTag === 'verify' ? encodeCommVerify(commAttachedVerify) : '');
+  const packedTitle = packCommTitle(text, finalBody);
   _ownPostTs = Date.now(); // Realtime 중복 알림 억제
-  const { error } = await sb.from('posts').insert({
+  const payload = {
     user_id: currentUser.id,
     nickname: nick,
     tag: saveTag,
     title: packedTitle,
     likes: 0,
     comment_count: 0,
-  });
+  };
+  let { error } = await sb.from('posts').insert(payload);
+  if (error && /column|schema cache/i.test(error.message || '')) {
+    const compatible = { ...payload };
+    delete compatible.comment_count;
+    ({ error } = await sb.from('posts').insert(compatible));
+  }
+  if (error && /column|schema cache/i.test(error.message || '')) {
+    ({ error } = await sb.from('posts').insert({
+      user_id: currentUser.id,
+      nickname: nick,
+      tag: saveTag,
+      title: packedTitle,
+    }));
+  }
   if (error) { _ownPostTs = 0; toast('❌ 등록 실패: ' + error.message); return; }
   collapsePostForm();
   toast('✅ 게시글이 등록되었습니다');
@@ -10851,6 +11015,7 @@ async function openPostDetail(postId) {
       </div>
       <div class="post-detail-title">${(()=>{const {tag,cleanTitle}=parsePostTag(packed.title||'');return (tag?tagChip(tag):'')+cleanTitle.replace(/</g,'&lt;');})()}</div>
       ${bodyParts.rec ? `<div style="margin:12px 0;">${renderCommunityRecSlip(bodyParts.rec)}</div>` : ''}
+      ${bodyParts.verify ? `<div style="margin:12px 0;">${renderCommunityVerifySlip(bodyParts.verify)}</div>` : ''}
       ${bodyParts.text ? `<div style="font-size:13px;color:var(--text-dark);line-height:1.7;margin:12px 0;white-space:pre-wrap;opacity:.85;">${bodyParts.text.replace(/</g,'&lt;')}</div>` : ''}
       <div class="post-detail-meta">
         <span>${post.nickname}</span>
@@ -11001,13 +11166,6 @@ function updateCommTabCounts() {
   if (qBtn) qBtn.textContent = `문의/건의 (${(commPosts.feedback||[]).length})`;
 }
 
-let _selectedPostTag = '';
-function selectPostTag(btn, tag) {
-  _selectedPostTag = tag;
-  document.querySelectorAll('.post-tag-btn').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-}
-
 // QR 당첨 결과를 인증게시판 작성폼에 연결한다.
 function openCommunityShare(rankLabel, roundStr) {
   if (!isLoggedIn) { showAuthModal(); return; }
@@ -11054,10 +11212,9 @@ function collapsePostForm() {
   const t = $('post-input-title'); if(t) t.value = '';
   const b = $('post-input-body'); if(b) b.value = '';
   const bc = $('post-body-count'); if(bc) { bc.textContent = '0/2000'; bc.style.color = 'var(--text-muted)'; }
-  _selectedPostTag = '';
   commAttachedRecommend = null;
+  commAttachedVerify = null;
   commRecommendSkin = 'basic';
-  document.querySelectorAll('.post-tag-btn').forEach(b => b.classList.remove('on'));
   renderCommunityRecommendPicker();
 }
 
