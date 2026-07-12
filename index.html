@@ -253,10 +253,10 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .lab-omr-slot:hover:not(.marked)::before,[data-theme="dark"] .lab-omr-slot:hover:not(.marked)::after { border-color:#fb7185; }
 [data-theme="dark"] .lab-omr-slot:hover:not(.marked) .lab-omr-mark { background:rgba(251,113,133,.12); }
 
-.ticket-slip { max-width:440px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
+.ticket-slip { max-width:470px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
 .ticket-slip-games { display:grid; gap:0; }
-.ticket-slip-game { display:grid; grid-template-columns:20px minmax(0,1fr) 58px 110px; gap:8px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
+.ticket-slip-game { display:grid; grid-template-columns:20px minmax(0,1fr) 54px 88px; gap:8px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
 .ticket-game-label { font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace; color:#111827; text-align:left; }
 .ticket-slip-nums { display:grid; grid-template-columns:repeat(6,minmax(24px,1fr)); gap:7px; min-width:0; text-align:center; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; font-variant-numeric:tabular-nums; }
 .ticket-status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:26px;border-radius:7px;font-size:10px;font-weight:900;border:1px solid #cbd5e1;background:#f8fafc;color:#64748b;white-space:nowrap;}
@@ -265,7 +265,7 @@ main.chat-hidden .chat-panel { display: none; }
 .ticket-status-pill.win{border-color:#fecaca;background:#fff1f2;color:var(--lotto-red);}
 .ticket-status-pill.rank2{border-color:#ddd6fe;background:#f5f3ff;color:#7c3aed;}
 .ticket-status-pill.rank3{border-color:#bbf7d0;background:#f0fdf4;color:#059669;}
-.pension-ticket-row { display:grid; grid-template-columns:minmax(0,1fr) 58px 88px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
+.pension-ticket-row { display:grid; grid-template-columns:minmax(0,1fr) 54px 88px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
 .pension-ticket-numbers { display:flex; justify-content:center; align-items:center; gap:7px; min-width:0; }
 .pension-number-ball { width:27px; height:34px; border:1px solid #9ad5ae; border-radius:5px; background:#e9f7ed; display:inline-flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; }
 .ticket-history-filter { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
@@ -276,7 +276,7 @@ main.chat-hidden .chat-panel { display: none; }
 .store-picker-list { overflow-y:auto; padding:0 12px 12px; }
 .store-picker-item { width:100%; display:block; padding:10px 12px; border:0; border-bottom:1px solid var(--border-dashed); background:transparent; color:var(--text-dark); text-align:left; cursor:pointer; font-family:inherit; }
 .store-picker-item:hover { background:var(--bg-light); }
-.store-picker-trigger { width:84px; max-width:84px; min-height:26px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid #cbd5e1; border-radius:4px; background:#f8fafc; color:#475569; padding:4px 6px; font:700 9px inherit; cursor:pointer; }
+.store-picker-trigger { width:82px; max-width:82px; min-height:26px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid #cbd5e1; border-radius:4px; background:#f8fafc; color:#475569; padding:4px 6px; font:700 9px inherit; cursor:pointer; }
 .stats-section-head { min-height:38px; display:flex; align-items:center; justify-content:space-between; gap:10px; margin:4px 0 8px; }
 .stats-section-head > div { display:flex; align-items:baseline; gap:8px; min-width:0; }
 .stats-section-head b { font-size:13px; color:var(--text-dark); }
@@ -2841,9 +2841,11 @@ function ticketGameStatus(ticket, gameIndex = 0) {
   const type = ticketLotteryType(ticket);
   const results = Array.isArray(ticket?.game_results) ? ticket.game_results : [];
   const perGame = results[gameIndex] || null;
-  const rawRank = perGame?.rank ?? ticket?.prize_rank ?? null;
+  const games = ticket?.game_numbers?.length ? ticket.game_numbers : (ticket?.numbers?.length ? [ticket.numbers] : []);
+  const canUseTicketRank = type === 'pension' || games.length <= 1;
+  const rawRank = perGame?.rank ?? (canUseTicketRank ? ticket?.prize_rank : null);
   const rank = Number(rawRank);
-  const checked = ticket?.result === 'checked' || Number.isFinite(rank);
+  const checked = ticket?.result === 'checked' || (canUseTicketRank && Number.isFinite(rank));
   if (Number.isFinite(rank)) {
     const maxRank = type === 'pension' ? 7 : 5;
     if (rank >= 1 && rank <= maxRank) return `${rank}등`;
@@ -2852,6 +2854,27 @@ function ticketGameStatus(ticket, gameIndex = 0) {
   if (perGame && (!Number.isFinite(rank) || rank > (type === 'pension' ? 7 : 5))) return '낙첨';
   if (checked) return '낙첨';
   return '추첨중';
+}
+
+async function enrichLottoTicketGameResults(ticket) {
+  if (ticketLotteryType(ticket) !== 'lotto' || ticket?.source === 'saved') return ticket;
+  const games = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
+  if (!games.length) return ticket;
+  if (Array.isArray(ticket.game_results) && ticket.game_results.length >= games.length) return ticket;
+  const round = Number(ticket.round_no || ticket.round);
+  if (!round) return ticket;
+  const winData = await fetchLotto(round);
+  if (!winData) return ticket;
+  const gameResults = games.map(nums => checkWinRank(nums.map(Number), winData.nums, winData.bonus));
+  const best = gameResults.reduce((acc, item) => item.rank < acc.rank ? item : acc, gameResults[0]);
+  const totalPrize = gameResults.reduce((sum, item) => sum + calcPrizeAmount(item.rank, winData), 0);
+  return {
+    ...ticket,
+    result: 'checked',
+    game_results: gameResults,
+    prize_rank: best.rank <= 5 ? best.rank : null,
+    prize_amount: totalPrize,
+  };
 }
 
 function ticketStatusClass(label) {
@@ -4403,13 +4426,14 @@ async function renderNumberHistory() {
     return;
   }
   const savedSets = await loadSavedNumberSets();
-  const qrTickets = (result.data || []).map(ticket => {
+  const rawQrTickets = (result.data || []).map(ticket => {
     const type = ticketLotteryType(ticket);
     const restored = type === 'lotto' && (!ticket.game_numbers?.length || ticket.game_numbers.length < (ticket.game_count || 1))
       ? parseQRUrl(ticket.qr_url) : null;
     const base = { ...ticket, lottery_type:type, game_numbers:restored?.games || ticket.game_numbers || [] };
     return type === 'pension' ? restorePensionTicketFromQr(base) : repairKnownOnlineTicketGames(base);
   });
+  const qrTickets = await Promise.all(rawQrTickets.map(enrichLottoTicketGameResults));
   const { data: stores } = await sb.from('lottery_stores').select('id,name,address,region,lat,lng').order('name').limit(5000);
   window._lotteryStoreOptions = stores || [];
   const ticketIds = qrTickets.map(ticket => ticket.id).filter(Boolean);
@@ -10671,13 +10695,14 @@ async function loadCommunityVerifyTickets() {
       .limit(40);
   }
   if (result.error) return [];
-  return (result.data || []).map(ticket => {
+  const tickets = (result.data || []).map(ticket => {
     const type = ticketLotteryType(ticket);
     const restored = type === 'lotto' && (!ticket.game_numbers?.length || ticket.game_numbers.length < (ticket.game_count || 1))
       ? parseQRUrl(ticket.qr_url) : null;
     const base = { ...ticket, lottery_type:type, game_numbers:restored?.games || ticket.game_numbers || [] };
     return type === 'pension' ? restorePensionTicketFromQr(base) : repairKnownOnlineTicketGames(base);
   });
+  return Promise.all(tickets.map(enrichLottoTicketGameResults));
 }
 
 async function renderCommunityRecommendPicker() {
