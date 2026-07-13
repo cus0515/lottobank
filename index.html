@@ -1345,6 +1345,10 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-rec-slip.pension.skin-basic::before{background:#16a34a;}
 .community-rec-slip.skin-preview-slip{max-width:100%;transform:none;}
 .community-rec-slip.skin-preview-slip .community-rec-nums{grid-template-columns:repeat(6,28px);gap:7px;}
+.community-rec-slip.skin-preview-slip.pension .community-rec-head{border-bottom-color:rgba(15,23,42,.7);}
+.community-rec-slip.skin-preview-slip.pension.skin-mint .community-rec-head{border-bottom-color:#22c55e;}
+.community-rec-slip.skin-preview-slip.pension.skin-midnight .community-rec-head{border-bottom-color:rgba(255,255,255,.55);}
+.community-rec-slip.skin-preview-slip.pension .community-pension-group{background:#22a55b;}
 .community-pension-rec-row{display:flex;align-items:center;justify-content:center;gap:7px;padding-top:13px;min-height:46px;}
 .community-pension-group{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:#16a34a;color:#fff;border-radius:6px;font-size:13px;font-weight:900;line-height:1;}
 .community-rec-slip .community-pension-rec-row .pension-number-ball{width:28px!important;height:32px!important;font-size:15px!important;}
@@ -1355,7 +1359,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
 .community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
-@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:38px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,25px);gap:6px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}.radar-history-row{grid-template-columns:46px minmax(0,1fr) 48px;gap:5px}.radar-history-row.pension{grid-template-columns:40px 34px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
+@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:38px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,25px);gap:6px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:46px minmax(0,1fr);gap:6px}.radar-pick-row.pension{grid-template-columns:42px 36px minmax(0,1fr)}.radar-pick-nums{gap:4px}.radar-win-row{grid-template-columns:48px minmax(0,1fr);gap:6px}.radar-history-row{grid-template-columns:46px minmax(0,1fr) 48px;gap:5px}.radar-history-row.pension{grid-template-columns:40px 34px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
 
 /* == Task #124: Profile page premium upgrade == */
 .profile-hero{text-align:center;padding:32px 20px 24px;border-bottom:none;margin-bottom:12px;background:linear-gradient(160deg,rgba(225,29,72,.08) 0%,rgba(139,92,246,.06) 50%,transparent 100%);border-radius:16px;position:relative;overflow:hidden;}
@@ -1560,6 +1564,11 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
   transform:translateY(5px);
   animation:radar-row-in .32s ease-out forwards;
 }
+.radar-pick-row{display:grid!important;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center;}
+.radar-pick-row.pension{grid-template-columns:58px 48px minmax(0,1fr);}
+.radar-pick-nums{display:flex;gap:7px;justify-content:center;align-items:center;min-width:0;}
+.radar-win-row{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center;margin-bottom:8px;padding:7px 9px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--bg-light);}
+.radar-win-nums{display:flex;gap:5px;justify-content:center;align-items:center;flex-wrap:wrap;}
 .radar-number-ball {
   opacity:0;
   transform:translateY(4px) scale(.9);
@@ -7808,9 +7817,9 @@ function renderFortune() {
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">등장 간격(60~70%) + 출현 빈도(30~40%) 가중치 · 저·중·고 구간 균형 · 5가지 조합 제시</div>
         </div>
         ${games.map((g,i)=>`
-          <div class="radar-game-row" style="animation-delay:${i*65}ms;display:flex;align-items:center;gap:8px;padding:6px 0;${i<4?'border-bottom:1px dashed var(--border-dashed);':''}">
+          <div class="radar-game-row radar-pick-row" style="animation-delay:${i*65}ms;padding:6px 0;${i<4?'border-bottom:1px dashed var(--border-dashed);':''}">
             <span style="font-size:10px;font-weight:900;color:var(--text-muted);min-width:44px;flex-shrink:0;">게임 ${i+1}</span>
-            <div style="display:flex;gap:5px;flex-wrap:wrap;">${g.map((n,j)=>gBall(n,150+i*65+j*35)).join('')}</div>
+            <div class="radar-pick-nums">${g.map((n,j)=>gBall(n,150+i*65+j*35)).join('')}</div>
           </div>`).join('')}
         <div class="radar-history-link" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-dashed);font-size:10px;color:var(--text-muted);">
           <button type="button" onclick="openFortuneHistory('lotto')" style="display:flex;align-items:center;gap:6px;border:0;background:none;padding:0;color:var(--text-dark);font:800 11px inherit;cursor:pointer;">${svgIcon('history',13,'currentColor')} 로또 6/45 추천 이력 · 당첨 결과 보기</button>
@@ -8084,11 +8093,13 @@ async function renderLottoHistory() {
     const isCurrentResult = r === latestRound && rd;
 
     const winBalls = (isCurrentResult || (!isPending && rd))
-      ? `<div style="display:flex;align-items:center;gap:4px;margin-bottom:8px;flex-wrap:wrap;">
-          <span style="font-size:9px;color:var(--text-muted);min-width:44px;">당첨번호</span>
-          ${rd.nums.map(n=>sBall(n)).join('')}
-          <span style="font-size:10px;color:var(--text-muted);">+</span>
-          <span style="width:20px;height:20px;border-radius:50%;background:transparent;color:${zC(rd.bonus)};border:2px solid ${zC(rd.bonus)};display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;">${rd.bonus}</span>
+      ? `<div class="radar-win-row">
+          <span style="font-size:9px;color:var(--text-muted);font-weight:800;">당첨번호</span>
+          <div class="radar-win-nums">
+            ${rd.nums.map(n=>sBall(n)).join('')}
+            <span style="font-size:10px;color:var(--text-muted);">+</span>
+            <span style="width:24px;height:24px;border-radius:50%;background:transparent;color:${zC(rd.bonus)};border:2px solid ${zC(rd.bonus)};display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;">${rd.bonus}</span>
+          </div>
         </div>` : '';
 
     const gameRows = games.map((g, gi) => {
@@ -8244,10 +8255,10 @@ async function renderPensionRadar(data) {
       <div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:4px;">⭐ 연금 720+ 제 ${nextDrw}회 추천 번호</div>
       <div style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">조 + 6자리 번호 · 5게임 · 이력 탭에서 결과 확인</div>
       ${recGames.map((g,i)=>`
-        <div class="radar-game-row" style="animation-delay:${i*65}ms;display:flex;align-items:center;gap:8px;padding:7px 0;${i<4?'border-bottom:1px dashed var(--border-dashed);':''}">
+        <div class="radar-game-row radar-pick-row pension" style="animation-delay:${i*65}ms;padding:7px 0;${i<4?'border-bottom:1px dashed var(--border-dashed);':''}">
           <span style="font-size:10px;font-weight:900;color:var(--text-muted);min-width:44px;">게임 ${i+1}</span>
           <span style="background:#16a34a;color:#fff;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:900;white-space:nowrap;">${g.jo}조</span>
-          <div style="display:flex;gap:3px;">${numDigitBalls(g.num,i)}</div>
+          <div class="radar-pick-nums">${numDigitBalls(g.num,i)}</div>
         </div>`).join('')}
       <div class="radar-history-link" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-dashed);font-size:10px;color:var(--text-muted);">
         <button type="button" onclick="openFortuneHistory('pension')" style="display:flex;align-items:center;gap:5px;border:0;background:none;padding:0;color:var(--text-dark);font:800 11px inherit;cursor:pointer;">${svgIcon('history',13,'currentColor')} 연금 720+ 추천 이력 · 당첨 결과 보기</button>
