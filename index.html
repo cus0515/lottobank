@@ -257,16 +257,17 @@ main.chat-hidden .chat-panel { display: none; }
 .ticket-slip { max-width:470px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
 .ticket-slip-games { display:grid; gap:0; }
-.ticket-slip-game { display:grid; grid-template-columns:20px minmax(0,1fr) 54px 88px; gap:8px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
+.ticket-slip-game { display:grid; grid-template-columns:22px minmax(180px,1fr) 58px 86px; gap:10px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
 .ticket-game-label { font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace; color:#111827; text-align:left; }
-.ticket-slip-nums { display:grid; grid-template-columns:repeat(6,minmax(24px,1fr)); gap:7px; min-width:0; text-align:center; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; font-variant-numeric:tabular-nums; }
+.ticket-slip-nums { display:grid; grid-template-columns:repeat(6,minmax(26px,1fr)); gap:6px; min-width:0; max-width:360px; text-align:center; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; font-variant-numeric:tabular-nums; }
+.ticket-slip-nums span { display:flex; align-items:center; justify-content:center; min-width:0; line-height:1; }
 .ticket-status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:26px;border-radius:7px;font-size:10px;font-weight:900;border:1px solid #cbd5e1;background:#f8fafc;color:#64748b;white-space:nowrap;}
 .ticket-status-pill.pending{border-color:#cbd5e1;background:#f8fafc;color:#64748b;}
 .ticket-status-pill.lose{border-color:#e5e7eb;background:#f9fafb;color:#94a3b8;}
 .ticket-status-pill.win{border-color:#fecaca;background:#fff1f2;color:var(--lotto-red);}
 .ticket-status-pill.rank2{border-color:#ddd6fe;background:#f5f3ff;color:#7c3aed;}
 .ticket-status-pill.rank3{border-color:#bbf7d0;background:#f0fdf4;color:#059669;}
-.pension-ticket-row { display:grid; grid-template-columns:minmax(0,1fr) 54px 88px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
+.pension-ticket-row { display:grid; grid-template-columns:minmax(180px,1fr) 58px 86px; gap:10px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
 .pension-ticket-numbers { display:flex; justify-content:center; align-items:center; gap:7px; min-width:0; }
 .pension-number-ball { width:27px; height:34px; border:1px solid #9ad5ae; border-radius:5px; background:#e9f7ed; display:inline-flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; }
 .community-verify-slip .pension-ticket-row { border-bottom:0 !important; }
@@ -443,7 +444,7 @@ main.chat-hidden .chat-panel { display: none; }
 .hall-card.silver { border:1px solid #cbd5e1; box-shadow:0 0 8px rgba(148,163,184,.3), inset 0 0 8px rgba(148,163,184,.08); }
 .map-frame { width:100%; height:320px; border:0; display:block; background:var(--bg-light); }
 @media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}#qr-purchase-meta{grid-template-columns:1fr!important;}}
-@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:16px minmax(0,1fr) 50px 74px;gap:6px;min-height:36px;padding:6px 0}.ticket-slip-nums{grid-template-columns:repeat(6,minmax(20px,1fr));gap:3px}.ticket-slip-nums,.ticket-game-label{font-size:11px}.ticket-status-pill{min-width:42px;height:24px;font-size:9px}.store-picker-trigger{width:74px;max-width:74px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 50px 74px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
+@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:18px minmax(0,1fr) 48px 72px;gap:5px;min-height:36px;padding:6px 0}.ticket-slip-nums{grid-template-columns:repeat(6,minmax(20px,1fr));gap:3px;max-width:none}.ticket-slip-nums,.ticket-game-label{font-size:11px}.ticket-status-pill{min-width:42px;height:24px;font-size:9px}.store-picker-trigger{width:72px;max-width:72px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 48px 72px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
 @media(max-width:700px){.stats-login-notice{grid-template-columns:1fr auto}.stats-login-notice span{grid-column:1/-1;grid-row:2}.stats-share-btn span{display:none}.stats-share-btn{width:30px;justify-content:center;padding:5px}.stats-section-head{margin-top:2px}.stats-kpi-grid{grid-template-columns:1fr 1fr}}
 .rank-tab-pill { display:inline-block;padding:5px 14px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;margin-right:4px;white-space:nowrap; }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
@@ -1323,7 +1324,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-board-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;}
 .community-recommend-picker{display:none;margin:8px 0 10px;padding:10px;border:1px dashed rgba(225,29,72,.35);border-radius:10px;background:rgba(225,29,72,.035);}
 .community-recommend-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
-.community-rec-slip{max-width:470px;margin:0 auto;border:1px solid rgba(226,232,240,.9);border-radius:8px;background:#fffdf7;padding:10px;box-shadow:0 1px 4px rgba(15,23,42,.05);position:relative;overflow:hidden;}
+.community-rec-slip{max-width:470px;margin:0 auto;border:1px solid rgba(226,232,240,.9);border-radius:8px;background:#fffdf7;padding:14px 12px 12px;box-shadow:0 1px 4px rgba(15,23,42,.05);position:relative;overflow:hidden;}
 .community-rec-slip::before{content:'';position:absolute;inset:0 0 auto 0;height:4px;background:var(--lotto-red);opacity:.9;}
 .community-rec-slip.skin-gold{background:linear-gradient(135deg,#fff8d5 0%,#fffdf7 48%,#fff1a6 100%);border-color:#eab308;box-shadow:0 0 0 1px rgba(234,179,8,.35),0 8px 22px rgba(234,179,8,.18);}
 .community-rec-slip.skin-gold::before{background:linear-gradient(90deg,#a16207,#fde68a,#d97706);}
@@ -1333,12 +1334,17 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-rec-slip.skin-midnight *{color:inherit!important;}
 .community-rec-slip.skin-mint{background:linear-gradient(135deg,#eafff4 0%,#f8fffb 52%,#dcfce7 100%);border-color:#4ade80;box-shadow:0 0 0 1px rgba(74,222,128,.25),0 8px 20px rgba(34,197,94,.13);}
 .community-rec-slip.skin-mint::before{background:linear-gradient(90deg,#16a34a,#86efac,#14b8a6);}
-.community-rec-row{display:grid;grid-template-columns:18px minmax(0,1fr);gap:8px;align-items:center;border-top:1px dashed #cbd5e1;padding-top:7px;margin-top:7px;}
-.community-rec-nums{display:grid;grid-template-columns:repeat(6,minmax(20px,1fr));gap:4px;font-size:11px;font-weight:900;text-align:center;}
+.community-rec-row{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:center;border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:8px;min-height:34px;}
+.community-rec-row>b{display:flex;align-items:center;justify-content:center;font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace;color:#0f172a;}
+.community-rec-nums{display:grid;grid-template-columns:repeat(6,minmax(28px,1fr));gap:8px;align-items:center;max-width:380px;margin-left:auto;font-size:12px;font-weight:900;text-align:center;}
+.community-rec-nums span{display:flex;align-items:center;justify-content:center;min-width:28px;height:24px;line-height:1;font:900 12px ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums;}
+.community-pension-rec-row{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:12px;min-height:44px;}
+.community-pension-group{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:#16a34a;color:#fff;border-radius:6px;font-size:13px;font-weight:900;line-height:1;}
+.community-rec-slip .community-pension-rec-row .pension-number-ball{width:28px!important;height:32px!important;font-size:15px!important;}
 .community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
 .community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
-@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}}
+@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}.community-rec-slip{padding:13px 10px 11px}.community-rec-row{grid-template-columns:20px minmax(0,1fr);gap:7px}.community-rec-nums{grid-template-columns:repeat(6,minmax(22px,1fr));gap:5px;max-width:none}.community-rec-nums span{min-width:22px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}}
 
 /* == Task #124: Profile page premium upgrade == */
 .profile-hero{text-align:center;padding:32px 20px 24px;border-bottom:none;margin-bottom:12px;background:linear-gradient(160deg,rgba(225,29,72,.08) 0%,rgba(139,92,246,.06) 50%,transparent 100%);border-radius:16px;position:relative;overflow:hidden;}
@@ -10647,9 +10653,9 @@ function renderCommunityRecSlip(rec) {
         <div><b style="font-size:17px;">연금복권 <span style="color:#16a34a;">720+</span></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${rec.round || '-'}회 추천</div></div>
         <b style="font-size:12px;">1,000원</b>
       </div>
-      <div style="display:flex;align-items:center;gap:5px;justify-content:center;padding-top:10px;">
-        <span style="background:#16a34a;color:#fff;border-radius:5px;padding:6px 8px;font-size:12px;font-weight:900;">${rec.jo || '-'}조</span>
-        ${digits.map(n=>`<span class="pension-number-ball" style="width:24px;height:28px;font-size:14px;">${n}</span>`).join('')}
+      <div class="community-pension-rec-row">
+        <span class="community-pension-group">${rec.jo || '-'}조</span>
+        ${digits.map(n=>`<span class="pension-number-ball">${n}</span>`).join('')}
       </div>
     </div>`;
   }
