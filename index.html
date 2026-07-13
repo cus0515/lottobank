@@ -97,9 +97,11 @@ header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); positio
 .nav-container { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 64px; }
 .logo-area { flex: 1; display: flex; align-items: center; }
 .auth-zone-wrap { flex: 1; display: flex; justify-content: flex-end; }
-.logo-title { font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; display:flex; align-items:center; }
+.logo-title { font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; display:flex; align-items:center; position:relative; }
 .logo-title .logo-brand { font-size:22px; font-weight:900; line-height:1; }
 .logo-title .logo-tagline { font-size:11px; color:var(--text-muted); font-weight:400; }
+.logo-draw-ball{width:9px;height:9px;border-radius:50%;margin-left:6px;background:radial-gradient(circle at 35% 30%,#fff 0 18%,#fbbf24 19% 58%,#e11d48 59% 100%);box-shadow:0 1px 4px rgba(225,29,72,.28);animation:logoBallDraw 2.8s ease-in-out infinite;transform-origin:center;}
+@keyframes logoBallDraw{0%,72%,100%{transform:translateX(0) rotate(0deg);opacity:.75}28%{transform:translateX(9px) rotate(135deg);opacity:1}48%{transform:translateX(4px) rotate(215deg);opacity:.95}}
 .menu-tabs { display: flex; height: 100%; gap: 2px; }
 .menu-btn { height: 64px; padding: 0 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); border: none; background: none; cursor: pointer; display: flex; align-items: center; position: relative; white-space: nowrap; transition: color .15s ease; }
 .menu-btn:hover:not(.on) { color: var(--lotto-red); }
@@ -270,7 +272,10 @@ main.chat-hidden .chat-panel { display: none; }
 .pension-ticket-row { display:grid; grid-template-columns:minmax(180px,1fr) 78px 94px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
 .pension-ticket-numbers { display:flex; justify-content:center; align-items:center; gap:7px; min-width:0; }
 .pension-number-ball { width:27px; height:34px; border:1px solid #9ad5ae; border-radius:5px; background:#e9f7ed; display:inline-flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; }
+.pension-group-chip{width:42px;min-width:42px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:#16a34a;color:#fff;font-size:13px;font-weight:900;line-height:1;white-space:nowrap;}
 .community-verify-slip .pension-ticket-row { border-bottom:0 !important; }
+.community-verify-slip{max-width:470px;}
+.lab-vault-slip{max-width:470px;}
 .ticket-store-readonly { width:94px; max-width:94px; height:28px; min-height:28px; display:inline-flex; align-items:center; justify-content:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid #cbd5e1; border-radius:6px; background:#f8fafc; color:#475569; padding:0 8px; font-size:10px; font-weight:800; line-height:1; }
 .ticket-history-filter { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
 .store-picker-backdrop { position:fixed; inset:0; z-index:1200; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(15,23,42,.58); }
@@ -1358,7 +1363,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
 .community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
-@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:38px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,25px);gap:6px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:48px minmax(0,1fr);gap:6px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
+@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:38px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,25px);gap:6px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
 
 /* == Task #124: Profile page premium upgrade == */
 .profile-hero{text-align:center;padding:32px 20px 24px;border-bottom:none;margin-bottom:12px;background:linear-gradient(160deg,rgba(225,29,72,.08) 0%,rgba(139,92,246,.06) 50%,transparent 100%);border-radius:16px;position:relative;overflow:hidden;}
@@ -1569,7 +1574,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .radar-pick-nums{display:flex;gap:7px;justify-content:center;align-items:center;min-width:0;}
 .radar-pick-nums.pension{gap:6px;}
 .radar-pension-group{width:42px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;background:#16a34a;color:#fff;font-size:12px;font-weight:900;line-height:1;white-space:nowrap;}
-.radar-win-row{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center;margin-bottom:8px;padding:7px 9px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--bg-light);}
+.radar-win-row{display:grid;grid-template-columns:52px minmax(0,1fr) 54px;gap:8px;align-items:center;margin-bottom:8px;padding:7px 9px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--bg-light);}
+.radar-win-row::after{content:'';}
 .radar-win-nums{display:flex;gap:5px;justify-content:center;align-items:center;flex-wrap:wrap;}
 .radar-number-ball {
   opacity:0;
@@ -1888,7 +1894,7 @@ textarea {
   <div class="nav-container">
     <div class="logo-area">
       <div class="logo-title" onclick="go('home')" style="cursor:pointer;letter-spacing:-.3px;" title="홈으로 이동">
-          <span class="logo-brand" style="background:linear-gradient(135deg,#ef4444,#dc2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lotto</span><span class="logo-brand" style="color:var(--text-dark);">Bank</span>
+          <span class="logo-brand" style="background:linear-gradient(135deg,#ef4444,#dc2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lotto</span><span class="logo-brand" style="color:var(--text-dark);">Bank</span><span class="logo-draw-ball" aria-hidden="true"></span>
           <span class="logo-tagline" style="opacity:.5;margin-left:8px;">| 로또 전적 &amp; 인증</span>
         </div>
     </div>
@@ -2952,7 +2958,7 @@ function renderOnlineCaptureTicket(parsed) {
     <div style="font-size:11px;color:#64748b;text-align:center;padding:8px 0 4px;">제 ${parsed.round}회 · ${parsed.pensionGames.length}게임</div>
     ${parsed.pensionGames.map(game => `<div class="pension-ticket-row">
       <div class="pension-ticket-numbers">
-        <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${game.jo}조</span>
+        <span class="pension-group-chip">${game.jo}조</span>
         ${game.no.split('').map(number => `<span class="pension-number-ball">${number}</span>`).join('')}
       </div>
       ${ticketStatusPill('추첨중')}
@@ -4541,7 +4547,7 @@ async function renderNumberHistory() {
         const pBtn = ticket.id?`<button class="store-picker-trigger" onclick="openStorePicker('${ticket.id}',0,'${ps}')">${pn}</button>`:'<span></span>';
         return `<div class="pension-ticket-row">
           <div class="pension-ticket-numbers">
-            <span style="background:#2fa85e;color:#fff;border-radius:5px;padding:7px 9px;font-size:15px;font-weight:900;">${jo}조</span>
+            <span class="pension-group-chip">${jo}조</span>
             ${number ? number.split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('') : '<span style="font-size:12px;color:#64748b;padding:0 8px;">번호 미등록</span>'}
           </div>
           ${ticketStatusPill(ticketGameStatus(ticket, 0))}
@@ -7244,7 +7250,7 @@ function renderLabVault() {
   const vault = getLabVault();
   const rows = vault[labVaultView] || [];
   const renderSlip = (item, i) => labVaultView === 'lotto'
-    ? `<div class="ticket-slip">
+    ? `<div class="ticket-slip lab-vault-slip">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111827;padding-bottom:8px;margin-bottom:4px;">
           <div><b style="font-size:22px;">Lotto <small>6/45</small></b><div style="font-size:11px;color:#64748b;margin-top:2px;">제 ${item.round || '-'}회</div></div>
           <div style="text-align:right;"><span style="font-size:11px;color:#64748b;">1게임</span><br><b style="font-size:15px;">1,000원</b></div>
@@ -7257,14 +7263,14 @@ function renderLabVault() {
           </div>
         </div>
       </div>`
-    : `<div class="ticket-slip pension">
+    : `<div class="ticket-slip pension lab-vault-slip">
         <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2f855a;padding-bottom:8px;margin-bottom:12px;">
           <div><b style="font-size:22px;">연금복권 <span style="color:#22a55b;">720+</span></b><div style="font-size:11px;color:#64748b;margin-top:2px;">저장 번호</div></div>
           <b style="font-size:14px;">1,000원</b>
         </div>
         <div style="font-size:11px;color:#64748b;margin:-4px 0 8px;">제 ${item.round || '-'}회 저장</div>
         <div class="pension-ticket-row" style="border-bottom:0;">
-          <div class="pension-ticket-numbers"><span style="background:#22a55b;color:#fff;border-radius:5px;padding:7px 9px;font-weight:900;">${item.jo}조</span>${String(item.no).padStart(6,'0').split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('')}</div>
+          <div class="pension-ticket-numbers"><span class="pension-group-chip">${item.jo}조</span>${String(item.no).padStart(6,'0').split('').map(n=>`<span class="pension-number-ball">${n}</span>`).join('')}</div>
 <span></span>
 <div style="display:flex;gap:4px;flex-shrink:0;"><button class="qr-inner-tab" style="min-height:28px;font-size:11px;padding:0 9px;white-space:nowrap;display:flex;align-items:center;justify-content:center;" onclick="loadLabSaved('pension',${i})">불러오기</button><button class="qr-inner-tab" style="min-height:28px;font-size:11px;padding:0 9px;border-color:#86efac;color:#16a34a;white-space:nowrap;display:flex;align-items:center;justify-content:center;" onclick="deleteLabSaved('pension',${i})">삭제</button></div>
         </div>
@@ -10784,7 +10790,7 @@ function renderCommunityVerifySlip(meta) {
         const number = row.no ? String(row.no).padStart(6, '0') : '';
         return `<div class="pension-ticket-row" style="padding:10px 0 0;">
         <div class="pension-ticket-numbers">
-          <span style="background:#16a34a;color:#fff;border-radius:5px;padding:6px 8px;font-size:12px;font-weight:900;">${row.jo || '-'}조</span>
+          <span class="pension-group-chip">${row.jo || '-'}조</span>
           ${number ? number.split('').map(n=>`<span class="pension-number-ball" style="width:24px;height:28px;font-size:14px;">${n}</span>`).join('') : '<span style="font-size:12px;color:var(--text-muted);">번호 미등록</span>'}
         </div>
         ${ticketStatusPill(row.status || '추첨중')}
