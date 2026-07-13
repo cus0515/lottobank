@@ -1,0 +1,55 @@
+<!-- LottoBank 전적 관리 기능을 설명하는 공개 가이드 페이지 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로또 전적 관리 방법 | LottoBank</title>
+<meta name="description" content="LottoBank에서 QR 인증 이력을 바탕으로 로또 구매 게임, 당첨 횟수, 당첨금, 수익률, 랭킹을 관리하는 방법을 설명합니다.">
+<meta name="robots" content="index, follow">
+<meta name="google-adsense-account" content="ca-pub-3323488098461026">
+<link rel="canonical" href="https://lottobank.pages.dev/lotto-record-guide.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+body{margin:0;background:#f6f8fb;color:#0f172a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.75}
+main{max-width:860px;margin:0 auto;padding:34px 18px}
+.card{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:26px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+.brand{color:#e11d48;font-weight:900}
+h1{font-size:30px;line-height:1.25;margin:0 0 12px}
+h2{font-size:20px;margin:30px 0 8px}
+p,li{font-size:15px;color:#334155}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:14px 0}
+.box{border:1px solid #dbe3ef;border-radius:10px;padding:14px;background:#f8fafc}
+.box b{display:block;margin-bottom:4px;color:#0f172a}
+a{color:#e11d48;font-weight:800}
+footer{margin-top:22px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<main>
+  <article class="card">
+    <h1><span class="brand">LottoBank</span> 전적 관리 가이드</h1>
+    <p>복권을 꾸준히 구매하면 “얼마나 샀는지”, “얼마나 당첨됐는지”, “어떤 회차가 좋았는지”를 기억하기 어렵습니다. LottoBank는 QR 인증 이력을 기준으로 개인 전적을 자동 정리하는 방향으로 만들어졌습니다.</p>
+
+    <h2>전적에서 확인하는 항목</h2>
+    <div class="grid">
+      <div class="box"><b>구매 게임</b><span>등록한 QR과 인터넷 구매 캡처의 게임 수를 합산합니다.</span></div>
+      <div class="box"><b>당첨 게임</b><span>회차 결과가 나온 뒤 등수별 당첨 여부를 기록합니다.</span></div>
+      <div class="box"><b>총 당첨금</b><span>당첨금은 원 단위로 누적해 투자금과 비교합니다.</span></div>
+      <div class="box"><b>최고 기록</b><span>사용자 기준 최고 등수와 해당 회차를 보여줍니다.</span></div>
+    </div>
+
+    <h2>로또와 연금의 등수 차이</h2>
+    <p>로또 6/45는 1등부터 5등까지의 당첨 구조를 사용합니다. 연금복권 720+는 1등부터 7등까지 구분되므로 전적 화면에서도 복권 종류별로 다른 등수 구조를 적용해야 합니다.</p>
+
+    <h2>커뮤니티와 랭킹 연결</h2>
+    <p>QR 인증으로 등록된 이력은 커뮤니티 인증게시판에 첨부할 수 있고, 랭킹은 구매, 당첨, 출석 같은 실제 기록을 기준으로 계산됩니다. 수동 입력보다 QR 인증 기록을 우선하는 이유는 조작 가능성을 줄이고, 같은 기준으로 사용자 전적을 비교하기 위해서입니다.</p>
+
+    <h2>운영자가 확인해야 할 점</h2>
+    <p>서비스 운영자는 잘못 등록된 QR, 중복 데이터, 판매점 지정 누락, 결과 미확정 회차 표시를 주기적으로 확인해야 합니다. 특히 결과가 아직 발표되지 않은 회차는 낙첨이 아니라 추첨중으로 표시되는 것이 사용자에게 더 정확합니다.</p>
+
+    <footer><a href="/">LottoBank 홈으로 돌아가기</a> · <a href="/lotto-qr-guide.html">QR 인증 가이드</a> · <a href="/lotto-tax-guide.html">당첨금 세금</a></footer>
+  </article>
+</main>
+</body>
+</html>
