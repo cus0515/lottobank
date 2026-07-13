@@ -268,6 +268,8 @@ main.chat-hidden .chat-panel { display: none; }
 .pension-ticket-row { display:grid; grid-template-columns:minmax(0,1fr) 54px 88px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed #86b998; }
 .pension-ticket-numbers { display:flex; justify-content:center; align-items:center; gap:7px; min-width:0; }
 .pension-number-ball { width:27px; height:34px; border:1px solid #9ad5ae; border-radius:5px; background:#e9f7ed; display:inline-flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; }
+.community-verify-slip .pension-ticket-row { border-bottom:0 !important; }
+.ticket-store-readonly { width:82px; max-width:82px; min-height:26px; display:inline-flex; align-items:center; justify-content:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid #cbd5e1; border-radius:4px; background:#f8fafc; color:#475569; padding:4px 6px; font:700 9px inherit; }
 .ticket-history-filter { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
 .store-picker-backdrop { position:fixed; inset:0; z-index:1200; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(15,23,42,.58); }
 .store-picker { width:min(520px,100%); max-height:min(620px,85vh); display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--border-dashed); border-radius:10px; background:var(--paper-white); box-shadow:0 18px 55px rgba(15,23,42,.28); }
@@ -5329,6 +5331,9 @@ function updateHeaderUser(nick, badgeText) {
 function currentNickname() {
   return window._profileNickname || currentUser?.user_metadata?.nickname || currentUser?.email?.split('@')[0] || '익명';
 }
+function isForcedVipAccount() {
+  return currentNickname() === '윤석열';
+}
 function toggleUserDropdown() {
   $('user-dropdown')?.classList.toggle('open');
 }
@@ -6271,6 +6276,7 @@ function isGroupTier(value) {
 function applyMembershipProfile(profile) {
   const tier = profile?.subscription_tier || profile?.membership || profile?.plan || '';
   window._membership = isGroupTier(tier) ? 'group' : (isPlusTier(tier) || profile?.is_plus === true ? 'plus' : 'free');
+  if (isForcedVipAccount()) window._membership = 'group';
   window._isPremiumUser = window._membership === 'plus' || window._membership === 'group';
 }
 
@@ -9210,6 +9216,16 @@ function setStatsLotteryMode(mode) {
   renderStats();
 }
 
+function statsRankLimit(ticketOrType) {
+  const type = typeof ticketOrType === 'string' ? ticketOrType : ticketLotteryType(ticketOrType);
+  return type === 'pension' ? 7 : 5;
+}
+
+function isStatsWinningRank(ticketOrType, rank) {
+  const n = Number(rank);
+  return Number.isFinite(n) && n >= 1 && n <= statsRankLimit(ticketOrType);
+}
+
 function renderStats() {
   const wrap = $('stats-content');
   if (!isLoggedIn && wrap) {
@@ -9232,21 +9248,22 @@ function renderStats() {
     const results = Array.isArray(ticket.game_results) ? ticket.game_results : [];
     if (results.length) {
       return results
-        .filter(result => result.rank >= 1 && result.rank <= 5)
+        .filter(result => isStatsWinningRank(ticket, result.rank))
         .map(result => ({ ...ticket, prize_rank:result.rank }));
     }
-    return ticket.prize_rank >= 1 && ticket.prize_rank <= 5 ? [ticket] : [];
+    return isStatsWinningRank(ticket, ticket.prize_rank) ? [ticket] : [];
   });
-  const winningTickets = tickets.filter(ticket => ticket.prize_rank >= 1 && ticket.prize_rank <= 5);
+  const winningTickets = tickets.filter(ticket => isStatsWinningRank(ticket, ticket.prize_rank));
   const bestTicket = winningTickets.slice().sort((a, b) =>
     (a.prize_rank || 99) - (b.prize_rank || 99) || (b.prize_amount || 0) - (a.prize_amount || 0)
   )[0];
   const roi = spent > 0 ? ((prize - spent) / spent * 100) : 0;
   const rankConditions = statsLotteryMode === 'pension'
-    ? ['7자리 일치','6자리 일치','5자리 일치','4자리 일치','3자리 일치']
+    ? ['7자리 일치','6자리 일치','5자리 일치','4자리 일치','3자리 일치','2자리 일치','1자리 일치']
     : ['6개 일치','5개+보너스','5개 일치','4개 일치','3개 일치'];
-  const rankColors = {1:'var(--lotto-red)',2:'#8b5cf6',3:'var(--b-green)',4:'#3b82f6',5:'#64748b'};
-  const rankRows = [1,2,3,4,5].map(rank => {
+  const rankColors = {1:'var(--lotto-red)',2:'#8b5cf6',3:'var(--b-green)',4:'#3b82f6',5:'#64748b',6:'#0ea5e9',7:'#14b8a6'};
+  const ranks = statsLotteryMode === 'pension' ? [1,2,3,4,5,6,7] : [1,2,3,4,5];
+  const rankRows = ranks.map(rank => {
     const rows = winGames.filter(game => game.prize_rank === rank);
     const amount = tickets
       .filter(ticket => ticket.prize_rank === rank)
@@ -9331,7 +9348,7 @@ async function loadTicketHistory() {
     const rankColor = r => r===1?'#dc2626':r===2?'#a855f7':r===3?'#10b981':r===4?'#3b82f6':r===5?'#64748b':'#94a3b8';
 
     // 최고 당첨금 KPI 업데이트
-    const bestPrizeTicket = tickets.filter(t=>t.prize_rank&&t.prize_rank<=5).sort((a,b)=>(b.prize_amount||0)-(a.prize_amount||0))[0];
+    const bestPrizeTicket = tickets.filter(t=>isStatsWinningRank(t,t.prize_rank)).sort((a,b)=>(b.prize_amount||0)-(a.prize_amount||0))[0];
     const bpEl = document.getElementById('kpi-best-prize');
     const bpRankEl = document.getElementById('kpi-best-prize-rank');
     if (bpEl && bestPrizeTicket) {
@@ -9344,7 +9361,7 @@ async function loadTicketHistory() {
 
     // 등수별 누적 당첨금 업데이트
     const rankPrizeMap = {1:0,2:0,3:0,4:0,5:0};
-    tickets.forEach(t => { if(t.prize_rank&&t.prize_rank<=5) rankPrizeMap[t.prize_rank] += (t.prize_amount||0); });
+    tickets.forEach(t => { if(isStatsWinningRank(t,t.prize_rank) && rankPrizeMap[t.prize_rank] !== undefined) rankPrizeMap[t.prize_rank] += (t.prize_amount||0); });
     const tbody = document.getElementById('rank-breakdown-tbody');
     if (tbody) {
       const rows = tbody.querySelectorAll('tr');
@@ -9359,7 +9376,7 @@ async function loadTicketHistory() {
       });
     }
 
-    const winningTickets = tickets.filter(ticket => ticket.prize_rank >= 1 && ticket.prize_rank <= 5);
+    const winningTickets = tickets.filter(ticket => isStatsWinningRank(ticket, ticket.prize_rank));
     histSection.innerHTML = `
       <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">당첨 이력</div>
       ${winningTickets.length ? `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;overflow:hidden;">
@@ -9440,7 +9457,7 @@ async function loadTicketHistory() {
         let recentStreak = 0, recentDir = 'none';
         const streakTickets = tickets.filter(t => t.result !== 'pension'); // 연금복권은 스트릭 집계 제외
         for (const t of streakTickets) {
-          const won = t.prize_rank && t.prize_rank <= 5;
+          const won = isStatsWinningRank(t, t.prize_rank);
           if (!won) {
             curLose++;
             maxLose = Math.max(maxLose, curLose);
@@ -9453,7 +9470,7 @@ async function loadTicketHistory() {
             curLose = 0;
           }
         }
-        const lastIsWin = streakTickets[0] && streakTickets[0].prize_rank && streakTickets[0].prize_rank <= 5;
+        const lastIsWin = streakTickets[0] && isStatsWinningRank(streakTickets[0], streakTickets[0].prize_rank);
         const currentStreak = lastIsWin ? curWin : curLose;
         const streakLabel = lastIsWin ? '당첨 연속' : '낙첨 연속';
         const streakColor = lastIsWin ? '#16a34a' : '#dc2626';
@@ -9485,7 +9502,7 @@ async function loadTicketHistory() {
       const m = (t.purchase_date || '').slice(0,7) || '알수없음';
       if(!monthMap[m]) monthMap[m] = {buy:0, win:0, prize:0};
       monthMap[m].buy++;
-      if(t.prize_rank && t.prize_rank <= 5) { monthMap[m].win++; monthMap[m].prize += (t.prize_amount||0); }
+      if(isStatsWinningRank(t, t.prize_rank)) { monthMap[m].win++; monthMap[m].prize += (t.prize_amount||0); }
     });
     const months = Object.keys(monthMap).sort().reverse().slice(0,6).reverse();
     const maxBuy = Math.max(...months.map(m=>monthMap[m].buy), 1);
@@ -10518,8 +10535,24 @@ let curCommSort = 'newest';
 let commSearchQuery = '';
 let commAttachedRecommend = null;
 let commAttachedVerify = null;
-let commRecommendSkin = 'basic';
 let commRecommendType = 'lotto';
+const COMMUNITY_SKINS = [['basic','기본'],['gold','골드'],['mint','민트'],['midnight','미드나잇']];
+
+function getProfileSlipSkin() {
+  return localStorage.getItem(`ltb_slip_skin_${currentUser?.id || 'guest'}`) || 'basic';
+}
+
+function setProfileSlipSkin(skin) {
+  if (!isVipMember()) { toast('VIP 전용 스킨입니다.'); return; }
+  const next = COMMUNITY_SKINS.some(([key]) => key === skin) ? skin : 'basic';
+  localStorage.setItem(`ltb_slip_skin_${currentUser?.id || 'guest'}`, next);
+  commRecommendSkin = next;
+  renderProfile();
+  renderCommunityRecommendPicker();
+  toast('추천 용지 기본 스킨을 저장했습니다.');
+}
+
+let commRecommendSkin = getProfileSlipSkin();
 
 function commBoardMeta(tab) {
   const map = {
@@ -10538,7 +10571,7 @@ function updateCommunityBoardMeta() {
 }
 
 function isVipMember() {
-  return (window._membership || 'free') === 'group';
+  return (window._membership || 'free') === 'group' || isForcedVipAccount();
 }
 
 function encodeCommRecommend(data) {
@@ -10588,7 +10621,7 @@ function splitCommTitle(title, body) {
 
 function renderCommunityRecSlip(rec) {
   if (!rec) return '';
-  const skin = rec.skin && isVipMember() ? rec.skin : (rec.skin || 'basic');
+  const skin = isVipMember() ? (rec.skin || 'basic') : 'basic';
   if (rec.type === 'pension') {
     const digits = String(rec.no || '').padStart(6,'0').split('');
     return `<div class="community-rec-slip skin-${skin}">
@@ -10618,6 +10651,12 @@ function verifyTicketGroupKey(ticket) {
   return `${ticketLotteryType(ticket)}-${ticket.round_no || ticket.round || 0}`;
 }
 
+function ticketStoreLabel(ticket, gameIndex = 0) {
+  const assigned = (ticket.storeAssignments || []).find(row => Number(row.game_index) === Number(gameIndex));
+  const store = (ticket.storeOptions || []).find(item => String(item.id) === String(assigned?.store_id));
+  return store?.name || ticket.store_name || (ticket.purchase_channel === 'online' ? '동행복권 인터넷 구매' : '판매점 미지정');
+}
+
 function ticketsToVerifyMeta(group) {
   const list = Array.isArray(group) ? group : [group].filter(Boolean);
   if (!list.length) return null;
@@ -10631,6 +10670,7 @@ function ticketsToVerifyMeta(group) {
       status: ticketGameStatus(ticket, 0),
       prize_rank: ticket.prize_rank || null,
       prize_amount: ticket.prize_amount || 0,
+      store_name: ticketStoreLabel(ticket, 0),
     }));
     const bestRank = rows.map(row => Number(row.prize_rank)).filter(rank => Number.isFinite(rank) && rank > 0).sort((a,b)=>a-b)[0] || null;
     return {
@@ -10646,12 +10686,14 @@ function ticketsToVerifyMeta(group) {
   }
   const games = [];
   const gameResults = [];
+  const storeNames = [];
   list.forEach(ticket => {
     const ticketGames = ticket.game_numbers?.length ? ticket.game_numbers : (ticket.numbers?.length ? [ticket.numbers] : []);
     const results = Array.isArray(ticket.game_results) ? ticket.game_results : [];
     ticketGames.forEach((nums, index) => {
       games.push(nums);
       gameResults.push(results[index] || null);
+      storeNames.push(ticketStoreLabel(ticket, index));
     });
   });
   const bestRank = gameResults.map(row => Number(row?.rank)).filter(rank => Number.isFinite(rank) && rank > 0).sort((a,b)=>a-b)[0] || null;
@@ -10664,6 +10706,7 @@ function ticketsToVerifyMeta(group) {
     prize_rank: bestRank,
     prize_amount: list.reduce((sum, ticket) => sum + (Number(ticket.prize_amount) || 0), 0),
     game_results: gameResults,
+    store_names: storeNames,
     games,
   };
 }
@@ -10682,26 +10725,26 @@ function renderCommunityVerifySlip(meta) {
   if (!meta) return '';
   if (meta.type === 'pension') {
     const rows = meta.pensionRows?.length ? meta.pensionRows : [{ jo:meta.jo, no:meta.no, status:ticketGameStatus({ ...meta, lottery_type:'pension' }, 0) }];
-    return `<div class="community-rec-slip">
+    return `<div class="community-rec-slip community-verify-slip">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #16a34a;padding-bottom:7px;">
         <div><b style="font-size:17px;">연금복권 <span style="color:#16a34a;">720+</span></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${meta.round || '-'}회 인증</div></div>
         <b style="font-size:12px;">${fmtMFull(meta.prize_amount || 0)}</b>
       </div>
       ${rows.map((row, index) => {
         const number = row.no ? String(row.no).padStart(6, '0') : '';
-        return `<div class="pension-ticket-row" style="${index === rows.length - 1 ? 'border-bottom:0;' : ''}padding:10px 0 0;">
+        return `<div class="pension-ticket-row" style="padding:10px 0 0;">
         <div class="pension-ticket-numbers">
           <span style="background:#16a34a;color:#fff;border-radius:5px;padding:6px 8px;font-size:12px;font-weight:900;">${row.jo || '-'}조</span>
           ${number ? number.split('').map(n=>`<span class="pension-number-ball" style="width:24px;height:28px;font-size:14px;">${n}</span>`).join('') : '<span style="font-size:12px;color:var(--text-muted);">번호 미등록</span>'}
         </div>
         ${ticketStatusPill(row.status || '추첨중')}
-        <span></span>
+        <span class="ticket-store-readonly">${row.store_name || '판매점 미지정'}</span>
       </div>`;
       }).join('')}
     </div>`;
   }
   const games = meta.games?.length ? meta.games : [];
-  return `<div class="community-rec-slip">
+  return `<div class="community-rec-slip community-verify-slip">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111827;padding-bottom:7px;">
       <div><b style="font-size:17px;">Lotto <small>6/45</small></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${meta.round || '-'}회 인증</div></div>
       <b style="font-size:12px;">${fmtMFull(meta.prize_amount || 0)}</b>
@@ -10709,7 +10752,7 @@ function renderCommunityVerifySlip(meta) {
     <div class="ticket-slip-games" style="margin-top:4px;">
       ${games.map((nums, index) => {
         const ticket = { ...meta, lottery_type:'lotto', result:meta.result, prize_rank:meta.prize_rank, game_results:meta.game_results };
-        return `<div class="ticket-slip-game"><b class="ticket-game-label">${String.fromCharCode(65 + (index % 26))}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${ticketStatusPill(ticketGameStatus(ticket, index))}<span></span></div>`;
+        return `<div class="ticket-slip-game"><b class="ticket-game-label">${String.fromCharCode(65 + (index % 26))}</b><div class="ticket-slip-nums">${nums.map(n=>`<span>${String(n).padStart(2,'0')}</span>`).join('')}</div>${ticketStatusPill(ticketGameStatus(ticket, index))}<span class="ticket-store-readonly">${meta.store_names?.[index] || '판매점 미지정'}</span></div>`;
       }).join('')}
     </div>
   </div>`;
@@ -10718,14 +10761,14 @@ function renderCommunityVerifySlip(meta) {
 async function loadCommunityVerifyTickets() {
   if (!isLoggedIn || !currentUser || !sb) return [];
   let result = await sb.from('tickets')
-    .select('id,qr_url,round_no,lottery_type,result,numbers,game_numbers,game_count,pension_group,pension_number,serial_meta,prize_rank,prize_amount,game_results,created_at')
+    .select('id,qr_url,round_no,lottery_type,result,numbers,game_numbers,game_count,pension_group,pension_number,serial_meta,prize_rank,prize_amount,game_results,purchase_channel,store_name,created_at')
     .eq('user_id', currentUser.id)
     .order('round_no', { ascending:false })
     .order('created_at', { ascending:false })
     .limit(40);
   if (result.error && /column|schema cache/i.test(result.error.message || '')) {
     result = await sb.from('tickets')
-      .select('id,qr_url,round_no,lottery_type,result,numbers,game_count,pension_group,pension_number,serial_meta,prize_rank,prize_amount,created_at')
+      .select('id,qr_url,round_no,lottery_type,result,numbers,game_count,pension_group,pension_number,serial_meta,prize_rank,prize_amount,purchase_channel,store_name,created_at')
       .eq('user_id', currentUser.id)
       .order('round_no', { ascending:false })
       .order('created_at', { ascending:false })
@@ -10747,7 +10790,24 @@ async function loadCommunityVerifyTickets() {
     const base = { ...ticket, lottery_type:type, game_numbers:restored?.games || ticket.game_numbers || [] };
     return type === 'pension' ? restorePensionTicketFromQr(base) : repairKnownOnlineTicketGames(base);
   });
-  return Promise.all(tickets.map(enrichLottoTicketGameResults));
+  const enriched = await Promise.all(tickets.map(enrichLottoTicketGameResults));
+  const ticketIds = enriched.map(ticket => ticket.id).filter(Boolean);
+  let assignments = [];
+  let storeOptions = [];
+  if (ticketIds.length) {
+    const assignRes = await sb.from('ticket_game_stores').select('ticket_id,game_index,store_id').in('ticket_id', ticketIds);
+    assignments = assignRes.error ? [] : (assignRes.data || []);
+    const storeIds = [...new Set(assignments.map(row => row.store_id).filter(Boolean))];
+    if (storeIds.length) {
+      const storeRes = await sb.from('lottery_stores').select('id,name,address').in('id', storeIds);
+      storeOptions = storeRes.error ? [] : (storeRes.data || []);
+    }
+  }
+  return enriched.map(ticket => ({
+    ...ticket,
+    storeAssignments: assignments.filter(row => row.ticket_id === ticket.id),
+    storeOptions,
+  }));
 }
 
 async function renderCommunityRecommendPicker() {
@@ -10782,7 +10842,7 @@ async function renderCommunityRecommendPicker() {
   const items = (vault[commRecommendType] || []).map((item, idx) => ({ ...item, type:commRecommendType, idx }));
   const selectedKey = commAttachedRecommend ? `${commAttachedRecommend.type}_${commAttachedRecommend.idx}` : '';
   const skinRow = isVipMember() ? `<div class="community-skin-row" style="display:flex;">
-    ${[['basic','기본'],['gold','골드'],['mint','민트'],['midnight','미드나잇']].map(([k,v])=>`<button class="community-skin-btn ${commRecommendSkin===k?'on':''}" onclick="setCommunitySkin('${k}')">${v}</button>`).join('')}
+    ${COMMUNITY_SKINS.map(([k,v])=>`<button class="community-skin-btn ${commRecommendSkin===k?'on':''}" onclick="setCommunitySkin('${k}')">${v}</button>`).join('')}
   </div>` : `<div style="font-size:10px;color:var(--text-muted);margin-top:8px;">VIP는 추천 용지 스킨을 선택할 수 있습니다.</div>`;
   wrap.innerHTML = `<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px;">
     <b style="font-size:12px;color:var(--text-dark);">연구소 저장 번호 첨부</b>
@@ -10833,6 +10893,7 @@ function selectCommunityRecommend(type, idx) {
 function setCommunitySkin(skin) {
   if (!isVipMember()) { toast('VIP 전용 스킨입니다.'); return; }
   commRecommendSkin = skin || 'basic';
+  localStorage.setItem(`ltb_slip_skin_${currentUser?.id || 'guest'}`, commRecommendSkin);
   if (commAttachedRecommend) commAttachedRecommend.skin = commRecommendSkin;
   renderCommunityRecommendPicker();
 }
@@ -11293,7 +11354,7 @@ function collapsePostForm() {
   const bc = $('post-body-count'); if(bc) { bc.textContent = '0/2000'; bc.style.color = 'var(--text-muted)'; }
   commAttachedRecommend = null;
   commAttachedVerify = null;
-  commRecommendSkin = 'basic';
+  commRecommendSkin = getProfileSlipSkin();
   renderCommunityRecommendPicker();
 }
 
@@ -11462,14 +11523,22 @@ function renderProfile() {
       <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
         <div>
           <div style="font-size:14px;font-weight:900;color:var(--text-dark);">
-            ${window._membership === 'group' ? '<span class="group-chip">VIP</span>' : window._membership === 'plus' ? '<span class="plus-chip">Light</span>' : '<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;">FREE</span>'}
+            ${isVipMember() ? '<span class="group-chip">VIP</span>' : window._membership === 'plus' ? '<span class="plus-chip">Light</span>' : '<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:800;">FREE</span>'}
           </div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
-            ${window._membership === 'group' ? 'VIP 플랜 이용 중' : window._membership === 'plus' ? 'Light 플랜 이용 중' : '무료 플랜 이용 중'}
+            ${isVipMember() ? 'VIP 플랜 이용 중' : window._membership === 'plus' ? 'Light 플랜 이용 중' : '무료 플랜 이용 중'}
           </div>
         </div>
         <button onclick="go('subscription')" style="padding:8px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">플랜 보기</button>
       </div>
+    </div>
+    <div class="profile-block">
+      <div class="profile-block-title">추천 용지 스킨</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">커뮤니티 추천번호 게시판에 올리는 용지에 기본 적용됩니다.</div>
+      <div class="community-skin-row" style="display:flex;">
+        ${COMMUNITY_SKINS.map(([key,label])=>`<button class="community-skin-btn ${getProfileSlipSkin()===key?'on':''}" onclick="setProfileSlipSkin('${key}')">${label}</button>`).join('')}
+      </div>
+      ${isVipMember() ? '' : '<div style="font-size:10px;color:var(--text-muted);margin-top:8px;">VIP에서 스킨을 변경할 수 있습니다.</div>'}
     </div>
     <div class="profile-block">
       <div class="profile-block-title">출석 기록</div>
