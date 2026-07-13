@@ -257,9 +257,9 @@ main.chat-hidden .chat-panel { display: none; }
 .ticket-slip { max-width:470px; margin:10px auto; background:#fffef8; color:#111827; border:1px solid #d6d3d1; border-top:7px solid var(--lotto-red); border-radius:4px; padding:16px 18px; box-shadow:0 2px 7px rgba(15,23,42,.07); }
 .ticket-slip.pension { border-top:7px solid #42aa64; }
 .ticket-slip-games { display:grid; gap:0; }
-.ticket-slip-game { display:grid; grid-template-columns:22px minmax(180px,1fr) 58px 86px; gap:10px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
-.ticket-game-label { font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace; color:#111827; text-align:left; }
-.ticket-slip-nums { display:grid; grid-template-columns:repeat(6,minmax(26px,1fr)); gap:6px; min-width:0; max-width:360px; text-align:center; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; font-variant-numeric:tabular-nums; }
+.ticket-slip-game { display:grid; grid-template-columns:minmax(210px,1fr) 58px 86px; gap:10px; align-items:center; min-height:38px; padding:7px 0; border-bottom:1px dashed #cbd5e1; }
+.ticket-game-label { display:none; }
+.ticket-slip-nums { display:grid; grid-template-columns:repeat(6,34px); gap:8px; min-width:0; justify-content:center; text-align:center; font:800 13px ui-monospace,SFMono-Regular,Consolas,monospace; font-variant-numeric:tabular-nums; }
 .ticket-slip-nums span { display:flex; align-items:center; justify-content:center; min-width:0; line-height:1; }
 .ticket-status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:26px;border-radius:7px;font-size:10px;font-weight:900;border:1px solid #cbd5e1;background:#f8fafc;color:#64748b;white-space:nowrap;}
 .ticket-status-pill.pending{border-color:#cbd5e1;background:#f8fafc;color:#64748b;}
@@ -444,7 +444,7 @@ main.chat-hidden .chat-panel { display: none; }
 .hall-card.silver { border:1px solid #cbd5e1; box-shadow:0 0 8px rgba(148,163,184,.3), inset 0 0 8px rgba(148,163,184,.08); }
 .map-frame { width:100%; height:320px; border:0; display:block; background:var(--bg-light); }
 @media(max-width:700px){.ranking-category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.map-frame{height:280px;}#qr-purchase-meta{grid-template-columns:1fr!important;}}
-@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:18px minmax(0,1fr) 48px 72px;gap:5px;min-height:36px;padding:6px 0}.ticket-slip-nums{grid-template-columns:repeat(6,minmax(20px,1fr));gap:3px;max-width:none}.ticket-slip-nums,.ticket-game-label{font-size:11px}.ticket-status-pill{min-width:42px;height:24px;font-size:9px}.store-picker-trigger{width:72px;max-width:72px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 48px 72px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
+@media(max-width:700px){.ticket-slip{padding:13px 12px}.ticket-slip-game{grid-template-columns:minmax(0,1fr) 48px 72px;gap:5px;min-height:36px;padding:6px 0}.ticket-slip-nums{grid-template-columns:repeat(6,24px);gap:4px}.ticket-slip-nums{font-size:11px}.ticket-status-pill{min-width:42px;height:24px;font-size:9px}.store-picker-trigger{width:72px;max-width:72px}.pension-ticket-row{grid-template-columns:minmax(0,1fr) 48px 72px;gap:5px}.pension-ticket-numbers{gap:3px}.pension-number-ball{width:23px;height:31px;font-size:15px}.identity-line{max-width:260px}.header-user-meta,#user-name{max-width:150px}.saved-number-form{grid-template-columns:1fr 1fr}.saved-number-form #stats-save-numbers{grid-column:1/-1}.saved-number-form button{min-height:36px;grid-column:1/-1}}
 @media(max-width:700px){.stats-login-notice{grid-template-columns:1fr auto}.stats-login-notice span{grid-column:1/-1;grid-row:2}.stats-share-btn span{display:none}.stats-share-btn{width:30px;justify-content:center;padding:5px}.stats-section-head{margin-top:2px}.stats-kpi-grid{grid-template-columns:1fr 1fr}}
 .rank-tab-pill { display:inline-block;padding:5px 14px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;margin-right:4px;white-space:nowrap; }
 .rank-tab-pill.on { background: var(--lotto-red); color: #fff; border-color: var(--lotto-red); box-shadow:0 2px 8px rgba(220,38,38,.25); }
@@ -1338,18 +1338,24 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-rec-head.pension{border-bottom-color:#16a34a;}
 .community-rec-amount{flex:0 0 auto;font-size:12px;font-weight:900;line-height:1.2;}
 .community-rec-slip.skin-gold .community-rec-amount{padding-right:46px;}
-.community-rec-row{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:center;border-top:1px dashed #cbd5e1;padding-top:12px;margin-top:8px;min-height:38px;}
+.community-rec-row{display:grid;grid-template-columns:1fr;gap:10px;align-items:center;border-top:1px dashed #cbd5e1;padding-top:12px;margin-top:8px;min-height:38px;}
 .community-rec-row>b{display:flex;align-items:center;justify-content:center;font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace;color:#0f172a;}
 .community-rec-nums{display:grid;grid-template-columns:repeat(6,30px);gap:9px;align-items:center;justify-content:center;margin:0 auto;font-size:13px;font-weight:900;text-align:center;}
 .community-rec-nums span{display:flex;align-items:center;justify-content:center;min-width:0;height:26px;line-height:1;border-radius:5px;background:rgba(15,23,42,.035);font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums;}
 .community-rec-slip.pension.skin-basic::before{background:#16a34a;}
+.community-rec-slip.skin-preview-slip{max-width:100%;transform:none;}
+.community-rec-slip.skin-preview-slip .community-rec-nums{grid-template-columns:repeat(6,28px);gap:7px;}
 .community-pension-rec-row{display:flex;align-items:center;justify-content:center;gap:7px;padding-top:13px;min-height:46px;}
 .community-pension-group{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:#16a34a;color:#fff;border-radius:6px;font-size:13px;font-weight:900;line-height:1;}
 .community-rec-slip .community-pension-rec-row .pension-number-ball{width:28px!important;height:32px!important;font-size:15px!important;}
+.radar-history-row{display:grid;grid-template-columns:52px minmax(0,1fr) 54px;gap:8px;align-items:center;padding:6px 0;}
+.radar-history-row.pension{grid-template-columns:52px 42px minmax(0,1fr) 54px;}
+.radar-history-nums{display:grid;grid-template-columns:repeat(6,30px);gap:6px;justify-content:center;align-items:center;}
+.radar-history-pension-nums{display:flex;gap:5px;justify-content:center;align-items:center;}
 .community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
 .community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
-@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:38px}.community-rec-row{grid-template-columns:20px minmax(0,1fr);gap:7px}.community-rec-nums{grid-template-columns:repeat(6,25px);gap:6px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}}
+@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:38px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,25px);gap:6px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}.radar-history-row{grid-template-columns:46px minmax(0,1fr) 48px;gap:5px}.radar-history-row.pension{grid-template-columns:40px 34px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
 
 /* == Task #124: Profile page premium upgrade == */
 .profile-hero{text-align:center;padding:32px 20px 24px;border-bottom:none;margin-bottom:12px;background:linear-gradient(160deg,rgba(225,29,72,.08) 0%,rgba(139,92,246,.06) 50%,transparent 100%);border-radius:16px;position:relative;overflow:hidden;}
@@ -2560,6 +2566,8 @@ function getLatestPensionRound() {
 
 // 단일 회차 조회 — Cloudflare Pages Function 프록시 사용
 const apiCache = {};
+const pensionApiCache = {};
+const LAB_BACKTEST_BATCH = 20;
 async function fetchLotto(round) {
   if (apiCache[round]) return apiCache[round];
   try {
@@ -7279,18 +7287,18 @@ async function runLabLottoBacktest() {
   result.innerHTML = renderLabProgress(`로또 6/45 제 ${latest}회부터 조회 중`, 0, latest, 'var(--lotto-red)');
   const labDraws = [];
   const _labSeq = ++window._labRunSeq;
-  // 5개씩 배치 처리 — apiCache 우선 활용
-  for (let start = latest; start >= 1; start -= 5) {
+  // 배치 처리 — 캐시 우선 활용, DOM 갱신 최소화
+  for (let start = latest; start >= 1; start -= LAB_BACKTEST_BATCH) {
     if (_labSeq !== window._labRunSeq) return; // 중단 (사용자가 다른 탭 이동)
     const batch = [];
-    for (let r = start; r >= Math.max(1, start - 4); r--) {
+    for (let r = start; r >= Math.max(1, start - LAB_BACKTEST_BATCH + 1); r--) {
       const cached = apiCache[r] || recentData[r];
       if (cached) labDraws.push(cached);
       else batch.push(fetchLotto(r).then(d => { if (d) labDraws.push(d); }));
     }
     await Promise.allSettled(batch);
-    const checked = latest - start + 5;
-    if (checked % 50 === 0 || start <= 5) {
+    const checked = latest - start + LAB_BACKTEST_BATCH;
+    if (checked % 100 === 0 || start <= LAB_BACKTEST_BATCH) {
       result.innerHTML = renderLabProgress(`로또 6/45 역대 전적 조회 중`, Math.min(checked, latest), latest, 'var(--lotto-red)');
     }
   }
@@ -7325,10 +7333,13 @@ function labPensionRank(userGroup, userNo, draw) {
 }
 
 async function fetchLabPension(round) {
+  if (pensionApiCache[round]) return pensionApiCache[round];
   try {
     const res = await fetch(`/api/pension?round=${round}`, { cache:'no-store' });
     const data = await res.json();
-    return data.returnValue === 'success' ? data : null;
+    if (data.returnValue !== 'success') return null;
+    pensionApiCache[round] = data;
+    return data;
   } catch { return null; }
 }
 
@@ -7345,10 +7356,10 @@ async function runLabPensionBacktest() {
   result.innerHTML = renderLabProgress(`연금 720+ 제 ${latest}회부터 조회 중`, 0, latest, '#16a34a');
   const rows = [];
   const _labPenSeq = ++window._labRunSeq;
-  for (let start = latest; start >= 1; start -= 5) {
+  for (let start = latest; start >= 1; start -= LAB_BACKTEST_BATCH) {
     if (_labPenSeq !== window._labRunSeq) return;
     const batch = [];
-    for (let r = start; r >= Math.max(1, start - 4); r--) {
+    for (let r = start; r >= Math.max(1, start - LAB_BACKTEST_BATCH + 1); r--) {
       batch.push(fetchLabPension(r).then(d => {
         if (!d) return;
         const info = labPensionRank(labPensionGroup, userNo, d);
@@ -7357,8 +7368,8 @@ async function runLabPensionBacktest() {
     }
     await Promise.allSettled(batch);
     if (_labPenSeq !== window._labRunSeq) return;
-    const checked = latest - start + 5;
-    if (checked % 50 === 0 || start <= 5)
+    const checked = latest - start + LAB_BACKTEST_BATCH;
+    if (checked % 100 === 0 || start <= LAB_BACKTEST_BATCH)
       result.innerHTML = renderLabProgress(`연금 720+ 역대 전적 조회 중`, Math.min(checked, latest), latest, '#16a34a');
   }
   if (_labPenSeq !== window._labRunSeq) return;
@@ -8054,7 +8065,7 @@ async function renderLottoHistory() {
   }
   const zC = n => n<=10?'#f59e0b':n<=20?'#3b82f6':n<=30?'#ef4444':n<=40?'#64748b':'#10b981';
   const sBall = n =>
-    `<span style="width:20px;height:20px;border-radius:50%;background:${zC(n)};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;">${n}</span>`;
+    `<span style="width:24px;height:24px;border-radius:50%;background:${zC(n)};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;">${n}</span>`;
 
   if (!pickRounds.length) {
     el.innerHTML = `<div style="text-align:center;padding:32px 16px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;">
@@ -8095,9 +8106,9 @@ async function renderLottoHistory() {
       } else if (isPending) {
         matchInfo = `<span style="font-size:10px;color:#94a3b8;font-weight:600;">대기 중</span>`;
       }
-      return `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;${gi<games.length-1?'border-bottom:1px dashed var(--border-dashed);':''}">
+      return `<div class="radar-history-row" style="${gi<games.length-1?'border-bottom:1px dashed var(--border-dashed);':''}">
         <span style="font-size:9px;font-weight:700;color:var(--text-muted);min-width:44px;flex-shrink:0;">게임 ${gi+1}</span>
-        <div style="display:flex;gap:3px;flex:1;flex-wrap:wrap;">${g.map(n=>sBall(n)).join('')}</div>
+        <div class="radar-history-nums">${g.map(n=>sBall(n)).join('')}</div>
         ${matchInfo}
       </div>`;
     }).join('');
@@ -8285,7 +8296,7 @@ async function renderPensionHistory() {
   const pRounds = Object.keys(allPPicks).map(Number).sort((a,b)=>b-a);
 
   const numDigitBalls = (numStr,sm=true) => (numStr||'').split('').map(d=>
-    `<span style="width:${sm?'18px':'22px'};height:${sm?'22px':'28px'};border-radius:4px;background:#16a34a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:${sm?'9':'12'}px;font-weight:900;">${d}</span>`
+    `<span style="width:${sm?'24px':'26px'};height:${sm?'28px':'30px'};border-radius:5px;background:#16a34a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:${sm?'12':'13'}px;font-weight:900;">${d}</span>`
   ).join('');
 
   if (!pRounds.length) {
@@ -8329,11 +8340,11 @@ async function renderPensionHistory() {
         resultColor = rank === '1' || rank === '2' ? '#dc2626' : rank ? '#16a34a' : '#94a3b8';
       }
       return `
-      <div style="display:flex;align-items:center;gap:6px;padding:5px 0;${gi<games.length-1?'border-bottom:1px dashed var(--border-dashed);':''}">
+      <div class="radar-history-row pension" style="${gi<games.length-1?'border-bottom:1px dashed var(--border-dashed);':''}">
         <span style="font-size:9px;font-weight:700;color:var(--text-muted);min-width:44px;">게임 ${gi+1}</span>
         <span style="background:#16a34a;color:#fff;border-radius:5px;padding:2px 6px;font-size:10px;font-weight:900;">${g.jo}조</span>
-        <div style="display:flex;gap:2px;">${numDigitBalls(g.num)}</div>
-        <span style="font-size:10px;color:${resultColor};font-weight:800;margin-left:auto;white-space:nowrap;">${resultLabel}</span>
+        <div class="radar-history-pension-nums">${numDigitBalls(g.num)}</div>
+        <span style="font-size:10px;color:${resultColor};font-weight:800;white-space:nowrap;text-align:center;">${resultLabel}</span>
       </div>`;
     }).join('');
 
@@ -10651,9 +10662,10 @@ function splitCommTitle(title, body) {
 function renderCommunityRecSlip(rec) {
   if (!rec) return '';
   const skin = rec.previewSkin ? (rec.skin || 'basic') : (isVipMember() ? (rec.skin || 'basic') : 'basic');
+  const previewClass = rec.previewSkin ? ' skin-preview-slip' : '';
   if (rec.type === 'pension') {
     const digits = String(rec.no || '').padStart(6,'0').split('');
-    return `<div class="community-rec-slip pension skin-${skin}">
+    return `<div class="community-rec-slip pension skin-${skin}${previewClass}">
       <div class="community-rec-head pension">
         <div><b style="font-size:17px;">연금복권 <span style="color:#16a34a;">720+</span></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${rec.round || '-'}회 추천</div></div>
         <b class="community-rec-amount">1,000원</b>
@@ -10665,14 +10677,12 @@ function renderCommunityRecSlip(rec) {
     </div>`;
   }
   const nums = (rec.nums || []).map(n => String(n).padStart(2,'0'));
-  return `<div class="community-rec-slip skin-${skin}">
+  return `<div class="community-rec-slip skin-${skin}${previewClass}">
     <div class="community-rec-head">
       <div><b style="font-size:17px;">Lotto <small>6/45</small></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${rec.round || '-'}회 추천</div></div>
       <b class="community-rec-amount">1,000원</b>
     </div>
-    <div class="community-rec-row">
-      <b>A</b><div class="community-rec-nums">${nums.map(n=>`<span>${n}</span>`).join('')}</div>
-    </div>
+    <div class="community-rec-row"><div class="community-rec-nums">${nums.map(n=>`<span>${n}</span>`).join('')}</div></div>
   </div>`;
 }
 
