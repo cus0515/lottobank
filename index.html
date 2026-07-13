@@ -1336,15 +1336,16 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-rec-slip.skin-mint::before{background:linear-gradient(90deg,#16a34a,#86efac,#14b8a6);}
 .community-rec-row{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:center;border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:8px;min-height:34px;}
 .community-rec-row>b{display:flex;align-items:center;justify-content:center;font:900 13px ui-monospace,SFMono-Regular,Consolas,monospace;color:#0f172a;}
-.community-rec-nums{display:grid;grid-template-columns:repeat(6,minmax(28px,1fr));gap:8px;align-items:center;max-width:380px;margin-left:auto;font-size:12px;font-weight:900;text-align:center;}
-.community-rec-nums span{display:flex;align-items:center;justify-content:center;min-width:28px;height:24px;line-height:1;font:900 12px ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums;}
+.community-rec-nums{display:grid;grid-template-columns:repeat(6,34px);gap:12px;align-items:center;justify-content:center;margin:0 auto;font-size:12px;font-weight:900;text-align:center;}
+.community-rec-nums span{display:flex;align-items:center;justify-content:center;min-width:0;height:24px;line-height:1;font:900 12px ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums;}
+.community-rec-slip.pension.skin-basic::before{background:#16a34a;}
 .community-pension-rec-row{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:12px;min-height:44px;}
 .community-pension-group{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:#16a34a;color:#fff;border-radius:6px;font-size:13px;font-weight:900;line-height:1;}
 .community-rec-slip .community-pension-rec-row .pension-number-ball{width:28px!important;height:32px!important;font-size:15px!important;}
 .community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
 .community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
-@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}.community-rec-slip{padding:13px 10px 11px}.community-rec-row{grid-template-columns:20px minmax(0,1fr);gap:7px}.community-rec-nums{grid-template-columns:repeat(6,minmax(22px,1fr));gap:5px;max-width:none}.community-rec-nums span{min-width:22px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}}
+@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}.community-rec-slip{padding:13px 10px 11px}.community-rec-row{grid-template-columns:20px minmax(0,1fr);gap:7px}.community-rec-nums{grid-template-columns:repeat(6,24px);gap:7px}.community-rec-nums span{font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}}
 
 /* == Task #124: Profile page premium upgrade == */
 .profile-hero{text-align:center;padding:32px 20px 24px;border-bottom:none;margin-bottom:12px;background:linear-gradient(160deg,rgba(225,29,72,.08) 0%,rgba(139,92,246,.06) 50%,transparent 100%);border-radius:16px;position:relative;overflow:hidden;}
@@ -10648,7 +10649,7 @@ function renderCommunityRecSlip(rec) {
   const skin = rec.previewSkin ? (rec.skin || 'basic') : (isVipMember() ? (rec.skin || 'basic') : 'basic');
   if (rec.type === 'pension') {
     const digits = String(rec.no || '').padStart(6,'0').split('');
-    return `<div class="community-rec-slip skin-${skin}">
+    return `<div class="community-rec-slip pension skin-${skin}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #16a34a;padding-bottom:7px;">
         <div><b style="font-size:17px;">연금복권 <span style="color:#16a34a;">720+</span></b><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">제 ${rec.round || '-'}회 추천</div></div>
         <b style="font-size:12px;">1,000원</b>
