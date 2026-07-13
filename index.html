@@ -1917,7 +1917,7 @@ textarea {
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('stats')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 나의 전적</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('ticket')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg> QR 인증</button>
           <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('profile')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필</button>
-          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();window._profileFocusSkin=true;go('profile')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12 3H5a2 2 0 0 0-2 2v7"/><path d="M19 12v7a2 2 0 0 1-2 2h-7"/><path d="M21 3 9 15"/><path d="M15 3h6v6"/></svg> 스킨</button>
+          <button class="dd-item" onclick="event.stopPropagation();closeUserDropdown();go('skin')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12 3H5a2 2 0 0 0-2 2v7"/><path d="M19 12v7a2 2 0 0 1-2 2h-7"/><path d="M21 3 9 15"/><path d="M15 3h6v6"/></svg> 스킨</button>
           <button class="dd-item dd-logout" onclick="event.stopPropagation();doLogout()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> 로그아웃</button>
         </div>
       </div>
@@ -2403,6 +2403,11 @@ textarea {
       <!-- 10. 멤버십 구독 -->
       <div id="pg-subscription" class="page-content" style="display:none;">
         <div id="subscription-content"></div>
+      </div>
+
+      <!-- 10-2. 스킨 -->
+      <div id="pg-skin" class="page-content" style="display:none;">
+        <div id="skin-content"></div>
       </div>
 
       <!-- 9. 프로필 -->
@@ -6111,12 +6116,13 @@ function go(id) {
     community: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 커뮤니티',
     profile:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필',
     subscription: '멤버십 플랜',
+    skin: '스킨',
   };
   $('mid-title').innerHTML = titles[id] || '';
   const mainLayout = $('main-content');
   if (mainLayout) mainLayout.dataset.activePage = id;
   // 페이지 타이틀 동적 업데이트
-  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', rank:'랭킹', map:'내 주변 판매점', profile:'내 프로필', home:'실시간 피드', lab:'연구소', group:'로또 모임', fortune:'레이더', subscription:'멤버십' };
+  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', rank:'랭킹', map:'내 주변 판매점', profile:'내 프로필', home:'실시간 피드', lab:'연구소', group:'로또 모임', fortune:'레이더', subscription:'멤버십', skin:'스킨' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
@@ -6129,6 +6135,7 @@ function go(id) {
   }
   if (id === 'lab') renderLab();
   if (id === 'group') renderGroup();
+  if (id === 'skin') renderSkinPage();
   if (id === 'stats') {
     $('stats-content').innerHTML = '<div class="skel-card"><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div><div class="skel" style="height:60px;border-radius:8px;"></div></div></div>';
     loadStatsView();
@@ -10553,11 +10560,12 @@ function getProfileSlipSkin() {
 }
 
 function setProfileSlipSkin(skin) {
-  if (!isVipMember()) { toast('VIP 전용 스킨입니다.'); return; }
   const next = COMMUNITY_SKINS.some(([key]) => key === skin) ? skin : 'basic';
+  if (next !== 'basic' && !isVipMember()) { toast('VIP 전용 스킨입니다.'); return; }
   localStorage.setItem(`ltb_slip_skin_${currentUser?.id || 'guest'}`, next);
   commRecommendSkin = next;
-  renderProfile();
+  if ($('pg-profile')?.style.display !== 'none') renderProfile();
+  if ($('pg-skin')?.style.display !== 'none') renderSkinPage();
   renderCommunityRecommendPicker();
   toast('추천 용지 기본 스킨을 저장했습니다.');
 }
@@ -10631,7 +10639,7 @@ function splitCommTitle(title, body) {
 
 function renderCommunityRecSlip(rec) {
   if (!rec) return '';
-  const skin = isVipMember() ? (rec.skin || 'basic') : 'basic';
+  const skin = rec.previewSkin ? (rec.skin || 'basic') : (isVipMember() ? (rec.skin || 'basic') : 'basic');
   if (rec.type === 'pension') {
     const digits = String(rec.no || '').padStart(6,'0').split('');
     return `<div class="community-rec-slip skin-${skin}">
@@ -10906,6 +10914,47 @@ function setCommunitySkin(skin) {
   localStorage.setItem(`ltb_slip_skin_${currentUser?.id || 'guest'}`, commRecommendSkin);
   if (commAttachedRecommend) commAttachedRecommend.skin = commRecommendSkin;
   renderCommunityRecommendPicker();
+}
+
+function renderSkinPage() {
+  const wrap = $('skin-content');
+  if (!wrap) return;
+  const active = getProfileSlipSkin();
+  const sampleLotto = { type:'lotto', round:getLabSaveRound('lotto'), nums:[3, 11, 18, 27, 34, 42], previewSkin:true };
+  const samplePension = { type:'pension', round:getLabSaveRound('pension'), jo:3, no:'455695', previewSkin:true };
+  wrap.innerHTML = `
+    <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:14px;padding:18px;margin-bottom:12px;color:#fff;">
+      <div style="font-size:10px;font-weight:900;letter-spacing:1.6px;color:#fb7185;margin-bottom:4px;">VIP SKIN</div>
+      <div style="font-size:20px;font-weight:900;">추천번호 용지 스킨</div>
+      <div style="font-size:12px;opacity:.68;line-height:1.6;margin-top:4px;">커뮤니티 추천번호 게시판에 올리는 용지에 적용되는 전용 스킨입니다.</div>
+    </div>
+    ${isVipMember() ? '' : `<div class="plus-card" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:900;color:var(--text-dark);">VIP 전용 기능입니다.</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">무료 회원은 기본 스킨만 사용할 수 있습니다.</div>
+    </div>`}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">
+      ${COMMUNITY_SKINS.map(([key,label]) => {
+        const chosen = active === key;
+        const locked = key !== 'basic' && !isVipMember();
+        return `<div style="border:1.5px solid ${chosen?'var(--lotto-red)':'var(--border-dashed)'};border-radius:14px;background:var(--paper-white);padding:12px;box-shadow:${chosen?'0 0 0 3px rgba(225,29,72,.08)':'0 1px 4px rgba(15,23,42,.04)'};">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
+            <div>
+              <div style="font-size:14px;font-weight:900;color:var(--text-dark);">${label}</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">커뮤니티 용지 미리보기</div>
+            </div>
+            <span style="font-size:10px;font-weight:900;border-radius:999px;padding:3px 8px;background:${chosen?'rgba(225,29,72,.09)':'var(--bg-light)'};color:${chosen?'var(--lotto-red)':'var(--text-muted)'};">${chosen?'적용 중':locked?'VIP':'선택 가능'}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${renderCommunityRecSlip({ ...sampleLotto, skin:key })}
+            ${renderCommunityRecSlip({ ...samplePension, skin:key })}
+          </div>
+          <button class="btn-action" style="margin-top:10px;background:${chosen?'#94a3b8':'var(--lotto-red)'};box-shadow:none;" onclick="setProfileSlipSkin('${key}')" ${chosen?'disabled':''}>${chosen?'적용 중':'이 스킨 적용'}</button>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="margin-top:12px;padding:13px;border:1px solid var(--border-dashed);border-radius:10px;background:var(--bg-light);font-size:11px;color:var(--text-muted);line-height:1.7;">
+      저장한 스킨은 새로 작성하는 추천번호 게시글에 기본 적용됩니다. 이미 작성된 게시글은 등록 당시 스킨을 유지합니다.
+    </div>`;
 }
 
 function commTab(tab) {
@@ -11542,14 +11591,6 @@ function renderProfile() {
         <button onclick="go('subscription')" style="padding:8px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">플랜 보기</button>
       </div>
     </div>
-    <div id="profile-skin-block" class="profile-block">
-      <div class="profile-block-title">스킨</div>
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">커뮤니티 추천번호 게시판에 올리는 용지에 적용됩니다.</div>
-      <div class="community-skin-row" style="display:flex;">
-        ${COMMUNITY_SKINS.map(([key,label])=>`<button class="community-skin-btn ${getProfileSlipSkin()===key?'on':''}" onclick="setProfileSlipSkin('${key}')">${label}</button>`).join('')}
-      </div>
-      ${isVipMember() ? '' : '<div style="font-size:10px;color:var(--text-muted);margin-top:8px;">VIP에서 스킨을 변경할 수 있습니다.</div>'}
-    </div>
     <div class="profile-block">
       <div class="profile-block-title">출석 기록</div>
       <div class="profile-row"><span>누적 출석일</span><span class="profile-row-val">${window._attendanceStats?.total||0}일</span></div>
@@ -11602,10 +11643,6 @@ function renderProfile() {
     </div>
     `}
   `;
-  if (window._profileFocusSkin) {
-    window._profileFocusSkin = false;
-    setTimeout(() => $('profile-skin-block')?.scrollIntoView({ behavior:'smooth', block:'center' }), 60);
-  }
 }
 </script>
 </body>
