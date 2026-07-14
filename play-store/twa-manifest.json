@@ -1,0 +1,21 @@
+{
+  "packageId": "com.lottobank.app",
+  "host": "lottobank.pages.dev",
+  "name": "LottoBank",
+  "launcherName": "LottoBank",
+  "display": "standalone",
+  "themeColor": "#d61c4e",
+  "navigationColor": "#ffffff",
+  "navigationColorDark": "#0f172a",
+  "backgroundColor": "#ffffff",
+  "startUrl": "/",
+  "iconUrl": "https://lottobank.pages.dev/icon-512.png",
+  "maskableIconUrl": "https://lottobank.pages.dev/icon-512.png",
+  "monochromeIconUrl": "https://lottobank.pages.dev/favicon.svg",
+  "orientation": "portrait-primary",
+  "enableNotifications": false,
+  "webManifestUrl": "https://lottobank.pages.dev/manifest.json",
+  "fallbackType": "customtabs",
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1
+}
