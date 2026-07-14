@@ -609,3 +609,12 @@
 - 프로필 내부 스킨 블록은 제거하고, 우측 유저 드롭다운의 `스킨` 버튼이 새 페이지로 바로 이동하게 한다.
 - 스킨 페이지에서는 실제 추천번호 용지 렌더러를 재사용해 로또와 연금 예시 이미지를 함께 보여준다.
 - 무료 회원도 예시는 볼 수 있지만 기본 스킨 외 적용은 VIP 권한으로 제한한다.
+
+## Play Store AAB 생성.
+
+- 로컬 PATH에는 Node, Java, Android SDK가 없어 `.tools` 아래에 휴대용 빌드 도구를 설치했다.
+- Bubblewrap CLI가 구형 SDK 경로인 `android-sdk/bin/sdkmanager.bat`을 찾으므로 wrapper를 추가해 현재 SDK cmdline-tools로 연결했다.
+- Windows 사용자 경로에 한글이 포함되어 Android Gradle path check가 실패해 `android.overridePathCheck=true`를 Android 프로젝트에 추가했다.
+- Play Console 업로드용 App Bundle은 `android-twa/app-release-bundle.aab`에 생성됐다.
+- `versionCode 1`은 Play Console에서 이미 사용된 상태라 재업로드 충돌을 피하기 위해 `versionCode 2`, `versionName 1.0.1-alpha02`로 다시 빌드했다.
+- Android 프로젝트, keystore, AAB, APK, 휴대용 도구는 로컬 산출물이라 Git 추적에서 제외한다.

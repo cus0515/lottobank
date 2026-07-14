@@ -1,2 +1,7 @@
 *.bat
 *.ps1
+.tools/
+android-twa/
+*.keystore
+*.aab
+*.apk

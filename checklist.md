@@ -779,3 +779,11 @@
 - [x] 전적 관리 가이드 공개 페이지를 추가한다.
 - [x] 푸터와 사이트맵에 공개 콘텐츠 페이지를 연결한다.
 - [x] 검증과 Git 반영을 완료한다.
+
+## Play Store AAB 생성.
+
+- [x] 휴대용 Node, JDK, Android SDK, Bubblewrap 빌드 도구를 준비한다.
+- [x] LottoBank TWA Android 프로젝트를 생성한다.
+- [x] Play Console 업로드용 `versionCode 2` AAB 파일을 생성한다.
+- [ ] Play Console 비공개 테스트 트랙에 AAB 파일을 업로드한다.
+- [ ] 업로드 결과를 확인하고 Git 반영을 완료한다.
