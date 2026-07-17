@@ -2612,11 +2612,14 @@ textarea {
       <a href="javascript:void(0)" onclick="go('home')">홈</a>
       <a href="javascript:void(0)" onclick="go('rank')">랭킹</a>
       <a href="/lotto-qr-guide.html" target="_blank" rel="noopener">QR 인증 가이드</a>
+      <a href="/lotto-internet-purchase-guide.html" target="_blank" rel="noopener">인터넷 구매 등록</a>
+      <a href="/pension-qr-guide.html" target="_blank" rel="noopener">연금복권 등록</a>
       <a href="/lotto-tax-guide.html" target="_blank" rel="noopener">당첨금 세금</a>
       <a href="/lotto-record-guide.html" target="_blank" rel="noopener">전적 관리</a>
       <a href="/lotto-winning-numbers.html" target="_blank" rel="noopener">로또 당첨번호</a>
       <a href="/pension-winning-numbers.html" target="_blank" rel="noopener">연금복권 당첨번호</a>
       <a href="/lotto-number-lab.html" target="_blank" rel="noopener">번호 연구소</a>
+      <a href="/responsible-lottery-guide.html" target="_blank" rel="noopener">건전 이용 안내</a>
       <a href="/lotto-community-guide.html" target="_blank" rel="noopener">커뮤니티 가이드</a>
       <a href="/app-info.html" target="_blank" rel="noopener">앱 정보</a>
       <a href="/support.html" target="_blank" rel="noopener">고객지원</a>
@@ -3914,7 +3917,18 @@ function renderLatestOnLeft(data) {
 }
 
 function renderHomeLive() {
-  $('home-live').innerHTML = '<div id="feed-list" style="min-height:220px;"></div>';
+  $('home-live').innerHTML = `
+    <section style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:16px;margin-bottom:12px;">
+      <div style="font-size:10px;font-weight:900;color:var(--lotto-red);letter-spacing:1.5px;margin-bottom:4px;">LOTTOBANK GUIDE</div>
+      <h1 style="margin:0 0 8px;font-size:20px;line-height:1.3;color:var(--text-dark);">QR 인증 기반 복권 전적 관리</h1>
+      <p style="margin:0;color:var(--text-muted);font-size:12px;line-height:1.8;">LottoBank는 로또 6/45와 연금복권 720+의 QR 코드, 인터넷 구매 캡처, 당첨 결과를 한곳에서 관리하는 복권 기록 도구입니다. 공개 페이지에서는 당첨번호 조회, 번호 연구소, 커뮤니티 글을 볼 수 있고, QR 등록과 개인 전적 저장은 로그인 후 이용합니다.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:12px;">
+        <a href="/lotto-qr-guide.html" target="_blank" rel="noopener" style="padding:10px;border:1px solid var(--border-dashed);border-radius:9px;text-decoration:none;background:var(--bg-light);color:var(--text-dark);font-size:11px;font-weight:800;">QR 인증 가이드</a>
+        <a href="/lotto-record-guide.html" target="_blank" rel="noopener" style="padding:10px;border:1px solid var(--border-dashed);border-radius:9px;text-decoration:none;background:var(--bg-light);color:var(--text-dark);font-size:11px;font-weight:800;">전적 관리 방법</a>
+        <a href="/responsible-lottery-guide.html" target="_blank" rel="noopener" style="padding:10px;border:1px solid var(--border-dashed);border-radius:9px;text-decoration:none;background:var(--bg-light);color:var(--text-dark);font-size:11px;font-weight:800;">건전 이용 안내</a>
+      </div>
+    </section>
+    <div id="feed-list" style="min-height:220px;"></div>`;
   renderFeed();
   return;
   const d = latestData;
@@ -6604,7 +6618,7 @@ function renderPlusUpsell(reason) {
         <div style="font-size:16px;font-weight:900;color:var(--text-dark);margin-top:7px;">${reason || 'LottoBank Light로 광고 없이 이용하세요.'}</div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">월 ${LTB_PLUS_PLAN.monthlyPrice.toLocaleString()}원 예정 · 앱 출시 후 Google Play 결제로 제공됩니다.</div>
       </div>
-      <button class="btn-premium" style="padding:9px 13px;font-size:12px;white-space:nowrap;" onclick="showPlusComingSoon()">준비 중</button>
+      <button class="btn-premium" style="padding:9px 13px;font-size:12px;white-space:nowrap;" onclick="showPlusComingSoon()">안내 보기</button>
     </div>
     <div class="plus-benefits">
       <span>광고 제거</span>
@@ -6620,7 +6634,7 @@ function renderGroupUpsell() {
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
       <div>
         <span class="group-chip">VIP</span>
-        <div style="font-size:15px;font-weight:900;color:var(--text-dark);margin-top:7px;">상위 추천번호와 당첨 알림을 준비 중입니다.</div>
+        <div style="font-size:15px;font-weight:900;color:var(--text-dark);margin-top:7px;">상위 추천번호와 당첨 알림을 앱에서 제공합니다.</div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">모임은 유료 상품이 아니라 추후 무료 유입 기능으로 다시 정리합니다.</div>
       </div>
       <button class="qr-inner-tab" style="padding:8px 12px;font-size:12px;white-space:nowrap;" onclick="go('subscription')">멤버십 보기</button>
@@ -6691,7 +6705,7 @@ function renderSubscription() {
         row(xSvg('#94a3b8'),'VIP 추천번호 모아보기 제외',true)+
         row(xSvg('#94a3b8'),'추천 성과 추적 제외',true)+
         row(xSvg('#94a3b8'),'당첨 알림 제외',true),
-        isPlusMember?'현재 이용 중':(isGroupMember?'포함됨':'준비 중'),
+        isPlusMember?'현재 이용 중':(isGroupMember?'포함됨':'앱 결제 제공'),
         isPlusMember?'':'showPlusComingSoon()',isPlusMember)}
       ${planCard('#0f766e','rgba(15,118,110,.04)','rgba(15,118,110,.25)',
         '<span class="group-chip">VIP</span>',
@@ -6702,7 +6716,7 @@ function renderSubscription() {
         row(starSvg('#0f766e'),'많이 저장된 번호와 인기 추천글')+
         row(starSvg('#0f766e'),'VIP 게시글 강조와 뱃지')+
         row(starSvg('#0f766e'),'티켓 당첨 알림 (앱 출시 후)'),
-        isGroupMember?'현재 이용 중':'준비 중',
+        isGroupMember?'현재 이용 중':'앱 결제 제공',
         isGroupMember?'':'showPlusComingSoon()',isGroupMember)}
     </div>
     <div style="margin-top:14px;padding:14px;background:var(--bg-light);border-radius:12px;border:1px solid var(--border-dashed);">
@@ -7271,7 +7285,12 @@ function renderLab() {
     <div style="font-size:9px;color:var(--lotto-red);font-weight:900;letter-spacing:1.5px;margin-bottom:3px;">LOTTOBANK LAB</div>
     <div style="font-size:18px;font-weight:900;color:var(--text-dark);">복권 연구소</div>
     <div style="font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.6;">복권 용지를 마킹하듯 번호를 고르고 과거 당첨 이력과 실수령액을 바로 확인하세요.</div>
-  </div><div id="lab-body"></div>`;
+  </div>
+  <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+    <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:4px;">건전한 복권 이용 안내</div>
+    <div style="font-size:11px;color:var(--text-muted);line-height:1.7;">연구소의 백테스트와 번호 저장은 과거 데이터 확인용 도구입니다. 특정 번호의 당첨을 보장하지 않으며, 복권 구매는 본인의 예산 안에서 책임 있게 이용해 주세요.</div>
+  </div>
+  <div id="lab-body"></div>`;
   switchLabTab(labTab || 'backtest');
 }
 
