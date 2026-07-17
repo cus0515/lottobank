@@ -2,6 +2,10 @@
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const query = (url.searchParams.get('q') || '').trim();
+  const lat = Number(url.searchParams.get('lat'));
+  const lng = Number(url.searchParams.get('lng'));
+  const radius = Math.min(Math.max(Number(url.searchParams.get('radius')) || 1000, 100), 20000);
+  const hasPoint = Number.isFinite(lat) && Number.isFinite(lng);
   const cors = {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
@@ -25,44 +29,56 @@ export async function onRequest(context) {
     pageCount: '5',
     srchValue: query,
   };
-  try {
-    const requests = ['1', '2'].map(srchOption => {
-      const params = new URLSearchParams({ ...officialBase, srchOption });
-      return fetch(`https://www.dhlottery.co.kr/prchsplcsrch/selectLtShp.do?${params}`, {
-        headers: {
-          'Accept': 'application/json',
-          'Referer': 'https://www.dhlottery.co.kr/prchsplcsrch/home',
-          'User-Agent': 'Mozilla/5.0 LottoBank/1.0',
-        },
-        signal: AbortSignal.timeout(7000),
+  if (!hasPoint) {
+    try {
+      const requests = ['1', '2'].map(srchOption => {
+        const params = new URLSearchParams({ ...officialBase, srchOption });
+        return fetch(`https://www.dhlottery.co.kr/prchsplcsrch/selectLtShp.do?${params}`, {
+          headers: {
+            'Accept': 'application/json',
+            'Referer': 'https://www.dhlottery.co.kr/prchsplcsrch/home',
+            'User-Agent': 'Mozilla/5.0 LottoBank/1.0',
+          },
+          signal: AbortSignal.timeout(7000),
+        });
       });
-    });
-    const responses = await Promise.all(requests);
-    const payloads = await Promise.all(responses.map(async response => response.ok ? response.json() : null));
-    const storeMap = new Map();
-    payloads.flatMap(payload => payload?.data?.list || []).forEach(item => {
-      if (!item.ltShpId || !item.conmNm) return;
-      storeMap.set(String(item.ltShpId), {
-        id: `dhlottery_${item.ltShpId}`,
-        name: item.conmNm,
-        address: item.bplcRdnmDaddr || item.bplcLctnDaddr || '',
-        region: [item.tm1BplcLctnAddr, item.tm2BplcLctnAddr].filter(Boolean).join(' '),
-        lat: Number(item.shpLat) || null,
-        lng: Number(item.shpLot) || null,
+      const responses = await Promise.all(requests);
+      const payloads = await Promise.all(responses.map(async response => response.ok ? response.json() : null));
+      const storeMap = new Map();
+      payloads.flatMap(payload => payload?.data?.list || []).forEach(item => {
+        if (!item.ltShpId || !item.conmNm) return;
+        storeMap.set(String(item.ltShpId), {
+          id: `dhlottery_${item.ltShpId}`,
+          name: item.conmNm,
+          address: item.bplcRdnmDaddr || item.bplcLctnDaddr || '',
+          region: [item.tm1BplcLctnAddr, item.tm2BplcLctnAddr].filter(Boolean).join(' '),
+          lat: Number(item.shpLat) || null,
+          lng: Number(item.shpLot) || null,
+        });
       });
-    });
-    const stores = [...storeMap.values()];
-    if (stores.length) {
-      return new Response(JSON.stringify({ stores, source: 'dhlottery' }), { headers: cors });
-    }
-  } catch (_) { /* try next */ }
+      const stores = [...storeMap.values()];
+      if (stores.length) {
+        return new Response(JSON.stringify({ stores, source: 'dhlottery' }), { headers: cors });
+      }
+    } catch (_) { /* try next */ }
+  }
 
   // ── 2. Kakao Local API (env: KAKAO_REST_API_KEY) ──────────────
   const kakaoKey = context.env?.KAKAO_REST_API_KEY;
   if (kakaoKey) {
     try {
       const keyword = /로또|복권/.test(query) ? query : `${query} 복권`;
-      const kakaoUrl = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(keyword)}&size=15&sort=accuracy`;
+      const params = new URLSearchParams({
+        query: keyword,
+        size: '15',
+        sort: hasPoint ? 'distance' : 'accuracy',
+      });
+      if (hasPoint) {
+        params.set('x', String(lng));
+        params.set('y', String(lat));
+        params.set('radius', String(radius));
+      }
+      const kakaoUrl = `https://dapi.kakao.com/v2/local/search/keyword.json?${params}`;
       const r = await fetch(kakaoUrl, {
         headers: { Authorization: `KakaoAK ${kakaoKey}` },
         signal: AbortSignal.timeout(6000),
@@ -78,6 +94,7 @@ export async function onRequest(context) {
             region: (d.address_name || '').split(' ').slice(0, 2).join(' '),
             lat: parseFloat(d.y) || null,
             lng: parseFloat(d.x) || null,
+            distance: d.distance ? Number(d.distance) : null,
           }));
           return new Response(JSON.stringify({ stores, source: 'kakao' }), { headers: cors });
         }

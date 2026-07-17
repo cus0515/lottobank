@@ -546,6 +546,12 @@ main.chat-hidden .chat-panel { display: none; }
   .mob-bottom-nav { display:flex; }
   .api-status { display:none; }
   .auth-zone { gap:6px; }
+  .auth-zone { min-width:0; flex:1; justify-content:flex-end; overflow:hidden; }
+  .auth-zone #chat-reopen-btn { max-width:68px; overflow:hidden; white-space:nowrap; }
+  .auth-zone #user-profile { min-width:0; max-width:156px; }
+  .auth-zone .header-user-meta { min-width:0; max-width:124px; overflow:hidden; }
+  .auth-zone #user-name { max-width:86px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .auth-zone #header-membership-btn { padding:2px 5px; }
   .btn-login { padding:5px 10px; font-size:12px; }
   .user-profile { font-size:12px; }
   .nav-container { height:56px; padding:0 14px; }
@@ -1368,7 +1374,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
 .community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
-@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px;gap:5px}.comm-tab-btn{white-space:nowrap;padding:6px 11px;font-size:11px;letter-spacing:-.02em;flex:0 0 auto}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:38px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,25px);gap:6px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
+@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px;gap:5px}.comm-tab-btn{white-space:nowrap;padding:6px 11px;font-size:11px;letter-spacing:-.02em;flex:0 0 auto}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold::after{right:-39px;top:7px;font-size:7px;padding:3px 31px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:34px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,minmax(23px,1fr));gap:5px;width:100%;max-width:190px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:4px}.community-pension-group{width:30px;height:30px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:23px!important;height:29px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
 @media(max-width:700px){
   .ticket-slip,
   .community-verify-slip,
@@ -10390,6 +10396,69 @@ function distanceKm(lat1, lng1, lat2, lng2) {
   return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
+function nearbyStoreFallbackHtml(lat, lng) {
+  return `
+    <div style="display:grid;gap:8px;text-align:left;">
+      <div style="font-size:12px;font-weight:900;color:var(--text-dark);">1km 내 판매점 정보를 찾지 못했습니다.</div>
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">현재 위치 기준 지도 검색 결과가 없거나 판매점 좌표를 확인하지 못했습니다. 카카오 지도에서 주변 판매점을 바로 확인할 수 있습니다.</div>
+      <a href="https://map.kakao.com/link/search/로또 판매점,${lat},${lng}" target="_blank" rel="noopener" style="display:block;text-align:center;padding:9px;border-radius:7px;background:var(--lotto-red);color:#fff;text-decoration:none;font-size:12px;font-weight:900;">카카오 지도에서 주변 판매점 찾기</a>
+    </div>`;
+}
+
+function normalizeNearbyStore(raw, lat, lng, source) {
+  const storeLat = Number(raw.lat);
+  const storeLng = Number(raw.lng);
+  if (!Number.isFinite(storeLat) || !Number.isFinite(storeLng)) return null;
+  const distance = Number.isFinite(Number(raw.distance)) ? Number(raw.distance) / (Number(raw.distance) > 50 ? 1000 : 1) : distanceKm(lat, lng, storeLat, storeLng);
+  return {
+    id: raw.id || `${source}_${raw.name}_${storeLat}_${storeLng}`,
+    name: raw.name || '복권 판매점',
+    address: raw.address || '',
+    lat: storeLat,
+    lng: storeLng,
+    distance,
+    source,
+  };
+}
+
+async function fetchNearbyStoreApi(lat, lng) {
+  try {
+    const url = `/api/store-search?q=${encodeURIComponent('로또 판매점')}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=1000&_=${Date.now()}`;
+    const res = await fetch(url, { cache:'no-store' });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return (json.stores || [])
+      .map(store => normalizeNearbyStore(store, lat, lng, json.source || 'api'))
+      .filter(Boolean);
+  } catch (_) {
+    return [];
+  }
+}
+
+function renderNearbyStoreList(stores, lat, lng) {
+  const list = $('nearby-store-list');
+  if (!list) return;
+  const unique = new Map();
+  stores
+    .filter(store => Number.isFinite(store.distance) && store.distance <= 1)
+    .sort((a,b) => a.distance - b.distance)
+    .forEach(store => {
+      const key = `${store.name}|${store.address}`.toLowerCase();
+      if (!unique.has(key)) unique.set(key, store);
+    });
+  const rows = [...unique.values()];
+  if (storeLocationLayer && window.L) {
+    rows.forEach(store => L.marker([store.lat, store.lng]).bindPopup(qrSafeText(store.name)).addTo(storeLocationLayer));
+  }
+  list.style.padding = rows.length ? '0' : '14px';
+  list.style.textAlign = rows.length ? 'left' : 'center';
+  list.innerHTML = rows.length ? rows.map(store=>`
+    <a href="https://map.kakao.com/link/map/${encodeURIComponent(store.name)},${store.lat},${store.lng}" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;gap:8px;padding:10px 11px;margin-bottom:6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:7px;text-decoration:none;color:inherit;">
+      <span style="min-width:0;"><b style="display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${qrSafeText(store.name)}</b><span style="font-size:10px;color:var(--text-muted);">${qrSafeText(store.address)}</span></span>
+      <b style="font-size:11px;color:var(--lotto-red);white-space:nowrap;">${Math.round(store.distance*1000)}m</b>
+    </a>`).join('') : nearbyStoreFallbackHtml(lat, lng);
+}
+
 function findNearbyLottoStores() {
   const status = $('map-location-status');
   if (!navigator.geolocation) {
@@ -10410,28 +10479,20 @@ function findNearbyLottoStores() {
     if (status) status.textContent = `현재 위치 확인 완료 · 반경 1km · 정확도 약 ${Math.round(pos.coords.accuracy)}m`;
     const list = $('nearby-store-list');
     if (!list) return;
-    const fallbackHtml = `
-      <div style="display:grid;gap:8px;text-align:left;">
-        <div style="font-size:12px;font-weight:900;color:var(--text-dark);">등록된 좌표형 판매점이 아직 없습니다.</div>
-        <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">현재 위치 기준 반경 1km 판매점은 카카오 지도 검색으로 바로 확인할 수 있습니다. QR 등록과 판매점 지정 데이터가 쌓이면 이 영역에 LottoBank 판매점 목록이 표시됩니다.</div>
-        <a href="https://map.kakao.com/link/search/로또 판매점,${lat},${lng}" target="_blank" rel="noopener" style="display:block;text-align:center;padding:9px;border-radius:7px;background:var(--lotto-red);color:#fff;text-decoration:none;font-size:12px;font-weight:900;">카카오 지도에서 주변 판매점 찾기</a>
-      </div>`;
-    if (!sb) { list.style.padding = '14px'; list.innerHTML = fallbackHtml; return; }
+    list.style.padding = '20px';
+    list.style.textAlign = 'center';
+    list.innerHTML = '주변 판매점을 검색하고 있습니다...';
     try {
-      const { data, error } = await sb.from('lottery_stores').select('id,name,address,lat,lng,scan_count').not('lat','is',null).not('lng','is',null);
-      if (error) throw error;
-      const stores = (data||[]).map(s=>({...s,distance:distanceKm(lat,lng,s.lat,s.lng)})).filter(s=>s.distance<=1).sort((a,b)=>a.distance-b.distance);
-      stores.forEach(s => L.marker([s.lat,s.lng]).addTo(storeLocationLayer));
-      list.style.padding = stores.length ? '0' : '20px';
-      list.style.textAlign = stores.length ? 'left' : 'center';
-      list.innerHTML = stores.length ? stores.map(s=>`
-        <a href="https://map.kakao.com/link/map/${encodeURIComponent(s.name)},${s.lat},${s.lng}" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;gap:8px;padding:10px 11px;margin-bottom:6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:7px;text-decoration:none;color:inherit;">
-          <span style="min-width:0;"><b style="display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${qrSafeText(s.name)}</b><span style="font-size:10px;color:var(--text-muted);">${qrSafeText(s.address)}</span></span>
-          <b style="font-size:11px;color:var(--lotto-red);white-space:nowrap;">${Math.round(s.distance*1000)}m</b>
-        </a>`).join('') : fallbackHtml;
+      const apiStores = await fetchNearbyStoreApi(lat, lng);
+      let dbStores = [];
+      if (sb) {
+        const { data, error } = await sb.from('lottery_stores').select('id,name,address,lat,lng,scan_count').not('lat','is',null).not('lng','is',null);
+        if (!error) dbStores = (data || []).map(store => normalizeNearbyStore(store, lat, lng, 'db')).filter(Boolean);
+      }
+      renderNearbyStoreList([...apiStores, ...dbStores], lat, lng);
     } catch (_) {
       list.style.padding = '14px';
-      list.innerHTML = fallbackHtml;
+      list.innerHTML = nearbyStoreFallbackHtml(lat, lng);
     }
   }, err => {
     if (status) status.textContent = err.code === 1 ? '위치 권한이 필요합니다.' : '현재 위치를 확인할 수 없습니다.';
@@ -10975,6 +11036,60 @@ async function loadCommunityVerifyTickets() {
   }));
 }
 
+async function hydrateVerifyMetaFromTickets(meta) {
+  if (!meta || !sb) return meta;
+  const ids = (meta.ticket_ids || []).filter(Boolean);
+  if (!ids.length) return meta;
+  let result = await sb.from('tickets')
+    .select('id,qr_url,round_no,lottery_type,result,numbers,game_numbers,game_count,pension_group,pension_number,serial_meta,prize_rank,prize_amount,game_results,purchase_channel,store_name,created_at')
+    .in('id', ids);
+  if (result.error && /column|schema cache/i.test(result.error.message || '')) {
+    result = await sb.from('tickets')
+      .select('id,qr_url,round_no,lottery_type,result,numbers,game_count,pension_group,pension_number,serial_meta,prize_rank,prize_amount,purchase_channel,store_name,created_at')
+      .in('id', ids);
+  }
+  if (result.error || !result.data?.length) return meta;
+  const tickets = (result.data || []).map(ticket => {
+    const type = ticketLotteryType(ticket);
+    const restored = type === 'lotto' && (!ticket.game_numbers?.length || ticket.game_numbers.length < (ticket.game_count || 1))
+      ? parseQRUrl(ticket.qr_url) : null;
+    const base = { ...ticket, lottery_type:type, game_numbers:restored?.games || ticket.game_numbers || [] };
+    return type === 'pension' ? restorePensionTicketFromQr(base) : repairKnownOnlineTicketGames(base);
+  });
+  const enriched = await Promise.all(tickets.map(enrichLottoTicketGameResults));
+  let assignments = [];
+  let storeOptions = [];
+  const assignRes = await sb.from('ticket_game_stores').select('ticket_id,game_index,store_id').in('ticket_id', ids);
+  if (!assignRes.error) {
+    assignments = assignRes.data || [];
+    const storeIds = [...new Set(assignments.map(row => row.store_id).filter(Boolean))];
+    if (storeIds.length) {
+      const storeRes = await sb.from('lottery_stores').select('id,name,address').in('id', storeIds);
+      if (!storeRes.error) storeOptions = storeRes.data || [];
+    }
+  }
+  return ticketsToVerifyMeta(enriched.map(ticket => ({
+    ...ticket,
+    storeAssignments: assignments.filter(row => row.ticket_id === ticket.id),
+    storeOptions,
+  }))) || meta;
+}
+
+async function hydrateCommunityVerifyPost(post) {
+  if (post?.tag !== 'verify') return post;
+  const packed = splitCommTitle(post.title, post.body);
+  const bodyParts = splitCommBody(packed.body);
+  if (!bodyParts.verify) return post;
+  const freshVerify = await hydrateVerifyMetaFromTickets(bodyParts.verify);
+  if (freshVerify === bodyParts.verify) return post;
+  const nextBody = `${bodyParts.text || ''}${bodyParts.rec ? encodeCommRecommend(bodyParts.rec) : ''}${encodeCommVerify(freshVerify)}`.trim();
+  return {
+    ...post,
+    title: packCommTitle(packed.title, nextBody),
+    body: post.body ? nextBody : post.body,
+  };
+}
+
 async function renderCommunityRecommendPicker() {
   const wrap = $('community-recommend-picker');
   if (!wrap) return;
@@ -11314,7 +11429,7 @@ async function loadCommunityPosts() {
       .limit(100);
     if (data) {
       const canSeeFeedback = p => p.tag !== 'feedback' || (isLoggedIn && currentUser && (window._isAppAdmin || p.user_id === currentUser.id));
-      const visible = data.filter(canSeeFeedback);
+      const visible = await Promise.all(data.filter(canSeeFeedback).map(hydrateCommunityVerifyPost));
       commPosts.free = visible.filter(p => p.tag === 'free' || !['recommend','verify','feedback'].includes(p.tag));
       commPosts.recommend = visible.filter(p => p.tag === 'recommend');
       commPosts.verify = visible.filter(p => p.tag === 'verify');
