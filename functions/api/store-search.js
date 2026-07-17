@@ -103,7 +103,51 @@ export async function onRequest(context) {
     } catch (_) { /* try next */ }
   }
 
-  // ── 3. 구형 동행복권 API 폴백 ─────────────────────────────────
+  // ── 3. OpenStreetMap Overpass 폴백 (무료 위치 기반 검색) ─────
+  if (hasPoint) {
+    try {
+      const namePattern = '로또|복권|동행복권|연금복권|lotto|lottery';
+      const overpass = `
+        [out:json][timeout:6];
+        (
+          node(around:${radius},${lat},${lng})["shop"~"lottery",i];
+          node(around:${radius},${lat},${lng})["name"~"${namePattern}",i];
+          way(around:${radius},${lat},${lng})["shop"~"lottery",i];
+          way(around:${radius},${lat},${lng})["name"~"${namePattern}",i];
+        );
+        out center 30;
+      `;
+      const r = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'User-Agent': 'LottoBank/1.0 nearby store lookup',
+        },
+        body: new URLSearchParams({ data: overpass }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (r.ok) {
+        const json = await r.json();
+        const stores = (json?.elements || []).map(el => {
+          const storeLat = Number(el.lat ?? el.center?.lat);
+          const storeLng = Number(el.lon ?? el.center?.lon);
+          const tags = el.tags || {};
+          return {
+            id: `osm_${el.type}_${el.id}`,
+            name: tags.name || tags['name:ko'] || '복권 판매점',
+            address: [tags['addr:city'], tags['addr:district'], tags['addr:street'], tags['addr:housenumber']].filter(Boolean).join(' '),
+            category: tags.shop || 'lottery',
+            region: [tags['addr:city'], tags['addr:district']].filter(Boolean).join(' '),
+            lat: storeLat || null,
+            lng: storeLng || null,
+          };
+        }).filter(store => store.lat && store.lng);
+        if (stores.length) return new Response(JSON.stringify({ stores, source: 'osm' }), { headers: cors });
+      }
+    } catch (_) { /* try next */ }
+  }
+
+  // ── 4. 구형 동행복권 API 폴백 ─────────────────────────────────
   const dhlHdrs = {
     'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15',
     'Accept': 'application/json, text/javascript, */*; q=0.01',
