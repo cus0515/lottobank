@@ -674,3 +674,11 @@
 - 네이버 서치어드바이저는 현재 페이지 접근과 robots 검사가 정상이라 `Yeti`, `NaverBot` 허용 정책은 유지한다.
 - AdSense의 리소스 진단에 `robots.txt에서 Googlebot이 차단됨`이 표시되어도 라이브 `robots.txt`, `ads.txt`, `sitemap.xml`은 200으로 열렸다. 광고 크롤러 오인을 줄이기 위해 `Googlebot`, `AdsBot-Google`, `Mediapartners-Google`을 명시 허용하고 네이버 봇 허용은 유지한다.
 - Google Search Console의 사이트맵 `가져올 수 없음` 가능성을 낮추기 위해 사이트맵 `loc`는 리다이렉트 전 URL이 아니라 최종 도착 URL로 맞춘다.
+## Android App Links와 모바일 로그인 보정.
+
+- Play Console 딥링크 사용자 인증 정보 공유는 루트 `.well-known/assetlinks.json`을 요구한다.
+- `assetlinks.json`은 JSON 표준 파일이므로 주석을 넣지 않는다.
+- 모바일 회원가입 약관은 좁은 폭에서 세로로 밀리지 않도록 체크박스와 문구를 클래스 기반 flex 행으로 고정한다.
+- 모바일 하단 고정 탭은 전적과 랭킹 대신 연구소, 커뮤니티, 지도를 노출하고 전적/랭킹은 더보기와 프로필 메뉴에서 계속 접근하도록 둔다.
+- 커뮤니티 용지 스킨은 작성자가 저장한 게시글 데이터의 일부이므로 보는 사용자의 VIP 여부와 무관하게 렌더링해야 한다. VIP 제한은 스킨 선택과 적용 행동에만 유지한다.
+- 모바일 커뮤니티 게시판 탭은 스크롤형 칩보다 2열 세그먼트가 안정적이므로 가로 overflow를 막고 버튼을 컨테이너 안에서 줄어들게 한다.

@@ -583,6 +583,9 @@ main.chat-hidden .chat-panel { display: none; }
 .auth-field input { width:100%; padding:11px 14px; border:1.5px solid var(--border-dashed); border-radius:7px; font-size:14px; font-family:inherit; outline:none; transition:border-color .15s; }
 .auth-field input[type="checkbox"] { width:16px; height:16px; padding:0; }
 .auth-field input:focus { border-color:var(--lotto-red); }
+.auth-terms-label { display:flex !important; align-items:flex-start !important; gap:8px !important; cursor:pointer; font-size:12px !important; font-weight:500 !important; line-height:1.45 !important; word-break:keep-all; }
+.auth-terms-label input { width:16px !important; height:16px !important; padding:0 !important; margin-top:2px !important; flex:0 0 16px !important; accent-color:var(--lotto-red); }
+.auth-terms-text { min-width:0; flex:1; overflow-wrap:break-word; }
 .auth-submit { width:100%; padding:13px; background:var(--lotto-red); color:#fff; font-size:15px; font-weight:700; border:none; border-radius:7px; cursor:pointer; margin-top:6px; font-family:inherit; }
 .auth-submit:disabled { opacity:0.55; cursor:not-allowed; }
 .auth-divider { text-align:center; font-size:13px; color:var(--text-muted); margin:14px 0 4px; }
@@ -1374,7 +1377,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
 .community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
-@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px;gap:5px}.comm-tab-btn{white-space:nowrap;padding:6px 11px;font-size:11px;letter-spacing:-.02em;flex:0 0 auto}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold::after{right:-39px;top:7px;font-size:7px;padding:3px 31px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:34px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,minmax(23px,1fr));gap:5px;width:100%;max-width:190px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:4px}.community-pension-group{width:30px;height:30px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:23px!important;height:29px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
+@media(max-width:700px){#pg-community,#community-content,.community-board-head{min-width:0;max-width:100%;overflow-x:hidden;box-sizing:border-box}.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;width:100%;overflow-x:hidden;padding-bottom:0}.comm-tab-btn{width:100%;min-width:0;white-space:nowrap;padding:7px 6px;font-size:11px;letter-spacing:-.03em;flex:initial}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold::after{right:-39px;top:7px;font-size:7px;padding:3px 31px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:34px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,minmax(23px,1fr));gap:5px;width:100%;max-width:190px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:4px}.community-pension-group{width:30px;height:30px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:23px!important;height:29px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
 @media(max-width:700px){
   .ticket-slip,
   .community-verify-slip,
@@ -1876,6 +1879,40 @@ textarea {
   .market-analysis-card {
     padding:12px !important;
   }
+  .auth-overlay {
+    align-items:center;
+    padding:12px;
+  }
+  .auth-box {
+    width:100%;
+    max-width:400px;
+    max-height:calc(100dvh - 24px);
+    padding:28px 22px 22px;
+    border-radius:18px;
+  }
+  .auth-box h2 {
+    font-size:20px !important;
+    line-height:1.25;
+  }
+  .auth-box p.auth-sub {
+    font-size:12px;
+    line-height:1.45;
+    margin-bottom:18px;
+  }
+  .auth-field {
+    margin-bottom:12px;
+  }
+  .auth-field input {
+    min-height:42px;
+    font-size:14px;
+  }
+  #auth-terms-row {
+    margin-top:10px;
+    margin-bottom:12px;
+  }
+  .auth-terms-label {
+    line-height:1.55 !important;
+  }
 }
 
 /* ── 구독 페이지 ── */
@@ -2089,10 +2126,9 @@ textarea {
 <!-- 바텀 네비게이션 -->
 <nav class="mob-bottom-nav" role="navigation" aria-label="하단 메뉴">
   <button class="mob-nav-btn on" id="mob-btn-home" onclick="go('home')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>홈</button>
-  <button class="mob-nav-btn" id="mob-btn-result" onclick="go('result')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>회차조회</button>
-  <button class="mob-nav-btn" id="mob-btn-ticket" onclick="go('ticket')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg></span>QR인증</button>
-  <button class="mob-nav-btn" id="mob-btn-stats" onclick="go('stats')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>전적</button>
-  <button class="mob-nav-btn" id="mob-btn-rank" onclick="go('rank')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></span>랭킹</button>
+  <button class="mob-nav-btn" id="mob-btn-lab" onclick="go('lab')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M8 14h8"/><path d="M9 18h6"/></svg></span>연구소</button>
+  <button class="mob-nav-btn" id="mob-btn-community" onclick="go('community')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>커뮤니티</button>
+  <button class="mob-nav-btn" id="mob-btn-map" onclick="go('map')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg></span>지도</button>
   <button class="mob-nav-btn" id="mob-btn-more" onclick="openMobMenu()"><span class="mob-nav-icon">☰</span>더보기</button>
 </nav>
 
@@ -2133,9 +2169,9 @@ textarea {
       <span id="auth-success-msg">인증 링크를 발송했습니다.</span>
     </div>
     <div class="auth-field" id="auth-terms-row" style="display:none;">
-      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12px;font-weight:500;line-height:1.4;">
-        <input type="checkbox" id="auth-terms-chk" style="width:16px;height:16px;padding:0;margin-top:2px;flex:0 0 16px;accent-color:var(--lotto-red);">
-        <span style="min-width:0;flex:1;"><a href="/terms.html" target="_blank" rel="noopener" style="color:var(--lotto-red);text-decoration:underline;">이용약관</a> 및 <a href="/privacy.html" target="_blank" rel="noopener" style="color:var(--lotto-red);text-decoration:underline;">개인정보처리방침</a>에 동의합니다</span>
+      <label class="auth-terms-label">
+        <input type="checkbox" id="auth-terms-chk">
+        <span class="auth-terms-text"><a href="/terms.html" target="_blank" rel="noopener" style="color:var(--lotto-red);text-decoration:underline;">이용약관</a> 및 <a href="/privacy.html" target="_blank" rel="noopener" style="color:var(--lotto-red);text-decoration:underline;">개인정보처리방침</a>에 동의합니다</span>
       </label>
     </div>
     <div class="auth-divider">계정이 없으신가요?</div>
@@ -10857,7 +10893,7 @@ function splitCommTitle(title, body) {
 
 function renderCommunityRecSlip(rec) {
   if (!rec) return '';
-  const skin = rec.previewSkin ? (rec.skin || 'basic') : (isVipMember() ? (rec.skin || 'basic') : 'basic');
+  const skin = COMMUNITY_SKINS.some(([key]) => key === rec.skin) ? rec.skin : 'basic';
   const previewClass = rec.previewSkin ? ' skin-preview-slip' : '';
   if (rec.type === 'pension') {
     const digits = String(rec.no || '').padStart(6,'0').split('');
