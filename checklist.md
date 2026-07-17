@@ -847,6 +847,7 @@
 ## 검색봇 사이트맵 보정.
 
 - [x] 라이브 `ads.txt`, `robots.txt`, `sitemap.xml` 응답을 확인한다.
+- [x] Googlebot, AdsBot-Google, Mediapartners-Google 명시 허용을 `robots.txt`에 추가한다.
 - [x] 사이트맵 URL의 `.html` 리다이렉트 원인을 확인한다.
 - [x] 네이버 크롤러 허용 정책은 유지한다.
 - [x] 사이트맵을 최종 도착 URL 기준으로 수정한다.

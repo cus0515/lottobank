@@ -659,4 +659,5 @@
 
 - 라이브 `ads.txt`, `robots.txt`, `sitemap.xml`은 모두 200으로 열렸지만, 사이트맵에 들어간 `.html` 공개 페이지 URL은 Cloudflare Pages에서 확장자 없는 URL로 308 리다이렉트됐다.
 - 네이버 서치어드바이저는 현재 페이지 접근과 robots 검사가 정상이라 `Yeti`, `NaverBot` 허용 정책은 유지한다.
+- AdSense의 리소스 진단에 `robots.txt에서 Googlebot이 차단됨`이 표시되어도 라이브 `robots.txt`, `ads.txt`, `sitemap.xml`은 200으로 열렸다. 광고 크롤러 오인을 줄이기 위해 `Googlebot`, `AdsBot-Google`, `Mediapartners-Google`을 명시 허용하고 네이버 봇 허용은 유지한다.
 - Google Search Console의 사이트맵 `가져올 수 없음` 가능성을 낮추기 위해 사이트맵 `loc`는 리다이렉트 전 URL이 아니라 최종 도착 URL로 맞춘다.
