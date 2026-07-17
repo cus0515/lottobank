@@ -1368,7 +1368,96 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
 .community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
-@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px}.comm-tab-btn{white-space:nowrap;}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:38px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,25px);gap:6px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
+@media(max-width:700px){.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{overflow-x:auto;padding-bottom:2px;gap:5px}.comm-tab-btn{white-space:nowrap;padding:6px 11px;font-size:11px;letter-spacing:-.02em;flex:0 0 auto}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:38px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,25px);gap:6px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:5px}.community-pension-group{width:31px;height:31px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:24px!important;height:30px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
+@media(max-width:700px){
+  .ticket-slip,
+  .community-verify-slip,
+  .lab-vault-slip {
+    width:100%;
+    max-width:470px;
+    box-sizing:border-box;
+    margin:9px auto;
+    padding:13px 11px;
+  }
+  .ticket-slip-game,
+  .pension-ticket-row {
+    grid-template-columns:minmax(0,1fr) 52px 70px !important;
+    gap:5px !important;
+    min-height:36px;
+    padding:7px 0;
+    align-items:center;
+  }
+  .ticket-slip-nums {
+    grid-template-columns:repeat(6,24px) !important;
+    gap:5px !important;
+    justify-content:center;
+    font-size:11px;
+  }
+  .pension-ticket-numbers {
+    gap:4px !important;
+    justify-content:center;
+    min-width:0;
+  }
+  .pension-group-chip {
+    width:32px;
+    min-width:32px;
+    height:31px;
+    font-size:12px;
+  }
+  .pension-number-ball {
+    width:24px !important;
+    height:31px !important;
+    font-size:15px !important;
+  }
+  .ticket-status-pill,
+  .store-picker-trigger,
+  .ticket-store-readonly {
+    height:26px;
+    min-height:26px;
+    border-radius:6px;
+    font-size:8px;
+    line-height:1;
+  }
+  .ticket-status-pill {
+    width:52px;
+    min-width:52px;
+  }
+  .store-picker-trigger,
+  .ticket-store-readonly {
+    width:70px;
+    max-width:70px;
+    padding:0 4px;
+  }
+  .lab-vault-slip .ticket-slip-game,
+  .lab-vault-slip .pension-ticket-row {
+    grid-template-columns:minmax(0,1fr) auto !important;
+    gap:8px !important;
+  }
+  .lab-vault-actions {
+    width:auto;
+    min-width:106px;
+    justify-content:flex-end;
+    gap:5px;
+  }
+  .lab-vault-actions .qr-inner-tab {
+    min-width:50px;
+    min-height:26px;
+    padding:0 7px;
+    font-size:10px;
+  }
+  .community-rec-slip {
+    padding:13px 11px 11px;
+  }
+  .community-rec-nums {
+    grid-template-columns:repeat(6,26px) !important;
+    gap:6px !important;
+    justify-content:center;
+  }
+  .community-rec-nums span {
+    height:25px;
+    font-size:12px;
+  }
+}
 
 /* == Task #124: Profile page premium upgrade == */
 .profile-hero{text-align:center;padding:32px 20px 24px;border-bottom:none;margin-bottom:12px;background:linear-gradient(160deg,rgba(225,29,72,.08) 0%,rgba(139,92,246,.06) 50%,transparent 100%);border-radius:16px;position:relative;overflow:hidden;}

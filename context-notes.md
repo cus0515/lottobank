@@ -638,3 +638,11 @@
 - Play Console 업로드용 App Bundle은 `android-twa/app-release-bundle.aab`에 생성됐다.
 - `versionCode 1`은 Play Console에서 이미 사용된 상태라 재업로드 충돌을 피하기 위해 `versionCode 2`, `versionName 1.0.1-alpha02`로 다시 빌드했다.
 - Android 프로젝트, keystore, AAB, APK, 휴대용 도구는 로컬 산출물이라 Git 추적에서 제외한다.
+
+## Play Store 이미지 실제 화면 재생성.
+
+- 사용자는 꾸민 홍보 이미지보다 실제 모바일 화면 스크린샷을 원한다.
+- Chrome headless가 GPU 프로세스 오류로 CDP 연결이 끊겨 `--disable-gpu-compositing`, `--disable-software-rasterizer`, `--no-sandbox` 플래그를 추가했다.
+- 로컬 캡처에서는 외부 CDN 스크립트가 막혀 앱 라우팅이 늦어질 수 있으므로 캡처 전용 로컬 서버에서 Supabase, Chart, QR, OCR, 지도 라이브러리를 가벼운 스텁으로 대체한다.
+- 모바일 커뮤니티 탭은 버튼 폭이 커서 텍스트가 잘렸으므로 모바일 전용으로 패딩과 글자 크기를 줄였다.
+- 캡처 이미지는 실제 앱 UI를 기반으로 하되, 로컬 스텁 환경에서는 일부 데이터가 빈 상태로 보일 수 있다.
