@@ -10993,6 +10993,13 @@ function verifyMetaStatus(meta) {
   return win || '낙첨';
 }
 
+function verifyMetaPostLabel(meta) {
+  const status = verifyMetaStatus(meta);
+  if (status === '추첨중') return { label:'추첨중', title:'추첨중 인증', tone:'#64748b', bg:'#f8fafc', border:'#cbd5e1' };
+  if (status === '낙첨') return { label:'낙첨', title:'낙첨 인증', tone:'#64748b', bg:'#f8fafc', border:'#cbd5e1' };
+  return { label:status, title:`${status} 당첨 인증`, tone:'var(--lotto-red)', bg:'rgba(225,29,72,.06)', border:'rgba(225,29,72,.25)' };
+}
+
 function renderCommunityVerifySlip(meta) {
   if (!meta) return '';
   if (meta.type === 'pension') {
@@ -11196,8 +11203,8 @@ async function selectCommunityVerify(ticketId) {
   if (!meta) { toast('인증 이력을 찾지 못했습니다.'); return; }
   commAttachedVerify = meta;
   const title = $('post-input-title');
-  const status = verifyMetaStatus(meta);
-  if (title && !title.value.trim()) title.value = `제 ${meta.round || '-'}회 ${status} 인증`;
+  const label = verifyMetaPostLabel(meta);
+  if (title && !title.value.trim()) title.value = `제 ${meta.round || '-'}회 ${label.title}`;
   renderCommunityRecommendPicker();
 }
 
@@ -11384,10 +11391,12 @@ function renderCommunityList() {
     const isHot = (p.likes||0) >= 5;
     const isNew = (Date.now() - new Date(p.created_at).getTime()) < 3600000;
     const {tag, cleanTitle} = parsePostTag(packed.title||'');
-    const titleHl = commSearchQuery ? hlSearch(cleanTitle, commSearchQuery) : cleanTitle.replace(/</g,'&lt;');
+    const verifyLabel = verify ? verifyMetaPostLabel(verify) : null;
+    const displayTitle = verifyLabel ? `제 ${verify.round || '-'}회 ${verifyLabel.title}` : cleanTitle;
+    const titleHl = commSearchQuery ? hlSearch(displayTitle, commSearchQuery) : displayTitle.replace(/</g,'&lt;');
     return `<div class="post-card" onclick="openPostDetail('${p.id}')" style="${isHot?'border-color:var(--comm-hot-border,#fecaca);background:linear-gradient(to right,var(--paper-white),var(--comm-hot-bg,rgba(255,245,245,.5)));':''}">
       <div class="post-card-top">
-        <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}">${p.tag==='recommend'?'추천':p.tag==='verify'?'인증':p.tag==='feedback'?'문의':'자유'}</span>
+        <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}" ${verifyLabel ? `style="background:${verifyLabel.bg};color:${verifyLabel.tone};border-color:${verifyLabel.border};"` : ''}>${verifyLabel ? verifyLabel.label : (p.tag==='recommend'?'추천':p.tag==='verify'?'인증':p.tag==='feedback'?'문의':'자유')}</span>
         ${tagChip(tag)}<span class="post-card-title">${titleHl}</span>
         ${isHot ? '<span style="font-size:9px;font-weight:700;color:var(--comm-hot-text,#dc2626);background:var(--comm-hot-bg,#fff5f5);border:1px solid var(--comm-hot-border,#fecaca);border-radius:10px;padding:1px 6px;margin-left:4px;">🔥인기</span>' : ''}
         ${isNew ? '<span style="font-size:9px;font-weight:700;color:#059669;background:var(--comm-new-bg,#f0fdf4);border:1px solid var(--comm-new-border,#86efac);border-radius:10px;padding:1px 6px;margin-left:4px;">NEW</span>' : ''}
@@ -11508,6 +11517,8 @@ async function openPostDetail(postId) {
   const liked = myLikedPostIds.has(postId);
   const packed = splitCommTitle(post.title, post.body);
   const bodyParts = splitCommBody(packed.body);
+  const verifyLabel = bodyParts.verify ? verifyMetaPostLabel(bodyParts.verify) : null;
+  const verifyTitle = verifyLabel ? `제 ${bodyParts.verify.round || '-'}회 ${verifyLabel.title}` : '';
   const heartSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="${liked?'var(--lotto-red)':'none'}" stroke="${liked?'var(--lotto-red)':'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
   const backSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
 
@@ -11518,9 +11529,9 @@ async function openPostDetail(postId) {
     </div>
     <div class="post-detail-wrap" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:16px;margin-bottom:12px;">
       <div style="margin-bottom:6px;">
-        <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}">${post.tag==='recommend'?'추천':post.tag==='verify'?'인증':post.tag==='feedback'?'문의':'자유'}</span>
+        <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}" ${verifyLabel ? `style="background:${verifyLabel.bg};color:${verifyLabel.tone};border-color:${verifyLabel.border};"` : ''}>${verifyLabel ? verifyLabel.label : (post.tag==='recommend'?'추천':post.tag==='verify'?'인증':post.tag==='feedback'?'문의':'자유')}</span>
       </div>
-      <div class="post-detail-title">${(()=>{const {tag,cleanTitle}=parsePostTag(packed.title||'');return (tag?tagChip(tag):'')+cleanTitle.replace(/</g,'&lt;');})()}</div>
+      <div class="post-detail-title">${(()=>{const {tag,cleanTitle}=parsePostTag(packed.title||'');const title=verifyTitle||cleanTitle;return (tag?tagChip(tag):'')+title.replace(/</g,'&lt;');})()}</div>
       ${bodyParts.rec ? `<div style="margin:12px 0;">${renderCommunityRecSlip(bodyParts.rec)}</div>` : ''}
       ${bodyParts.verify ? `<div style="margin:12px 0;">${renderCommunityVerifySlip(bodyParts.verify)}</div>` : ''}
       ${bodyParts.text ? `<div style="font-size:13px;color:var(--text-dark);line-height:1.7;margin:12px 0;white-space:pre-wrap;opacity:.85;">${bodyParts.text.replace(/</g,'&lt;')}</div>` : ''}
