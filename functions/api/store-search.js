@@ -91,6 +91,7 @@ export async function onRequest(context) {
             id: 'kakao_' + d.id,
             name: d.place_name,
             address: d.road_address_name || d.address_name || '',
+            category: d.category_name || '',
             region: (d.address_name || '').split(' ').slice(0, 2).join(' '),
             lat: parseFloat(d.y) || null,
             lng: parseFloat(d.x) || null,

@@ -10414,6 +10414,7 @@ function normalizeNearbyStore(raw, lat, lng, source) {
     id: raw.id || `${source}_${raw.name}_${storeLat}_${storeLng}`,
     name: raw.name || '복권 판매점',
     address: raw.address || '',
+    category: raw.category || '',
     lat: storeLat,
     lng: storeLng,
     distance,
@@ -10422,17 +10423,25 @@ function normalizeNearbyStore(raw, lat, lng, source) {
 }
 
 async function fetchNearbyStoreApi(lat, lng) {
-  try {
-    const url = `/api/store-search?q=${encodeURIComponent('로또 판매점')}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=1000&_=${Date.now()}`;
-    const res = await fetch(url, { cache:'no-store' });
-    if (!res.ok) return [];
-    const json = await res.json();
-    return (json.stores || [])
-      .map(store => normalizeNearbyStore(store, lat, lng, json.source || 'api'))
-      .filter(Boolean);
-  } catch (_) {
-    return [];
-  }
+  const keywords = ['로또', '복권', '동행복권', '연금복권'];
+  const relevant = /로또|복권|동행복권|연금복권|lotto/i;
+  const results = await Promise.all(keywords.map(async keyword => {
+    try {
+      const url = `/api/store-search?q=${encodeURIComponent(keyword)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=1000&_=${Date.now()}`;
+      const res = await fetch(url, { cache:'no-store' });
+      if (!res.ok) return [];
+      const json = await res.json();
+      return (json.stores || [])
+        .map(store => normalizeNearbyStore(store, lat, lng, json.source || 'api'))
+        .filter(Boolean)
+        .map(store => ({ ...store, keyword }));
+    } catch (_) {
+      return [];
+    }
+  }));
+  const flat = results.flat();
+  const filtered = flat.filter(store => relevant.test(`${store.name} ${store.address} ${store.category}`));
+  return filtered.length ? filtered : flat;
 }
 
 function renderNearbyStoreList(stores, lat, lng) {
