@@ -722,3 +722,9 @@
 - 라이브 `sitemap.xml`은 `200 application/xml`이고 `robots.txt`도 정상이며, 사이트맵 안 17개 URL은 Googlebot User-Agent로 모두 200 응답을 반환했다.
 - Cloudflare Pages는 `/page.html` 요청을 `/page`로 308 리다이렉트하므로 사이트맵은 확장자 없는 최종 URL을 쓰는 것이 맞다.
 - 기존 정적 페이지 canonical은 `.html` URL을 가리켜 사이트맵 URL과 대표 URL 신호가 어긋났으므로 canonical도 최종 URL로 통일한다.
+
+## Search Console 텍스트 사이트맵 우회 제출 보강.
+
+- 사용자는 Search Console에서 `유형을 알 수 없음`, `가져올 수 없음` 상태가 몇 주째 유지된다고 보고했다.
+- 라이브 XML 사이트맵은 정상 응답이므로 Google 공식 문서가 허용하는 URL 1줄당 1개 형식의 텍스트 사이트맵을 추가해 제출 경로를 하나 더 만든다.
+- 텍스트 사이트맵에는 URL 외 다른 문구를 넣으면 안 되므로 AGENTS의 새 파일 주석 규칙보다 사이트맵 포맷 준수를 우선한다.

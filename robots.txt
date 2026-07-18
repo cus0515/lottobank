@@ -17,3 +17,4 @@ User-agent: NaverBot
 Allow: /
 
 Sitemap: https://lottobank.pages.dev/sitemap.xml
+Sitemap: https://lottobank.pages.dev/sitemap.txt

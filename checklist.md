@@ -925,3 +925,10 @@
 - [x] 사이트맵 내부 URL의 Googlebot 200 응답을 확인한다.
 - [x] 정적 페이지 canonical을 최종 도착 URL로 통일한다.
 - [x] 정적 검증과 Git 반영을 완료한다.
+
+## Search Console 텍스트 사이트맵 우회 제출 보강.
+
+- [x] XML 사이트맵과 동일한 URL 목록으로 `sitemap.txt`를 추가한다.
+- [x] `robots.txt`에 텍스트 사이트맵 위치를 함께 알린다.
+- [x] XML과 TXT 사이트맵 내용을 검증한다.
+- [x] Git Commit과 Push를 완료한다.
