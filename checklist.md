@@ -918,3 +918,10 @@
 - [x] 푸터와 사이트맵 연결을 보강한다.
 - [x] 번호 분석 책임 이용 고지를 추가한다.
 - [x] 정적 검증과 Git 반영을 완료한다.
+
+## Search Console 사이트맵 canonical 정합성 보정.
+
+- [x] 라이브 sitemap과 robots 응답을 확인한다.
+- [x] 사이트맵 내부 URL의 Googlebot 200 응답을 확인한다.
+- [x] 정적 페이지 canonical을 최종 도착 URL로 통일한다.
+- [x] 정적 검증과 Git 반영을 완료한다.
