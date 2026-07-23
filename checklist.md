@@ -275,7 +275,7 @@
 - [ ] QR 고유값 DB 저장과 중복 검사 검증.
 - [x] 카메라 인식 후 자동 조회 연결.
 - [x] 스크립트와 반응형 화면 검증.
-- [ ] Git Commit 및 Push 수행.
+- [x] Git Commit 및 Push 수행.
 
 ## QR 화면과 대시보드 정리
 
@@ -307,7 +307,7 @@
 - [x] 사용자 화면의 개발 용어 정리.
 - [x] 불필요 파일 후보 사용 여부 감사.
 - [x] 문법·데스크톱·모바일 검증.
-- [ ] Git Commit 및 Push 수행.
+- [x] Git Commit 및 Push 수행.
 
 - [x] 공식 연금 판매소 API 엔드포인트 확인.
 - [x] `lotto-region.js` 연금 분기 수정.
@@ -954,6 +954,7 @@
 - [x] versionCode 5 반영
 - [x] versionName 1.0.4-alpha05 반영
 - [x] release AAB 빌드 확인
-- [ ] Git Commit 및 Push
+- [x] Git Commit 및 Push
+
 
 
