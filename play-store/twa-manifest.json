@@ -16,6 +16,6 @@
   "enableNotifications": false,
   "webManifestUrl": "https://lottobank.pages.dev/manifest.json",
   "fallbackType": "customtabs",
-  "appVersionName": "1.0.0",
-  "appVersionCode": 1
+  "appVersionName": "1.0.4-alpha05",
+  "appVersionCode": 5
 }

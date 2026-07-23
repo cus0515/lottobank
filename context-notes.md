@@ -738,3 +738,10 @@
 ## 토스 등록 이미지 로고 복구 - 2026-07-19 12:43:35
 사용자 피드백에 따라 로고 자체를 바꾸지 않고 기존 LottoBank 워드마크를 유지하기로 결정했다. 토스 반려 사유는 크롭 없는 꽉 찬 사각형 배경 요구였으므로, 배경 조건만 충족하고 LB 신규 심볼은 제거했다.
 
+
+## Android 16 target SDK 업데이트 - 2026-07-23 17:58:11
+Play Console 정책 경고는 기존 AAB의 targetSdkVersion 35 때문에 발생했다. 테스터를 리셋하지 않기 위해 새 비공개 테스트 트랙을 만들지 않고, 기존 Alpha 트랙에 새 AAB를 업로드하는 방식으로 진행한다. 실제 빌드 기준인 android-twa/app/build.gradle과 재생성 기준 manifest의 버전을 함께 1.0.4-alpha05, versionCode 5로 맞췄다.
+
+
+Android release AAB 빌드 검증 결과 versionCode 5, versionName 1.0.4-alpha05, targetSdkVersion 36으로 생성되었다. 업로드 파일은 android-twa/app-release-bundle-api36-v5.aab이며 기존 Alpha 비공개 테스트 트랙에 새 릴리스로 업로드하면 된다.
+
