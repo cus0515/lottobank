@@ -745,3 +745,6 @@ Play Console 정책 경고는 기존 AAB의 targetSdkVersion 35 때문에 발생
 
 Android release AAB 빌드 검증 결과 versionCode 5, versionName 1.0.4-alpha05, targetSdkVersion 36으로 생성되었다. 업로드 파일은 android-twa/app-release-bundle-api36-v5.aab이며 기존 Alpha 비공개 테스트 트랙에 새 릴리스로 업로드하면 된다.
 
+
+## Google Play AAB 서명 보정 - 2026-07-24
+Play Console 키 관리 화면에서 앱 서명 키와 업로드 키가 분리되어 있음을 확인했다. 기존 app-release-signed.apk의 SHA-256 지문은 Play Console 업로드 키 지문과 일치하므로 lottobank-release.keystore는 올바른 업로드 키다. 다만 새로 만든 app-release-bundle-api36-v5.aab는 jar is unsigned 상태라서 Play Console 업로드가 거부되었다. 비밀번호를 채팅에 남기지 않기 위해 scripts/sign-release-aab.ps1를 추가하고, 사용자가 로컬 PowerShell 창에서 키스토어 비밀번호를 입력하면 app-release-bundle-api36-v5-signed.aab를 생성하도록 했다.

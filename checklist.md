@@ -956,5 +956,12 @@
 - [x] release AAB 빌드 확인
 - [x] Git Commit 및 Push
 
+## Google Play AAB 서명 보정 - 2026-07-24
+- [x] Play Console 키 관리 화면에서 업로드 키 지문 확인
+- [x] 로컬 signed APK 지문과 Play Console 업로드 키 지문 일치 확인
+- [x] 기존 AAB가 unsigned 상태임을 확인
+- [x] 비밀번호 노출 없이 AAB 서명하는 로컬 스크립트 추가
+- [ ] signed AAB 생성 및 Play Console 업로드
+
 
 
