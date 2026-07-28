@@ -748,3 +748,10 @@ Android release AAB 빌드 검증 결과 versionCode 5, versionName 1.0.4-alpha0
 
 ## Google Play AAB 서명 보정 - 2026-07-24
 Play Console 키 관리 화면에서 앱 서명 키와 업로드 키가 분리되어 있음을 확인했다. 기존 app-release-signed.apk의 SHA-256 지문은 Play Console 업로드 키 지문과 일치하므로 lottobank-release.keystore는 올바른 업로드 키다. 다만 새로 만든 app-release-bundle-api36-v5.aab는 jar is unsigned 상태라서 Play Console 업로드가 거부되었다. 비밀번호를 채팅에 남기지 않기 위해 scripts/sign-release-aab.ps1를 추가하고, 사용자가 로컬 PowerShell 창에서 키스토어 비밀번호를 입력하면 app-release-bundle-api36-v5-signed.aab를 생성하도록 했다.
+## 앱인토스 출시 번들 준비
+
+- 앱인토스 콘솔은 앱 출시 파일로 `.ait` 번들을 요구한다.
+- 현재 프로젝트는 단일 정적 SPA라 Vite 빌드 결과를 앱인토스 `ait build`로 패키징하는 최소 구성을 추가한다.
+- 앱 ID는 콘솔에 표시된 `lottobank`와 맞췄고 표시명은 `로또뱅크`로 설정했다.
+- Toss 콘솔 업로드 파일은 `C:\Users\최우석\Desktop\LottoBank\lottobank.ait`로 생성됐다.
+- `.ait`, `dist`, `node_modules`, `.granite`, `.pnpm-store`는 재생성 가능한 산출물이라 Git 추적 제외로 처리한다.

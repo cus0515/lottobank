@@ -6,3 +6,8 @@ android-twa/
 *.keystore
 *.aab
 *.apk
+*.ait
+node_modules/
+dist/
+.granite/
+.pnpm-store/
