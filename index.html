@@ -2659,6 +2659,12 @@ textarea {
 const SUPABASE_URL = 'https://wosbpljbdyofavsbrkyn.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_WhehbHhTwxo-9uEyWbEEtA_52ACEDbj';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const LOTTOBANK_ORIGIN = 'https://lottobank.pages.dev';
+function apiPath(path) {
+  const host = location.hostname || '';
+  const isLottoBankHost = host === 'lottobank.pages.dev' || host === 'localhost' || host === '127.0.0.1';
+  return isLottoBankHost ? path : LOTTOBANK_ORIGIN + path;
+}
 
 // =====================================================
 // 유틸리티
@@ -2784,7 +2790,7 @@ async function fetchPensionRound(round) {
     return stored;
   }
   try {
-    const res = await fetch(`/api/pension?round=${round}`, { cache:'no-store' });
+    const res = await fetch(apiPath(`/api/pension?round=${round}`), { cache:'no-store' });
     const data = await res.json();
     if (!res.ok || data?.returnValue !== 'success') return null;
     pensionApiCache[round] = data;
@@ -2805,7 +2811,7 @@ async function fetchLotto(round) {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 12000);
-    const res = await fetch(`/api/lotto?round=${round}`, { signal: controller.signal });
+    const res = await fetch(apiPath(`/api/lotto?round=${round}`), { signal: controller.signal });
     clearTimeout(timer);
     const data = await res.json();
     if (data.returnValue !== 'success') return null;
@@ -3903,7 +3909,7 @@ function renderLatestOnLeft(data) {
   }).join('');
   // 홈 패널 수동/자동도 판매소 데이터로 업데이트
   const hr = data.round;
-  fetch(`/api/lotto-region?round=${hr}`, {cache:'no-cache'})
+  fetch(apiPath(`/api/lotto-region?round=${hr}`), {cache:'no-cache'})
     .then(r=>r.json())
     .then(j=>{
       [[j.stores1||[], 1],[j.stores2||[], 2]].forEach(([stores, rank])=>{
@@ -4302,7 +4308,7 @@ function renderPensionResult(d, container, round) {
     _sd.style.cssText = 'margin-top:10px;text-align:left;';
     _sd.innerHTML = '<div style="font-size:11px;color:#94a3b8;padding:4px 0;">판매소 조회 중...</div>';
     container.appendChild(_sd);
-    fetch('/api/lotto-region?round='+round+'&type=pension&_='+Date.now(),{cache:'no-store'})
+    fetch(apiPath('/api/lotto-region?round='+round+'&type=pension&_='+Date.now()),{cache:'no-store'})
       .then(r=>r.json()).then(j=>{
         const s1=j.stores1||[],s2=j.stores2||[];
         if(!s1.length&&!s2.length){
@@ -4540,7 +4546,7 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
     <div id="store-section" style="margin-top:10px;"><div style="font-size:11px;color:#94a3b8;padding:4px 0;"> 판매소 데이터 로딩 중...</div></div>
   `;
   // 1등/2등 판매소 비동기 로드
-  fetch(`/api/lotto-region?round=${round}`, {cache: 'no-cache'})
+  fetch(apiPath(`/api/lotto-region?round=${round}`), {cache: 'no-cache'})
     .then(r => r.json())
     .then(j => {
       const s1 = j.stores1 || [];
@@ -4955,7 +4961,7 @@ async function searchStorePicker() {
   window._storeSearchRequest = requestId;
   $('store-picker-list').innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;">검색 중...</div>';
   try {
-    const res = await fetch(`/api/store-search?q=${encodeURIComponent(query)}&_=${Date.now()}`, { cache:'no-store' });
+    const res = await fetch(apiPath(`/api/store-search?q=${encodeURIComponent(query)}&_=${Date.now()}`), { cache:'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (requestId !== window._storeSearchRequest) return;
@@ -10578,7 +10584,7 @@ async function fetchNearbyStoreApi(lat, lng) {
   const fallback = [];
   for (const keyword of keywords) {
     try {
-      const url = `/api/store-search?q=${encodeURIComponent(keyword)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=1000&_=${Date.now()}`;
+      const url = apiPath(`/api/store-search?q=${encodeURIComponent(keyword)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=1000&_=${Date.now()}`);
       const res = await fetch(url, { cache:'no-store' });
       if (!res.ok) continue;
       const json = await res.json();

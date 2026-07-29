@@ -755,3 +755,10 @@ Play Console 키 관리 화면에서 앱 서명 키와 업로드 키가 분리�
 - 앱 ID는 콘솔에 표시된 `lottobank`와 맞췄고 표시명은 `로또뱅크`로 설정했다.
 - Toss 콘솔 업로드 파일은 `C:\Users\최우석\Desktop\LottoBank\lottobank.ait`로 생성됐다.
 - `.ait`, `dist`, `node_modules`, `.granite`, `.pnpm-store`는 재생성 가능한 산출물이라 Git 추적 제외로 처리한다.
+
+## 앱인토스 API 경로 보정
+
+- Toss `.ait` 런타임에서는 `fetch('/api/lotto')`가 LottoBank 도메인이 아니라 Toss 런타임 기준 상대 경로로 해석된다.
+- 웹과 Google Play TWA는 `lottobank.pages.dev`에서 상대 API가 정상 동작하지만, Toss에서는 `https://lottobank.pages.dev` 절대 경로가 필요하다.
+- `apiPath()` 헬퍼를 추가해 LottoBank 호스트와 로컬에서는 상대 경로를 유지하고, 그 외 런타임에서는 LottoBank 절대 주소를 사용하게 했다.
+- 갱신된 Toss 업로드 파일은 `C:\Users\최우석\Desktop\LottoBank\lottobank.ait`다.
