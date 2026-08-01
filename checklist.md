@@ -978,3 +978,6 @@
 - [x] LottoBank API 절대 경로 헬퍼 추가.
 - [x] 로또, 연금, 판매소 API 호출 경로 보정.
 - [x] Toss `.ait` 파일 재생성.
+- [x] SEO 내부 링크를 canonical URL 형태로 정리.
+- [x] sitemap.xml lastmod를 2026-08-01 기준으로 갱신.
+- [x] Vite 빌드 검증 완료.

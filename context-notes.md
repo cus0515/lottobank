@@ -762,3 +762,4 @@ Play Console 키 관리 화면에서 앱 서명 키와 업로드 키가 분리�
 - 웹과 Google Play TWA는 `lottobank.pages.dev`에서 상대 API가 정상 동작하지만, Toss에서는 `https://lottobank.pages.dev` 절대 경로가 필요하다.
 - `apiPath()` 헬퍼를 추가해 LottoBank 호스트와 로컬에서는 상대 경로를 유지하고, 그 외 런타임에서는 LottoBank 절대 주소를 사용하게 했다.
 - 갱신된 Toss 업로드 파일은 `C:\Users\최우석\Desktop\LottoBank\lottobank.ait`다.
+- 2026-08-01 SEO 점검에서 Google Search Console 노출이 낮은 원인은 즉시 차단보다는 초기 색인 신뢰와 공개 콘텐츠 확장 부족으로 판단했다. 내부 링크를 sitemap/canonical과 같은 확장자 없는 URL로 맞추고 sitemap lastmod를 최신화했다.
