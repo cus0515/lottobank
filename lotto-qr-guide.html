@@ -1,52 +1,110 @@
-﻿<!-- LottoBank QR 인증 기능을 설명하는 공개 가이드 페이지 -->
+<!-- LottoBank 가이드 페이지 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>로또 QR 인증 가이드 | LottoBank</title>
-<meta name="description" content="LottoBank에서 로또 QR 코드와 인터넷 구매 캡처를 등록해 구매 이력, 당첨 여부, 전적을 관리하는 방법을 설명합니다.">
 <meta name="robots" content="index, follow">
 <meta name="google-adsense-account" content="ca-pub-3323488098461026">
-<link rel="canonical" href="https://lottobank.pages.dev/lotto-qr-guide">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
-body{margin:0;background:#f6f8fb;color:#0f172a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.75}
+body{margin:0;background:#f6f8fb;color:#0f172a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.8;font-size:15px}
 main{max-width:860px;margin:0 auto;padding:34px 18px}
-.card{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:26px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+.card{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:28px 32px;box-shadow:0 8px 24px rgba(15,23,42,.06);margin-bottom:20px}
 .brand{color:#e11d48;font-weight:900}
-h1{font-size:30px;line-height:1.25;margin:0 0 12px}
-h2{font-size:20px;margin:30px 0 8px}
-p,li{font-size:15px;color:#334155}
-.note{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px;color:#9a3412}
-a{color:#e11d48;font-weight:800}
-footer{margin-top:22px;font-size:13px;color:#64748b}
+h1{font-size:28px;line-height:1.3;margin:0 0 14px;color:#0f172a}
+h2{font-size:19px;margin:28px 0 8px;color:#1e293b;border-bottom:2px solid #f1f5f9;padding-bottom:6px}
+h3{font-size:16px;margin:18px 0 6px;color:#334155}
+p,li{color:#334155;margin:0 0 10px}
+ul,ol{padding-left:22px}
+li{margin-bottom:6px}
+.note{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px;color:#9a3412;margin:20px 0}
+.tip{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;color:#166534;margin:16px 0}
+.table{width:100%;border-collapse:collapse;margin:16px 0}
+.table th{background:#f8fafc;padding:10px;text-align:left;font-size:13px;border:1px solid #e2e8f0}
+.table td{padding:10px;border:1px solid #e2e8f0;font-size:14px}
+a{color:#e11d48;font-weight:700;text-decoration:none}
+a:hover{text-decoration:underline}
+footer{margin-top:24px;font-size:13px;color:#64748b;text-align:center}
+nav{background:#0f172a;padding:12px 18px;display:flex;align-items:center;gap:12px}
+nav a{color:#fff;font-weight:800;font-size:15px;text-decoration:none}
+nav span{color:#94a3b8;font-size:13px}
 </style>
 </head>
 <body>
+<nav><a href="/">LottoBank</a><span>·</span>가이드</nav>
 <main>
-  <article class="card">
-    <h1><span class="brand">LottoBank</span> QR 인증 가이드</h1>
-    <p>LottoBank는 로또 6/45와 연금복권 720+의 구매 이력을 QR 코드 또는 인터넷 구매 캡처로 등록해 전적을 관리하는 도구입니다. 사용자가 직접 번호를 다시 입력하는 방식보다 실제 구매 기록을 기준으로 관리하는 흐름을 우선합니다.</p>
+<article class="card">
+<h1><span class="brand">LottoBank</span> QR 인증 가이드</h1>
+<p>LottoBank는 로또 6/45와 연금복권 720+의 실물 복권 QR 코드 또는 인터넷 구매 캡처를 등록해 구매 이력, 당첨 여부, 전적을 체계적으로 관리하는 플랫폼입니다. 직접 번호를 입력하지 않고 실제 구매 기록을 기반으로 전적이 자동 계산됩니다.</p>
 
-    <h2>QR 코드 등록 방식</h2>
-    <p>종이 복권에 인쇄된 동행복권 QR 주소를 등록하면 회차, 복권 종류, 구매 번호, 게임 수를 분석합니다. 같은 QR은 중복 등록을 막아 한 장의 복권이 여러 번 전적에 반영되지 않도록 처리합니다.</p>
-    <ul>
-      <li>로또 6/45는 한 장에 여러 게임이 포함될 수 있으며 A, B, C, D, E 순서로 저장됩니다.</li>
-      <li>연금복권 720+는 조 번호와 6자리 번호를 기준으로 저장합니다.</li>
-      <li>추첨 결과가 나온 회차는 당첨 등수와 당첨금을 전적에 반영합니다.</li>
-    </ul>
+<h2>QR 코드란?</h2>
+<p>동행복권에서 발행한 로또 복권 하단에는 고유한 QR 코드가 인쇄되어 있습니다. 이 QR 코드에는 복권의 종류(로또 6/45, 연금복권 720+), 구매 회차, 선택한 번호, 게임 수 정보가 암호화되어 있습니다. LottoBank는 이 QR 코드 정보를 분석해 중복 없이 정확한 구매 이력을 기록합니다.</p>
 
-    <h2>인터넷 구매 캡처 등록</h2>
-    <p>인터넷 구매는 종이 QR이 없을 수 있으므로 구매내역 화면의 티켓 보기 캡처를 사용합니다. LottoBank는 캡처에서 회차, 선택 번호, 구매 고유 코드를 읽어 중복 등록을 줄이고, 판매점은 인터넷 구매로 분류합니다.</p>
+<h2>QR 등록 방법 — 단계별 안내</h2>
+<ol>
+<li><strong>LottoBank 앱(또는 웹)에 로그인</strong>합니다. 회원가입은 이메일로 30초 안에 완료됩니다.</li>
+<li>상단 메뉴에서 <strong>QR 인증</strong>을 선택합니다.</li>
+<li><strong>QR 코드 스캔</strong> 버튼을 눌러 복권 하단의 QR 코드를 카메라로 촬영합니다.</li>
+<li>스캔이 완료되면 회차, 복권 종류, 게임 번호를 확인하는 화면이 표시됩니다.</li>
+<li><strong>등록 확인</strong>을 누르면 구매 이력에 저장됩니다.</li>
+<li>추첨 결과가 발표된 이후에는 당첨 여부와 당첨금이 자동으로 반영됩니다.</li>
+</ol>
 
-    <h2>전적에 반영되는 정보</h2>
-    <p>등록된 복권은 구매 게임 수, 투자 금액, 당첨 게임 수, 당첨금, 최고 등수, 수익률 계산에 사용됩니다. 커뮤니티 인증게시판에 공유할 때도 QR로 등록된 실제 이력만 첨부할 수 있게 설계했습니다.</p>
+<div class="tip">💡 <strong>팁:</strong> QR 코드는 추첨 전·후 언제든 등록할 수 있습니다. 추첨 전 등록한 복권도 추첨 결과가 나오면 자동으로 당첨 여부가 업데이트됩니다.</div>
 
-    <p class="note">LottoBank는 동행복권 공식 서비스가 아닙니다. 당첨 여부와 당첨금 수령은 반드시 동행복권 공식 홈페이지와 실물 복권을 통해 최종 확인해야 합니다.</p>
+<h2>인터넷 구매 캡처 등록</h2>
+<p>동행복권 홈페이지 또는 앱에서 인터넷으로 구매한 복권은 실물 QR이 없습니다. 이 경우 구매내역 화면의 <strong>티켓 보기 화면을 캡처</strong>하여 LottoBank에 등록할 수 있습니다.</p>
+<ul>
+<li>동행복권 앱 → 구매내역 → 해당 회차 → 티켓 보기 화면을 캡처합니다.</li>
+<li>LottoBank QR 인증 → 캡처 등록 탭에서 이미지를 업로드합니다.</li>
+<li>LottoBank가 이미지에서 회차, 선택 번호, 구매 고유 코드를 자동으로 인식합니다.</li>
+</ul>
 
-    <footer><a href="/">LottoBank 홈으로 돌아가기</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/terms.html">이용약관</a></footer>
-  </article>
-</main>
-</body>
-</html>
+<h2>로또 6/45 QR 등록 시 저장 정보</h2>
+<table class="table">
+<tr><th>항목</th><th>내용</th></tr>
+<tr><td>복권 종류</td><td>로또 6/45</td></tr>
+<tr><td>구매 회차</td><td>해당 주 회차 번호</td></tr>
+<tr><td>게임 구성</td><td>A~E 게임, 각 6개 번호</td></tr>
+<tr><td>구매 방식</td><td>자동/수동/반자동</td></tr>
+<tr><td>구매 금액</td><td>게임 수 × 1,000원</td></tr>
+<tr><td>판매점</td><td>판매점명 또는 인터넷 구매</td></tr>
+</table>
+
+<h2>연금복권 720+ QR 등록 시 저장 정보</h2>
+<table class="table">
+<tr><th>항목</th><th>내용</th></tr>
+<tr><td>복권 종류</td><td>연금복권 720+</td></tr>
+<tr><td>구매 회차</td><td>해당 주 회차 번호</td></tr>
+<tr><td>복권 번호</td><td>조 번호 + 6자리 번호</td></tr>
+<tr><td>구매 금액</td><td>장수 × 1,000원</td></tr>
+</table>
+
+<h2>중복 등록 방지</h2>
+<p>LottoBank는 동일한 QR 코드의 중복 등록을 자동으로 차단합니다. 같은 복권을 다시 스캔하면 "이미 등록된 QR입니다" 메시지가 표시됩니다. 덕분에 실수로 같은 복권이 전적에 두 번 반영되는 일이 없습니다.</p>
+
+<h2>전적에 미치는 영향</h2>
+<p>등록된 복권 정보는 다음 항목을 자동으로 계산합니다.</p>
+<ul>
+<li>총 구매 횟수 및 총 구매 금액</li>
+<li>총 당첨 횟수 및 총 당첨 금액</li>
+<li>수익률(ROI) = (총 당첨금 - 총 구매금액) / 총 구매금액 × 100</li>
+<li>최고 등수 및 최고 당첨금</li>
+<li>등수별 당첨 통계(1~5등)</li>
+<li>랭킹 및 뱃지 시스템 반영</li>
+</ul>
+
+<div class="note">⚠️ LottoBank는 동행복권 공식 서비스가 아닙니다. 당첨 여부와 당첨금 수령은 반드시 동행복권 공식 홈페이지와 실물 복권을 통해 최종 확인해야 합니다.</div>
+</article>
+<footer>
+  <a href="/">LottoBank 홈</a> &nbsp;·&nbsp;
+  <a href="/lotto-qr-guide.html">QR 인증 가이드</a> &nbsp;·&nbsp;
+  <a href="/lotto-tax-guide.html">세금 안내</a> &nbsp;·&nbsp;
+  <a href="/lotto-record-guide.html">전적 관리</a> &nbsp;·&nbsp;
+  <a href="/lotto-winning-numbers.html">당첨번호</a> &nbsp;·&nbsp;
+  <a href="/privacy.html">개인정보처리방침</a> &nbsp;·&nbsp;
+  <a href="/terms.html">이용약관</a><br><br>
+  LottoBank는 동행복권 공식 서비스가 아닙니다. 복권 구매는 만 19세 이상만 가능하며 과도한 구매는 삼가세요.
+</footer>
+</main></body></html>

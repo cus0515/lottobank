@@ -1,55 +1,95 @@
-﻿<!-- LottoBank 전적 관리 기능을 설명하는 공개 가이드 페이지 -->
+<!-- LottoBank 가이드 페이지 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>로또 전적 관리 방법 | LottoBank</title>
-<meta name="description" content="LottoBank에서 QR 인증 이력을 바탕으로 로또 구매 게임, 당첨 횟수, 당첨금, 수익률, 랭킹을 관리하는 방법을 설명합니다.">
 <meta name="robots" content="index, follow">
 <meta name="google-adsense-account" content="ca-pub-3323488098461026">
-<link rel="canonical" href="https://lottobank.pages.dev/lotto-record-guide">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
-body{margin:0;background:#f6f8fb;color:#0f172a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.75}
+body{margin:0;background:#f6f8fb;color:#0f172a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.8;font-size:15px}
 main{max-width:860px;margin:0 auto;padding:34px 18px}
-.card{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:26px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+.card{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:28px 32px;box-shadow:0 8px 24px rgba(15,23,42,.06);margin-bottom:20px}
 .brand{color:#e11d48;font-weight:900}
-h1{font-size:30px;line-height:1.25;margin:0 0 12px}
-h2{font-size:20px;margin:30px 0 8px}
-p,li{font-size:15px;color:#334155}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:14px 0}
-.box{border:1px solid #dbe3ef;border-radius:10px;padding:14px;background:#f8fafc}
-.box b{display:block;margin-bottom:4px;color:#0f172a}
-a{color:#e11d48;font-weight:800}
-footer{margin-top:22px;font-size:13px;color:#64748b}
+h1{font-size:28px;line-height:1.3;margin:0 0 14px;color:#0f172a}
+h2{font-size:19px;margin:28px 0 8px;color:#1e293b;border-bottom:2px solid #f1f5f9;padding-bottom:6px}
+h3{font-size:16px;margin:18px 0 6px;color:#334155}
+p,li{color:#334155;margin:0 0 10px}
+ul,ol{padding-left:22px}
+li{margin-bottom:6px}
+.note{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px;color:#9a3412;margin:20px 0}
+.tip{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;color:#166534;margin:16px 0}
+.table{width:100%;border-collapse:collapse;margin:16px 0}
+.table th{background:#f8fafc;padding:10px;text-align:left;font-size:13px;border:1px solid #e2e8f0}
+.table td{padding:10px;border:1px solid #e2e8f0;font-size:14px}
+a{color:#e11d48;font-weight:700;text-decoration:none}
+a:hover{text-decoration:underline}
+footer{margin-top:24px;font-size:13px;color:#64748b;text-align:center}
+nav{background:#0f172a;padding:12px 18px;display:flex;align-items:center;gap:12px}
+nav a{color:#fff;font-weight:800;font-size:15px;text-decoration:none}
+nav span{color:#94a3b8;font-size:13px}
 </style>
 </head>
 <body>
+<nav><a href="/">LottoBank</a><span>·</span>전적 관리</nav>
 <main>
-  <article class="card">
-    <h1><span class="brand">LottoBank</span> 전적 관리 가이드</h1>
-    <p>복권을 꾸준히 구매하면 “얼마나 샀는지”, “얼마나 당첨됐는지”, “어떤 회차가 좋았는지”를 기억하기 어렵습니다. LottoBank는 QR 인증 이력을 기준으로 개인 전적을 자동 정리하는 방향으로 만들어졌습니다.</p>
+<article class="card">
+<h1><span class="brand">LottoBank</span> 로또 전적 관리 가이드</h1>
+<p>LottoBank는 로또 구매 이력을 QR 인증 기반으로 기록하고, 구매 횟수·당첨 횟수·수익률(ROI)을 자동으로 계산해 사용자의 로또 전적을 체계적으로 관리합니다.</p>
 
-    <h2>전적에서 확인하는 항목</h2>
-    <div class="grid">
-      <div class="box"><b>구매 게임</b><span>등록한 QR과 인터넷 구매 캡처의 게임 수를 합산합니다.</span></div>
-      <div class="box"><b>당첨 게임</b><span>회차 결과가 나온 뒤 등수별 당첨 여부를 기록합니다.</span></div>
-      <div class="box"><b>총 당첨금</b><span>당첨금은 원 단위로 누적해 투자금과 비교합니다.</span></div>
-      <div class="box"><b>최고 기록</b><span>사용자 기준 최고 등수와 해당 회차를 보여줍니다.</span></div>
-    </div>
+<h2>전적 통계 항목</h2>
+<table class="table">
+<tr><th>항목</th><th>설명</th></tr>
+<tr><td>총 구매 횟수</td><td>등록한 전체 복권 게임 수</td></tr>
+<tr><td>총 구매 금액</td><td>게임 수 × 1,000원</td></tr>
+<tr><td>총 당첨 횟수</td><td>1~5등 당첨된 게임 수</td></tr>
+<tr><td>총 당첨 금액</td><td>1~5등 당첨금 합산</td></tr>
+<tr><td>수익률(ROI)</td><td>(당첨금 - 구매금액) / 구매금액 × 100%</td></tr>
+<tr><td>최고 등수</td><td>역대 달성한 가장 높은 등수</td></tr>
+<tr><td>최고 당첨금</td><td>한 번에 받은 최고 당첨금</td></tr>
+<tr><td>등수별 통계</td><td>1·2·3·4·5등 각각 몇 번 달성했는지</td></tr>
+</table>
 
-    <h2>로또와 연금의 등수 차이</h2>
-    <p>로또 6/45는 1등부터 5등까지의 당첨 구조를 사용합니다. 연금복권 720+는 1등부터 7등까지 구분되므로 전적 화면에서도 복권 종류별로 다른 등수 구조를 적용해야 합니다.</p>
+<h2>수익률(ROI) 계산 방식</h2>
+<p>수익률은 투자 대비 회수율을 나타냅니다.</p>
+<ul>
+<li>ROI = (총 당첨금 - 총 구매금액) / 총 구매금액 × 100</li>
+<li>예: 총 50,000원 구매, 총 5,000원 당첨 → ROI = -90%</li>
+<li>예: 총 10,000원 구매, 총 50,000원 당첨 → ROI = +400%</li>
+</ul>
+<p>로또는 기대값이 구매 금액보다 낮은 구조이므로 장기 ROI는 대부분 음수입니다. LottoBank는 이를 투명하게 표시합니다.</p>
 
-    <h2>커뮤니티와 랭킹 연결</h2>
-    <p>QR 인증으로 등록된 이력은 커뮤니티 인증게시판에 첨부할 수 있고, 랭킹은 구매, 당첨, 출석 같은 실제 기록을 기준으로 계산됩니다. 수동 입력보다 QR 인증 기록을 우선하는 이유는 조작 가능성을 줄이고, 같은 기준으로 사용자 전적을 비교하기 위해서입니다.</p>
+<h2>로또 6/45 vs 연금복권 720+ 분리 관리</h2>
+<p>LottoBank는 로또 6/45와 연금복권 720+의 전적을 분리해서 볼 수 있습니다. 두 복권의 구매·당첨·ROI를 각각 확인하거나 합산해서 볼 수 있습니다.</p>
 
-    <h2>운영자가 확인해야 할 점</h2>
-    <p>서비스 운영자는 잘못 등록된 QR, 중복 데이터, 판매점 지정 누락, 결과 미확정 회차 표시를 주기적으로 확인해야 합니다. 특히 결과가 아직 발표되지 않은 회차는 낙첨이 아니라 추첨중으로 표시되는 것이 사용자에게 더 정확합니다.</p>
+<h2>뱃지 시스템과 연동</h2>
+<p>전적 데이터를 기반으로 다양한 뱃지를 자동 지급합니다.</p>
+<ul>
+<li>첫 QR 등록 — 첫 구매 이력 등록 시 지급</li>
+<li>첫 당첨 — 처음으로 당첨금을 기록했을 때 지급</li>
+<li>인증 10회, 50회 — QR 등록 누적 횟수 달성 시 지급</li>
+<li>구매 100게임, 500게임, 1000게임 — 총 게임 수 달성 시 지급</li>
+<li>5등 헌터, 4등 헌터 — 해당 등수 5회 이상 달성 시 지급</li>
+<li>3등 수집가, 2등 인증자, 1등 인증자 — 해당 등수 달성 시 지급</li>
+</ul>
 
-    <footer><a href="/">LottoBank 홈으로 돌아가기</a> · <a href="/lotto-qr-guide.html">QR 인증 가이드</a> · <a href="/lotto-tax-guide.html">당첨금 세금</a></footer>
-  </article>
-</main>
-</body>
-</html>
+<h2>랭킹 반영</h2>
+<p>전적 데이터는 실시간으로 랭킹에 반영됩니다. 구매 횟수 랭킹, ROI 랭킹, 총 당첨금 랭킹, 등수별 최다 당첨 랭킹에서 자신의 순위를 확인할 수 있습니다. 모든 랭킹은 실제 QR 인증 데이터를 기반으로 하여 신뢰할 수 있습니다.</p>
+
+<h2>데이터 보안</h2>
+<p>전적 데이터는 Supabase 보안 데이터베이스에 암호화되어 저장됩니다. 사용자 본인만 전적 상세 내역을 볼 수 있으며, 공개 랭킹에는 닉네임만 표시됩니다. 개인 구매 번호는 공개되지 않습니다.</p>
+
+<div class="note">⚠️ 로또는 운에 따른 게임입니다. 과도한 구매를 삼가고 건전한 취미로 즐기세요. LottoBank는 책임감 있는 복권 구매를 권장합니다.</div>
+</article>
+<footer>
+  <a href="/">LottoBank 홈</a> &nbsp;·&nbsp;
+  <a href="/lotto-qr-guide.html">QR 인증 가이드</a> &nbsp;·&nbsp;
+  <a href="/lotto-tax-guide.html">세금 안내</a> &nbsp;·&nbsp;
+  <a href="/lotto-record-guide.html">전적 관리</a> &nbsp;·&nbsp;
+  <a href="/lotto-winning-numbers.html">당첨번호</a> &nbsp;·&nbsp;
+  <a href="/privacy.html">개인정보처리방침</a> &nbsp;·&nbsp;
+  <a href="/terms.html">이용약관</a><br><br>
+  LottoBank는 동행복권 공식 서비스가 아닙니다. 복권 구매는 만 19세 이상만 가능하며 과도한 구매는 삼가세요.
+</footer>
+</main></body></html>

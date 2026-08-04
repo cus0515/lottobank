@@ -1,14 +1,11 @@
 [
   {
-    "relation": [
-      "delegate_permission/common.handle_all_urls",
-      "delegate_permission/common.get_login_creds"
-    ],
+    "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
       "package_name": "com.lottobank.app",
       "sha256_cert_fingerprints": [
-        "3B:D8:5A:6F:98:84:3B:F7:AD:22:6F:5C:2C:48:A4:A4:D1:39:6F:74:84:58:A4:A9:69:5D:7F:DF:97:DE"
+        "BE:DD:A5:A3:64:3F:47:27:D6:AA:FD:B1:87:B7:13:87:74:CA:1B:F3:06:31:52:FC:14:F4:6C:CC:88:B0:AB:67"
       ]
     }
   }

@@ -1,52 +1,103 @@
-﻿<!-- LottoBank 연금복권 등록 방식을 설명하는 공개 가이드 페이지 -->
+<!-- LottoBank 가이드 페이지 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>연금복권 720+ 등록 가이드 | LottoBank</title>
-<meta name="description" content="연금복권 720+의 조 번호, 6자리 번호, 회차 정보를 LottoBank에서 관리하는 방법과 당첨 등수 판정 기준을 설명합니다.">
 <meta name="robots" content="index, follow">
 <meta name="google-adsense-account" content="ca-pub-3323488098461026">
-<link rel="canonical" href="https://lottobank.pages.dev/pension-qr-guide">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
-body{margin:0;background:#f6f8fb;color:#0f172a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.75}
+body{margin:0;background:#f6f8fb;color:#0f172a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.8;font-size:15px}
 main{max-width:860px;margin:0 auto;padding:34px 18px}
-.card{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:26px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
-.brand{color:#16a34a;font-weight:900}
-h1{font-size:30px;line-height:1.25;margin:0 0 12px}
-h2{font-size:20px;margin:30px 0 8px}
-p,li{font-size:15px;color:#334155}
-.note{background:#ecfdf5;border:1px solid #bbf7d0;border-radius:10px;padding:14px;color:#166534}
-a{color:#e11d48;font-weight:800}
-footer{margin-top:22px;font-size:13px;color:#64748b}
+.card{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:28px 32px;box-shadow:0 8px 24px rgba(15,23,42,.06);margin-bottom:20px}
+.brand{color:#e11d48;font-weight:900}
+h1{font-size:28px;line-height:1.3;margin:0 0 14px;color:#0f172a}
+h2{font-size:19px;margin:28px 0 8px;color:#1e293b;border-bottom:2px solid #f1f5f9;padding-bottom:6px}
+h3{font-size:16px;margin:18px 0 6px;color:#334155}
+p,li{color:#334155;margin:0 0 10px}
+ul,ol{padding-left:22px}
+li{margin-bottom:6px}
+.note{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px;color:#9a3412;margin:20px 0}
+.tip{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;color:#166534;margin:16px 0}
+.table{width:100%;border-collapse:collapse;margin:16px 0}
+.table th{background:#f8fafc;padding:10px;text-align:left;font-size:13px;border:1px solid #e2e8f0}
+.table td{padding:10px;border:1px solid #e2e8f0;font-size:14px}
+a{color:#e11d48;font-weight:700;text-decoration:none}
+a:hover{text-decoration:underline}
+footer{margin-top:24px;font-size:13px;color:#64748b;text-align:center}
+nav{background:#0f172a;padding:12px 18px;display:flex;align-items:center;gap:12px}
+nav a{color:#fff;font-weight:800;font-size:15px;text-decoration:none}
+nav span{color:#94a3b8;font-size:13px}
 </style>
 </head>
 <body>
+<nav><a href="/">LottoBank</a><span>·</span>연금복권 가이드</nav>
 <main>
-  <article class="card">
-    <h1><span class="brand">연금복권 720+</span> 등록 가이드</h1>
-    <p>연금복권 720+는 로또 6/45와 달리 조 번호와 6자리 번호를 함께 관리해야 합니다. LottoBank는 회차, 조, 번호를 분리해 저장하고 결과 회차가 공개되면 1등부터 7등, 보너스 등수까지 전적에 반영하는 구조를 사용합니다.</p>
+<article class="card">
+<h1><span class="brand">연금복권 720+</span> QR 인증 및 이용 가이드</h1>
+<p>연금복권 720+는 1등 당첨 시 월 700만원씩 20년간(총 16억 8천만원) 받는 연금 방식의 복권입니다. LottoBank에서 연금복권 구매 이력을 QR 코드로 등록하고 당첨 여부를 자동으로 확인할 수 있습니다.</p>
 
-    <h2>저장되는 정보</h2>
-    <ul>
-      <li>회차 번호와 추첨일.</li>
-      <li>1조부터 5조까지의 조 번호.</li>
-      <li>각 복권의 6자리 선택 번호.</li>
-      <li>QR 또는 인터넷 구매 캡처에서 확인 가능한 고유 식별 정보.</li>
-    </ul>
+<h2>연금복권 720+ 기본 정보</h2>
+<table class="table">
+<tr><th>항목</th><th>내용</th></tr>
+<tr><td>정식 명칭</td><td>연금복권 720+</td></tr>
+<tr><td>추첨 방식</td><td>조 번호(1~5조) + 6자리 숫자(000000~999999)</td></tr>
+<tr><td>추첨 일시</td><td>매주 목요일 오후 7시 5분</td></tr>
+<tr><td>1장 가격</td><td>1,000원</td></tr>
+<tr><td>총 회차 번호</td><td>연간 52회 추첨</td></tr>
+</table>
 
-    <h2>당첨 판정 기준</h2>
-    <p>연금복권은 조와 번호의 일치 여부, 그리고 번호 뒷자리 일치 개수에 따라 등수가 달라집니다. 결과 발표 전에는 추첨중으로 표시하고, 결과가 공개된 회차는 당첨 등수와 당첨금 합계를 다시 계산합니다.</p>
+<h2>당첨 등수 및 당첨금</h2>
+<table class="table">
+<tr><th>등수</th><th>조건</th><th>당첨금</th></tr>
+<tr><td>1등</td><td>조 번호 + 6자리 번호 모두 일치</td><td>월 700만원 × 20년 (총 16억 8천만원)</td></tr>
+<tr><td>2등</td><td>6자리 번호 일치, 조 번호 불일치</td><td>월 100만원 × 10년 (총 1억 2천만원)</td></tr>
+<tr><td>3등</td><td>끝 5자리 일치</td><td>100만원 (일시금)</td></tr>
+<tr><td>4등</td><td>끝 4자리 일치</td><td>10만원 (일시금)</td></tr>
+<tr><td>5등</td><td>끝 3자리 일치</td><td>5,000원 (일시금)</td></tr>
+<tr><td>6등</td><td>끝 2자리 일치</td><td>1,000원 (일시금 — 구매가 환급)</td></tr>
+</table>
 
-    <h2>전적과 커뮤니티 연동</h2>
-    <p>등록된 연금복권은 나의 전적, 등수별 기록, 커뮤니티 인증게시판, 랭킹 통계에 사용됩니다. 같은 회차의 5개 조 세트 구매는 한 장의 용지처럼 묶어 보여 사용자가 실제 구매 내역을 쉽게 확인할 수 있게 합니다.</p>
+<h2>LottoBank에서 연금복권 QR 등록 방법</h2>
+<ol>
+<li>연금복권 실물 복권 하단의 QR 코드를 확인합니다.</li>
+<li>LottoBank 앱(또는 웹) → QR 인증 메뉴를 선택합니다.</li>
+<li>복권 종류를 <strong>연금복권 720+</strong>로 선택합니다.</li>
+<li>QR 스캔 버튼을 눌러 복권 QR을 카메라로 촬영합니다.</li>
+<li>조 번호, 6자리 번호, 구매 회차가 자동으로 인식됩니다.</li>
+<li>등록 확인을 누르면 구매 이력에 저장됩니다.</li>
+<li>매주 목요일 추첨 후 자동으로 당첨 여부가 반영됩니다.</li>
+</ol>
 
-    <p class="note">연금복권 당첨 판매점 정보는 공식 공개 데이터 범위가 제한될 수 있습니다. LottoBank의 판매점 표시는 참고용이며, 공식 결과와 수령 가능 여부는 동행복권에서 최종 확인해야 합니다.</p>
+<h2>연금복권 당첨금 수령</h2>
+<h3>1·2등 (연금 방식)</h3>
+<p>당첨 후 가까운 농협은행 지점 또는 동행복권 서울지사에서 수령 신청을 합니다. 수령 신청 이후 매월 정해진 날에 계좌로 입금됩니다. 연금 방식이므로 일시금 수령은 불가합니다.</p>
+<h3>3~6등 (일시금)</h3>
+<p>복권 판매점이나 농협은행 지점에서 즉시 수령 가능합니다. 6등(1,000원)은 구매가 환급 개념으로 판매점에서 바로 받을 수 있습니다.</p>
 
-    <footer><a href="/">LottoBank 홈</a> · <a href="/pension-winning-numbers.html">연금복권 당첨번호</a> · <a href="/responsible-lottery-guide.html">건전 이용 안내</a></footer>
-  </article>
-</main>
-</body>
-</html>
+<h2>연금복권 vs 로또 6/45 비교</h2>
+<table class="table">
+<tr><th>항목</th><th>로또 6/45</th><th>연금복권 720+</th></tr>
+<tr><td>추첨 요일</td><td>토요일</td><td>목요일</td></tr>
+<tr><td>1등 당첨 방식</td><td>일시금</td><td>월 지급 연금</td></tr>
+<tr><td>1장 가격</td><td>1,000원/게임</td><td>1,000원/장</td></tr>
+<tr><td>1등 확률</td><td>약 1/814만</td><td>약 1/500만</td></tr>
+<tr><td>소액 당첨 최저</td><td>5등 5,000원</td><td>6등 1,000원</td></tr>
+</table>
+
+<div class="tip">💡 연금복권은 로또보다 1등 확률이 약간 높고, 당첨 시 연금 방식으로 장기간 안정적인 금액을 받을 수 있는 것이 특징입니다.</div>
+
+<div class="note">⚠️ LottoBank는 동행복권 공식 서비스가 아닙니다. 당첨 여부 최종 확인은 동행복권 공식 홈페이지(dhlottery.co.kr)를 이용하세요.</div>
+</article>
+<footer>
+  <a href="/">LottoBank 홈</a> &nbsp;·&nbsp;
+  <a href="/lotto-qr-guide.html">QR 인증 가이드</a> &nbsp;·&nbsp;
+  <a href="/lotto-tax-guide.html">세금 안내</a> &nbsp;·&nbsp;
+  <a href="/pension-qr-guide.html">연금복권 가이드</a> &nbsp;·&nbsp;
+  <a href="/lotto-winning-numbers.html">당첨번호</a> &nbsp;·&nbsp;
+  <a href="/privacy.html">개인정보처리방침</a> &nbsp;·&nbsp;
+  <a href="/terms.html">이용약관</a><br><br>
+  LottoBank는 동행복권 공식 서비스가 아닙니다. 복권 구매는 만 19세 이상만 가능합니다.
+</footer>
+</main></body></html>
