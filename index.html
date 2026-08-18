@@ -6418,7 +6418,7 @@ function go(id) {
     home:      '실시간 피드',
     result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="qr-tab-register" class="qr-inner-tab on" onclick="switchQrView(\'register\')">QR 인증</button><button id="qr-tab-history" class="qr-inner-tab" onclick="switchQrView(\'history\')">번호 이력</button></div>',
-    fortune:   `<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="fortune-tab-btn-radar" class="qr-inner-tab on" onclick="switchFortuneTab('radar')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('radar',13,'currentColor')} 레이더</button><button id="fortune-tab-btn-history" class="qr-inner-tab" onclick="switchFortuneTab('history')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('history',13,'currentColor')} 추천이력</button></div>`,
+    fortune:   `<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="fortune-head-lotto" class="qr-inner-tab on" onclick="switchFortuneLottery('lotto')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('ticket',13,'currentColor')} 로또 6/45</button><button id="fortune-head-pension" class="qr-inner-tab" onclick="switchFortuneLottery('pension')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('bank',13,'currentColor')} 연금복권 720+</button></div>`,
     lab:       '<div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);width:100%;margin:0;"><button id="lab-tab-backtest" class="qr-inner-tab on" onclick="switchLabTab(\'backtest\')">백테스터</button><button id="lab-tab-vault" class="qr-inner-tab" onclick="switchLabTab(\'vault\')">저장고</button></div>',
     group:     '<div style="width:100%;font-weight:900;text-align:center;">로또 모임</div>',
     stats:     '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="stats-tab-all" class="qr-inner-tab on" onclick="setStatsLotteryMode(\'all\')">Total</button><button id="stats-tab-lotto" class="qr-inner-tab" onclick="setStatsLotteryMode(\'lotto\')">로또</button><button id="stats-tab-pension" class="qr-inner-tab" onclick="setStatsLotteryMode(\'pension\')">연금</button></div>',
@@ -8047,10 +8047,14 @@ function renderFortune() {
 
   el.innerHTML = `
     <!-- ═══ 레이더 탭 ═══ -->
+    <div class="qr-inner-tabs" style="width:100%;margin:0 0 10px;grid-template-columns:1fr 1fr;">
+      <button id="fortune-view-btn-radar" class="qr-inner-tab on" onclick="switchFortuneTab('radar')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('radar',13,'currentColor')} 추천 번호</button>
+      <button id="fortune-view-btn-history" class="qr-inner-tab" onclick="switchFortuneTab('history')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('history',13,'currentColor')} 추천 이력</button>
+    </div>
     <div id="fortune-tab-radar">
-      <div class="qr-inner-tabs" style="width:100%;margin:0 0 10px;grid-template-columns:1fr 1fr;">
-        <button id="radar-sub-btn-lotto" class="qr-inner-tab on" onclick="switchRadarType('lotto')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('ticket',12,'currentColor')} 로또</button>
-        <button id="radar-sub-btn-pension" class="qr-inner-tab" onclick="switchRadarType('pension')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('bank',12,'currentColor')} 연금</button>
+      <div class="qr-inner-tabs" style="display:none;">
+        <button id="radar-sub-btn-lotto" class="qr-inner-tab on" onclick="switchRadarType('lotto')">로또</button>
+        <button id="radar-sub-btn-pension" class="qr-inner-tab" onclick="switchRadarType('pension')">연금</button>
       </div>
       <div id="radar-sub-lotto" class="radar-clean">
 
@@ -8185,9 +8189,9 @@ function renderFortune() {
 
     <!-- ═══ 추천 이력 탭 ═══ -->
     <div id="fortune-tab-history" style="display:none;">
-      <div class="qr-inner-tabs" style="width:100%;margin:0 0 10px;grid-template-columns:1fr 1fr;">
-        <button id="history-sub-btn-lotto" class="qr-inner-tab on" onclick="switchHistoryType('lotto')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('ticket',12,'currentColor')} 로또</button>
-        <button id="history-sub-btn-pension" class="qr-inner-tab" onclick="switchHistoryType('pension')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('bank',12,'currentColor')} 연금</button>
+      <div class="qr-inner-tabs" style="display:none;">
+        <button id="history-sub-btn-lotto" class="qr-inner-tab on" onclick="switchHistoryType('lotto')">로또</button>
+        <button id="history-sub-btn-pension" class="qr-inner-tab" onclick="switchHistoryType('pension')">연금</button>
       </div>
       <div id="history-sub-lotto"></div>
       <div id="history-sub-pension" style="display:none;"></div>
@@ -8243,7 +8247,7 @@ function switchFortuneTab(tab) {
   ['radar','history'].forEach(t => {
     const panel = $('fortune-tab-'+t);
     if (panel) panel.style.display = t === tab ? '' : 'none';
-    const btn = $('fortune-tab-btn-'+t);
+    const btn = $('fortune-view-btn-'+t) || $('fortune-tab-btn-'+t);
     if (btn) btn.classList.toggle('on', t === tab);
   });
   if (tab === 'history') switchHistoryType(window._fortuneHistoryType || 'lotto');
@@ -8252,9 +8256,25 @@ function switchFortuneTab(tab) {
   _syncTabUrl(tab, tab === 'radar' ? (window._radarType||'lotto') : (window._fortuneHistoryType||'lotto'));
 }
 
+function updateFortuneHeader(type) {
+  const active = type === 'pension' ? 'pension' : 'lotto';
+  $('fortune-head-lotto')?.classList.toggle('on', active === 'lotto');
+  $('fortune-head-pension')?.classList.toggle('on', active === 'pension');
+}
+
+function switchFortuneLottery(type) {
+  const active = type === 'pension' ? 'pension' : 'lotto';
+  window._radarType = active;
+  window._fortuneHistoryType = active;
+  updateFortuneHeader(active);
+  if ((window._fortuneTab || 'radar') === 'history') switchHistoryType(active);
+  else switchRadarType(active);
+}
+
 function switchRadarType(type) {
   // 레이더 탭 내 로또/연금 전환
   window._radarType = type === 'pension' ? 'pension' : 'lotto';
+  updateFortuneHeader(window._radarType);
   ['lotto','pension'].forEach(t => {
     const btn = $('radar-sub-btn-'+t);
     const panel = $('radar-sub-'+t);
@@ -8285,6 +8305,7 @@ function switchHistoryType(type) {
   // 추천이력 탭 내 로또/연금 전환
   window._fortuneHistoryType = type === 'pension' ? 'pension' : 'lotto';
   const active = window._fortuneHistoryType;
+  updateFortuneHeader(active);
   ['lotto','pension'].forEach(t => {
     const btn = $('history-sub-btn-'+t);
     const panel = $('history-sub-'+t);
@@ -10447,17 +10468,36 @@ async function renderRankingHub() {
   if (!sb || !list) return;
   try {
     const adminPreview = location.search.includes('admin-test=1') && window._isAppAdmin;
-    const periodKey = adminPreview
+    let periodKey = adminPreview
       ? 'admin-test'
       : rankingScope === 'monthly' ? new Date().toISOString().slice(0,7) : 'all';
-    const { data: rdata, error } = await sb.from('ranking_snapshots')
+    let { data: rdata, error } = await sb.from('ranking_snapshots')
       .select('rank,score,title,badge_icon,border_color,user_id')
       .eq('period_key', periodKey)
       .eq('ranking_type', rankingCategory)
       .order('rank', { ascending:true })
       .limit(50);
     if (error) throw error;
-    const rows = rdata || [];
+    let rows = rdata || [];
+    if (!adminPreview && rankingScope === 'monthly' && !rows.length) {
+      const { data: latestPeriod } = await sb.from('ranking_snapshots')
+        .select('period_key')
+        .neq('period_key', 'all')
+        .eq('ranking_type', rankingCategory)
+        .order('period_key', { ascending:false })
+        .limit(1)
+        .maybeSingle();
+      if (latestPeriod?.period_key) {
+        periodKey = latestPeriod.period_key;
+        const fallback = await sb.from('ranking_snapshots')
+          .select('rank,score,title,badge_icon,border_color,user_id')
+          .eq('period_key', periodKey)
+          .eq('ranking_type', rankingCategory)
+          .order('rank', { ascending:true })
+          .limit(50);
+        if (!fallback.error) rows = fallback.data || [];
+      }
+    }
     // 닉네임 별도 조회
     const ruids = [...new Set(rows.map(r=>r.user_id))];
     let rnickMap = {};
