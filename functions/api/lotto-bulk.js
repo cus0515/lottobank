@@ -47,31 +47,31 @@ export async function onRequest(context) {
   async function fetchOne(round) {
     try {
       const r = await ft('https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=' + round, 6000);
-      if (r && r.ok) {
-        const txt = await r.text();
-        if (txt && txt.trim().charAt(0) === '{') {
-          const d = JSON.parse(txt);
-          if (d && d.returnValue === 'success') {
-            return {
-              drwNo: Number(d.drwNo),
-              drwNoDate: d.drwNoDate,
-              numbers: [d.drwtNo1, d.drwtNo2, d.drwtNo3, d.drwtNo4, d.drwtNo5, d.drwtNo6].map(Number),
-              bonusNo: Number(d.bnusNo),
-              totSellamnt: Number(d.totSellamnt || 0),
-              firstWinamnt: Number(d.firstWinamnt || 0),
-              firstPrzwnerCo: Number(d.firstPrzwnerCo || 0),
-            };
-          }
-        }
-      }
-    } catch (_) {}
-    return null;
+      if (!r) return { _dbg: 'no-response', round };
+      if (!r.ok) return { _dbg: 'status-' + r.status, round };
+      const txt = await r.text();
+      if (!txt || txt.trim().charAt(0) !== '{') return { _dbg: 'non-json', round, sample: (txt || '').slice(0, 120) };
+      const d = JSON.parse(txt);
+      if (!d || d.returnValue !== 'success') return { _dbg: 'not-success', round, raw: d };
+      return {
+        drwNo: Number(d.drwNo),
+        drwNoDate: d.drwNoDate,
+        numbers: [d.drwtNo1, d.drwtNo2, d.drwtNo3, d.drwtNo4, d.drwtNo5, d.drwtNo6].map(Number),
+        bonusNo: Number(d.bnusNo),
+        totSellamnt: Number(d.totSellamnt || 0),
+        firstWinamnt: Number(d.firstWinamnt || 0),
+        firstPrzwnerCo: Number(d.firstPrzwnerCo || 0),
+      };
+    } catch (e) {
+      return { _dbg: 'exception', round, message: String(e && e.message || e) };
+    }
   }
 
   const rounds = [];
   for (let n = start; n <= end; n++) rounds.push(n);
   const results = await Promise.all(rounds.map(fetchOne));
-  const data = results.filter(Boolean);
+  const data = results.filter((x) => x && !x._dbg);
+  const errors = results.filter((x) => x && x._dbg);
 
-  return new Response(JSON.stringify({ start, end, count: data.length, data }), { headers: cors });
+  return new Response(JSON.stringify({ start, end, count: data.length, data, errors }), { headers: cors });
 }
