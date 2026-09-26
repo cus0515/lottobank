@@ -568,6 +568,15 @@ main.chat-hidden .chat-panel { display: none; }
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .badge-grid { grid-template-columns: repeat(3, 1fr); }
   #toast { bottom: 80px; }
+  /* 공(볼) 한 줄 표시 — 좁은 화면에서 보너스 볼이 다음 줄로 밀리거나 잘리지 않도록 축소 */
+  .ball { width:28px!important; height:28px!important; font-size:11px!important; }
+  .ball-context { gap:4px!important; flex-wrap:nowrap!important; overflow-x:auto; -ms-overflow-style:none; scrollbar-width:none; }
+  .ball-context::-webkit-scrollbar { display:none; }
+  #res-balls { gap:4px!important; flex-wrap:nowrap!important; overflow-x:auto; }
+  #res-balls .ball { width:30px!important; height:30px!important; font-size:12px!important; }
+  #res-balls span[style*="font-size:20px"] { font-size:15px !important; margin:0 2px !important; }
+  .dna-card .b-num, .dna-card .ball,
+  .wisdom-card .b-num, .wisdom-card .ball { width:28px!important; height:28px!important; font-size:11px!important; }
 }
 
 /* ── 로그인 모달 ── */
