@@ -1,6 +1,7 @@
 """
 LottoBank — GitHub Actions lotto cache updater
 매주 토요일 추첨 직후 자동 실행, dhlottery에서 당첨번호 가져와 lotto-cache.json 저장
+그리고 lotto-history.json(전체 회차 누적 이력)에도 새 회차를 자동 추가한다.
 """
 
 import json
@@ -18,6 +19,7 @@ HEADERS = {
 }
 
 CACHE_PATH = 'lotto-cache.json'
+HISTORY_PATH = 'lotto-history.json'
 SEED_ROUND = 1228  # 캐시 없을 때 시작 회차
 
 
@@ -135,6 +137,37 @@ def try_old_api(round_num):
     return None
 
 
+def update_history(result):
+    """lotto-history.json(전체 회차 누적 이력)에 새 회차를 추가한다. 이미 있으면 건너뜀."""
+    drw_no = result['drwNo']
+    try:
+        with open(HISTORY_PATH, encoding='utf-8') as f:
+            history = json.load(f)
+    except Exception:
+        print(f"  ⚠️ {HISTORY_PATH} 없음 — 새로 생성")
+        history = []
+
+    existing_nos = {rec.get('drwNo') for rec in history}
+    if drw_no in existing_nos:
+        print(f"  history: {drw_no}회 이미 존재, 건너뜀")
+        return False
+
+    numbers = [result['drwtNo1'], result['drwtNo2'], result['drwtNo3'],
+               result['drwtNo4'], result['drwtNo5'], result['drwtNo6']]
+    history.append({
+        'drwNo': drw_no,
+        'drwNoDate': result['drwNoDate'],
+        'numbers': numbers,
+        'bonusNo': result['bnusNo'],
+    })
+    history.sort(key=lambda x: x['drwNo'])
+
+    with open(HISTORY_PATH, 'w', encoding='utf-8') as f:
+        json.dump(history, f, ensure_ascii=False, separators=(',', ':'))
+    print(f"  ✅ history: {drw_no}회 추가 (총 {len(history)}회차)")
+    return True
+
+
 def main():
     # 현재 캐시 읽기
     current_round = 0
@@ -161,6 +194,7 @@ def main():
             print(f"💾 저장 완료: {result['drwNo']}회 ({result['drwNoDate']})")
             print(f"   번호: {result['drwtNo1']} {result['drwtNo2']} {result['drwtNo3']} "
                   f"{result['drwtNo4']} {result['drwtNo5']} {result['drwtNo6']} +{result['bnusNo']}")
+            update_history(result)
             return
 
     print("새 데이터 없음 — 기존 캐시 유지")

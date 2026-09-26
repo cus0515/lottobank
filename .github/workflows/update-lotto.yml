@@ -36,7 +36,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add lotto-cache.json
+          git add lotto-cache.json lotto-history.json
           if git diff --staged --quiet; then
             echo "No changes — cache is already up to date"
           else

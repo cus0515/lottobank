@@ -11,3 +11,4 @@ node_modules/
 dist/
 .granite/
 .pnpm-store/
+__pycache__/
