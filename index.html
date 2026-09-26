@@ -91,7 +91,7 @@
   --amber-border: #fde68a;
   --amber-text: #92400e;
 }
-body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-floor); color: var(--text-dark); line-height: 1.5; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; min-height:100vh; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-floor); color: var(--text-dark); line-height: 1.5;word-break:keep-all;overflow-wrap:break-word; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; min-height:100vh; }
 
 header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
 .nav-container { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 64px; }
@@ -116,7 +116,7 @@ header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); positio
 .user-btn:hover { background:rgba(225,29,72,.1); }
 .user-avatar { width:32px; height:32px; border-radius:50%; background:var(--lotto-red); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:900; flex-shrink:0; }
 .user-btn-arrow { font-size:10px; color:rgba(148,163,184,.7); }
-.user-dropdown { display:none; position:absolute; top:calc(100% + 8px); right:0; background:var(--paper-white); border:1px solid rgba(226,232,240,.7); border-radius:14px; box-shadow:0 12px 32px rgba(0,0,0,.16),0 0 0 1px rgba(0,0,0,.04); min-width:190px; z-index:9999; overflow:hidden; }
+.user-dropdown { display:none; position:absolute; top:calc(100% + 8px); right:0; background:var(--paper-white); border:1px solid var(--border-dashed); border-radius:14px; box-shadow:0 12px 32px rgba(0,0,0,.16),0 0 0 1px rgba(0,0,0,.04); min-width:190px; z-index:9999; overflow:hidden; }
 .user-dropdown.open { display:block; }
 .dd-item { display:block; width:100%; text-align:left; padding:10px 14px; font-size:13px; font-weight:600; color:var(--text-dark); background:none; border:none; cursor:pointer; font-family:inherit; }
 .dd-item:hover { background:var(--bg-light); }
@@ -157,13 +157,13 @@ main.chat-hidden .chat-panel { display: none; }
 .region-list { font-size:11px; color:var(--text-muted); margin-top:6px; padding:6px 8px; background:var(--bg-light); border-radius:6px; line-height:1.8; }
 @media (max-width: 1200px) { main { grid-template-columns: 1fr; height: auto; } }
 
-.panel { background: var(--paper-white); border-radius: 14px; border:1px solid rgba(226,232,240,.7); display: flex; flex-direction: column; height: 100%; overflow: hidden; box-shadow: 0 2px 4px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06); }
+.panel { background: var(--paper-white); border-radius: 14px; border:1px solid var(--border-dashed); display: flex; flex-direction: column; height: 100%; overflow: hidden; box-shadow: 0 2px 4px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06); }
 .panel-header { height:50px; box-sizing:border-box; padding: 9px 20px; border-bottom: 1px solid var(--border-dashed); font-size: 14px; font-weight: 800; color: var(--text-dark); display: flex; justify-content: space-between; align-items: center; background:var(--paper-white); letter-spacing:-.2px; flex-shrink:0; }
 .panel-body { padding: 16px 18px; overflow-y: auto; flex: 1; scroll-behavior:smooth; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .page-fade { animation: pageFadeIn 0.2s ease; }
 
-.lotto-slip { background:var(--paper-white); border: 1px solid rgba(226,232,240,.8); border-radius: 14px; padding: 18px; position: relative; box-shadow: 0 2px 8px rgba(15,23,42,.06); }
+.lotto-slip { background:var(--paper-white); border: 1px solid var(--border-dashed); border-radius: 14px; padding: 18px; position: relative; box-shadow: 0 2px 8px rgba(15,23,42,.06); }
 .slip-header { border-bottom: 1px solid rgba(225,29,72,.2); padding-bottom: 10px; margin-bottom: 12px; text-align: center; }
 .slip-header h2 { color: var(--lotto-red); font-size: 17px; font-weight: 900; }
 .slip-header p { font-size: 11px; color: var(--text-muted); }
@@ -178,20 +178,20 @@ main.chat-hidden .chat-panel { display: none; }
 .ball.match { box-shadow: 0 0 0 3px #111; font-weight: 900; }
 
 .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.stats-box { background: var(--paper-white); border: 1px solid rgba(226,232,240,.8); padding: 12px 14px; border-radius: 10px; box-shadow: 0 1px 3px rgba(15,23,42,.04); }
+.stats-box { background: var(--paper-white); border: 1px solid var(--border-dashed); padding: 12px 14px; border-radius: 10px; box-shadow: 0 1px 3px rgba(15,23,42,.04); }
 .stats-label { font-size: 10px; color: var(--text-muted); font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
 .stats-value { font-size: 16px; font-weight: 900; margin-top: 3px; letter-spacing: -.3px; color: var(--text-dark); }
 .lotto-receipt { background:var(--paper-white); border: 1px solid #cbd5e1; padding: 12px; border-radius: 4px; font-family: 'Courier New', monospace; margin-bottom: 8px; font-size: 12px; }
 
 .live-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
-.live-card { background:var(--paper-white);border:1px solid rgba(226,232,240,.8); border-radius: 10px; padding: 12px 14px; min-height: 72px; transition:transform .18s ease,box-shadow .18s ease; }
+.live-card { background:var(--paper-white);border:1px solid var(--border-dashed); border-radius: 10px; padding: 12px 14px; min-height: 72px; transition:transform .18s ease,box-shadow .18s ease; }
 .live-card strong { display: block; color: var(--lotto-red); font-size: 20px; font-weight: 900; line-height: 1.1; margin-top: 4px; letter-spacing: -.5px; }
 .live-card span { color: var(--text-muted); font-size: 10px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; }
 .section-mini-title { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 900; color: var(--text-dark); margin: 14px 0 8px; }
 .section-mini-title em { font-style: normal; color: var(--text-muted); font-size: 11px; font-weight: 600; }
 .hot-number-strip { display: flex; gap: 6px; flex-wrap: wrap; background:var(--paper-white);border:1px solid var(--border-dashed); border-radius: 6px; padding: 10px; margin-bottom: 10px; }
 .insight-list { display: grid; gap: 8px; margin-bottom: 12px; }
-.insight-item { display: flex; justify-content: space-between; gap: 12px; align-items: center; background:var(--paper-white);border:1px solid rgba(226,232,240,.8); border-radius: 10px; padding: 11px 14px; font-size: 12px; box-shadow: 0 1px 2px rgba(15,23,42,.04); }
+.insight-item { display: flex; justify-content: space-between; gap: 12px; align-items: center; background:var(--paper-white);border:1px solid var(--border-dashed); border-radius: 10px; padding: 11px 14px; font-size: 12px; box-shadow: 0 1px 2px rgba(15,23,42,.04); }
 .insight-item b { color: var(--lotto-red); white-space: nowrap; }
 .ticket-feedback { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 6px; padding: 10px 12px; font-size: 12px; font-weight: 700; margin-bottom: 12px; }
 [data-theme="dark"] .ticket-feedback { background:#1a0f00 !important; border-color:#92400e !important; color:#fbbf24 !important; }
@@ -473,7 +473,7 @@ main.chat-hidden .chat-panel { display: none; }
 .post-detail-back { display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--lotto-red);cursor:pointer;margin-bottom:12px;padding:4px 0; }
 .post-detail-title { font-size:16px;font-weight:900;color:var(--text-dark);margin-bottom:6px;line-height:1.4; }
 .post-detail-meta  { font-size:11px;color:var(--text-muted);display:flex;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-dashed); }
-.post-like-btn     { background:none;border:1px solid var(--border-dashed);border-radius:20px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;transition:all .15s; }
+.post-like-btn     { background:none;border:1px solid var(--border-dashed);border-radius:12px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;transition:all .15s; }
 .post-like-btn:hover,.post-like-btn.liked { color:var(--lotto-red);border-color:var(--lotto-red); }
 .comment-section   { margin-top:14px; }
 .comment-section-title { font-size:12px;font-weight:700;color:var(--text-dark);margin-bottom:10px; }
@@ -513,7 +513,7 @@ main.chat-hidden .chat-panel { display: none; }
 .profile-stat-cell { background: var(--paper-white); padding: 12px; text-align: center; }
 .profile-stat-val { font-size: 18px; font-weight: 900; color: var(--text-dark); }
 .profile-stat-lbl { font-size: 10px; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
-.profile-block { background:var(--paper-white);border:1px solid rgba(226,232,240,.8); border-radius: 12px; padding: 16px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(15,23,42,.04); }
+.profile-block { background:var(--paper-white);border:1px solid var(--border-dashed); border-radius: 12px; padding: 16px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(15,23,42,.04); }
 .profile-block-title { font-size: 11px; font-weight: 900; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 .profile-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-dashed); font-size: 13px; }
 .profile-row:last-child { border-bottom: none; }
@@ -829,7 +829,7 @@ input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px
 .plus-card { border:1px solid rgba(225,29,72,.22); border-radius:12px; background:linear-gradient(135deg,rgba(225,29,72,.08),rgba(245,158,11,.07)); padding:14px; }
 .plus-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:999px; background:#fff7ed; border:1px solid #fed7aa; color:#c2410c; font-size:10px; font-weight:900; }
 .plus-benefits { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:10px; }
-.plus-benefits span { min-height:34px; display:flex; align-items:center; gap:6px; padding:8px 9px; border:1px solid rgba(226,232,240,.85); border-radius:8px; background:var(--paper-white); color:var(--text-dark); font-size:11px; font-weight:800; }
+.plus-benefits span { min-height:34px; display:flex; align-items:center; gap:6px; padding:8px 9px; border:1px solid var(--border-dashed); border-radius:8px; background:var(--paper-white); color:var(--text-dark); font-size:11px; font-weight:800; }
 .group-card { margin-top:10px; border:1px solid rgba(22,163,74,.24); border-radius:12px; background:linear-gradient(135deg,rgba(22,163,74,.08),rgba(14,165,233,.06)); padding:14px; }
 .group-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:999px; background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; font-size:10px; font-weight:900; }
 .group-grid { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.35fr); gap:12px; }
@@ -1165,12 +1165,12 @@ input:focus-visible { outline:none; }
 /* Premium stat number */
 .kpi-num { font-size: 22px; font-weight: 900; letter-spacing: -1px; color: var(--text-dark); line-height: 1.1; }
 .kpi-label { font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: .4px; text-transform: uppercase; margin-top: 3px; }
-.kpi-card { background: var(--paper-white); border: 1px solid rgba(226,232,240,.8); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(15,23,42,.04); position: relative; overflow: hidden; }
+.kpi-card { background: var(--paper-white); border: 1px solid var(--border-dashed); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(15,23,42,.04); position: relative; overflow: hidden; }
 .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, var(--lotto-red), var(--lotto-purple)); opacity: 0; transition: opacity .2s; }
 .kpi-card:hover::before { opacity: 1; }
 
 /* Hot number balls upgrade */
-.hot-number-strip { display: flex; gap: 6px; flex-wrap: wrap; background:var(--paper-white); border:1px solid rgba(226,232,240,.8); border-radius: 10px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(15,23,42,.03); }
+.hot-number-strip { display: flex; gap: 6px; flex-wrap: wrap; background:var(--paper-white); border:1px solid var(--border-dashed); border-radius: 10px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(15,23,42,.03); }
 
 /* Profile hero upgrade */
 .profile-hero { text-align: center; padding: 28px 20px 20px; border-bottom: 1px solid var(--border-dashed); margin-bottom: 14px; background: linear-gradient(160deg, rgba(225,29,72,.06) 0%, rgba(124,58,237,.04) 60%, transparent 100%); border-radius: 12px 12px 0 0; position: relative; }
@@ -1179,7 +1179,7 @@ input:focus-visible { outline:none; }
 .profile-avatar-circle { width: 66px; height: 66px; border-radius: 50%; background: linear-gradient(135deg, var(--lotto-red), var(--lotto-purple)); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; font-weight: 900; margin: 0 auto 12px; box-shadow: 0 4px 16px rgba(225,29,72,.3); }
 
 /* Community post card upgrade */
-.post-card { background: var(--paper-white); border: 1px solid rgba(226,232,240,.8); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; transition: box-shadow .15s, transform .1s; }
+.post-card { background: var(--paper-white); border: 1px solid var(--border-dashed); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; transition: box-shadow .15s, transform .1s; }
 .post-card:hover { box-shadow: 0 4px 16px rgba(15,23,42,.1); transform: translateY(-1px); }
 
 /* Auth modal upgrade */
@@ -1191,7 +1191,7 @@ input:focus-visible { outline:none; }
 .select-custom:focus { border-color: var(--lotto-red); }
 
 /* Round lookup result card */
-.res-slip-card { background: var(--paper-white); border: 1px solid rgba(226,232,240,.8); border-radius: 16px; padding: 20px; box-shadow: 0 2px 12px rgba(15,23,42,.06); }
+.res-slip-card { background: var(--paper-white); border: 1px solid var(--border-dashed); border-radius: 16px; padding: 20px; box-shadow: 0 2px 12px rgba(15,23,42,.06); }
 
 /* Dark mode overrides for new components */
 [data-theme="dark"] .kpi-card { background: #162032; border-color: #1e3a5f; }
@@ -1224,7 +1224,7 @@ input:focus-visible { outline:none; }
 /* Hot/cold container 2-col layout */
 #fortune-content .hot-cold-section { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .stat-kpi-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:12px; }
-.stat-kpi-card { background:var(--paper-white); border:1px solid rgba(226,232,240,.8); border-radius:12px; padding:14px 16px; box-shadow:0 1px 3px rgba(15,23,42,.04); position:relative; overflow:hidden; }
+.stat-kpi-card { background:var(--paper-white); border:1px solid var(--border-dashed); border-radius:12px; padding:14px 16px; box-shadow:0 1px 3px rgba(15,23,42,.04); position:relative; overflow:hidden; }
 .stat-kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:3px 3px 0 0; }
 .stat-kpi-card.red::before { background:linear-gradient(90deg,#e11d48,#f43f5e); }
 .stat-kpi-card.green::before { background:linear-gradient(90deg,#10b981,#34d399); }
@@ -1301,19 +1301,19 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .qr-dup-title{font-size:13px;font-weight:800;color:#7c3aed;margin-bottom:3px;}
 .qr-dup-body{font-size:12px;color:var(--text-muted);line-height:1.55;}
 .qr-source-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
-.qr-source-tab{height:36px;border:1px solid var(--border-dashed);border-radius:7px;background:var(--paper-white);color:var(--text-muted);font:800 12px inherit;cursor:pointer;}
+.qr-source-tab{height:36px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-muted);font:800 12px inherit;cursor:pointer;}
 .qr-source-tab.on{border-color:var(--lotto-red);background:var(--lotto-red);color:#fff;}
 .online-capture-drop{display:flex;align-items:center;justify-content:center;min-height:120px;border:1px dashed var(--border-dashed);border-radius:8px;background:var(--bg-light);cursor:pointer;text-align:center;color:var(--text-muted);}
 .online-capture-drop:hover{border-color:var(--lotto-red);color:var(--lotto-red);}
-.online-capture-preview{display:block;max-width:100%;max-height:260px;margin:10px auto 0;border:1px solid var(--border-dashed);border-radius:7px;object-fit:contain;}
+.online-capture-preview{display:block;max-width:100%;max-height:260px;margin:10px auto 0;border:1px solid var(--border-dashed);border-radius:8px;object-fit:contain;}
 
 /* == Task #123: Community write bar + post card premium upgrade == */
-.post-write-bar{display:flex;gap:8px;margin-bottom:12px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:12px;padding:10px 12px;box-shadow:0 1px 4px rgba(15,23,42,.05);}
+.post-write-bar{display:flex;gap:8px;margin-bottom:12px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:10px 12px;box-shadow:0 1px 4px rgba(15,23,42,.05);}
 .post-write-input{flex:1;padding:8px 12px;border:1px solid rgba(226,232,240,.6);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg-light);color:var(--text-dark);outline:none;transition:border-color .15s,background .15s;}
 .post-write-input:focus{border-color:var(--lotto-red);background:var(--paper-white);}
 .post-write-btn{padding:8px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background .15s,transform .1s;letter-spacing:.3px;}
 .post-write-btn:hover{background:#c01237;transform:translateY(-1px);}
-.post-card{background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:14px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:box-shadow .18s,transform .12s,border-color .15s;position:relative;overflow:hidden;}
+.post-card{background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:box-shadow .18s,transform .12s,border-color .15s;position:relative;overflow:hidden;}
 .post-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:transparent;transition:background .15s;border-radius:14px 0 0 14px;}
 .post-card:hover{box-shadow:0 6px 20px rgba(15,23,42,.1);transform:translateY(-2px);border-color:rgba(225,29,72,.25);}
 .post-card:hover::before{background:var(--lotto-red);}
@@ -1321,7 +1321,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .post-card-title{font-size:13px;font-weight:700;color:var(--text-dark);line-height:1.4;}
 .post-card-preview{font-size:11px;color:var(--text-muted);margin:4px 0 0;line-height:1.55;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
 .post-card-stats{font-size:11px;color:var(--text-muted);display:flex;gap:10px;margin-top:7px;align-items:center;border-top:1px solid rgba(226,232,240,.6);padding-top:7px;}
-.post-card-stats .post-like-btn{background:none;border:1px solid rgba(226,232,240,.8);border-radius:20px;padding:2px 10px;font-size:11px;cursor:pointer;color:var(--text-muted);font-family:inherit;transition:border-color .15s,color .15s;display:inline-flex;align-items:center;gap:4px;}
+.post-card-stats .post-like-btn{background:none;border:1px solid var(--border-dashed);border-radius:12px;padding:2px 10px;font-size:11px;cursor:pointer;color:var(--text-muted);font-family:inherit;transition:border-color .15s,color .15s;display:inline-flex;align-items:center;gap:4px;}
 .post-card-stats .post-like-btn:hover,.post-card-stats .post-like-btn.liked{border-color:#fca5a5;color:#e11d48;}
 .post-tag-chip{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.3px;}
 .tag-free{background:rgba(100,116,139,.12);color:#475569;border:1px solid rgba(100,116,139,.2);}
@@ -1335,7 +1335,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 [data-theme='dark'] .post-card-stats .post-like-btn{border-color:#334155;}
 [data-theme='dark'] .tag-free{background:rgba(100,116,139,.2);color:#94a3b8;border-color:rgba(100,116,139,.3);}
 [data-theme='dark'] .tag-verify{background:rgba(225,29,72,.15);color:#f87171;border-color:rgba(225,29,72,.3);}
-.community-board-head{background:var(--paper-white);border:1px solid rgba(226,232,240,.85);border-radius:12px;padding:13px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(15,23,42,.04);}
+.community-board-head{background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:13px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(15,23,42,.04);}
 .community-board-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
 .community-board-title b{font-size:16px;color:var(--text-dark);}
 .community-board-title span{font-size:11px;color:var(--text-muted);}
@@ -1474,11 +1474,11 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .profile-nick{font-size:18px;font-weight:900;margin-bottom:4px;letter-spacing:-.3px;}
 .profile-sub-text{font-size:11px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:6px;}
 .profile-stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
-.profile-stat-cell{background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:12px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(15,23,42,.04);transition:transform .15s;}
+.profile-stat-cell{background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(15,23,42,.04);transition:transform .15s;}
 .profile-stat-cell:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(15,23,42,.08);}
 .profile-stat-val{font-size:17px;font-weight:900;color:var(--text-dark);line-height:1.2;}
 .profile-stat-lbl{font-size:9px;color:var(--text-muted);font-weight:700;margin-top:3px;letter-spacing:.4px;text-transform:uppercase;}
-.profile-block{background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(15,23,42,.05);}
+.profile-block{background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(15,23,42,.05);}
 .profile-block-title{font-size:10px;font-weight:900;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:6px;}
 .profile-block-title::before{content:'';width:3px;height:12px;background:var(--lotto-red);border-radius:2px;display:inline-block;}
 .profile-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(226,232,240,.6);font-size:12px;color:var(--text-muted);}
@@ -1494,13 +1494,13 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .rank-row{transition:background .15s,transform .1s !important;position:relative;overflow:hidden;cursor:pointer;}
 .rank-row:hover{background:rgba(225,29,72,.05) !important;transform:translateX(2px);}
 .rank-row.my-rank-row{background:linear-gradient(90deg,rgba(225,29,72,.08),transparent) !important;border-left:3px solid var(--lotto-red) !important;}
-.badge-card-item{background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:12px;padding:14px 10px;text-align:center;transition:transform .18s,box-shadow .18s,border-color .15s;}
+.badge-card-item{background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:14px 10px;text-align:center;transition:transform .18s,box-shadow .18s,border-color .15s;}
 .badge-card-item.earned{border-color:rgba(225,29,72,.3);background:linear-gradient(160deg,rgba(225,29,72,.05),rgba(255,255,255,0));box-shadow:0 2px 8px rgba(225,29,72,.08);}
 .badge-card-item.earned:hover{transform:translateY(-3px) !important;box-shadow:0 8px 24px rgba(225,29,72,.18) !important;border-color:rgba(225,29,72,.5) !important;}
 .badge-card-item.locked{opacity:.3;filter:grayscale(1);}
 .badge-icon-big{font-size:30px;display:block;margin-bottom:8px;transition:transform .2s;}
 .badge-card-item.earned:hover .badge-icon-big{transform:scale(1.2) rotate(-5deg);}
-.kpi-box{background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:14px !important;padding:14px;transition:transform .18s,box-shadow .18s;}
+.kpi-box{background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px !important;padding:14px;transition:transform .18s,box-shadow .18s;}
 .kpi-box:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,23,42,.1) !important;}
 .kpi-box.hl{border-color:rgba(225,29,72,.3);background:linear-gradient(160deg,rgba(225,29,72,.06),rgba(255,255,255,0));}
 .kpi-label{font-size:10px;color:var(--text-muted);font-weight:800;margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase;}
@@ -2047,9 +2047,9 @@ textarea {
       <button id="m-ticket" class="menu-btn" onclick="go('ticket')">QR 인증</button>
     </div>
     <div class="auth-zone">
-      <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크 모드로 전환" style="width:34px;height:30px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-dashed);border-radius:6px;padding:0;cursor:pointer;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="다크 모드로 전환"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+      <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크 모드로 전환" style="width:34px;height:30px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-dashed);border-radius:8px;padding:0;cursor:pointer;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="다크 모드로 전환"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
       <button id="chat-reopen-btn" onclick="toggleChat()" title="채팅 열기"
-        style="display:none;align-items:center;gap:4px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--text-muted);background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;cursor:pointer;">
+        style="display:none;align-items:center;gap:4px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--text-muted);background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;cursor:pointer;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 채팅
       </button>
       <button id="btn-auth" class="btn-login" onclick="showAuthModal()">로그인</button>
@@ -2070,15 +2070,15 @@ textarea {
               <div id="dd-badge" style="font-size:10px;color:#dc2626;font-weight:700;"></div>
             </div>
             <div id="dd-stats-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;">
-              <div style="text-align:center;padding:5px 0;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:5px;">
+              <div style="text-align:center;padding:5px 0;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;">
                 <div style="font-size:10px;color:#94a3b8;font-weight:600;">구매</div>
                 <div id="dd-stat-buy" style="font-size:12px;font-weight:900;color:var(--text-dark);">-</div>
               </div>
-              <div style="text-align:center;padding:5px 0;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:5px;">
+              <div style="text-align:center;padding:5px 0;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;">
                 <div style="font-size:10px;color:#94a3b8;font-weight:600;">당첨</div>
                 <div id="dd-stat-win" style="font-size:12px;font-weight:900;color:var(--b-green);">-</div>
               </div>
-              <div style="text-align:center;padding:5px 0;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:5px;">
+              <div style="text-align:center;padding:5px 0;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;">
                 <div style="font-size:10px;color:#94a3b8;font-weight:600;">수익률</div>
                 <div id="dd-stat-roi" style="font-size:12px;font-weight:900;color:var(--text-dark);">-</div>
               </div>
@@ -2264,15 +2264,15 @@ textarea {
           </div>
           <!-- 세 가지 핵심 가치 제안 -->
           <div style="margin:10px 0;display:flex;flex-direction:column;gap:5px;">
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:8px;border:1px solid var(--border-dashed);">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/></svg>
               <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">QR 구매 내역 인증</div><div style="font-size:10px;color:var(--text-muted);">회차와 구매 번호 자동 인식</div></div>
             </div>
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:8px;border:1px solid var(--border-dashed);">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-5"/><path d="M14 22v-5"/><path d="M8 4h8v7a4 4 0 0 1-8 0V4z"/></svg>
               <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">나의 전적 자동 기록</div><div style="font-size:10px;color:var(--text-muted);">구매·당첨·수익률 통계 관리</div></div>
             </div>
-            <div onclick="go('rank')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:7px;border:1px solid var(--border-dashed);cursor:pointer;">
+            <div onclick="go('rank')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--paper-white);border-radius:8px;border:1px solid var(--border-dashed);cursor:pointer;">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--lotto-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
               <div><div style="font-size:11px;font-weight:800;color:var(--text-dark);">인증 기반 랭킹</div><div style="font-size:10px;color:var(--text-muted);">검증된 구매 이력으로 순위 반영</div></div>
             </div>
@@ -2326,11 +2326,11 @@ textarea {
             </div>
           </div>
           <div id="left-invest-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;margin-top:4px;">
-            <div id="left-prize-card" style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;padding:7px;text-align:center;">
+            <div id="left-prize-card" style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;padding:7px;text-align:center;">
               <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px;">총 당첨금</div>
               <div id="my-total-prize" style="font-weight:900;color:#15803d;">-</div>
             </div>
-            <div id="left-cost-card" style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:6px;padding:7px;text-align:center;">
+            <div id="left-cost-card" style="background:var(--bg-light);border:1px solid var(--border-dashed);border-radius:8px;padding:7px;text-align:center;">
               <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px;">총 투자금</div>
               <div id="my-total-cost" style="font-weight:900;color:#dc2626;">-</div>
             </div>
@@ -2383,7 +2383,7 @@ textarea {
           <button id="res-next-btn" onclick="resNavStep(1)" title="다음 회차" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
         </div>
 
-        <div id="res-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
+        <div id="res-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
           <div id="res-round-header" class="round-result-header" style="padding:12px 16px;display:none;">
             <div id="res-round-label" style="font-size:16px;font-weight:900;"></div>
           </div>
@@ -2405,7 +2405,7 @@ textarea {
           <button id="pen-prev-btn" onclick="penNavStep(1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">◀ 이전 회차</button>
           <button id="pen-next-btn" onclick="penNavStep(-1)" style="flex:1;padding:7px 6px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">다음 회차 ▶</button>
         </div>
-        <div id="pen-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid rgba(226,232,240,.8);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
+        <div id="pen-result-card" style="margin-top:10px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(15,23,42,.06);">
           <div id="pen-round-header" class="round-result-header" style="padding:12px 16px;display:none;">
                         <div id="pen-round-label" style="font-size:16px;font-weight:900;"></div>
           </div>
@@ -2561,14 +2561,14 @@ textarea {
             <input type="text" id="post-input-title" class="post-write-input" placeholder="제목을 입력하세요..." style="width:100%;box-sizing:border-box;padding-right:52px;" maxlength="100" oninput="const c=$('post-title-count');if(c){c.textContent=this.value.length+'/100';c.style.color=this.value.length>80?'#dc2626':'#94a3b8'}">
             <span id="post-title-count" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:#94a3b8;pointer-events:none;">0/100</span>
           </div>
-          <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid var(--border-dashed);border-radius:6px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:var(--text-dark);background:var(--paper-white);" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'" oninput="const c=$('post-body-count');if(c){c.textContent=this.value.length+'/2000';c.style.color=this.value.length>1800?'#dc2626':'var(--text-muted)'}"></textarea>
+          <textarea id="post-input-body" placeholder="본문을 입력하세요 (선택)" style="width:100%;box-sizing:border-box;border:1px solid var(--border-dashed);border-radius:8px;padding:9px 12px;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none;color:var(--text-dark);background:var(--paper-white);" maxlength="2000" onfocus="this.style.borderColor='var(--lotto-red)'" onblur="this.style.borderColor='var(--border-dashed)'" oninput="const c=$('post-body-count');if(c){c.textContent=this.value.length+'/2000';c.style.color=this.value.length>1800?'#dc2626':'var(--text-muted)'}"></textarea>
           <div id="community-recommend-picker" class="community-recommend-picker"></div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
             <span style="font-size:10px;color:var(--text-muted);">※ 홍보·욕설·스팸 금지</span>
             <span id="post-body-count" style="font-size:11px;color:var(--text-muted);">0/2000</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
-            <button type="button" onclick="collapsePostForm()" style="padding:8px 14px;border:1px solid var(--border-dashed);border-radius:6px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">취소</button>
+            <button type="button" onclick="collapsePostForm()" style="padding:8px 14px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">취소</button>
             <button type="button" onclick="writePost()" style="padding:8px 16px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">등록</button>
           </div>
         </div>
@@ -6410,7 +6410,7 @@ function go(id) {
     result:    '<div style="display:flex;gap:6px;width:100%;">' + '<button id="res-tab-lotto" onclick="switchResultTab(\'lotto\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--lotto-red);background:var(--lotto-red);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">로또 6/45</button>' + '<button id="res-tab-pension" onclick="switchResultTab(\'pension\')" style="flex:1;padding:6px 0;border-radius:8px;border:1.5px solid var(--border-dashed);background:var(--paper-white);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">연금복권 720+</button>' + '</div>',
     ticket:    '<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="qr-tab-register" class="qr-inner-tab on" onclick="switchQrView(\'register\')">QR 인증</button><button id="qr-tab-history" class="qr-inner-tab" onclick="switchQrView(\'history\')">번호 이력</button></div>',
     fortune:   `<div class="qr-inner-tabs" style="width:100%;margin:0;"><button id="fortune-head-lotto" class="qr-inner-tab on" onclick="switchFortuneLottery('lotto')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('ticket',13,'currentColor')} 로또 6/45</button><button id="fortune-head-pension" class="qr-inner-tab" onclick="switchFortuneLottery('pension')" style="display:flex;align-items:center;justify-content:center;gap:5px;">${svgIcon('bank',13,'currentColor')} 연금복권 720+</button></div>`,
-    lab:       '<div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);width:100%;margin:0;"><button id="lab-tab-backtest" class="qr-inner-tab on" onclick="switchLabTab(\'backtest\')">백테스터</button><button id="lab-tab-vault" class="qr-inner-tab" onclick="switchLabTab(\'vault\')">저장고</button></div>',
+    lab:       '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="lab-tab-backtest" class="qr-inner-tab on" onclick="switchLabTab(\'backtest\')">백테스터</button><button id="lab-tab-vault" class="qr-inner-tab" onclick="switchLabTab(\'vault\')">저장고</button><button id="lab-tab-tax" class="qr-inner-tab" onclick="switchLabTab(\'tax\')">세금계산기</button></div>',
     group:     '<div style="width:100%;font-weight:900;text-align:center;">로또 모임</div>',
     stats:     '<div class="qr-inner-tabs" style="grid-template-columns:repeat(3,1fr);width:100%;margin:0;"><button id="stats-tab-all" class="qr-inner-tab on" onclick="setStatsLotteryMode(\'all\')">Total</button><button id="stats-tab-lotto" class="qr-inner-tab" onclick="setStatsLotteryMode(\'lotto\')">로또</button><button id="stats-tab-pension" class="qr-inner-tab" onclick="setStatsLotteryMode(\'pension\')">연금</button></div>',
     rank:      '<div class="rank-view-tabs" style="width:100%;margin-bottom:0;"><button id="rank-view-ranking" class="rank-view-btn on" onclick="setRankView(\'ranking\')">랭킹</button><button id="rank-view-hall" class="rank-view-btn" onclick="setRankView(\'hall\')">명예의 전당</button></div>',
@@ -6570,6 +6570,9 @@ async function loadMyNumberStats() {
 window._labRunSeq = 0; // 백테스터 abort 시퀀스
 let labTab = 'backtest';
 let labBackType = 'lotto';
+let labTaxType = 'lotto';
+let _taxLottoPeople = 1;
+let _taxPensionYears = 20;
 let labVaultView = 'lotto';
 let labLottoPick = [];
 let labPensionGroup = 1;
@@ -7271,7 +7274,7 @@ function shareLottoGroup() {
 
 function switchLabTab(tab) {
   labTab = tab || 'backtest';
-  ['backtest','vault'].forEach(key => $('lab-tab-' + key)?.classList.toggle('on', key === labTab));
+  ['backtest','vault','tax'].forEach(key => $('lab-tab-' + key)?.classList.toggle('on', key === labTab));
   renderLabBody();
 }
 
@@ -7355,9 +7358,217 @@ function renderLabProgress(label, checked, total, color) {
 function renderLabBody() {
   const body = $('lab-body');
   if (!body) return;
-  body.innerHTML = labTab === 'vault' ? renderLabVaultPage() : renderLabBacktester();
-  if (labTab === 'vault') renderLabVault();
-  else renderLabBackType();
+  if (labTab === 'vault') { body.innerHTML = renderLabVaultPage(); renderLabVault(); }
+  else if (labTab === 'tax') { body.innerHTML = renderLabTaxCalculator(); initLabTaxCalc(); }
+  else { body.innerHTML = renderLabBacktester(); renderLabBackType(); }
+}
+
+/* ===== 복권 세금 계산기 ===== */
+function renderLabTaxCalculator() {
+  return labCard('복권 세금 계산기', `
+    <div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 12px;">
+      <button id="tax-tab-lotto" class="qr-inner-tab ${labTaxType==='lotto'?'on':''}" onclick="switchTaxType('lotto')">로또 6/45</button>
+      <button id="tax-tab-pension" class="qr-inner-tab ${labTaxType==='pension'?'on':''}" onclick="switchTaxType('pension')">연금복권 720+</button>
+    </div>
+    <div id="tax-calc-body"></div>
+  `);
+}
+
+function initLabTaxCalc() { renderTaxCalcBody(); }
+
+function switchTaxType(type) {
+  labTaxType = type === 'pension' ? 'pension' : 'lotto';
+  $('tax-tab-lotto')?.classList.toggle('on', labTaxType === 'lotto');
+  $('tax-tab-pension')?.classList.toggle('on', labTaxType === 'pension');
+  renderTaxCalcBody();
+}
+
+function renderTaxCalcBody() {
+  const wrap = $('tax-calc-body');
+  if (!wrap) return;
+  wrap.innerHTML = labTaxType === 'pension' ? taxPensionFormHTML() : taxLottoFormHTML();
+  if (labTaxType === 'pension') { setTaxPensionYears(_taxPensionYears); }
+  else { $('tax-lotto-people') && ($('tax-lotto-people').textContent = _taxLottoPeople); }
+}
+
+function formatTaxInput(el) {
+  const raw = el.value.replace(/[^0-9]/g, '');
+  el.value = raw ? Number(raw).toLocaleString('ko-KR') : '';
+}
+
+function taxLottoFormHTML() {
+  return `<div style="display:flex;flex-direction:column;gap:12px;">
+    <div>
+      <label style="font-size:11px;font-weight:800;color:var(--text-muted);">세전 당첨금 (원)</label>
+      <input type="text" inputmode="numeric" id="tax-lotto-amount" class="input-custom" placeholder="예: 2,000,000,000" oninput="formatTaxInput(this);calcTaxLotto()" style="width:100%;margin-top:6px;font-size:15px;font-weight:800;box-sizing:border-box;">
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        ${[['1등 평균(20억)', 2000000000], ['2등 평균(5천만)', 50000000], ['3등 평균(1500만)', 15000000], ['4등(5만원)', 50000]].map(([label, val]) => `<button type="button" class="qr-inner-tab" style="min-height:26px;font-size:10px;padding:0 8px;flex:none;" onclick="setTaxLottoAmount(${val})">${label}</button>`).join('')}
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border-dashed);padding-top:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <label style="font-size:11px;font-weight:800;color:var(--text-muted);">공동구매 인원수</label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button type="button" class="qr-inner-tab" style="width:26px;min-height:26px;padding:0;flex:none;" onclick="stepTaxPeople(-1)">−</button>
+          <span id="tax-lotto-people" style="min-width:20px;text-align:center;font-weight:900;font-size:13px;">${_taxLottoPeople}</span>
+          <button type="button" class="qr-inner-tab" style="width:26px;min-height:26px;padding:0;flex:none;" onclick="stepTaxPeople(1)">+</button>
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--text-muted);cursor:pointer;">
+        <input type="checkbox" id="tax-lotto-proof" onchange="calcTaxLotto()"> 공동구매 사전 약정서(증빙) 있음
+      </label>
+    </div>
+    <div id="tax-lotto-result"></div>
+    <div style="font-size:10px;color:var(--text-muted);line-height:1.7;background:var(--bg-light);border-radius:8px;padding:10px 12px;">
+      ※ 당첨금 5만원 이하는 비과세, 5만원 초과분부터 3억원까지는 22%(기타소득세 20%+지방소득세 2%), 3억원 초과분은 33%(기타소득세 30%+지방소득세 3%)가 원천징수돼요.<br>
+      ※ 공동구매는 사전 약정서 등으로 실제 공동 구매 사실이 증빙될 때만 인원수만큼 나누어 과세돼요. 증빙 없이 1인이 전액 수령 후 나눠주면 그 몫만큼 <b>증여세</b>가 별도로 부과될 수 있어요.
+    </div>
+  </div>`;
+}
+
+function setTaxLottoAmount(v) {
+  const el = $('tax-lotto-amount');
+  if (el) el.value = v.toLocaleString('ko-KR');
+  calcTaxLotto();
+}
+
+function stepTaxPeople(d) {
+  _taxLottoPeople = Math.max(1, Math.min(20, _taxLottoPeople + d));
+  const el = $('tax-lotto-people');
+  if (el) el.textContent = _taxLottoPeople;
+  calcTaxLotto();
+}
+
+function calcLottoTaxBracket(amount) {
+  if (amount <= 50000) return { taxFree: true, tax: 0, net: amount, brackets: [{ label: '5만원 이하 (비과세)', tax: 0 }] };
+  const threshold = 300000000;
+  const brackets = [];
+  let tax = 0;
+  if (amount <= threshold) {
+    tax = Math.round(amount * 0.22);
+    brackets.push({ label: '당첨금 전액 (22%)', tax });
+  } else {
+    const t1 = Math.round(threshold * 0.22);
+    const t2 = Math.round((amount - threshold) * 0.33);
+    tax = t1 + t2;
+    brackets.push({ label: '3억원 이하분 (22%)', tax: t1 });
+    brackets.push({ label: '3억원 초과분 (33%)', tax: t2 });
+  }
+  return { taxFree: false, tax, net: amount - tax, brackets };
+}
+
+function calcTaxLotto() {
+  const raw = ($('tax-lotto-amount')?.value || '').replace(/[^0-9]/g, '');
+  const amount = Number(raw || 0);
+  const people = _taxLottoPeople;
+  const proof = $('tax-lotto-proof')?.checked;
+  const out = $('tax-lotto-result');
+  if (!out) return;
+  if (!amount) { out.innerHTML = ''; return; }
+
+  if (people <= 1) {
+    out.innerHTML = taxResultBlockHTML(amount, calcLottoTaxBracket(amount), null);
+    return;
+  }
+
+  if (proof) {
+    const per = Math.floor(amount / people);
+    const r = calcLottoTaxBracket(per);
+    out.innerHTML = taxResultBlockHTML(amount, { tax: r.tax * people, net: r.net * people, brackets: r.brackets }, { people, per, perTax: r.tax, perNet: r.net });
+  } else {
+    const r = calcLottoTaxBracket(amount);
+    out.innerHTML = taxResultBlockHTML(amount, r, null) + `
+      <div style="margin-top:8px;border:1px solid #fecaca;background:#fff5f5;border-radius:8px;padding:10px 12px;font-size:11px;color:#b91c1c;line-height:1.7;">
+        ⚠️ 공동구매 증빙이 없으면 세금은 1인 전액 수령 기준(위 계산)으로 원천징수되고, 이후 나머지 ${people - 1}명에게 나눠줄 때 1인당 증여금액에 따라 <b>증여세</b>가 추가로 발생할 수 있어요. (10년 합산 기준 성인 자녀 5천만원 · 배우자 6억원 · 기타친족 1천만원까지 공제)
+      </div>`;
+  }
+}
+
+function taxResultBlockHTML(amount, r, split) {
+  const fmt = n => Math.round(n).toLocaleString('ko-KR') + '원';
+  return `<div style="border:1px solid var(--border-dashed);border-radius:10px;padding:14px;background:var(--bg-light);">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+      <span style="font-size:11px;color:var(--text-muted);font-weight:700;">세전 당첨금</span>
+      <span style="font-size:13px;font-weight:800;">${fmt(amount)}</span>
+    </div>
+    ${r.brackets.map(b => `<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);padding:3px 0;"><span>${b.label}</span><span>${fmt(b.tax)}</span></div>`).join('')}
+    <div style="display:flex;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border-dashed);">
+      <span style="font-size:11px;color:var(--text-muted);font-weight:700;">원천징수 세액 합계</span>
+      <span style="font-size:13px;font-weight:900;color:#dc2626;">− ${fmt(r.tax)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-dashed);">
+      <span style="font-size:13px;font-weight:900;">실수령액</span>
+      <span style="font-size:18px;font-weight:900;color:var(--lotto-red);">${fmt(r.net)}</span>
+    </div>
+    ${split ? `<div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--border-dashed);">
+      <div style="font-size:11px;font-weight:800;color:var(--text-muted);margin-bottom:6px;">공동구매 ${split.people}인 분배 (1인당)</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0;"><span>1인당 세전</span><span>${fmt(split.per)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0;color:#dc2626;"><span>1인당 세금</span><span>− ${fmt(split.perTax)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:900;margin-top:4px;"><span>1인당 실수령</span><span style="color:var(--lotto-red);">${fmt(split.perNet)}</span></div>
+    </div>` : ''}
+  </div>`;
+}
+
+function taxPensionFormHTML() {
+  return `<div style="display:flex;flex-direction:column;gap:12px;">
+    <div>
+      <label style="font-size:11px;font-weight:800;color:var(--text-muted);">세전 월 당첨금 (원)</label>
+      <input type="text" inputmode="numeric" id="tax-pension-amount" class="input-custom" placeholder="예: 7,000,000" oninput="formatTaxInput(this);calcTaxPension()" style="width:100%;margin-top:6px;font-size:15px;font-weight:800;box-sizing:border-box;">
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        ${[['1등(월 700만·20년)', 7000000, 20], ['2등(월 100만·10년)', 1000000, 10], ['3등(월 30만·10년)', 300000, 10]].map(([label, val, yrs]) => `<button type="button" class="qr-inner-tab" style="min-height:26px;font-size:10px;padding:0 8px;flex:none;" onclick="setTaxPensionPreset(${val},${yrs})">${label}</button>`).join('')}
+      </div>
+    </div>
+    <div>
+      <label style="font-size:11px;font-weight:800;color:var(--text-muted);">지급 기간</label>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <button type="button" id="tax-pension-yr-20" class="qr-inner-tab" style="flex:1;" onclick="setTaxPensionYears(20)">20년</button>
+        <button type="button" id="tax-pension-yr-10" class="qr-inner-tab" style="flex:1;" onclick="setTaxPensionYears(10)">10년</button>
+      </div>
+    </div>
+    <div id="tax-pension-result"></div>
+    <div style="font-size:10px;color:var(--text-muted);line-height:1.7;background:var(--bg-light);border-radius:8px;padding:10px 12px;">
+      ※ 연금복권은 회차별(매월) 당첨금이 3억원을 넘지 않기 때문에, 로또와 달리 전액 22%(기타소득세 20%+지방소득세 2%)로만 원천징수돼요.
+    </div>
+  </div>`;
+}
+
+function setTaxPensionYears(y) {
+  _taxPensionYears = y === 10 ? 10 : 20;
+  $('tax-pension-yr-20')?.classList.toggle('on', _taxPensionYears === 20);
+  $('tax-pension-yr-10')?.classList.toggle('on', _taxPensionYears === 10);
+  calcTaxPension();
+}
+
+function setTaxPensionPreset(v, y) {
+  const el = $('tax-pension-amount');
+  if (el) el.value = v.toLocaleString('ko-KR');
+  setTaxPensionYears(y);
+}
+
+function calcTaxPension() {
+  const raw = ($('tax-pension-amount')?.value || '').replace(/[^0-9]/g, '');
+  const amount = Number(raw || 0);
+  const out = $('tax-pension-result');
+  if (!out) return;
+  if (!amount) { out.innerHTML = ''; return; }
+  const r = calcLottoTaxBracket(amount);
+  const months = _taxPensionYears * 12;
+  const fmt = n => Math.round(n).toLocaleString('ko-KR') + '원';
+  out.innerHTML = `<div style="border:1px solid var(--border-dashed);border-radius:10px;padding:14px;background:var(--bg-light);">
+    <div style="font-size:11px;font-weight:800;color:var(--text-muted);margin-bottom:8px;">매월 지급 기준</div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;"><span>세전 월액</span><span>${fmt(amount)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:#dc2626;"><span>월 세금(22%)</span><span>− ${fmt(r.tax)}</span></div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid var(--border-dashed);">
+      <span style="font-size:13px;font-weight:900;">월 실수령액</span>
+      <span style="font-size:18px;font-weight:900;color:var(--lotto-red);">${fmt(r.net)}</span>
+    </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--border-dashed);">
+      <div style="font-size:11px;font-weight:800;color:var(--text-muted);margin-bottom:6px;">${_taxPensionYears}년(${months}개월) 총 수령액</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0;"><span>세전 총액</span><span>${fmt(amount * months)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0;color:#dc2626;"><span>총 세금</span><span>− ${fmt(r.tax * months)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:900;margin-top:4px;"><span>총 실수령액</span><span style="color:var(--lotto-red);">${fmt(r.net * months)}</span></div>
+    </div>
+  </div>`;
 }
 
 function renderLabBacktester() {
@@ -8570,7 +8781,7 @@ async function renderPensionRadar(data) {
       </div>
       <div style="font-size:10px;font-weight:800;color:var(--text-muted);margin-bottom:7px;">출현 숫자 분포</div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;">
-        ${digitCounts.map(item => `<div style="border:1px solid var(--border-dashed);border-radius:7px;padding:6px;text-align:center;background:${item.count?'rgba(22,163,74,.08)':'transparent'};">
+        ${digitCounts.map(item => `<div style="border:1px solid var(--border-dashed);border-radius:8px;padding:6px;text-align:center;background:${item.count?'rgba(22,163,74,.08)':'transparent'};">
           <div style="font-size:13px;font-weight:900;color:${item.count?'#16a34a':'var(--text-muted)'};">${item.digit}</div>
           <div style="font-size:9px;color:var(--text-muted);">${item.count}회</div>
         </div>`).join('')}
@@ -9874,7 +10085,7 @@ async function loadTicketHistory() {
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:900;color:var(--text-dark);">QR 인증 이력 <span style="font-size:10px;font-weight:500;color:#94a3b8;">(최근 ${tickets.length}건)</span></div>
-        <button onclick="if(window._ltbTickets)downloadTicketCSV(window._ltbTickets);else toast('데이터 없음')" style="background:none;border:1px solid var(--border-dashed);border-radius:5px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='var(--border-dashed)';this.style.color='var(--text-muted)'">
+        <button onclick="if(window._ltbTickets)downloadTicketCSV(window._ltbTickets);else toast('데이터 없음')" style="background:none;border:1px solid var(--border-dashed);border-radius:8px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;" onmouseover="this.style.borderColor='var(--lotto-red)';this.style.color='var(--lotto-red)'" onmouseout="this.style.borderColor='var(--border-dashed)';this.style.color='var(--text-muted)'">
           <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           CSV 내보내기
         </button>
@@ -10652,7 +10863,7 @@ function renderNearbyStoreList(stores, lat, lng) {
   list.style.padding = rows.length ? '0' : '14px';
   list.style.textAlign = rows.length ? 'left' : 'center';
   list.innerHTML = rows.length ? rows.map(store=>`
-    <a href="https://map.kakao.com/link/map/${encodeURIComponent(store.name)},${store.lat},${store.lng}" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;gap:8px;padding:10px 11px;margin-bottom:6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:7px;text-decoration:none;color:inherit;">
+    <a href="https://map.kakao.com/link/map/${encodeURIComponent(store.name)},${store.lat},${store.lng}" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;gap:8px;padding:10px 11px;margin-bottom:6px;background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:8px;text-decoration:none;color:inherit;">
       <span style="min-width:0;"><b style="display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${qrSafeText(store.name)}</b><span style="font-size:10px;color:var(--text-muted);">${qrSafeText(store.address)}</span></span>
       <b style="font-size:11px;color:var(--lotto-red);white-space:nowrap;">${Math.round(store.distance*1000)}m</b>
     </a>`).join('') : nearbyStoreFallbackHtml(lat, lng);
