@@ -141,7 +141,7 @@ main.chat-hidden .chat-panel { display: none; }
 [data-theme="dark"] .prize-table tr:hover td { background:#263244; }
 .round-result-header { background:var(--paper-white) !important; color:var(--text-dark) !important; border-bottom:1px solid var(--border-dashed); }
 #res-pension-ui .prize-table th,
-#res-pension-ui .prize-table td { padding:6px 3px; overflow-wrap:anywhere; }
+#res-pension-ui .prize-table td { padding:6px 3px; word-break:keep-all; overflow-wrap:break-word; }
 .prize-rank-badge { display:inline-block; width:22px; height:22px; border-radius:50%; font-size:10px; font-weight:900; line-height:22px; }
 .pr1 { background:#fef08a; color:#854d0e; }
 [data-theme="dark"] .pr1 { background:#422006; color:#fef08a; }
@@ -7297,11 +7297,11 @@ function renderLab() {
   wrap.innerHTML = `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">
     <div style="font-size:9px;color:var(--lotto-red);font-weight:900;letter-spacing:1.5px;margin-bottom:3px;">LOTTOBANK LAB</div>
     <div style="font-size:18px;font-weight:900;color:var(--text-dark);">복권 연구소</div>
-    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.6;">복권 용지를 마킹하듯 번호를 고르고 과거 당첨 이력과 실수령액을 바로 확인하세요.</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.6;">번호를 마킹하듯 골라 과거 전적을 대조하고, 자주 쓰는 조합을 저장하고, 세금까지 계산하고, 통계 차트로 살펴보세요.</div>
   </div>
   <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
     <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:4px;">건전한 복권 이용 안내</div>
-    <div style="font-size:11px;color:var(--text-muted);line-height:1.7;">연구소의 백테스트와 번호 저장은 과거 데이터 확인용 도구입니다. 특정 번호의 당첨을 보장하지 않으며, 복권 구매는 본인의 예산 안에서 책임 있게 이용해 주세요.</div>
+    <div style="font-size:11px;color:var(--text-muted);line-height:1.7;">연구소의 백테스트·번호 저장·차트는 모두 과거 데이터 확인용 도구입니다. 특정 번호의 당첨을 보장하지 않으며, 복권 구매는 본인의 예산 안에서 책임 있게 이용해 주세요.</div>
   </div>
   <div id="lab-body"></div>`;
   switchLabTab(labTab || 'backtest');
@@ -7309,6 +7309,10 @@ function renderLab() {
 
 function labCard(title, body) {
   return `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:14px;margin-bottom:10px;">${title ? `<div style="font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:10px;">${title}</div>` : ''}${body}</div>`;
+}
+
+function labSubDesc(text) {
+  return `<div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin:-4px 0 12px;">${text}</div>`;
 }
 
 function isLabPremiumUser() {
@@ -7392,7 +7396,7 @@ async function loadLabHistory(type) {
 
 function renderLabChartPage() {
   return labCard('로또 · 연금 차트', `
-    <div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">과거 당첨번호를 바탕으로 한 통계 지표입니다. 로또·연금복권은 매 회차 독립 추첨이라 과거 출현 빈도가 다음 회차 당첨을 예측하지 않습니다 — 참고·재미용으로만 확인해주세요.</div>
+    ${labSubDesc('과거 당첨번호를 지표별 통계 차트로 정리해드려요. 로또·연금복권은 매 회차 독립 추첨이라 과거 빈도가 다음 회차 당첨을 예측하지 않으니 참고·재미용으로만 확인해주세요.')}
     <div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 10px;">
       <button id="chart-tab-lotto" class="qr-inner-tab ${labChartType==='lotto'?'on':''}" onclick="switchChartType('lotto')">로또 6/45</button>
       <button id="chart-tab-pension" class="qr-inner-tab ${labChartType==='pension'?'on':''}" onclick="switchChartType('pension')">연금복권 720+</button>
@@ -7415,13 +7419,6 @@ function renderLabChartControls() {
   const wrap = $('lab-chart-controls');
   if (!wrap) return;
   const opts = labChartIndicatorOptions(labChartType);
-  if (!isLoggedIn) {
-    wrap.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg-light);border-radius:8px;padding:10px 12px;flex-wrap:wrap;">
-      <div style="font-size:11px;color:var(--text-muted);">기본 지표 · 최근 100회차 (고정)</div>
-      <button type="button" onclick="showAuthModal()" style="font-size:11px;font-weight:800;color:#fff;background:var(--lotto-red);border:none;border-radius:999px;padding:6px 12px;cursor:pointer;font-family:inherit;">로그인하고 커스터마이즈</button>
-    </div>`;
-    return;
-  }
   wrap.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
     <select id="chart-indicator-select" class="input-custom" style="margin:0;flex:1;min-width:140px;" onchange="labChartIndicator=this.value;renderLabChartControls();renderLabChartNow();">
       ${opts.map(([v,l])=>`<option value="${v}" ${labChartIndicator===v?'selected':''}>${l}</option>`).join('')}
@@ -7453,8 +7450,8 @@ async function renderLabChartNow() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const axisColor = isDark ? '#94a3b8' : '#475569';
   const gridColor = isDark ? '#334155' : '#f1f5f9';
-  const range = isLoggedIn ? labChartRange : 100;
-  const indicator = isLoggedIn ? labChartIndicator : (labChartType==='pension' ? 'group' : 'freq');
+  const range = labChartRange;
+  const indicator = labChartIndicator;
 
   const history = await loadLabHistory(labChartType);
   const rows = labRecentRows(history, range);
@@ -7467,7 +7464,7 @@ async function renderLabChartNow() {
     else if (indicator === 'oddeven') cfg = lottoOddEvenChartConfig(rows, axisColor, gridColor);
     else cfg = lottoFreqChartConfig(rows, axisColor, gridColor);
   } else {
-    if (indicator === 'digit') cfg = pensionDigitChartConfig(rows, isLoggedIn ? labChartDigitPos : 1, axisColor, gridColor);
+    if (indicator === 'digit') cfg = pensionDigitChartConfig(rows, labChartDigitPos, axisColor, gridColor);
     else if (indicator === 'oddeven') cfg = pensionOddEvenChartConfig(rows, axisColor, gridColor);
     else cfg = pensionGroupChartConfig(rows, axisColor, gridColor);
   }
@@ -7564,6 +7561,7 @@ function switchChartType(type) {
 /* ===== 복권 세금 계산기 ===== */
 function renderLabTaxCalculator() {
   return labCard('복권 세금 계산기', `
+    ${labSubDesc('세전 당첨금을 입력하면 등수별 원천징수 기준으로 세금을 뗀 실수령액을 바로 계산해드려요.')}
     <div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 12px;">
       <button id="tax-tab-lotto" class="qr-inner-tab ${labTaxType==='lotto'?'on':''}" onclick="switchTaxType('lotto')">로또 6/45</button>
       <button id="tax-tab-pension" class="qr-inner-tab ${labTaxType==='pension'?'on':''}" onclick="switchTaxType('pension')">연금복권 720+</button>
@@ -7770,14 +7768,14 @@ function calcTaxPension() {
 }
 
 function renderLabBacktester() {
-  return `${labCard('복권 백테스터', `<div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 12px;">
+  return `${labCard('복권 백테스터', `${labSubDesc('번호 용지를 마킹하듯 직접 골라, 역대 전체 회차와 대조해 몇 회나 맞았는지 확인해보세요.')}<div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 12px;">
     <button id="lab-back-lotto" class="qr-inner-tab ${labBackType==='lotto'?'on':''}" onclick="switchLabBackType('lotto')">로또 6/45</button>
     <button id="lab-back-pension" class="qr-inner-tab ${labBackType==='pension'?'on':''}" onclick="switchLabBackType('pension')">연금 720+</button>
   </div><div id="lab-back-body"></div>`)}`;
 }
 
 function renderLabVaultPage() {
-  return labCard('번호 저장고', `<div id="lab-vault"></div>`);
+  return labCard('번호 저장고', `${labSubDesc('자주 쓰는 번호 조합을 저장해두고, 다음 구매 때 QR 인증 또는 추천번호 게시판에 바로 불러와 쓰세요.')}<div id="lab-vault"></div>`);
 }
 
 function switchLabBackType(type) {
