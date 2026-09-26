@@ -24,27 +24,29 @@ export async function onRequest(context) {
     } catch (e) { clearTimeout(t); throw e; }
   }
 
+  function fmtDate(ymd) {
+    if (!ymd || String(ymd).length !== 8) return ymd || '';
+    const s = String(ymd);
+    return s.slice(0, 4) + '-' + s.slice(4, 6) + '-' + s.slice(6, 8);
+  }
+
   try {
     const listR = await ft('https://www.dhlottery.co.kr/pt720/selectPstPt720WnList.do', { headers: browserHeaders }, 10000);
     const txt = await listR.text();
-    let parsed = null;
-    let parseError = null;
-    try {
-      parsed = JSON.parse(txt);
-    } catch (e) {
-      parseError = String(e);
-    }
-    const items = parsed ? ((parsed.data && parsed.data.result) || parsed.result || []) : [];
-    return new Response(JSON.stringify({
-      ok: listR.ok,
-      status: listR.status,
-      rawLength: txt.length,
-      rawSample: txt.slice(0, 300),
-      parseError,
-      itemCount: Array.isArray(items) ? items.length : -1,
-      firstItem: Array.isArray(items) ? items[0] : null,
-      lastItem: Array.isArray(items) ? items[items.length - 1] : null,
-    }), { headers: cors });
+    const parsed = JSON.parse(txt);
+    const items = (parsed.data && parsed.data.result) || parsed.result || [];
+
+    const data = items.map(function (item) {
+      return {
+        drwNo: Number(item.psltEpsd),
+        drwNoDate: fmtDate(item.psltRflYmd),
+        group: String(item.wnBndNo),
+        number: String(item.wnRnkVl),
+        bonusNumber: String(item.bnsRnkVl),
+      };
+    }).sort(function (a, b) { return a.drwNo - b.drwNo; });
+
+    return new Response(JSON.stringify({ count: data.length, data: data }), { headers: cors });
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: cors });
   }
