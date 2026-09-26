@@ -2278,6 +2278,10 @@ textarea {
             </div>
           </div>
           <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 0;font-size:12px;font-weight:900;cursor:pointer;width:100%;letter-spacing:.3px;">무료로 시작하기</button>
+          <a href="https://play.google.com/store/apps/details?id=com.lottobank.app" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;background:var(--bg-light);color:var(--text-dark);border:1px solid var(--border-dashed);border-radius:8px;padding:9px 0;font-size:12px;font-weight:800;text-decoration:none;width:100%;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M2 17v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4"/></svg>
+            앱 다운로드
+          </a>
         </div>
 <div id="left-hot-card" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:10px 12px;">
           <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
@@ -2611,30 +2615,19 @@ textarea {
     <div class="footer-links">
       <a href="javascript:void(0)" onclick="go('home')">홈</a>
       <a href="javascript:void(0)" onclick="go('rank')">랭킹</a>
-      <a href="/lotto-qr-guide" target="_blank" rel="noopener">QR 인증 가이드</a>
-      <a href="/lotto-internet-purchase-guide" target="_blank" rel="noopener">인터넷 구매 등록</a>
-      <a href="/pension-qr-guide" target="_blank" rel="noopener">연금복권 등록</a>
-      <a href="/lotto-tax-guide" target="_blank" rel="noopener">당첨금 세금</a>
-      <a href="/lotto-record-guide" target="_blank" rel="noopener">전적 관리</a>
-      <a href="/lotto-winning-numbers" target="_blank" rel="noopener">로또 당첨번호</a>
-      <a href="/pension-winning-numbers" target="_blank" rel="noopener">연금복권 당첨번호</a>
-      <a href="/lotto-number-lab" target="_blank" rel="noopener">번호 연구소</a>
-      <a href="/responsible-lottery-guide" target="_blank" rel="noopener">건전 이용 안내</a>
-      <a href="/lotto-community-guide" target="_blank" rel="noopener">커뮤니티 가이드</a>
       <a href="/app-info" target="_blank" rel="noopener">앱 정보</a>
       <a href="/support" target="_blank" rel="noopener">고객지원</a>
+      <a href="https://play.google.com/store/apps/details?id=com.lottobank.app" target="_blank" rel="noopener">앱 다운로드</a>
       <span style="color:var(--border-dashed);">|</span>
       <a href="https://dhlottery.co.kr" target="_blank" rel="noopener">동행복권</a>
     </div>
-    <div>© 2024–2026 LottoBank · QR 기반 로또 전적 인증 플랫폼 · 본 서비스는 동행복권 공식 서비스가 아닙니다.</div>
+    <div>© 2024–2026 LottoBank · 본 서비스는 동행복권 공식 서비스가 아닙니다.</div>
           <div style="margin-top:6px;font-size:10px;opacity:0.5;">
             <a href="/terms.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">이용약관</a>
             &nbsp;·&nbsp;
             <a href="/privacy.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">개인정보처리방침</a>
             &nbsp;·&nbsp;
             <a href="/data-safety.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">데이터 보안</a>
-            &nbsp;·&nbsp;
-            <a href="/login-info.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">로그인 안내</a>
           </div>
   </div>
 </footer>
@@ -3924,15 +3917,9 @@ function renderLatestOnLeft(data) {
 
 function renderHomeLive() {
   $('home-live').innerHTML = `
-    <section style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:16px;margin-bottom:12px;">
-      <div style="font-size:10px;font-weight:900;color:var(--lotto-red);letter-spacing:1.5px;margin-bottom:4px;">LOTTOBANK GUIDE</div>
-      <h1 style="margin:0 0 8px;font-size:20px;line-height:1.3;color:var(--text-dark);">QR 인증 기반 복권 전적 관리</h1>
-      <p style="margin:0;color:var(--text-muted);font-size:12px;line-height:1.8;">LottoBank는 로또 6/45와 연금복권 720+의 QR 코드, 인터넷 구매 캡처, 당첨 결과를 한곳에서 관리하는 복권 기록 도구입니다. 공개 페이지에서는 당첨번호 조회, 번호 연구소, 커뮤니티 글을 볼 수 있고, QR 등록과 개인 전적 저장은 로그인 후 이용합니다.</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:12px;">
-        <a href="/lotto-qr-guide" target="_blank" rel="noopener" style="padding:10px;border:1px solid var(--border-dashed);border-radius:9px;text-decoration:none;background:var(--bg-light);color:var(--text-dark);font-size:11px;font-weight:800;">QR 인증 가이드</a>
-        <a href="/lotto-record-guide" target="_blank" rel="noopener" style="padding:10px;border:1px solid var(--border-dashed);border-radius:9px;text-decoration:none;background:var(--bg-light);color:var(--text-dark);font-size:11px;font-weight:800;">전적 관리 방법</a>
-        <a href="/responsible-lottery-guide" target="_blank" rel="noopener" style="padding:10px;border:1px solid var(--border-dashed);border-radius:9px;text-decoration:none;background:var(--bg-light);color:var(--text-dark);font-size:11px;font-weight:800;">건전 이용 안내</a>
-      </div>
+    <section style="margin-bottom:14px;">
+      <h1 style="margin:0 0 4px;font-size:19px;line-height:1.3;color:var(--text-dark);">QR 인증 기반 복권 전적 관리</h1>
+      <p style="margin:0;color:var(--text-muted);font-size:12px;line-height:1.6;">QR로 구매 이력을 인증하고 전적을 자동으로 관리하세요.</p>
     </section>
     <div id="feed-list" style="min-height:220px;"></div>`;
   renderFeed();
@@ -4040,6 +4027,10 @@ function renderHomeLive() {
         </div>
       </div>
       <button onclick="showAuthModal()" style="width:100%;padding:12px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(220,38,38,.4);letter-spacing:.3px;">🚀 무료로 시작하기</button>
+      <a href="https://play.google.com/store/apps/details?id=com.lottobank.app" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 0;font-size:13px;font-weight:800;text-decoration:none;width:100%;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M2 17v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4"/></svg>
+        앱 다운로드
+      </a>
     </div>` : ''}`;
   renderFeed();
 }
