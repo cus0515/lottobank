@@ -7,7 +7,7 @@
  * platform's per-request subrequest limit.
  */
 
-const MAX_RANGE = 20;
+const MAX_RANGE = 250;
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
@@ -114,7 +114,16 @@ export async function onRequest(context) {
 
   const rounds = [];
   for (let n = start; n <= end; n++) rounds.push(n);
-  const results = await Promise.all(rounds.map(fetchOne));
+
+  // Gentle concurrency: 5 in flight at a time, to avoid tripping dhlottery's
+  // rate limiting and to stay well under the platform subrequest cap.
+  const CONCURRENCY = 5;
+  const results = [];
+  for (let i = 0; i < rounds.length; i += CONCURRENCY) {
+    const batch = rounds.slice(i, i + CONCURRENCY);
+    const batchResults = await Promise.all(batch.map(fetchOne));
+    results.push(...batchResults);
+  }
   const data = results.filter((x) => x && !x._dbg);
   const errors = results.filter((x) => x && x._dbg);
 
