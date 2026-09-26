@@ -7,7 +7,7 @@
  * platform's per-request subrequest limit.
  */
 
-const MAX_RANGE = 250;
+const MAX_RANGE = 50; // Cloudflare Pages Functions cap subrequests per invocation at 50
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
