@@ -2234,7 +2234,7 @@ textarea {
               <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
               <div style="text-align:center;"><div id="pen-cd-s" style="font-size:16px;font-weight:900;color:#16a34a;line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">초</div></div>
             </div>
-            <a href="https://ol.dhlottery.co.kr/olotto/game/game720.do" target="_blank" rel="noopener" style="display:block;margin-top:8px;text-align:center;background:#16a34a;color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:5px 0;text-decoration:none;">연금 구매하기</a>
+            <a href="https://el.dhlottery.co.kr/game_mobile/pension720/game.jsp" target="_blank" rel="noopener" style="display:block;margin-top:8px;text-align:center;background:#16a34a;color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:5px 0;text-decoration:none;">연금 구매하기</a>
           </div>
         </div>
       </div>
@@ -4276,7 +4276,7 @@ function renderPensionResult(d, container, round) {
       const siStr = (p.store != null && p.internet != null)
         ? `<span class="winner-type">판매 ${Number(p.store).toLocaleString()}<br>인터넷 ${Number(p.internet).toLocaleString()}</span>`
         : `<span style="color:#94a3b8;font-size:10px;">—</span>`;
-      return `<tr><td style="font-weight:700;color:${col};">${rankLabels[rk]||rk+'등'}</td><td style="font-size:11px;color:var(--text-muted);">${rankPrizes[rk]||''}</td><td style="font-weight:700;word-break:break-all;">${Number(p.total).toLocaleString()}매</td><td style="font-weight:800;color:var(--text-dark);word-break:break-all;">${totalStr}</td><td>${siStr}</td></tr>`;
+      return `<tr><td style="font-weight:700;color:${col};">${rankLabels[rk]||rk+'등'}</td><td style="font-size:11px;color:var(--text-muted);">${rankPrizes[rk]||''}</td><td style="font-weight:700;white-space:nowrap;">${Number(p.total).toLocaleString()}매</td><td style="font-weight:800;color:var(--text-dark);white-space:nowrap;">${totalStr}</td><td>${siStr}</td></tr>`;
     }).join('');
   }
 
@@ -4297,11 +4297,13 @@ function renderPensionResult(d, container, round) {
     ${prizes.length > 0 ? `
     <div style="border-top:1px solid var(--border-dashed);padding-top:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">등수별 당첨 현황</div>
-      <table class="prize-table" style="margin-top:0;table-layout:fixed;font-size:11px;">
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <table class="prize-table" style="margin-top:0;table-layout:fixed;font-size:11px;min-width:320px;">
         <colgroup><col style="width:9%"><col style="width:18%"><col style="width:20%"><col style="width:28%"><col style="width:25%"></colgroup>
         <thead><tr><th>등수</th><th>조건</th><th>당첨수</th><th>당첨금</th><th>구입 형태</th></tr></thead>
         <tbody>${prizeRows}</tbody>
       </table>
+      </div>
     </div>` : `<div style="border-top:1px solid var(--border-dashed);padding-top:8px;text-align:center;"><div style="font-size:10px;color:var(--text-muted);">1등: 월 700만원 × 20년 · 보너스: 월 100만원 × 10년</div></div>`}
   `;
   // 연금복권 판매점 조회 시도
@@ -4493,8 +4495,9 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
       </div>
     </div>
         <!-- Prize table -->
-    <table class="prize-table" style="margin-top:0;table-layout:fixed;">
-      <colgroup><col style="width:9%"><col style="width:17%"><col style="width:18%"><col style="width:30%"><col style="width:26%"></colgroup>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+    <table class="prize-table" style="margin-top:0;table-layout:fixed;min-width:340px;">
+      <colgroup><col style="width:9%"><col style="width:17%"><col style="width:19%"><col style="width:29%"><col style="width:26%"></colgroup>
       <thead><tr>
         <th>등수</th>
         <th>조건</th>
@@ -4514,13 +4517,14 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
           return `<tr>
             <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
             <td style="font-size:11px;color:var(--text-muted);">${p.cond}</td>
-            <td style="font-weight:700;word-break:break-all;">${cntStr}</td>
-            <td style="font-weight:800;color:var(--text-dark);word-break:break-all;">${p.rank<=2?fmtMFull(p.amt):fmtMFull(p.amt)}</td>
+            <td style="font-weight:700;white-space:nowrap;">${cntStr}</td>
+            <td style="font-weight:800;color:var(--text-dark);white-space:nowrap;">${p.rank<=2?fmtMFull(p.amt):fmtMFull(p.amt)}</td>
             <td${autoId}>${autoStr}</td>
           </tr>`;
         }).join('')}
       </tbody>
     </table>
+    </div>
     ${(()=>{
       if (!isLoggedIn || !MY.length) return '';
       const myThisRound = MY.filter(t => t.round === d.round);
