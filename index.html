@@ -2217,6 +2217,7 @@ textarea {
               <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
               <div style="text-align:center;"><div id="cd-s" style="font-size:16px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">초</div></div>
             </div>
+            <a href="https://ol.dhlottery.co.kr/olotto/game/game645.do" target="_blank" rel="noopener" style="display:block;margin-top:8px;text-align:center;background:var(--lotto-red);color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:5px 0;text-decoration:none;">로또 구매하기</a>
           </div>
           <!-- 연금복권 -->
           <div>
@@ -2233,6 +2234,7 @@ textarea {
               <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
               <div style="text-align:center;"><div id="pen-cd-s" style="font-size:16px;font-weight:900;color:#16a34a;line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">초</div></div>
             </div>
+            <a href="https://ol.dhlottery.co.kr/olotto/game/game720.do" target="_blank" rel="noopener" style="display:block;margin-top:8px;text-align:center;background:#16a34a;color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:5px 0;text-decoration:none;">연금 구매하기</a>
           </div>
         </div>
       </div>
@@ -4274,7 +4276,7 @@ function renderPensionResult(d, container, round) {
       const siStr = (p.store != null && p.internet != null)
         ? `<span class="winner-type">판매 ${Number(p.store).toLocaleString()}<br>인터넷 ${Number(p.internet).toLocaleString()}</span>`
         : `<span style="color:#94a3b8;font-size:10px;">—</span>`;
-      return `<tr><td style="font-weight:700;color:${col};">${rankLabels[rk]||rk+'등'}</td><td style="font-size:11px;color:var(--text-muted);">${rankPrizes[rk]||''}</td><td style="font-weight:700;">${Number(p.total).toLocaleString()}매</td><td style="font-weight:800;color:var(--text-dark);">${totalStr}</td><td>${siStr}</td></tr>`;
+      return `<tr><td style="font-weight:700;color:${col};">${rankLabels[rk]||rk+'등'}</td><td style="font-size:11px;color:var(--text-muted);">${rankPrizes[rk]||''}</td><td style="font-weight:700;word-break:break-all;">${Number(p.total).toLocaleString()}매</td><td style="font-weight:800;color:var(--text-dark);word-break:break-all;">${totalStr}</td><td>${siStr}</td></tr>`;
     }).join('');
   }
 
@@ -4296,7 +4298,7 @@ function renderPensionResult(d, container, round) {
     <div style="border-top:1px solid var(--border-dashed);padding-top:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">등수별 당첨 현황</div>
       <table class="prize-table" style="margin-top:0;table-layout:fixed;font-size:11px;">
-        <colgroup><col style="width:11%"><col style="width:23%"><col style="width:14%"><col style="width:29%"><col style="width:23%"></colgroup>
+        <colgroup><col style="width:9%"><col style="width:18%"><col style="width:20%"><col style="width:28%"><col style="width:25%"></colgroup>
         <thead><tr><th>등수</th><th>조건</th><th>당첨수</th><th>당첨금</th><th>구입 형태</th></tr></thead>
         <tbody>${prizeRows}</tbody>
       </table>
@@ -4491,7 +4493,8 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
       </div>
     </div>
         <!-- Prize table -->
-    <table class="prize-table" style="margin-top:0;">
+    <table class="prize-table" style="margin-top:0;table-layout:fixed;">
+      <colgroup><col style="width:9%"><col style="width:17%"><col style="width:18%"><col style="width:30%"><col style="width:26%"></colgroup>
       <thead><tr>
         <th>등수</th>
         <th>조건</th>
@@ -4511,8 +4514,8 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
           return `<tr>
             <td><span class="prize-rank-badge ${p.cls}">${p.rank}</span></td>
             <td style="font-size:11px;color:var(--text-muted);">${p.cond}</td>
-            <td style="font-weight:700;">${cntStr}</td>
-            <td style="font-weight:800;color:var(--text-dark);">${p.rank<=2?fmtMFull(p.amt):fmtMFull(p.amt)}</td>
+            <td style="font-weight:700;word-break:break-all;">${cntStr}</td>
+            <td style="font-weight:800;color:var(--text-dark);word-break:break-all;">${p.rank<=2?fmtMFull(p.amt):fmtMFull(p.amt)}</td>
             <td${autoId}>${autoStr}</td>
           </tr>`;
         }).join('')}
@@ -7299,10 +7302,6 @@ function renderLab() {
     <div style="font-size:18px;font-weight:900;color:var(--text-dark);">복권 연구소</div>
     <div style="font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.6;">번호를 마킹하듯 골라 과거 전적을 대조하고, 자주 쓰는 조합을 저장하고, 세금까지 계산하고, 통계 차트로 살펴보세요.</div>
   </div>
-  <div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
-    <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:4px;">건전한 복권 이용 안내</div>
-    <div style="font-size:11px;color:var(--text-muted);line-height:1.7;">연구소의 백테스트·번호 저장·차트는 모두 과거 데이터 확인용 도구입니다. 특정 번호의 당첨을 보장하지 않으며, 복권 구매는 본인의 예산 안에서 책임 있게 이용해 주세요.</div>
-  </div>
   <div id="lab-body"></div>`;
   switchLabTab(labTab || 'backtest');
 }
@@ -7396,15 +7395,17 @@ async function loadLabHistory(type) {
 
 function renderLabChartPage() {
   return labCard('로또 · 연금 차트', `
-    ${labSubDesc('과거 당첨번호를 지표별 통계 차트로 정리해드려요. 로또·연금복권은 매 회차 독립 추첨이라 과거 빈도가 다음 회차 당첨을 예측하지 않으니 참고·재미용으로만 확인해주세요.')}
+    ${labSubDesc('과거 당첨번호를 지표별로 정리해드려요. 히트맵은 진할수록 자주 나온 번호, 아래 리스트는 많이/적게 나온 순위예요. 로또·연금복권은 매 회차 독립 추첨이라 과거 빈도가 다음 회차 당첨을 예측하지 않으니 참고·재미용으로만 확인해주세요.')}
     <div class="qr-inner-tabs" style="grid-template-columns:repeat(2,1fr);margin:0 0 10px;">
       <button id="chart-tab-lotto" class="qr-inner-tab ${labChartType==='lotto'?'on':''}" onclick="switchChartType('lotto')">로또 6/45</button>
       <button id="chart-tab-pension" class="qr-inner-tab ${labChartType==='pension'?'on':''}" onclick="switchChartType('pension')">연금복권 720+</button>
     </div>
     <div id="lab-chart-controls"></div>
-    <div style="background:var(--bg-light);border-radius:8px;padding:10px;margin-top:10px;">
+    <div id="lab-chart-insight" style="font-size:12px;font-weight:800;color:var(--text-dark);margin:10px 0 4px;"></div>
+    <div id="lab-chart-canvas-wrap" style="background:var(--bg-light);border-radius:8px;padding:10px;margin-top:6px;">
       <canvas id="lab-chart-canvas" height="220"></canvas>
     </div>
+    <div id="lab-chart-heatmap-wrap" style="margin-top:6px;"></div>
     <div id="lab-chart-note" style="font-size:10px;color:var(--text-muted);margin-top:8px;line-height:1.6;"></div>
   `);
 }
@@ -7412,7 +7413,7 @@ function renderLabChartPage() {
 function labChartIndicatorOptions(type) {
   return type === 'pension'
     ? [['group','조(1~5) 출현 빈도'],['digit','자리별 숫자 빈도'],['oddeven','메인번호 홀짝 비율']]
-    : [['freq','번호별 출현 빈도'],['hotcold','핫 · 콜드 넘버 TOP10'],['range','구간별(1-9~40-45) 분포'],['oddeven','홀짝 비율']];
+    : [['freq','번호별 출현 빈도 (히트맵)'],['range','구간별(1-9~40-45) 분포'],['oddeven','홀짝 비율']];
 }
 
 function renderLabChartControls() {
@@ -7444,9 +7445,12 @@ function labRecentRows(history, range) {
 }
 
 async function renderLabChartNow() {
+  const canvasWrap = $('lab-chart-canvas-wrap');
+  const heatWrap = $('lab-chart-heatmap-wrap');
+  const insightEl = $('lab-chart-insight');
   const canvasEl = $('lab-chart-canvas');
   const noteEl = $('lab-chart-note');
-  if (!canvasEl || typeof Chart === 'undefined') return;
+  if (typeof Chart === 'undefined') return;
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const axisColor = isDark ? '#94a3b8' : '#475569';
   const gridColor = isDark ? '#334155' : '#f1f5f9';
@@ -7457,49 +7461,86 @@ async function renderLabChartNow() {
   const rows = labRecentRows(history, range);
   if (!rows.length) { if (noteEl) noteEl.textContent = '데이터를 불러오지 못했습니다.'; return; }
 
-  let cfg;
-  if (labChartType === 'lotto') {
-    if (indicator === 'hotcold') cfg = lottoHotColdChartConfig(rows, axisColor, gridColor);
-    else if (indicator === 'range') cfg = lottoRangeChartConfig(rows, axisColor, gridColor);
-    else if (indicator === 'oddeven') cfg = lottoOddEvenChartConfig(rows, axisColor, gridColor);
-    else cfg = lottoFreqChartConfig(rows, axisColor, gridColor);
-  } else {
-    if (indicator === 'digit') cfg = pensionDigitChartConfig(rows, labChartDigitPos, axisColor, gridColor);
-    else if (indicator === 'oddeven') cfg = pensionOddEvenChartConfig(rows, axisColor, gridColor);
-    else cfg = pensionGroupChartConfig(rows, axisColor, gridColor);
-  }
+  const isHeatmap = labChartType === 'lotto' ? indicator === 'freq' : (indicator === 'group' || indicator === 'digit');
 
-  if (window._labChartInst) { try { window._labChartInst.destroy(); } catch(e){} }
-  window._labChartInst = new Chart(canvasEl, cfg);
+  if (isHeatmap) {
+    if (window._labChartInst) { try { window._labChartInst.destroy(); } catch(e){} window._labChartInst = null; }
+    if (canvasWrap) canvasWrap.style.display = 'none';
+    if (heatWrap) { heatWrap.style.display = ''; renderLabChartHeatmap(rows, indicator, insightEl, heatWrap); }
+  } else {
+    if (heatWrap) { heatWrap.style.display = 'none'; heatWrap.innerHTML = ''; }
+    if (canvasWrap) canvasWrap.style.display = '';
+    if (insightEl) insightEl.innerHTML = '';
+    let cfg;
+    if (labChartType === 'lotto') {
+      cfg = indicator === 'range' ? lottoRangeChartConfig(rows, axisColor, gridColor) : lottoOddEvenChartConfig(rows, axisColor, gridColor);
+    } else {
+      cfg = pensionOddEvenChartConfig(rows, axisColor, gridColor);
+    }
+    if (window._labChartInst) { try { window._labChartInst.destroy(); } catch(e){} }
+    if (canvasEl) window._labChartInst = new Chart(canvasEl, cfg);
+  }
   if (noteEl) noteEl.textContent = `최근 ${rows.length.toLocaleString()}회차(${rows[0]?.drwNo}~${rows[rows.length-1]?.drwNo}회) 기준. 표본일 뿐 다음 회차 확률과 무관합니다.`;
 }
 
-function lottoFreqChartConfig(rows, axisColor, gridColor) {
-  const counts = Array(46).fill(0);
-  rows.forEach(r => (r.numbers||[]).forEach(n => { if (n>=1 && n<=45) counts[n]++; }));
-  const labels = Array.from({length:45}, (_,i)=>i+1);
-  const data = labels.map(n=>counts[n]);
-  const colors = labels.map(n => n<=10?'#dc2626':n<=20?'#f59e0b':n<=30?'#16a34a':n<=40?'#3b82f6':'#a855f7');
-  return { type:'bar', data:{ labels, datasets:[{ label:'출현 횟수', data, backgroundColor: colors }] },
-    options: { responsive:true, maintainAspectRatio:true, plugins:{ legend:{ display:false } },
-      scales:{ x:{ ticks:{ font:{size:9}, color:axisColor, maxRotation:0 }, grid:{ display:false } },
-               y:{ ticks:{ font:{size:10}, color:axisColor }, grid:{ color:gridColor }, beginAtZero:true } } } };
-}
+/* 번호별 출현 히트맵 + 많이·적게 나온 순위 리스트 */
+function renderLabChartHeatmap(rows, indicator, insightEl, wrap) {
+  let counts, domain, unit, colorBase, cols;
+  if (labChartType === 'lotto') {
+    counts = Array(46).fill(0);
+    rows.forEach(r => (r.numbers||[]).forEach(n => { if (n>=1 && n<=45) counts[n]++; }));
+    domain = Array.from({length:45}, (_,i)=>i+1);
+    unit = '';
+    colorBase = '220,38,38';
+    cols = 7;
+  } else if (indicator === 'digit') {
+    const idx = Math.max(1, Math.min(6, labChartDigitPos)) - 1;
+    counts = Array(10).fill(0);
+    rows.forEach(r => { const s = String(r.number||'').padStart(6,'0'); const d = Number(s[idx]); if (!isNaN(d)) counts[d]++; });
+    domain = Array.from({length:10}, (_,i)=>i);
+    unit = '';
+    colorBase = '22,163,74';
+    cols = 5;
+  } else {
+    counts = {1:0,2:0,3:0,4:0,5:0};
+    rows.forEach(r => { const g = Number(r.group); if (counts[g]!==undefined) counts[g]++; });
+    domain = [1,2,3,4,5];
+    unit = '조';
+    colorBase = '22,163,74';
+    cols = 5;
+  }
 
-function lottoHotColdChartConfig(rows, axisColor, gridColor) {
-  const counts = Array(46).fill(0);
-  rows.forEach(r => (r.numbers||[]).forEach(n => { if (n>=1 && n<=45) counts[n]++; }));
-  const nums = Array.from({length:45}, (_,i)=>i+1);
-  const sorted = [...nums].sort((a,b)=>counts[b]-counts[a]);
-  const hot = sorted.slice(0,10), cold = sorted.slice(-10).reverse();
-  const labels = [...hot.map(n=>'H'+n), ...cold.map(n=>'C'+n)];
-  const data = [...hot.map(n=>counts[n]), ...cold.map(n=>counts[n])];
-  const colors = [...hot.map(()=>'#dc2626'), ...cold.map(()=>'#3b82f6')];
-  return { type:'bar', data:{ labels, datasets:[{ label:'출현 횟수', data, backgroundColor: colors }] },
-    options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ display:false },
-      tooltip:{ callbacks:{ title: ctx => (ctx[0].label[0]==='H'?'핫넘버 ':'콜드넘버 ')+ctx[0].label.slice(1)+'번' } } },
-      scales:{ x:{ ticks:{ font:{size:9}, color:axisColor, maxRotation:0 }, grid:{ display:false } },
-               y:{ ticks:{ font:{size:10}, color:axisColor }, grid:{ color:gridColor }, beginAtZero:true } } } };
+  const maxC = Math.max(1, ...domain.map(n => counts[n]||0));
+  const cells = domain.map(n => {
+    const c = counts[n]||0;
+    const ratio = c / maxC;
+    const alpha = (0.12 + ratio*0.78).toFixed(2);
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+      <div style="width:100%;aspect-ratio:1;border-radius:8px;background:rgba(${colorBase},${alpha});display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:${ratio>0.55?'#fff':'var(--text-dark)'};">${n}${unit}</div>
+      <div style="font-size:9px;color:var(--text-muted);font-weight:700;">${c}회</div>
+    </div>`;
+  }).join('');
+
+  const sorted = [...domain].sort((a,b)=>(counts[b]||0)-(counts[a]||0));
+  const top = sorted.slice(0,10);
+  const bottom = [...sorted].reverse().slice(0,10);
+  const chip = (n, hot) => `<span style="display:inline-flex;align-items:center;gap:4px;background:${hot?'#fee2e2':'#dbeafe'};color:${hot?'#b91c1c':'#1d4ed8'};border-radius:999px;padding:3px 9px;font-size:11px;font-weight:800;">${n}${unit} <b>${counts[n]||0}회</b></span>`;
+
+  wrap.innerHTML = `
+    <div style="background:var(--bg-light);border-radius:8px;padding:10px;">
+      <div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:6px;">${cells}</div>
+    </div>
+    <div style="margin-top:12px;">
+      <div style="font-size:11px;font-weight:900;color:#b91c1c;margin-bottom:6px;">🔥 많이 나온 순위</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;">${top.map(n=>chip(n,true)).join('')}</div>
+      <div style="font-size:11px;font-weight:900;color:#1d4ed8;margin-bottom:6px;">🧊 적게 나온 순위</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">${bottom.map(n=>chip(n,false)).join('')}</div>
+    </div>`;
+
+  if (insightEl) {
+    const hotN = sorted[0], coldN = sorted[sorted.length-1];
+    insightEl.innerHTML = `최다 <b style="color:#b91c1c;">${hotN}${unit} (${counts[hotN]||0}회)</b> · 최소 <b style="color:#1d4ed8;">${coldN}${unit} (${counts[coldN]||0}회)</b>`;
+  }
 }
 
 function lottoRangeChartConfig(rows, axisColor, gridColor) {
@@ -7518,26 +7559,6 @@ function lottoOddEvenChartConfig(rows, axisColor, gridColor) {
   return { type:'bar', data:{ labels, datasets:[{ label:'회차 수', data:buckets, backgroundColor:'#dc2626' }] },
     options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ display:false } },
       scales:{ x:{ ticks:{ font:{size:9}, color:axisColor }, grid:{ display:false } }, y:{ ticks:{ color:axisColor }, grid:{ color:gridColor }, beginAtZero:true } } } };
-}
-
-function pensionGroupChartConfig(rows, axisColor, gridColor) {
-  const counts = {1:0,2:0,3:0,4:0,5:0};
-  rows.forEach(r => { const g = Number(r.group); if (counts[g]!==undefined) counts[g]++; });
-  const labels = ['1조','2조','3조','4조','5조'];
-  const data = [1,2,3,4,5].map(g=>counts[g]);
-  return { type:'bar', data:{ labels, datasets:[{ label:'당첨 횟수', data, backgroundColor:['#dc2626','#f59e0b','#16a34a','#3b82f6','#a855f7'] }] },
-    options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ display:false } },
-      scales:{ x:{ ticks:{ color:axisColor }, grid:{ display:false } }, y:{ ticks:{ color:axisColor }, grid:{ color:gridColor }, beginAtZero:true } } } };
-}
-
-function pensionDigitChartConfig(rows, pos, axisColor, gridColor) {
-  const idx = Math.max(1, Math.min(6, pos)) - 1;
-  const counts = Array(10).fill(0);
-  rows.forEach(r => { const s = String(r.number||'').padStart(6,'0'); const d = Number(s[idx]); if (!isNaN(d)) counts[d]++; });
-  const labels = Array.from({length:10},(_,i)=>String(i));
-  return { type:'bar', data:{ labels, datasets:[{ label:`${pos}번째 자리 숫자 빈도`, data:counts, backgroundColor:'#16a34a' }] },
-    options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ display:false } },
-      scales:{ x:{ ticks:{ color:axisColor }, grid:{ display:false } }, y:{ ticks:{ color:axisColor }, grid:{ color:gridColor }, beginAtZero:true } } } };
 }
 
 function pensionOddEvenChartConfig(rows, axisColor, gridColor) {
