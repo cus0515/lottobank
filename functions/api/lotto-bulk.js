@@ -44,24 +44,69 @@ export async function onRequest(context) {
     } catch (e) { clearTimeout(t); return null; }
   }
 
+  function fmtDate(ymd) {
+    if (!ymd || String(ymd).length !== 8) return ymd || '';
+    const s = String(ymd);
+    return s.slice(0, 4) + '-' + s.slice(4, 6) + '-' + s.slice(6, 8);
+  }
+
+  async function fetchOneOld(round) {
+    const r = await ft('https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=' + round, 6000);
+    if (!r) return { _dbg: 'old:no-response', round };
+    if (!r.ok) return { _dbg: 'old:status-' + r.status, round };
+    const txt = await r.text();
+    if (!txt || txt.trim().charAt(0) !== '{') return { _dbg: 'old:non-json', round, sample: (txt || '').slice(0, 80) };
+    const d = JSON.parse(txt);
+    if (!d || d.returnValue !== 'success') return { _dbg: 'old:not-success', round };
+    return {
+      drwNo: Number(d.drwNo),
+      drwNoDate: d.drwNoDate,
+      numbers: [d.drwtNo1, d.drwtNo2, d.drwtNo3, d.drwtNo4, d.drwtNo5, d.drwtNo6].map(Number),
+      bonusNo: Number(d.bnusNo),
+      totSellamnt: Number(d.totSellamnt || 0),
+      firstWinamnt: Number(d.firstWinamnt || 0),
+      firstPrzwnerCo: Number(d.firstPrzwnerCo || 0),
+    };
+  }
+
+  async function fetchOneNew(round) {
+    const r = await ft(
+      'https://www.dhlottery.co.kr/lt645/selectPstLt645InfoNew.do?srchDir=center&srchLtEpsd=' + round,
+      6000
+    );
+    if (!r) return { _dbg: 'new:no-response', round };
+    if (!r.ok) return { _dbg: 'new:status-' + r.status, round };
+    const txt = await r.text();
+    let j;
+    try { j = JSON.parse(txt); } catch (e) {
+      return { _dbg: 'new:non-json', round, sample: (txt || '').slice(0, 80) };
+    }
+    const list = (j && j.data && j.data.list) ? j.data.list : (j && j.list ? j.list : null);
+    if (!Array.isArray(list) || list.length === 0) return { _dbg: 'new:no-list', round };
+    let item = null;
+    for (let i = 0; i < list.length; i++) {
+      if (Number(list[i].ltEpsd) === round) { item = list[i]; break; }
+    }
+    if (!item) return { _dbg: 'new:round-not-in-list', round };
+    return {
+      drwNo: Number(item.ltEpsd || item.drwNo),
+      drwNoDate: item.drwNoDate || fmtDate(item.ltRflYmd),
+      numbers: [item.tm1WnNo || item.drwtNo1, item.tm2WnNo || item.drwtNo2, item.tm3WnNo || item.drwtNo3,
+        item.tm4WnNo || item.drwtNo4, item.tm5WnNo || item.drwtNo5, item.tm6WnNo || item.drwtNo6].map(Number),
+      bonusNo: Number(item.bnsWnNo || item.bnusNo),
+      totSellamnt: Number(item.rlvtEpsdSumNtslAmt || item.totSellamnt || 0),
+      firstWinamnt: Number(item.rnk1WnAmt || item.firstWinamnt || 0),
+      firstPrzwnerCo: Number(item.rnk1WnNope || item.firstPrzwnerCo || 0),
+    };
+  }
+
   async function fetchOne(round) {
     try {
-      const r = await ft('https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=' + round, 6000);
-      if (!r) return { _dbg: 'no-response', round };
-      if (!r.ok) return { _dbg: 'status-' + r.status, round };
-      const txt = await r.text();
-      if (!txt || txt.trim().charAt(0) !== '{') return { _dbg: 'non-json', round, sample: (txt || '').slice(0, 120) };
-      const d = JSON.parse(txt);
-      if (!d || d.returnValue !== 'success') return { _dbg: 'not-success', round, raw: d };
-      return {
-        drwNo: Number(d.drwNo),
-        drwNoDate: d.drwNoDate,
-        numbers: [d.drwtNo1, d.drwtNo2, d.drwtNo3, d.drwtNo4, d.drwtNo5, d.drwtNo6].map(Number),
-        bonusNo: Number(d.bnusNo),
-        totSellamnt: Number(d.totSellamnt || 0),
-        firstWinamnt: Number(d.firstWinamnt || 0),
-        firstPrzwnerCo: Number(d.firstPrzwnerCo || 0),
-      };
+      const oldR = await fetchOneOld(round);
+      if (!oldR._dbg) return oldR;
+      const newR = await fetchOneNew(round);
+      if (!newR._dbg) return newR;
+      return { _dbg: 'both-failed', round, oldErr: oldR._dbg, newErr: newR._dbg };
     } catch (e) {
       return { _dbg: 'exception', round, message: String(e && e.message || e) };
     }
