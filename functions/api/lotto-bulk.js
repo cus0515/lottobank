@@ -7,7 +7,7 @@
  * platform's per-request subrequest limit.
  */
 
-const MAX_RANGE = 40;
+const MAX_RANGE = 20;
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
@@ -102,11 +102,11 @@ export async function onRequest(context) {
 
   async function fetchOne(round) {
     try {
-      const oldR = await fetchOneOld(round);
-      if (!oldR._dbg) return oldR;
+      // old API (common.do) is permanently returning an HTML block page now — skip it
+      // to save subrequests and go straight to the API that actually works.
       const newR = await fetchOneNew(round);
       if (!newR._dbg) return newR;
-      return { _dbg: 'both-failed', round, oldErr: oldR._dbg, newErr: newR._dbg };
+      return { _dbg: 'new-failed', round, newErr: newR._dbg };
     } catch (e) {
       return { _dbg: 'exception', round, message: String(e && e.message || e) };
     }
