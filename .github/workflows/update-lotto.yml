@@ -53,6 +53,11 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python3 scripts/generate_news_post.py
 
+      - name: Generate radar recommendation picks (레이더 추천번호 서버 생성)
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python3 scripts/generate_radar_picks.py
+
       - name: Commit if changed
         run: |
           git config user.name "github-actions[bot]"

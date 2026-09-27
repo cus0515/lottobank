@@ -6662,7 +6662,7 @@ function go(id) {
   if (id === 'ticket')    { chgMode(); switchQrView('register'); }
   if (id === 'fortune') {
     renderFortune();
-    hydrateRadarRecommendations().then(() => {
+    Promise.all([hydrateRadarRecommendations(), hydrateServerRadarPicks()]).then(() => {
       if ($('pg-fortune')?.style.display !== 'none') renderFortune();
     });
   }
@@ -8419,6 +8419,34 @@ async function hydrateRadarRecommendations() {
     localStorage.setItem('ltb-radar-picks', JSON.stringify(lotto));
     localStorage.setItem('ltb-pension-picks', JSON.stringify(pension));
     window._radarHydratedUser = currentUser.id;
+  } catch (_) {}
+}
+
+async function hydrateServerRadarPicks() {
+  // 서버(GitHub Actions)가 매주 자동 생성해 저장한 레이더 추천을 공개 조회해 병합.
+  // 로그인 여부와 무관하게 항상 동작 — 방문 안 한 주도 이력이 끊기지 않게 하기 위함.
+  if (!sb || window._serverRadarHydrated) return;
+  try {
+    const { data, error } = await sb.from('radar_picks')
+      .select('lottery_type,round_no,games,created_at')
+      .order('round_no', { ascending:false })
+      .limit(300);
+    if (error) return;
+    const lotto = JSON.parse(localStorage.getItem('ltb-radar-picks') || '{}');
+    const pension = JSON.parse(localStorage.getItem('ltb-pension-picks') || '{}');
+    (data || []).forEach(row => {
+      const key = String(row.round_no);
+      const date = row.created_at ? new Date(row.created_at).toLocaleDateString('ko-KR') : '';
+      if (row.lottery_type === 'lotto' && !lotto[key]) {
+        lotto[key] = { date, games: row.games };
+      }
+      if (row.lottery_type === 'pension' && !pension[key]) {
+        pension[key] = { date, games: row.games };
+      }
+    });
+    localStorage.setItem('ltb-radar-picks', JSON.stringify(lotto));
+    localStorage.setItem('ltb-pension-picks', JSON.stringify(pension));
+    window._serverRadarHydrated = true;
   } catch (_) {}
 }
 
