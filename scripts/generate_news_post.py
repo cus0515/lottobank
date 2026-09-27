@@ -32,7 +32,7 @@ BOT_EMAIL = 'news-bot@lottobank.internal'
 BOT_NICKNAME = '로또뱅크'
 SITE_URL = 'https://lottobank.pages.dev'
 RECOMMENDATIONS_PATH = 'site-recommendations.json'
-NEWS_CONTENT_VERSION = 3
+NEWS_CONTENT_VERSIONS = {'lotto': 3, 'pension': 4}
 
 
 # ───────────────────────── 공용 유틸 ─────────────────────────
@@ -687,12 +687,24 @@ def build_pension_post(latest, history):
         f"ㆍ {group}조 누적 출현 · 전체 {len(history)}회 중 {current_group_count}회",
         f"ㆍ 가장 많이 나온 조 · {sorted_groups[0][0]}조 ({sorted_groups[0][1]}회)" if sorted_groups else f"ㆍ 이번 당첨 조 · {group}조",
         '',
-        '[구매 경로]',
+        '[당첨 지역과 구매 방식]',
         f"ㆍ 1등 · 인터넷 {first_stores['online']}건 / 오프라인 {first_stores['physical']}건",
         f"ㆍ 2등 · 인터넷 {second_stores['online']}건 / 오프라인 {second_stores['physical']}건",
     ]
-    if first_stores['names']:
-        body.append('ㆍ 1등 오프라인 판매점 · ' + ' / '.join(first_stores['names'][:6]))
+    if first_stores['tickets']:
+        if first_stores['physical']:
+            body.append('ㆍ 1등 당첨 지역 · ' + ' / '.join(f'{region} {count}건' for region, count in first_stores['top_regions']))
+            if first_stores['names']:
+                body.append('ㆍ 1등 판매점 · ' + ' / '.join(first_stores['names'][:6]))
+        else:
+            body.append(f"ㆍ 1등 당첨 지역 · 오프라인 당첨 없음 / 인터넷 {first_stores['online']}건")
+    if second_stores['tickets']:
+        if second_stores['physical']:
+            body.append('ㆍ 2등 당첨 지역 · ' + ' / '.join(f'{region} {count}건' for region, count in second_stores['top_regions']))
+            if second_stores['names']:
+                body.append('ㆍ 2등 판매점 · ' + ' / '.join(second_stores['names'][:6]))
+        else:
+            body.append(f"ㆍ 2등 당첨 지역 · 오프라인 당첨 없음 / 인터넷 {second_stores['online']}건")
     radar_lines = pension_radar_result_insight(latest, history)
     if radar_lines:
         body += ['', '[로또뱅크 연금 레이더 분석]'] + radar_lines
@@ -1183,6 +1195,7 @@ def run_for(lottery_type):
         return False
     latest = enrich_news_data(lottery_type, latest_record(lottery_type, history))
     state = load_json(state_path, {'lastPostedRound': 0})
+    content_version = NEWS_CONTENT_VERSIONS[lottery_type]
 
     if lottery_type == 'lotto':
         if not latest.get('firstWinamnt'):
@@ -1193,7 +1206,7 @@ def run_for(lottery_type):
 
     needs_replacement = (
         latest['drwNo'] <= state.get('lastPostedRound', 0)
-        and int(state.get('contentVersion', 0) or 0) < NEWS_CONTENT_VERSION
+        and int(state.get('contentVersion', 0) or 0) < content_version
     )
     if latest['drwNo'] <= state.get('lastPostedRound', 0) and not needs_replacement:
         if not static_news_exists(lottery_type, latest['drwNo']):
@@ -1211,7 +1224,7 @@ def run_for(lottery_type):
     write_static_news(lottery_type, latest, title, body)
     save_json(state_path, {
         'lastPostedRound': latest['drwNo'],
-        'contentVersion': NEWS_CONTENT_VERSION,
+        'contentVersion': content_version,
     })
     print(f'[ok] {lottery_type} 제 {latest["drwNo"]}회 소식 게시 완료')
     return True
