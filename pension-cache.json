@@ -1,67 +1,10 @@
 {
   "returnValue": "success",
-  "drwNo": 323,
-  "drwNoDate": "2026-07-09",
-  "wnBndNo": "4",
-  "wnRnkVl": "604270",
-  "bnsRnkVl": "945893",
-  "prizes": [
-    {
-      "rank": 1,
-      "store": 1,
-      "internet": 1,
-      "total": 2,
-      "totAmt": 3360000000
-    },
-    {
-      "rank": 2,
-      "store": 4,
-      "internet": 4,
-      "total": 8,
-      "totAmt": 960000000
-    },
-    {
-      "rank": 3,
-      "store": 30,
-      "internet": 19,
-      "total": 49,
-      "totAmt": 49000000
-    },
-    {
-      "rank": 4,
-      "store": 357,
-      "internet": 309,
-      "total": 666,
-      "totAmt": 66600000
-    },
-    {
-      "rank": 5,
-      "store": 3552,
-      "internet": 3039,
-      "total": 6591,
-      "totAmt": 329550000
-    },
-    {
-      "rank": 6,
-      "store": 33833,
-      "internet": 29934,
-      "total": 63767,
-      "totAmt": 318835000
-    },
-    {
-      "rank": 7,
-      "store": 332700,
-      "internet": 299043,
-      "total": 631743,
-      "totAmt": 631743000
-    },
-    {
-      "rank": 8,
-      "store": 5,
-      "internet": 5,
-      "total": 10,
-      "totAmt": 1200000000
-    }
-  ],
-  "_cachedAt": "2026-09-27T06:57:50Z"
+  "drwNo": 324,
+  "drwNoDate": "2026-07-16",
+  "wnBndNo": "2",
+  "wnRnkVl": "485216",
+  "bnsRnkVl": "061918",
+  "prizes": [],
+  "_cachedAt": "2026-09-27T19:10:13Z"
 }
