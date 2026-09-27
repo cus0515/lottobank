@@ -1341,6 +1341,8 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .news-detail-section{margin:18px 0 7px;padding-bottom:6px;border-bottom:1px solid var(--border-dashed);font-size:13px;font-weight:800;color:var(--text-dark);}
 .news-detail-section:first-child{margin-top:4px;}
 .news-detail-paragraph{margin:0 0 7px;min-width:0;max-width:100%;line-height:1.75;word-break:break-word;overflow-wrap:anywhere;}
+.news-detail-bullet{display:grid;grid-template-columns:13px minmax(0,1fr);gap:3px;margin:0 0 5px;min-width:0;max-width:100%;line-height:1.7;word-break:break-word;overflow-wrap:anywhere;}
+.news-detail-bullet-mark{color:var(--lotto-red);font-weight:900;}
 .post-card-stats .post-like-btn{background:none;border:1px solid var(--border-dashed);border-radius:12px;padding:2px 10px;font-size:11px;cursor:pointer;color:var(--text-muted);font-family:inherit;transition:border-color .15s,color .15s;display:inline-flex;align-items:center;gap:4px;}
 .post-card-stats .post-like-btn:hover,.post-card-stats .post-like-btn.liked{border-color:#fca5a5;color:#e11d48;}
 .post-tag-chip{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.3px;}
@@ -12035,6 +12037,7 @@ function renderCommunityBody(text, isNews) {
     if (!value) return '';
     const section = value.match(/^\[([^\]]+)\]$/);
     if (section) return `<div class="news-detail-section">${escapeStoreText(section[1])}</div>`;
+    if (value.startsWith('ㆍ')) return `<div class="news-detail-bullet"><span class="news-detail-bullet-mark">ㆍ</span><span>${escapeStoreText(value.slice(1).trim())}</span></div>`;
     return `<p class="news-detail-paragraph">${escapeStoreText(value)}</p>`;
   }).join('');
 }

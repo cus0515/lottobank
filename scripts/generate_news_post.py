@@ -32,7 +32,7 @@ BOT_EMAIL = 'news-bot@lottobank.internal'
 BOT_NICKNAME = '로또뱅크'
 SITE_URL = 'https://lottobank.pages.dev'
 RECOMMENDATIONS_PATH = 'site-recommendations.json'
-NEWS_CONTENT_VERSION = 2
+NEWS_CONTENT_VERSION = 3
 
 
 # ───────────────────────── 공용 유틸 ─────────────────────────
@@ -420,15 +420,16 @@ def lotto_radar_result_insight(latest, history):
     )
     top_candidates = {number for number, _ in scores[:10]}
     candidate_hits = sorted(set(winning) & top_candidates)
-    frequency_text = ' · '.join(f'{number}번 {frequency[number]}회' for number in winning)
-    candidate_line = (
-        f"상위 10개 후보 중 실제 당첨번호는 {len(candidate_hits)}개({' · '.join(map(str, candidate_hits))}) 포함됐습니다."
-        if candidate_hits else '상위 10개 후보에는 실제 당첨번호가 포함되지 않았습니다.'
-    )
+    most_seen_count = max(frequency[number] for number in winning)
+    least_seen_count = min(frequency[number] for number in winning)
+    most_seen = [number for number in winning if frequency[number] == most_seen_count]
+    least_seen = [number for number in winning if frequency[number] == least_seen_count]
+    hit_text = f"{len(candidate_hits)}개 ({' · '.join(map(str, candidate_hits))})" if candidate_hits else '0개'
     return [
-        f"직전 50회까지만 사용한 기본 레이더 점수(등장 간격 60%·출현 빈도 40%) {candidate_line}",
-        f"당첨번호의 직전 50회 출현 횟수는 {frequency_text}입니다.",
-        '이 항목은 결과 발표 후 당첨번호를 레이더 기준으로 설명한 사후 분석이며, 추첨 전에 저장된 추천번호의 적중 결과와는 구분합니다.',
+        'ㆍ 비교 기준 · 이번 추첨 전까지의 최근 50회 당첨번호',
+        f"ㆍ 레이더 상위 후보 10개 적중 · {hit_text}",
+        f"ㆍ 이번 당첨번호 중 최근 50회 최다 출현 · {' · '.join(map(str, most_seen))}번 ({most_seen_count}회)",
+        f"ㆍ 이번 당첨번호 중 최근 50회 최소 출현 · {' · '.join(map(str, least_seen))}번 ({least_seen_count}회)",
     ]
 
 
@@ -460,13 +461,13 @@ def pension_radar_result_insight(latest, history):
     ranked_groups = sorted(group_counts, key=lambda item: (-group_counts[item], item))
     group_rank = ranked_groups.index(group) + 1 if group in ranked_groups else None
     position_line = (
-        f"일치한 자리는 6자리 중 {len(matched_positions)}자리이며 위치는 {' · '.join(map(str, matched_positions))}번째입니다."
-        if matched_positions else '일치한 자리는 없었습니다.'
+        f"{len(matched_positions)}자리 ({' · '.join(map(str, matched_positions))}번째 자리)"
+        if matched_positions else '0자리'
     )
     return [
-        f"직전 50회 자리별 출현 빈도 상위 3개 숫자와 {position_line}",
-        f"{group}조는 직전 50회에 {group_counts.get(group, 0)}회 등장해 5개 조 중 {group_rank or '-'}번째 빈도입니다.",
-        '이 항목은 결과 발표 후 당첨번호 구성을 레이더 기준으로 설명한 사후 분석이며, 추첨 전에 저장된 추천번호의 적중 결과와는 구분합니다.',
+        'ㆍ 비교 기준 · 이번 추첨 전까지의 최근 50회 당첨번호',
+        f"ㆍ 각 자리의 최근 상위 3개 숫자와 일치 · {position_line}",
+        f"ㆍ {group}조 출현 · 최근 50회 중 {group_counts.get(group, 0)}회, 5개 조 가운데 {group_rank or '-'}번째",
     ]
 
 
@@ -482,7 +483,7 @@ def lotto_recommendation_insight(round_no, latest):
     best_rank, win_count = lotto_recommendation_result(games, latest)
     result = f"최고 {best_rank}등, {win_count}게임 당첨" if best_rank else '당첨 등수 없음'
     caught = ' · '.join(map(str, captured)) if captured else '없음'
-    return f"추천 {len(games)}게임에서 실제 당첨번호로 포함된 숫자는 {caught}이며, 한 게임 최고 {max(match_counts, default=0)}개 일치로 {result}입니다."
+    return f"ㆍ 저장 추천 {len(games)}게임 · 포함 당첨번호 {caught} · 한 게임 최고 {max(match_counts, default=0)}개 일치 · {result}"
 
 
 def pension_recommendation_insight(round_no, latest):
@@ -498,7 +499,7 @@ def pension_recommendation_insight(round_no, latest):
     for game in games:
         selected = str(game.get('num') or '').zfill(6)
         suffixes.append(next((digits for digits in range(6, 0, -1) if selected[-digits:] == winning[-digits:]), 0))
-    return f"추천 {len(games)}게임의 당첨번호 뒤자리 일치는 최고 {max(suffixes, default=0)}자리이며, 결과는 {result}({win_count}게임)입니다."
+    return f"ㆍ 저장 추천 {len(games)}게임 · 최고 뒤자리 {max(suffixes, default=0)}개 일치 · {result} {win_count}게임"
 
 
 def build_lotto_post(latest, history):
@@ -516,6 +517,7 @@ def build_lotto_post(latest, history):
     ]
     recent = [row for row in history[:-1] if row.get('numbers')][-50:]
     recent_sum = round(sum(sum(map(int, row['numbers'])) for row in recent) / len(recent), 1) if recent else 0
+    sum_gap = round(sum(nums) - recent_sum) if recent else 0
     odd = sum(number % 2 for number in nums)
     consecutive = [f'{left}-{right}' for left, right in zip(nums, nums[1:]) if right - left == 1]
     previous = set(map(int, recent[-1].get('numbers') or [])) if recent else set()
@@ -535,31 +537,34 @@ def build_lotto_post(latest, history):
     title = f'제 {no}회 로또 분석, {focus}과 당첨 판매점 분포'
 
     body = [
-        '[결과 요약]',
-        f"당첨번호는 {' · '.join(map(str, nums))}, 보너스 번호는 {bonus}입니다.",
-        f"1등은 {winners}명이며 1인당 {money(prize)}을 받습니다. 공식 총판매액은 {money(sales)}입니다.",
+        '[당첨 결과]',
+        f"ㆍ 당첨번호 · {' · '.join(map(str, nums))} + 보너스 {bonus}",
+        f"ㆍ 1등 · {winners}명 / 1인당 {money(prize)}",
+        f"ㆍ 총판매액 · {money(sales)}",
         '',
-        '[번호 데이터 분석]',
-        f"홀짝은 {odd}:{6-odd}, 번호 합은 {sum(nums)}으로 최근 50회 평균 {recent_sum}와 비교해 {sum(nums)-recent_sum:+.1f}입니다.",
-        f"번호대 분포는 1~10부터 41~45까지 {'-'.join(map(str, zones))}개입니다."
-        + (f" 연속번호는 {', '.join(consecutive)}입니다." if consecutive else ' 연속번호는 없습니다.'),
-        f"직전 회차와 겹친 번호는 {' · '.join(map(str, overlap)) + '입니다' if overlap else '없습니다'}.",
+        '[번호 한눈에 보기]',
+        f"ㆍ 홀짝 구성 · 홀수 {odd}개 / 짝수 {6-odd}개",
+        f"ㆍ 당첨번호 6개 합계 · {sum(nums)} / 최근 50회 합계 평균보다 약 {abs(sum_gap)} {'높음' if sum_gap > 0 else '낮음' if sum_gap < 0 else '같음'}",
+        f"ㆍ 번호 구간 · 1~10 {zones[0]}개 / 11~20 {zones[1]}개 / 21~30 {zones[2]}개 / 31~40 {zones[3]}개 / 41~45 {zones[4]}개",
+        f"ㆍ 연속번호 · {', '.join(consecutive) if consecutive else '없음'}",
+        f"ㆍ 직전 회차와 겹친 번호 · {' · '.join(map(str, overlap)) if overlap else '없음'}",
         '',
-        '[당첨 판매점 분석]',
-        f"1등 {first_stores['tickets']}건 중 인터넷 구매 {first_stores['online']}건, 오프라인 {first_stores['physical']}건이며 고유 오프라인 판매점은 {first_stores['unique_physical']}곳입니다.",
-        f"1등 구매 방식은 {format_counts(first_stores['modes'], ('자동', '수동', '반자동'))}입니다.",
+        '[판매점과 구매 방식]',
+        f"ㆍ 1등 구매 경로 · 인터넷 {first_stores['online']}건 / 오프라인 {first_stores['physical']}건",
+        f"ㆍ 1등 오프라인 판매점 · {first_stores['unique_physical']}곳",
+        f"ㆍ 1등 구매 방식 · {format_counts(first_stores['modes'], ('자동', '수동', '반자동')).replace(' · ', ' / ')}",
     ]
     if rank2_count and rank2_prize:
-        body.insert(3, f"2등은 {rank2_count}명이며 1인당 {money(rank2_prize)}입니다.")
+        body.insert(3, f"ㆍ 2등 · {rank2_count}명 / 1인당 {money(rank2_prize)}")
     populated_lower = [(rank, count, amount) for rank, count, amount in lower_ranks if count and amount]
     if populated_lower:
         body.insert(4 if rank2_count and rank2_prize else 3,
-                    '3~5등은 ' + ' · '.join(f'{rank}등 {count:,}명({money(amount)})' for rank, count, amount in populated_lower) + '입니다.')
+                    'ㆍ 3~5등 · ' + ' / '.join(f'{rank}등 {count:,}명 ({money(amount)})' for rank, count, amount in populated_lower))
     if first_stores['top_regions']:
-        body.append('1등 오프라인 지역은 ' + ' · '.join(f'{region} {count}건' for region, count in first_stores['top_regions']) + ' 순으로 확인됩니다.')
+        body.append('ㆍ 1등 주요 지역 · ' + ' / '.join(f'{region} {count}건' for region, count in first_stores['top_regions']))
     if first_stores['names']:
-        body.append('주요 1등 판매점은 ' + ', '.join(first_stores['names'][:6]) + (' 등입니다.' if len(first_stores['names']) > 6 else '입니다.'))
-    body.append(f"2등은 총 {second_stores['tickets']}건이며 인터넷 {second_stores['online']}건, 오프라인 {second_stores['physical']}건으로 집계됐습니다.")
+        body.append('ㆍ 주요 1등 판매점 · ' + ' / '.join(first_stores['names'][:6]) + (' 외' if len(first_stores['names']) > 6 else ''))
+    body.append(f"ㆍ 2등 구매 경로 · 인터넷 {second_stores['online']}건 / 오프라인 {second_stores['physical']}건")
     radar_lines = lotto_radar_result_insight(latest, history)
     if radar_lines:
         body += ['', '[로또뱅크 번호 레이더 분석]'] + radar_lines
@@ -568,8 +573,7 @@ def build_lotto_post(latest, history):
         body += ['', '[로또뱅크 추천 결과]', recommendation]
     site_stats = latest.get('siteStats') or {}
     if site_stats.get('wins'):
-        body += ['', '[로또뱅크 인증 현황]', f"이 회차에는 인증 티켓 {site_stats['tickets']}장과 총 {site_stats['games']}게임이 익명 집계됐으며, 당첨 확인 티켓은 {site_stats['wins']}장입니다."]
-    body += ['', '[읽는 방법]', '판매점의 같은 이름이 여러 번 보이면 한 판매점에서 복수 당첨이 나온 경우일 수 있습니다. 과거 통계와 판매점 분포는 다음 회차 당첨을 예측하지 않습니다.']
+        body += ['', '[로또뱅크 인증 현황]', f"ㆍ QR 인증 · {site_stats['tickets']}장 / {site_stats['games']}게임 / 당첨 확인 {site_stats['wins']}장"]
     return title, '\n'.join(body)
 
 
@@ -665,27 +669,30 @@ def build_pension_post(latest, history):
     title = f'제 {no}회 연금복권 분석, {channel_focus} 및 번호 패턴'
 
     body = [
-        '[결과 요약]',
-        f"1등 당첨번호는 {group}조 {number}, 보너스 번호는 각 조 {bonus}입니다.",
+        '[당첨 결과]',
+        f"ㆍ 1등 · {group}조 {number}",
+        f"ㆍ 보너스 · 각 조 {bonus}",
     ]
     if first:
-        body.append(f"1등은 총 {int(first.get('total') or 0)}건, 총 당첨금은 {money(first.get('totAmt') or 0)}이며 판매점 {int(first.get('store') or 0)}건·인터넷 {int(first.get('internet') or 0)}건입니다.")
+        body.append(f"ㆍ 1등 당첨 · {int(first.get('total') or 0)}건 / 총 {money(first.get('totAmt') or 0)}")
     if second:
-        body.append(f"2등은 {int(second.get('total') or 0)}건으로 판매점 {int(second.get('store') or 0)}건·인터넷 {int(second.get('internet') or 0)}건입니다.")
+        body.append(f"ㆍ 2등 당첨 · {int(second.get('total') or 0)}건")
     if bonus_prize:
-        body.append(f"보너스 당첨은 {int(bonus_prize.get('total') or 0)}건, 총 당첨금 {money(bonus_prize.get('totAmt') or 0)}으로 집계됐습니다.")
+        body.append(f"ㆍ 보너스 당첨 · {int(bonus_prize.get('total') or 0)}건 / 총 {money(bonus_prize.get('totAmt') or 0)}")
     body += [
         '',
-        '[번호 데이터 분석]',
-        f"여섯 자리 숫자 합은 {sum(digits)}, 홀짝 구성은 {odd}:{6-odd}입니다."
-        + (f" 반복된 숫자는 {' · '.join(repeated)}입니다." if repeated else ' 반복 숫자는 없습니다.'),
-        f"이번 {group}조는 전체 {len(history)}회 중 {current_group_count}번째 등장입니다. 가장 많이 나온 조는 {sorted_groups[0][0]}조({sorted_groups[0][1]}회)입니다." if sorted_groups else f"이번 당첨 조는 {group}조입니다.",
+        '[번호 한눈에 보기]',
+        f"ㆍ 홀짝 구성 · 홀수 {odd}개 / 짝수 {6-odd}개",
+        f"ㆍ 반복 숫자 · {' · '.join(repeated) if repeated else '없음'}",
+        f"ㆍ {group}조 누적 출현 · 전체 {len(history)}회 중 {current_group_count}회",
+        f"ㆍ 가장 많이 나온 조 · {sorted_groups[0][0]}조 ({sorted_groups[0][1]}회)" if sorted_groups else f"ㆍ 이번 당첨 조 · {group}조",
         '',
-        '[당첨 경로 분석]',
-        f"공개 판매점 데이터 기준 1등은 인터넷 {first_stores['online']}건·오프라인 {first_stores['physical']}건, 2등은 인터넷 {second_stores['online']}건·오프라인 {second_stores['physical']}건입니다.",
+        '[구매 경로]',
+        f"ㆍ 1등 · 인터넷 {first_stores['online']}건 / 오프라인 {first_stores['physical']}건",
+        f"ㆍ 2등 · 인터넷 {second_stores['online']}건 / 오프라인 {second_stores['physical']}건",
     ]
     if first_stores['names']:
-        body.append('1등 오프라인 판매점은 ' + ', '.join(first_stores['names'][:6]) + '입니다.')
+        body.append('ㆍ 1등 오프라인 판매점 · ' + ' / '.join(first_stores['names'][:6]))
     radar_lines = pension_radar_result_insight(latest, history)
     if radar_lines:
         body += ['', '[로또뱅크 연금 레이더 분석]'] + radar_lines
@@ -694,8 +701,7 @@ def build_pension_post(latest, history):
         body += ['', '[로또뱅크 추천 결과]', recommendation]
     site_stats = latest.get('siteStats') or {}
     if site_stats.get('wins'):
-        body += ['', '[로또뱅크 인증 현황]', f"이 회차에는 인증 티켓 {site_stats['tickets']}장과 총 {site_stats['games']}게임이 익명 집계됐으며, 당첨 확인 티켓은 {site_stats['wins']}장입니다."]
-    body += ['', '[읽는 방법]', '조·자리·구매 경로 통계는 이미 끝난 회차를 설명하는 자료입니다. 특정 조나 판매 방식의 다음 회차 당첨 가능성이 더 높다는 뜻은 아닙니다.']
+        body += ['', '[로또뱅크 인증 현황]', f"ㆍ QR 인증 · {site_stats['tickets']}장 / {site_stats['games']}게임 / 당첨 확인 {site_stats['wins']}장"]
     return title, '\n'.join(body)
 
 
@@ -708,8 +714,9 @@ def _build_prompt(title, body, lottery_label):
         f"[제목 초안]\n{title}\n\n[본문 초안]\n{body}\n\n"
         "규칙: 사실을 과장하거나 새로운 사실을 지어내지 말 것. 도박을 부추기거나 구매를 권유하는 "
         "표현은 쓰지 말 것. 정중체(합니다체)로, 친근하고 읽기 쉬운 정보형 문장으로 작성할 것. "
-        "당첨번호 요약, 데이터 관전 포인트, 서비스 확인 경로 순서를 유지할 것. 본문은 5~8줄, "
-        "이모지는 최대 1개만. 아래 JSON 형식으로만 답해:\n"
+        "당첨번호 요약, 데이터 관전 포인트, 서비스 확인 경로 순서를 유지할 것. 대괄호 섹션 제목과 "
+        "`ㆍ 항목 · 값` 목록 형식을 유지하고 장문 문단으로 합치지 말 것. 이모지는 사용하지 말 것. "
+        "아래 JSON 형식으로만 답해:\n"
         '{"title": "...", "body": "..."}'
     )
 
@@ -779,17 +786,33 @@ def render_news_html(lottery_type, latest, title, body):
     url = f'{SITE_URL}/news/{slug}'
     label = '로또 6/45' if lottery_type == 'lotto' else '연금복권 720+'
     published = datetime.now(timezone.utc).date().isoformat()
-    content_lines = [re.sub(r'\s+', ' ', line).strip(' •') for line in body.splitlines() if line.strip()]
+    content_lines = [
+        re.sub(r'\s+', ' ', line).strip('ㆍ •')
+        for line in body.splitlines()
+        if line.strip() and not (line.strip().startswith('[') and line.strip().endswith(']'))
+    ]
     description = ' '.join(content_lines[:2])[:160]
     article_parts = []
+    bullet_items = []
+
+    def flush_bullets():
+        if bullet_items:
+            article_parts.append('<ul>' + ''.join(f'<li>{html.escape(item)}</li>' for item in bullet_items) + '</ul>')
+            bullet_items.clear()
+
     for line in body.splitlines():
         clean = line.strip()
         if not clean:
             continue
         if clean.startswith('[') and clean.endswith(']'):
+            flush_bullets()
             article_parts.append(f'<h2>{html.escape(clean[1:-1])}</h2>')
+        elif clean.startswith('ㆍ'):
+            bullet_items.append(clean[1:].strip())
         else:
+            flush_bullets()
             article_parts.append(f'<p>{html.escape(clean.lstrip("• "))}</p>')
+    flush_bullets()
     paragraphs = ''.join(article_parts)
     structured = {
         '@context': 'https://schema.org',
@@ -814,7 +837,7 @@ def render_news_html(lottery_type, latest, title, body):
 <meta name="description" content="{html.escape(description, quote=True)}">
 <link rel="canonical" href="{url}"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <script type="application/ld+json">{json.dumps(structured, ensure_ascii=False)}</script>
-<style>*{{box-sizing:border-box}}body{{margin:0;background:#f6f8fb;color:#0f172a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.8;word-break:keep-all;overflow-wrap:anywhere}}nav{{background:#0f172a;padding:12px 18px}}nav a{{color:#fff;font-weight:800;text-decoration:none}}main{{width:100%;max-width:820px;margin:auto;padding:32px 18px}}article{{min-width:0;max-width:100%;background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:28px 32px;box-shadow:0 8px 24px rgba(15,23,42,.06)}}.kind{{color:#e11d48;font-size:13px;font-weight:800}}h1{{font-size:27px;line-height:1.35;margin:8px 0 6px;overflow-wrap:anywhere}}h2{{font-size:17px;line-height:1.45;margin:28px 0 8px;padding-bottom:7px;border-bottom:1px solid #e2e8f0}}.meta{{font-size:13px;color:#64748b;margin-bottom:22px}}p{{margin:0 0 12px;color:#334155;overflow-wrap:anywhere}}.notice{{margin-top:24px;padding:13px;border-radius:8px;background:#f8fafc;color:#64748b;font-size:13px}}.links{{margin-top:22px;display:flex;gap:14px;flex-wrap:wrap}}.links a{{color:#e11d48;font-weight:700;text-decoration:none}}@media(max-width:600px){{main{{padding:18px 10px}}article{{padding:19px 15px;border-radius:10px}}h1{{font-size:21px}}h2{{font-size:15px;margin-top:22px}}p{{font-size:14px;line-height:1.75}}}}</style>
+<style>*{{box-sizing:border-box}}body{{margin:0;background:#f6f8fb;color:#0f172a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.8;word-break:keep-all;overflow-wrap:anywhere}}nav{{background:#0f172a;padding:12px 18px}}nav a{{color:#fff;font-weight:800;text-decoration:none}}main{{width:100%;max-width:820px;margin:auto;padding:32px 18px}}article{{min-width:0;max-width:100%;background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:28px 32px;box-shadow:0 8px 24px rgba(15,23,42,.06)}}.kind{{color:#e11d48;font-size:13px;font-weight:800}}h1{{font-size:27px;line-height:1.35;margin:8px 0 6px;overflow-wrap:anywhere}}h2{{font-size:17px;line-height:1.45;margin:28px 0 8px;padding-bottom:7px;border-bottom:1px solid #e2e8f0}}.meta{{font-size:13px;color:#64748b;margin-bottom:22px}}p{{margin:0 0 12px;color:#334155;overflow-wrap:anywhere}}ul{{list-style:none;margin:0 0 14px;padding:0}}li{{position:relative;margin:0;padding:5px 0 5px 17px;color:#334155;line-height:1.65;overflow-wrap:anywhere}}li::before{{content:'ㆍ';position:absolute;left:0;color:#e11d48;font-weight:900}}.notice{{margin-top:24px;padding:13px;border-radius:8px;background:#f8fafc;color:#64748b;font-size:13px}}.links{{margin-top:22px;display:flex;gap:14px;flex-wrap:wrap}}.links a{{color:#e11d48;font-weight:700;text-decoration:none}}@media(max-width:600px){{main{{padding:18px 10px}}article{{padding:19px 15px;border-radius:10px}}h1{{font-size:21px}}h2{{font-size:15px;margin-top:22px}}p,li{{font-size:14px;line-height:1.7}}}}</style>
 </head><body><nav><a href="/">LottoBank</a></nav><main><article>
 <div class="kind">{label} 회차 소식</div><h1>{html.escape(title)}</h1>
 <div class="meta">제 {round_no}회 · {html.escape(str(latest.get('drwNoDate') or published))}</div>
