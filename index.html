@@ -2069,6 +2069,7 @@ textarea {
       <button id="m-group" class="menu-btn" onclick="go('group')" style="display:none;">모임</button>
       <button id="m-stats" class="menu-btn" onclick="go('stats')">나의 전적</button>
       <button id="m-ticket" class="menu-btn" onclick="go('ticket')">QR 인증</button>
+      <button id="m-admin" class="menu-btn" onclick="go('admin')" style="display:none;">관리</button>
     </div>
     <div class="auth-zone">
       <button id="dark-toggle-btn" onclick="toggleDarkMode()" title="다크 모드로 전환" style="width:34px;height:30px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border-dashed);border-radius:8px;padding:0;cursor:pointer;line-height:1;color:var(--text-muted);transition:all 0.2s;" aria-label="다크 모드로 전환"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
@@ -2154,6 +2155,7 @@ textarea {
   <button class="mob-nav-btn" id="mob-btn-lab" onclick="go('lab')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M8 14h8"/><path d="M9 18h6"/></svg></span>연구소</button>
   <button class="mob-nav-btn" id="mob-btn-community" onclick="go('community')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>커뮤니티</button>
   <button class="mob-nav-btn" id="mob-btn-fortune" onclick="go('fortune')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-width="1.5" opacity="0.4"/></svg></span>레이더</button>
+  <button class="mob-nav-btn" id="mob-btn-admin" onclick="go('admin')" style="display:none;"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>관리</button>
 </nav>
 
 <!-- 로그인 / 회원가입 모달 -->
@@ -2615,6 +2617,11 @@ textarea {
       <!-- 9. 프로필 -->
       <div id="pg-profile" class="page-content" style="display:none;">
         <div id="profile-content"></div>
+      </div>
+
+      <!-- 11. 관리자 운영 대시보드 -->
+      <div id="pg-admin" class="page-content" style="display:none;">
+        <div id="admin-content"></div>
       </div>
 
     </div>
@@ -5726,6 +5733,7 @@ function applyLoginUI(user) {
   window._isAppAdmin = false;
   sb.rpc('is_app_admin').then(({ data }) => {
     window._isAppAdmin = data === true;
+    updateAdminNavVisibility();
   }).catch(() => {});
   const nick = user.user_metadata?.nickname || user.email.split('@')[0];
   updateHeaderUser(nick, getDisplayVerifiedTitle() || '');
@@ -5757,6 +5765,7 @@ function applyLogoutUI() {
   if (mpL) mpL.style.display = 'none';
   currentUser = null;
   window._isAppAdmin = false;
+  updateAdminNavVisibility();
   dbStats = null;
   $('btn-auth').style.display = '';
   $('user-profile').style.display = 'none';
@@ -6622,7 +6631,7 @@ function go(id) {
   pg.classList.add('ui-motion-enter');
   const mBtn = $('m-' + id);
   if (mBtn) mBtn.classList.add('on');
-  ['home','result','ticket','stats','fortune','lab','group','rank','map','community'].forEach(k => {
+  ['home','result','ticket','stats','fortune','lab','group','rank','map','community','admin'].forEach(k => {
     const btn = $('mob-btn-' + k);
     if (btn) btn.classList.toggle('on', k === id);
   });
@@ -6640,12 +6649,13 @@ function go(id) {
     profile:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 내 프로필',
     subscription: '멤버십 플랜',
     skin: '스킨',
+    admin: '운영 관리 대시보드',
   };
   $('mid-title').innerHTML = titles[id] || '';
   const mainLayout = $('main-content');
   if (mainLayout) mainLayout.dataset.activePage = id;
   // 페이지 타이틀 동적 업데이트
-  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', rank:'랭킹', map:'내 주변 판매점', profile:'내 프로필', home:'실시간 피드', lab:'연구소', group:'로또 모임', fortune:'레이더', subscription:'멤버십', skin:'스킨' };
+  const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', rank:'랭킹', map:'내 주변 판매점', profile:'내 프로필', home:'실시간 피드', lab:'연구소', group:'로또 모임', fortune:'레이더', subscription:'멤버십', skin:'스킨', admin:'운영 관리' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
   if (id === 'home')      { renderHomeLive(); renderFeed(); }
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
@@ -6681,6 +6691,7 @@ function go(id) {
   }
   if (id === 'profile')   { renderProfile(); if(isLoggedIn && !window._ltbTickets) loadProfileRecentTickets(); }
   if (id === 'subscription') renderSubscription();
+  if (id === 'admin') renderAdmin();
 }
 
 // =====================================================
