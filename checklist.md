@@ -995,7 +995,7 @@
 
 - [x] OpenAI 연동을 제거하고 Gemini 전용 흐름으로 되돌린다.
 - [x] 신규 프로젝트에서 사용 가능한 무료 Flash-Lite 모델로 교체한다.
-- [ ] Supabase 서버용 Secret key와 Gemini API key를 GitHub Actions 시크릿에 갱신한다.
-- [ ] 워크플로를 수동 실행해 소식 게시 성공을 확인한다.
+- [x] Supabase 서버용 Secret key와 Gemini API key를 GitHub Actions 시크릿에 갱신한다.
+- [x] 워크플로를 수동 실행해 소식 게시 성공을 확인한다.
 - [x] 문법 검사와 프로덕션 빌드를 실행한다.
-- [ ] Git Commit과 Push를 완료한다.
+- [x] Git Commit과 Push를 완료한다.

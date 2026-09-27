@@ -776,3 +776,5 @@ Play Console 키 관리 화면에서 앱 서명 키와 업로드 키가 분리�
 - Gemini 키를 URL 쿼리에 넣지 않고 공식 REST 예시처럼 `x-goog-api-key` 헤더로 전달한다.
 - OpenAI 유료 API는 사용하지 않는다. Gemini 실패 시 기존 템플릿 원문으로 게시한다.
 - Supabase 자동 게시 작업에는 공개 키가 아닌 서버 전용 Secret key가 필요하며, GitHub Actions 시크릿에서만 관리한다.
+- GitHub Actions 실행 #258에서 Gemini 오류와 Supabase 401 없이 `[ok] pension 제 334회 소식 게시 완료`를 확인했다.
+- Supabase `posts` 테이블에서도 `로또뱅크 소식봇`의 제334회 연금복권 소식 글이 생성된 것을 확인했다.
