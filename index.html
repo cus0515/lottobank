@@ -576,7 +576,7 @@ main.chat-hidden .chat-panel { display: none; }
   .ball-context { gap:4px!important; flex-wrap:nowrap!important; overflow-x:auto; -ms-overflow-style:none; scrollbar-width:none; }
   .ball-context::-webkit-scrollbar { display:none; }
   #res-balls { gap:4px!important; flex-wrap:nowrap!important; overflow-x:auto; }
-  #res-balls .ball { width:30px!important; height:30px!important; font-size:12px!important; }
+  #res-balls .ball { width:30px!important; height:30px!important; font-size:15px!important; }
   #res-balls span[style*="font-size:20px"] { font-size:15px !important; margin:0 2px !important; }
   .dna-card .b-num, .dna-card .ball,
   .wisdom-card .b-num, .wisdom-card .ball { width:28px!important; height:28px!important; font-size:11px!important; }
@@ -1216,7 +1216,7 @@ input:focus-visible { outline:none; }
 
 /* Ball context centering for result page */
 #res-balls { display: flex; gap: 7px; justify-content: center; align-items: center; margin: 16px 0; flex-wrap: wrap; }
-#res-balls .ball { width: 38px; height: 38px; font-size: 14px; font-weight: 900; }
+#res-balls .ball { width: 38px; height: 38px; font-size: 16px; font-weight: 900; }
 
 /* ── Task #117: DNA/추천 카드 프리미엄 업그레이드 ── */
 .dna-card .b-num, .dna-card .ball { width:40px!important; height:40px!important; font-size:15px!important; font-weight:900!important; box-shadow:inset -2px -3px 6px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3)!important; }
@@ -6227,10 +6227,31 @@ async function loadGuestStats() {
   const setStat = (id, val) => {
     const element = $(id);
     if (!element) return;
-    element.textContent = val;
     element.classList.remove('stat-anim');
     void element.offsetWidth;
     element.classList.add('stat-anim');
+    // 숫자가 포함된 값이면 0(또는 이전 값)에서 목표값까지 카운트업 애니메이션, 아니면 바로 표시
+    const match = String(val).match(/^([+-]?)([\d,]+(?:\.\d+)?)(.*)$/);
+    if (!match) { element.textContent = val; return; }
+    const [, sign, numStr, suffix] = match;
+    const target = parseFloat(numStr.replace(/,/g, ''));
+    if (!Number.isFinite(target)) { element.textContent = val; return; }
+    const isFloat = numStr.includes('.');
+    const prevNum = parseFloat(String(element.dataset.rawVal || '0').replace(/,/g, '')) || 0;
+    const start = isFloat ? 0 : Math.min(prevNum, target); // 소수(수익률)는 0에서, 정수 카운트는 이전 값부터 자연스럽게
+    element.dataset.rawVal = numStr.replace(/,/g, '');
+    if (element._ltbCountRAF) cancelAnimationFrame(element._ltbCountRAF);
+    const dur = 650, t0 = performance.now();
+    const fmt = n => isFloat ? n.toFixed(1) : Math.round(n).toLocaleString('ko-KR');
+    const tick = now => {
+      const p = Math.min(1, (now - t0) / dur);
+      const eased = 1 - Math.pow(1 - p, 3); // ease-out-cubic
+      const cur = start + (target - start) * eased;
+      element.textContent = sign + fmt(cur) + suffix;
+      if (p < 1) { element._ltbCountRAF = requestAnimationFrame(tick); }
+      else { element.textContent = val; }
+    };
+    element._ltbCountRAF = requestAnimationFrame(tick);
   };
 
   // 공개 집계 RPC를 우선 사용하고, 미적용 DB에서는 기존 공개 테이블로 대체한다.
