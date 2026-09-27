@@ -39,7 +39,12 @@ def fetch_round(round_num):
     try:
         list_data = fetch_json('https://www.dhlottery.co.kr/pt720/selectPstPt720WnList.do')
         items = (list_data.get('data') or {}).get('result') or list_data.get('result') or []
-        item = next((r for r in items if int(r.get('psltEpsd', 0)) == round_num), None)
+        def _to_int(v):
+            try:
+                return int(v)
+            except (TypeError, ValueError):
+                return None
+        item = next((r for r in items if _to_int(r.get('psltEpsd')) == round_num), None)
         if not item:
             return None
 
@@ -78,7 +83,12 @@ def fetch_latest_round_num():
     try:
         list_data = fetch_json('https://www.dhlottery.co.kr/pt720/selectPstPt720WnList.do')
         items = (list_data.get('data') or {}).get('result') or list_data.get('result') or []
-        rounds = [int(item.get('psltEpsd', 0)) for item in items]
+        rounds = []
+        for item in items:
+            try:
+                rounds.append(int(item.get('psltEpsd', 0)))
+            except (TypeError, ValueError):
+                continue
         return max(rounds) if rounds else 0
     except Exception as e:
         print(f"  최신 회차 조회 실패: {e}")
@@ -130,23 +140,37 @@ def main():
         current_round = SEED_ROUND
 
     latest_round = fetch_latest_round_num()
-    candidates = [latest_round, current_round + 1, current_round]
-    # 오래된 캐시도 한 번에 최신 회차로 이동하고, 목록 조회 실패 시 기존 순차 방식을 사용한다.
-    for round_num in dict.fromkeys(candidates):
+    print(f"공식 최신 회차: {latest_round}회")
+
+    # 밀린 회차가 있으면 한 번의 실행에서 전부 따라잡는다 (최대 20회차 안전장치).
+    target_end = latest_round if latest_round > current_round else current_round + 1
+    round_candidates = list(range(current_round + 1, min(target_end, current_round + 20) + 1)) or [current_round + 1]
+    if latest_round > 0 and latest_round not in round_candidates:
+        round_candidates.append(latest_round)
+
+    saved_any = False
+    last_result = None
+    for round_num in round_candidates:
         if round_num <= 0:
             continue
         print(f"시도: {round_num}회...")
         result = fetch_round(round_num)
         if result and result.get('wnRnkVl'):
-            result['_cachedAt'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-            with open(CACHE_PATH, 'w', encoding='utf-8') as f:
-                json.dump(result, f, ensure_ascii=False, indent=2)
-            print(f"💾 저장 완료: {result['drwNo']}회 ({result['drwNoDate']})")
-            print(f"   {result['wnBndNo']}조 {result['wnRnkVl']} +{result['bnsRnkVl']}")
+            last_result = result
+            saved_any = True
+            print(f"   ✅ {result['drwNo']}회 ({result['drwNoDate']}) {result['wnBndNo']}조 {result['wnRnkVl']} +{result['bnsRnkVl']}")
             update_history(result)
-            return
+        else:
+            print(f"   (미발표 또는 조회 실패)")
 
-    print("새 데이터 없음 — 기존 캐시 유지")
+    if last_result:
+        last_result['_cachedAt'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+        with open(CACHE_PATH, 'w', encoding='utf-8') as f:
+            json.dump(last_result, f, ensure_ascii=False, indent=2)
+        print(f"💾 캐시 저장 완료: {last_result['drwNo']}회 기준")
+
+    if not saved_any:
+        print("새 데이터 없음 — 기존 캐시 유지")
 
 
 if __name__ == '__main__':
