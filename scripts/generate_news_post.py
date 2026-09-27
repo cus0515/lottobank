@@ -385,6 +385,91 @@ def format_counts(counts, keys):
     return ' · '.join(f'{key} {counts.get(key, 0)}건' for key in keys if counts.get(key, 0)) or '구분 정보 없음'
 
 
+def lotto_radar_result_insight(latest, history):
+    round_no = int(latest['drwNo'])
+    winning = sorted(map(int, latest.get('numbers') or []))
+    prior = sorted(
+        (row for row in history if int(row.get('drwNo') or 0) < round_no and row.get('numbers')),
+        key=lambda row: int(row.get('drwNo') or 0), reverse=True,
+    )[:50]
+    if not prior or not winning:
+        return []
+    frequency = {number: 0 for number in range(1, 46)}
+    last_seen = {number: 0 for number in range(1, 46)}
+    for row in prior:
+        row_round = int(row.get('drwNo') or 0)
+        for number in list(row.get('numbers') or []) + [row.get('bonusNo')]:
+            number = int(number or 0)
+            if 1 <= number <= 45:
+                frequency[number] += 1
+                if not last_seen[number]:
+                    last_seen[number] = row_round
+    source_round = int(prior[0].get('drwNo') or round_no - 1)
+    oldest_round = int(prior[-1].get('drwNo') or source_round)
+    gaps = {
+        number: source_round - (last_seen[number] or oldest_round)
+        for number in range(1, 46)
+    }
+    max_gap = max(gaps.values()) or 1
+    max_frequency = max(frequency.values()) or 1
+    excluded = set(map(int, prior[0].get('numbers') or [])) | {int(prior[0].get('bonusNo') or 0)}
+    scores = sorted(
+        ((number, gaps[number] / max_gap * 0.6 + frequency[number] / max_frequency * 0.4)
+         for number in range(1, 46) if number not in excluded),
+        key=lambda item: (-item[1], item[0]),
+    )
+    top_candidates = {number for number, _ in scores[:10]}
+    candidate_hits = sorted(set(winning) & top_candidates)
+    frequency_text = ' · '.join(f'{number}번 {frequency[number]}회' for number in winning)
+    candidate_line = (
+        f"상위 10개 후보 중 실제 당첨번호는 {len(candidate_hits)}개({' · '.join(map(str, candidate_hits))}) 포함됐습니다."
+        if candidate_hits else '상위 10개 후보에는 실제 당첨번호가 포함되지 않았습니다.'
+    )
+    return [
+        f"직전 50회까지만 사용한 기본 레이더 점수(등장 간격 60%·출현 빈도 40%) {candidate_line}",
+        f"당첨번호의 직전 50회 출현 횟수는 {frequency_text}입니다.",
+        '이 항목은 결과 발표 후 당첨번호를 레이더 기준으로 설명한 사후 분석이며, 추첨 전에 저장된 추천번호의 적중 결과와는 구분합니다.',
+    ]
+
+
+def pension_radar_result_insight(latest, history):
+    round_no = int(latest['drwNo'])
+    number = str(latest.get('number') or '').zfill(6)
+    group = str(latest.get('group') or '')
+    prior = sorted(
+        (row for row in history if int(row.get('drwNo') or 0) < round_no and row.get('number')),
+        key=lambda row: int(row.get('drwNo') or 0), reverse=True,
+    )[:50]
+    if not prior or len(number) != 6:
+        return []
+    position_counts = [{str(digit): 0 for digit in range(10)} for _ in range(6)]
+    group_counts = {str(value): 0 for value in range(1, 6)}
+    for row in prior:
+        value = str(row.get('number') or '').zfill(6)
+        if len(value) == 6:
+            for index, digit in enumerate(value):
+                position_counts[index][digit] += 1
+        row_group = str(row.get('group') or '')
+        if row_group in group_counts:
+            group_counts[row_group] += 1
+    matched_positions = []
+    for index, digit in enumerate(number):
+        top_digits = sorted(position_counts[index], key=lambda item: (-position_counts[index][item], item))[:3]
+        if digit in top_digits:
+            matched_positions.append(index + 1)
+    ranked_groups = sorted(group_counts, key=lambda item: (-group_counts[item], item))
+    group_rank = ranked_groups.index(group) + 1 if group in ranked_groups else None
+    position_line = (
+        f"일치한 자리는 6자리 중 {len(matched_positions)}자리이며 위치는 {' · '.join(map(str, matched_positions))}번째입니다."
+        if matched_positions else '일치한 자리는 없었습니다.'
+    )
+    return [
+        f"직전 50회 자리별 출현 빈도 상위 3개 숫자와 {position_line}",
+        f"{group}조는 직전 50회에 {group_counts.get(group, 0)}회 등장해 5개 조 중 {group_rank or '-'}번째 빈도입니다.",
+        '이 항목은 결과 발표 후 당첨번호 구성을 레이더 기준으로 설명한 사후 분석이며, 추첨 전에 저장된 추천번호의 적중 결과와는 구분합니다.',
+    ]
+
+
 def lotto_recommendation_insight(round_no, latest):
     records = load_json(RECOMMENDATIONS_PATH, {}) or {}
     record = (records.get('lotto') or {}).get(str(round_no))
@@ -475,11 +560,14 @@ def build_lotto_post(latest, history):
     if first_stores['names']:
         body.append('주요 1등 판매점은 ' + ', '.join(first_stores['names'][:6]) + (' 등입니다.' if len(first_stores['names']) > 6 else '입니다.'))
     body.append(f"2등은 총 {second_stores['tickets']}건이며 인터넷 {second_stores['online']}건, 오프라인 {second_stores['physical']}건으로 집계됐습니다.")
+    radar_lines = lotto_radar_result_insight(latest, history)
+    if radar_lines:
+        body += ['', '[로또뱅크 번호 레이더 분석]'] + radar_lines
     recommendation = lotto_recommendation_insight(no, latest)
     if recommendation:
         body += ['', '[로또뱅크 추천 결과]', recommendation]
     site_stats = latest.get('siteStats') or {}
-    if site_stats.get('games'):
+    if site_stats.get('wins'):
         body += ['', '[로또뱅크 인증 현황]', f"이 회차에는 인증 티켓 {site_stats['tickets']}장과 총 {site_stats['games']}게임이 익명 집계됐으며, 당첨 확인 티켓은 {site_stats['wins']}장입니다."]
     body += ['', '[읽는 방법]', '판매점의 같은 이름이 여러 번 보이면 한 판매점에서 복수 당첨이 나온 경우일 수 있습니다. 과거 통계와 판매점 분포는 다음 회차 당첨을 예측하지 않습니다.']
     return title, '\n'.join(body)
@@ -598,11 +686,14 @@ def build_pension_post(latest, history):
     ]
     if first_stores['names']:
         body.append('1등 오프라인 판매점은 ' + ', '.join(first_stores['names'][:6]) + '입니다.')
+    radar_lines = pension_radar_result_insight(latest, history)
+    if radar_lines:
+        body += ['', '[로또뱅크 연금 레이더 분석]'] + radar_lines
     recommendation = pension_recommendation_insight(no, latest)
     if recommendation:
         body += ['', '[로또뱅크 추천 결과]', recommendation]
     site_stats = latest.get('siteStats') or {}
-    if site_stats.get('games'):
+    if site_stats.get('wins'):
         body += ['', '[로또뱅크 인증 현황]', f"이 회차에는 인증 티켓 {site_stats['tickets']}장과 총 {site_stats['games']}게임이 익명 집계됐으며, 당첨 확인 티켓은 {site_stats['wins']}장입니다."]
     body += ['', '[읽는 방법]', '조·자리·구매 경로 통계는 이미 끝난 회차를 설명하는 자료입니다. 특정 조나 판매 방식의 다음 회차 당첨 가능성이 더 높다는 뜻은 아닙니다.']
     return title, '\n'.join(body)
