@@ -2,13 +2,12 @@
 LottoBank — 커뮤니티 "소식" 게시판 자동 작성
 매주 로또/연금 회차 결과가 갱신된 직후(update-lotto.yml에서 호출) 실행.
 역대 데이터에서 흥미로운 사실(hook)을 뽑아 회차마다 다른 조합으로 소식 글을 만들고,
-OpenAI(GPT) 키가 있으면 자연스러운 문장으로 다듬은 뒤, 없으면 템플릿 그대로 사용해
+Gemini API 키가 있으면 자연스러운 문장으로 다듬은 뒤, 없으면 템플릿 그대로 사용해
 Supabase posts 테이블에 봇 계정으로 등록한다.
 
 필요한 GitHub 저장소 시크릿:
   - SUPABASE_SERVICE_ROLE_KEY  (필수, RLS 우회용 — Supabase 대시보드 Project Settings > API)
-  - OPENAI_API_KEY             (선택, 없으면 템플릿 문장 그대로 게시)
-  - GEMINI_API_KEY             (선택, OpenAI 키가 없을 때만 대신 사용되는 보조 옵션)
+  - GEMINI_API_KEY             (선택, 없으면 템플릿 문장 그대로 게시)
 
 이미 이번 회차를 게시했다면 중복 게시하지 않도록 lotto-news-state.json /
 pension-news-state.json 에 마지막으로 게시한 회차를 기록한다(다른 캐시 파일과
@@ -25,10 +24,8 @@ import urllib.request
 
 SUPABASE_URL = 'https://wosbpljbdyofavsbrkyn.supabase.co'
 SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY', '').strip()
-OPENAI_KEY = os.environ.get('OPENAI_API_KEY', '').strip()
-OPENAI_MODEL = 'gpt-4o-mini'
 GEMINI_KEY = os.environ.get('GEMINI_API_KEY', '').strip()
-GEMINI_MODELS = ['gemini-2.5-pro', 'gemini-2.5-flash']  # OpenAI 키가 없을 때만 보조로 시도
+GEMINI_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite']
 
 BOT_EMAIL = 'news-bot@lottobank.internal'
 BOT_NICKNAME = '로또뱅크 소식봇'
@@ -308,7 +305,7 @@ def build_pension_post(latest, history):
     return title, body
 
 
-# ───────────────────────── AI 다듬기 (선택, GPT 우선 / Gemini 보조) ─────────────────────────
+# ───────────────────────── Gemini 다듬기 (선택) ─────────────────────────
 
 def _build_prompt(title, body, lottery_label):
     return (
@@ -334,33 +331,6 @@ def _parse_ai_json(text):
     return None
 
 
-def polish_with_openai(title, body, lottery_label):
-    if not OPENAI_KEY:
-        return None
-    prompt = _build_prompt(title, body, lottery_label)
-    try:
-        url = 'https://api.openai.com/v1/chat/completions'
-        payload = {
-            'model': OPENAI_MODEL,
-            'messages': [{'role': 'user', 'content': prompt}],
-            'temperature': 0.9,
-            'max_tokens': 600,
-        }
-        req = urllib.request.Request(
-            url, data=json.dumps(payload).encode('utf-8'),
-            headers={
-                'Content-Type': 'application/json',
-                'Authorization': f'Bearer {OPENAI_KEY}',
-            }, method='POST')
-        with urllib.request.urlopen(req, timeout=20) as r:
-            res = json.loads(r.read().decode('utf-8'))
-        text = res['choices'][0]['message']['content']
-        return _parse_ai_json(text)
-    except Exception as e:
-        print(f'[openai:{OPENAI_MODEL}] 실패, 다음 옵션/템플릿으로 폴백: {e}', file=sys.stderr)
-        return None
-
-
 def polish_with_gemini(title, body, lottery_label):
     if not GEMINI_KEY:
         return None
@@ -368,14 +338,21 @@ def polish_with_gemini(title, body, lottery_label):
     for model in GEMINI_MODELS:
         try:
             url = (f'https://generativelanguage.googleapis.com/v1beta/models/'
-                   f'{model}:generateContent?key={GEMINI_KEY}')
+                   f'{model}:generateContent')
             payload = {
                 'contents': [{'parts': [{'text': prompt}]}],
-                'generationConfig': {'temperature': 0.9, 'maxOutputTokens': 600},
+                'generationConfig': {
+                    'temperature': 0.9,
+                    'maxOutputTokens': 600,
+                    'responseMimeType': 'application/json',
+                },
             }
             req = urllib.request.Request(
                 url, data=json.dumps(payload).encode('utf-8'),
-                headers={'Content-Type': 'application/json'}, method='POST')
+                headers={
+                    'Content-Type': 'application/json',
+                    'x-goog-api-key': GEMINI_KEY,
+                }, method='POST')
             with urllib.request.urlopen(req, timeout=20) as r:
                 res = json.loads(r.read().decode('utf-8'))
             text = res['candidates'][0]['content']['parts'][0]['text']
@@ -389,10 +366,6 @@ def polish_with_gemini(title, body, lottery_label):
 
 
 def polish_text(title, body, lottery_label):
-    # 우선순위: OpenAI(GPT) → Gemini(보조) → 원본 템플릿
-    result = polish_with_openai(title, body, lottery_label)
-    if result:
-        return result
     result = polish_with_gemini(title, body, lottery_label)
     if result:
         return result
