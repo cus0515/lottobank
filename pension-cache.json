@@ -1,10 +1,10 @@
 {
   "returnValue": "success",
-  "drwNo": 322,
-  "drwNoDate": "2026-07-02",
-  "wnBndNo": "2",
-  "wnRnkVl": "119392",
-  "bnsRnkVl": "696967",
+  "drwNo": 323,
+  "drwNoDate": "2026-07-09",
+  "wnBndNo": "4",
+  "wnRnkVl": "604270",
+  "bnsRnkVl": "945893",
   "prizes": [
     {
       "rank": 1,
@@ -22,46 +22,46 @@
     },
     {
       "rank": 3,
-      "store": 0,
-      "internet": 37,
-      "total": 37,
-      "totAmt": 37000000
+      "store": 30,
+      "internet": 19,
+      "total": 49,
+      "totAmt": 49000000
     },
     {
       "rank": 4,
-      "store": 314,
-      "internet": 311,
-      "total": 625,
-      "totAmt": 62500000
+      "store": 357,
+      "internet": 309,
+      "total": 666,
+      "totAmt": 66600000
     },
     {
       "rank": 5,
-      "store": 3624,
-      "internet": 3236,
-      "total": 6860,
-      "totAmt": 343000000
+      "store": 3552,
+      "internet": 3039,
+      "total": 6591,
+      "totAmt": 329550000
     },
     {
       "rank": 6,
-      "store": 33470,
-      "internet": 30841,
-      "total": 64311,
-      "totAmt": 321555000
+      "store": 33833,
+      "internet": 29934,
+      "total": 63767,
+      "totAmt": 318835000
     },
     {
       "rank": 7,
-      "store": 346225,
-      "internet": 309902,
-      "total": 656127,
-      "totAmt": 656127000
+      "store": 332700,
+      "internet": 299043,
+      "total": 631743,
+      "totAmt": 631743000
     },
     {
       "rank": 8,
-      "store": 0,
-      "internet": 1,
-      "total": 1,
-      "totAmt": 120000000
+      "store": 5,
+      "internet": 5,
+      "total": 10,
+      "totAmt": 1200000000
     }
   ],
-  "_cachedAt": "2026-09-27T06:25:22Z"
+  "_cachedAt": "2026-09-27T06:57:50Z"
 }
