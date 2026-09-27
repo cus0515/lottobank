@@ -1335,6 +1335,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .post-tag-chip{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.3px;}
 .tag-free{background:rgba(100,116,139,.12);color:#475569;border:1px solid rgba(100,116,139,.2);}
 .tag-verify{background:rgba(225,29,72,.1);color:#e11d48;border:1px solid rgba(225,29,72,.2);}
+.tag-news{background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.22);}
 [data-theme='dark'] .post-write-bar{background:#1e293b;border-color:#334155;}
 [data-theme='dark'] .post-write-input{background:#0f172a;border-color:#334155;color:#f1f5f9;}
 [data-theme='dark'] .post-write-input:focus{border-color:var(--lotto-red);background:#1e293b;}
@@ -1344,6 +1345,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 [data-theme='dark'] .post-card-stats .post-like-btn{border-color:#334155;}
 [data-theme='dark'] .tag-free{background:rgba(100,116,139,.2);color:#94a3b8;border-color:rgba(100,116,139,.3);}
 [data-theme='dark'] .tag-verify{background:rgba(225,29,72,.15);color:#f87171;border-color:rgba(225,29,72,.3);}
+[data-theme='dark'] .tag-news{background:rgba(37,99,235,.2);color:#93c5fd;border-color:rgba(37,99,235,.35);}
 .community-board-head{background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:12px;padding:13px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(15,23,42,.04);}
 .community-board-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
 .community-board-title b{font-size:16px;color:var(--text-dark);}
@@ -1385,7 +1387,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
 .community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
-@media(max-width:700px){#pg-community,#community-content,.community-board-head{min-width:0;max-width:100%;overflow-x:hidden;box-sizing:border-box}.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;width:100%;overflow-x:hidden;padding-bottom:0}.comm-tab-btn{width:100%;min-width:0;white-space:nowrap;padding:7px 6px;font-size:11px;letter-spacing:-.03em;flex:initial}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold::after{right:-39px;top:7px;font-size:7px;padding:3px 31px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:34px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,minmax(23px,1fr));gap:5px;width:100%;max-width:190px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:4px}.community-pension-group{width:30px;height:30px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:23px!important;height:29px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
+@media(max-width:700px){#pg-community,#community-content,.community-board-head{min-width:0;max-width:100%;overflow-x:hidden;box-sizing:border-box}.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;width:100%;overflow-x:hidden;padding-bottom:0}.comm-tab-btn{width:100%;min-width:0;white-space:nowrap;padding:7px 6px;font-size:11px;letter-spacing:-.03em;flex:initial}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold::after{right:-39px;top:7px;font-size:7px;padding:3px 31px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:34px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,minmax(23px,1fr));gap:5px;width:100%;max-width:190px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:4px}.community-pension-group{width:30px;height:30px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:23px!important;height:29px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr);gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
 @media(max-width:700px){
   .ticket-slip,
   .community-verify-slip,
@@ -1685,9 +1687,9 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .radar-pick-nums{display:flex;gap:7px;justify-content:center;align-items:center;min-width:0;}
 .radar-pick-nums.pension{gap:6px;}
 .radar-pension-group{width:42px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;background:#16a34a;color:#fff;font-size:12px;font-weight:900;line-height:1;white-space:nowrap;}
-.radar-win-row{display:grid;grid-template-columns:52px minmax(0,1fr) 54px;gap:8px;align-items:center;margin-bottom:8px;padding:7px 9px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--bg-light);}
+.radar-win-row{display:grid;grid-template-columns:50px minmax(0,1fr);gap:6px;align-items:center;margin-bottom:8px;padding:7px 9px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--bg-light);}
 .radar-win-row::after{content:'';}
-.radar-win-nums{display:flex;gap:5px;justify-content:center;align-items:center;flex-wrap:wrap;}
+.radar-win-nums{display:flex;gap:4px;justify-content:flex-start;align-items:center;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .radar-number-ball {
   opacity:0;
   transform:translateY(4px) scale(.9);
@@ -2138,7 +2140,7 @@ textarea {
   <button class="mob-nav-btn" id="mob-btn-ticket" onclick="go('ticket')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4v4h-4z"/><path d="M14 21h3"/><path d="M21 14v3"/></svg></span>QR인증</button>
   <button class="mob-nav-btn" id="mob-btn-lab" onclick="go('lab')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M8 14h8"/><path d="M9 18h6"/></svg></span>연구소</button>
   <button class="mob-nav-btn" id="mob-btn-community" onclick="go('community')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>커뮤니티</button>
-  <button class="mob-nav-btn" id="mob-btn-map" onclick="go('map')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4 9.5 2 5 4v16l4.5-2 5 2 4.5-2V2z"/><path d="M9.5 2v16"/><path d="M14.5 4v16"/></svg></span>지도</button>
+  <button class="mob-nav-btn" id="mob-btn-fortune" onclick="go('fortune')"><span class="mob-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-width="1.5" opacity="0.4"/></svg></span>레이더</button>
 </nav>
 
 <!-- 로그인 / 회원가입 모달 -->
@@ -2548,9 +2550,10 @@ textarea {
         <div class="community-board-head">
           <div class="community-board-title">
             <div><b id="comm-board-title">자유게시판</b><span id="comm-board-desc" style="display:block;margin-top:2px;">로또 이야기와 질문을 자유롭게 남겨보세요.</span></div>
-            <button type="button" class="post-write-btn" onclick="expandPostForm()">글쓰기</button>
+            <button type="button" class="post-write-btn" id="post-write-btn" onclick="expandPostForm()">글쓰기</button>
           </div>
           <div class="comm-tab-row" style="margin-bottom:0;">
+            <button type="button" class="comm-tab-btn" id="ct-news" onclick="commTab('news')">${svgIcon('bell',11,'currentColor')} 소식</button>
             <button type="button" class="comm-tab-btn on" id="ct-free" onclick="commTab('free')">자유게시판</button>
             <button type="button" class="comm-tab-btn" id="ct-recommend" onclick="commTab('recommend')">추천번호</button>
             <button type="button" class="comm-tab-btn" id="ct-verify" onclick="commTab('verify')">인증게시판</button>
@@ -6743,8 +6746,7 @@ function renderSubscription() {
       <div style="font-size:11px;font-weight:800;color:var(--text-dark);margin-bottom:7px;">자주 묻는 질문</div>
       <div style="font-size:12px;color:var(--text-muted);line-height:1.9;">
         <b style="color:var(--text-dark);">결제는 언제부터?</b> Google Play 앱 출시 후 인앱 결제로 제공됩니다.<br>
-        <b style="color:var(--text-dark);">VIP는 Light를 포함하나요?</b> 네, VIP는 광고 제거를 포함합니다.<br>
-        <b style="color:var(--text-dark);">모임 기능은 어디로 갔나요?</b> 모임은 유료 상품이 아니라 추후 무료 유입 기능으로 다시 정리합니다.
+        <b style="color:var(--text-dark);">VIP는 Light를 포함하나요?</b> 네, VIP는 광고 제거를 포함합니다.
       </div>
     </div>
     <div style="margin-top:10px;text-align:center;">
@@ -8360,22 +8362,48 @@ function renderFortune() {
   const maxFreq = Math.max(...allNums.map(n=>freq[n]));
   const zC = n => n<=10?'#f59e0b':n<=20?'#3b82f6':n<=30?'#ef4444':n<=40?'#64748b':'#10b981';
 
-  // ── 5게임 추천 알고리즘 ──────────────────────────────────
+  // ── 5게임 추천 알고리즘 (회차 고정 시드 + 게임 간 중복 억제) ──
   const baseScored = allNums.filter(n=>!nums.includes(n)&&n!==bonus).map(n=>({
     n, gap: gapFrom(n)/(maxGap||1), frq: freq[n]/(maxFreq||1)
   }));
   const ZONE_SPLITS = [[2,2,2],[2,2,2],[3,2,1],[1,2,3],[2,3,1]];
   const WEIGHTS = [[0.6,0.4],[0.7,0.3],[0.5,0.5],[0.4,0.6],[0.65,0.35]];
-  const genGame = (gW, fW, zs, seed) => {
-    const sc = baseScored.map(x=>({n:x.n,score:x.gap*gW+x.frq*fW+((x.n*(seed+7)*nextRound)%100)/800}))
-      .sort((a,b)=>b.score-a.score);
-    const lo=sc.filter(x=>x.n<=15), mi=sc.filter(x=>x.n>=16&&x.n<=30), hi=sc.filter(x=>x.n>=31);
-    const picks=new Set();
-    [[lo,zs[0]],[mi,zs[1]],[hi,zs[2]]].forEach(([arr,cnt])=>arr.slice(0,cnt).forEach(x=>picks.add(x.n)));
-    for(const x of sc){if(picks.size>=6)break;picks.add(x.n);}
-    return [...picks].sort((a,b)=>a-b);
+  // 같은 회차에서는 항상 같은 5게임이 나오도록 회차 기반 고정 시드 PRNG 사용 (mulberry32)
+  let _rseed = (nextRound * 2654435761) >>> 0;
+  const rnd = () => {
+    _rseed = (_rseed + 0x6D2B79F5) | 0;
+    let t = Math.imul(_rseed ^ (_rseed >>> 15), 1 | _rseed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-  const games = WEIGHTS.map(([gW,fW],i)=>genGame(gW,fW,ZONE_SPLITS[i],i));
+  const usedCount = {}; // 게임 전체에서 이미 뽑힌 번호는 다음 게임에서 확률을 낮춤 (완전 배제는 아님)
+  const weightedPick = (arr, cnt) => {
+    const pool = arr.map(x => ({ n: x.n, w: Math.max(x.score * Math.pow(0.3, usedCount[x.n] || 0), 0.001) }));
+    const out = [];
+    for (let k = 0; k < cnt && pool.length; k++) {
+      const total = pool.reduce((s, x) => s + x.w, 0);
+      let r = rnd() * total, idx = pool.length - 1;
+      for (let i = 0; i < pool.length; i++) { r -= pool[i].w; if (r <= 0) { idx = i; break; } }
+      const chosen = pool.splice(idx, 1)[0];
+      out.push(chosen.n);
+      usedCount[chosen.n] = (usedCount[chosen.n] || 0) + 1;
+    }
+    return out;
+  };
+  const genGame = (gW, fW, zs) => {
+    const sc = baseScored.map(x => ({ n: x.n, score: x.gap * gW + x.frq * fW + 0.02 }))
+      .sort((a, b) => b.score - a.score);
+    const lo = sc.filter(x => x.n <= 15), mi = sc.filter(x => x.n >= 16 && x.n <= 30), hi = sc.filter(x => x.n >= 31);
+    const picks = new Set();
+    // 구간별 상위 후보 풀(필요 개수의 3배, 최소 8개)에서 가중치 랜덤 추출 → 게임마다 다른 번호 조합
+    [[lo, zs[0]], [mi, zs[1]], [hi, zs[2]]].forEach(([arr, cnt]) => {
+      const pool = arr.slice(0, Math.max(cnt * 3, 8));
+      weightedPick(pool, cnt).forEach(n => picks.add(n));
+    });
+    for (const x of sc) { if (picks.size >= 6) break; picks.add(x.n); }
+    return [...picks].sort((a, b) => a - b);
+  };
+  const games = WEIGHTS.map(([gW, fW], i) => genGame(gW, fW, ZONE_SPLITS[i]));
 
   // localStorage 저장 (nextRound 기준)
   const PKEY = 'ltb-radar-picks';
@@ -10397,6 +10425,7 @@ function downloadTicketCSV(tickets) {
 // SVG 아이콘 라이브러리
 // =====================================================
 const SVG_ICONS = {
+  bell:      '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
   search:    '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
   chart:     '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
   chat:      '<svg xmlns="http://www.w3.org/2000/svg" width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="{c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
@@ -11366,7 +11395,7 @@ async function renderRank(catId) {
 // 커뮤니티 페이지
 // =====================================================
 let curCommTab = 'free';
-let commPosts = { free: [], recommend: [], verify: [], feedback: [] };
+let commPosts = { news: [], free: [], recommend: [], verify: [], feedback: [] };
 let commDisplayLimit = 20;
 let myLikedPostIds = new Set();
 let commChannel = null;
@@ -11414,6 +11443,7 @@ let commRecommendSkin = getProfileSlipSkin();
 
 function commBoardMeta(tab) {
   const map = {
+    news: ['소식', '회차 결과 발표 후 자동으로 올라오는 로또뱅크 공식 소식입니다.'],
     free: ['자유게시판', '로또 이야기와 질문을 자유롭게 남겨보세요.'],
     recommend: ['추천번호', '연구소 저장 번호를 용지 형태로 첨부해 공유하세요.'],
     verify: ['인증게시판', 'QR 인증으로 확인한 당첨 회차와 등수를 공유하는 공간입니다.'],
@@ -11863,10 +11893,12 @@ function commTab(tab) {
   commDisplayLimit = 20;
   commSearchQuery = '';
   if ($('comm-search-input')) $('comm-search-input').value = '';
+  if ($('ct-news')) $('ct-news').classList.toggle('on', tab==='news');
   $('ct-free').classList.toggle('on', tab==='free');
   if ($('ct-recommend')) $('ct-recommend').classList.toggle('on', tab==='recommend');
   $('ct-verify').classList.toggle('on', tab==='verify');
   if ($('ct-feedback')) $('ct-feedback').classList.toggle('on', tab==='feedback');
+  if ($('post-write-btn')) $('post-write-btn').style.display = (tab==='news') ? 'none' : '';
   collapsePostForm();
   updateCommunityBoardMeta();
   renderCommunityList();
@@ -11930,8 +11962,8 @@ function renderCommunityList() {
     const isSearch = !!commSearchQuery;
     $('community-content').innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
       <div style="margin-bottom:10px;"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-      <div style="font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">${isSearch ? '검색 결과가 없습니다' : '아직 게시글이 없습니다'}</div>
-      <div style="font-size:12px;">${isSearch ? '다른 키워드로 검색해보세요' : curCommTab==='feedback' ? '문의나 건의사항을 남기면 작성자와 관리자만 확인합니다.' : '첫 번째 글을 작성해보세요!'}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">${isSearch ? '검색 결과가 없습니다' : curCommTab==='news' ? '아직 등록된 소식이 없습니다' : '아직 게시글이 없습니다'}</div>
+      <div style="font-size:12px;">${isSearch ? '다른 키워드로 검색해보세요' : curCommTab==='news' ? '회차 결과가 발표되면 자동으로 소식이 올라옵니다.' : curCommTab==='feedback' ? '문의나 건의사항을 남기면 작성자와 관리자만 확인합니다.' : '첫 번째 글을 작성해보세요!'}</div>
     </div>`;
     return;
   }
@@ -11981,7 +12013,7 @@ function renderCommunityList() {
     const titleHl = commSearchQuery ? hlSearch(displayTitle, commSearchQuery) : displayTitle.replace(/</g,'&lt;');
     return `<div class="post-card" onclick="openPostDetail('${p.id}')" style="${isHot?'border-color:var(--comm-hot-border,#fecaca);background:linear-gradient(to right,var(--paper-white),var(--comm-hot-bg,rgba(255,245,245,.5)));':''}">
       <div class="post-card-top">
-        <span class="post-tag-chip ${p.tag==='free'?'tag-free':'tag-verify'}" ${verifyLabel ? `style="background:${verifyLabel.bg};color:${verifyLabel.tone};border-color:${verifyLabel.border};"` : ''}>${verifyLabel ? verifyLabel.label : (p.tag==='recommend'?'추천':p.tag==='verify'?'인증':p.tag==='feedback'?'문의':'자유')}</span>
+        <span class="post-tag-chip ${p.tag==='news'?'tag-news':p.tag==='free'?'tag-free':'tag-verify'}" ${verifyLabel ? `style="background:${verifyLabel.bg};color:${verifyLabel.tone};border-color:${verifyLabel.border};"` : ''}>${verifyLabel ? verifyLabel.label : (p.tag==='news'?'소식':p.tag==='recommend'?'추천':p.tag==='verify'?'인증':p.tag==='feedback'?'문의':'자유')}</span>
         ${tagChip(tag)}<span class="post-card-title">${titleHl}</span>
         ${isHot ? '<span style="font-size:9px;font-weight:700;color:var(--comm-hot-text,#dc2626);background:var(--comm-hot-bg,#fff5f5);border:1px solid var(--comm-hot-border,#fecaca);border-radius:10px;padding:1px 6px;margin-left:4px;">🔥인기</span>' : ''}
         ${isNew ? '<span style="font-size:9px;font-weight:700;color:#059669;background:var(--comm-new-bg,#f0fdf4);border:1px solid var(--comm-new-border,#86efac);border-radius:10px;padding:1px 6px;margin-left:4px;">NEW</span>' : ''}
@@ -12070,10 +12102,11 @@ async function loadCommunityPosts() {
     if (data) {
       const canSeeFeedback = p => p.tag !== 'feedback' || (isLoggedIn && currentUser && (window._isAppAdmin || p.user_id === currentUser.id));
       const visible = await Promise.all(data.filter(canSeeFeedback).map(hydrateCommunityVerifyPost));
-      commPosts.free = visible.filter(p => p.tag === 'free' || !['recommend','verify','feedback'].includes(p.tag));
+      commPosts.free = visible.filter(p => p.tag === 'free' || !['recommend','verify','feedback','news'].includes(p.tag));
       commPosts.recommend = visible.filter(p => p.tag === 'recommend');
       commPosts.verify = visible.filter(p => p.tag === 'verify');
       commPosts.feedback = visible.filter(p => p.tag === 'feedback');
+      commPosts.news = visible.filter(p => p.tag === 'news');
     }
     if (isLoggedIn && currentUser) {
       const { data: likes } = await sb.from('post_likes').select('post_id').eq('user_id', currentUser.id);
@@ -12114,7 +12147,7 @@ async function openPostDetail(postId) {
     </div>
     <div class="post-detail-wrap" style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:16px;margin-bottom:12px;">
       <div style="margin-bottom:6px;">
-        <span class="post-tag-chip ${post.tag==='free'?'tag-free':'tag-verify'}" ${verifyLabel ? `style="background:${verifyLabel.bg};color:${verifyLabel.tone};border-color:${verifyLabel.border};"` : ''}>${verifyLabel ? verifyLabel.label : (post.tag==='recommend'?'추천':post.tag==='verify'?'인증':post.tag==='feedback'?'문의':'자유')}</span>
+        <span class="post-tag-chip ${post.tag==='news'?'tag-news':post.tag==='free'?'tag-free':'tag-verify'}" ${verifyLabel ? `style="background:${verifyLabel.bg};color:${verifyLabel.tone};border-color:${verifyLabel.border};"` : ''}>${verifyLabel ? verifyLabel.label : (post.tag==='news'?'소식':post.tag==='recommend'?'추천':post.tag==='verify'?'인증':post.tag==='feedback'?'문의':'자유')}</span>
       </div>
       <div class="post-detail-title">${(()=>{const {tag,cleanTitle}=parsePostTag(packed.title||'');const title=verifyTitle||cleanTitle;return (tag?tagChip(tag):'')+title.replace(/</g,'&lt;');})()}</div>
       ${bodyParts.rec ? `<div style="margin:12px 0;">${renderCommunityRecSlip(bodyParts.rec)}</div>` : ''}
@@ -12259,10 +12292,12 @@ async function renderCommunity() {
 }
 
 function updateCommTabCounts() {
+  const nBtn = $('ct-news');
   const fBtn = $('ct-free');
   const rBtn = $('ct-recommend');
   const vBtn = $('ct-verify');
   const qBtn = $('ct-feedback');
+  if (nBtn) nBtn.innerHTML = `${svgIcon('bell',11,'currentColor')} 소식 (${(commPosts.news||[]).length})`;
   if (fBtn) fBtn.textContent = `자유게시판 (${(commPosts.free||[]).length})`;
   if (rBtn) rBtn.textContent = `추천번호 (${(commPosts.recommend||[]).length})`;
   if (vBtn) vBtn.textContent = `인증게시판 (${(commPosts.verify||[]).length})`;
@@ -12585,14 +12620,11 @@ function renderProfile() {
 <h3>내 주변 복권 판매점 지도</h3>
 <p>현재 위치 기반으로 주변 복권 판매점을 지도에서 확인할 수 있습니다. 로또 명당으로 알려진 판매점 정보도 함께 제공합니다.</p>
 
-<h3>로또 모임 관리</h3>
-<p>친구나 동료와 함께 로또를 공동 구매하는 모임을 생성하고 관리할 수 있습니다. 멤버별 지분율을 설정하면 당첨금을 자동으로 분배 계산해 줍니다. 회차별 구매 기록, 당첨 기록, 정산 내역을 탭별로 확인할 수 있습니다.</p>
-
 <h3>커뮤니티</h3>
 <p>자유게시판과 인증게시판을 통해 다른 로또 구매자들과 소통할 수 있습니다. 당첨 인증, 구매 전략, 번호 분석 정보를 공유하고 댓글과 좋아요로 소통하세요.</p>
 
 <h3>멤버십 플랜</h3>
-<p>무료 플랜으로 기본 기능을 이용할 수 있으며, Plus 플랜(월 1,500원)에서는 광고 제거, 역대 전적 무제한 조회, 번호 저장 무제한, 연구소 조회 무제한 기능을 제공합니다. Group 플랜(월 3,900원)은 Plus의 모든 기능에 더해 로또 모임 생성 및 관리, 멤버별 지분율 정산, 당첨금 자동 분배 계산 기능을 포함합니다.</p>
+<p>무료 플랜으로 기본 기능을 이용할 수 있으며, Light 플랜(월 1,500원)에서는 광고를 제거할 수 있습니다. VIP 플랜(월 3,900원)은 Light의 모든 기능에 더해 상위 전적 유저의 추천번호 모아보기, 추천번호 성과 자동 추적, 티켓 당첨 알림 기능을 포함합니다.</p>
 </section>
 
 <section>
@@ -12650,7 +12682,6 @@ function renderProfile() {
 <li><strong>번호 레이더</strong> — 번호별 출현 빈도, 홀짝 비율, 구간 분포, 연속번호 패턴 분석으로 번호 선택 참고 데이터를 제공합니다.</li>
 <li><strong>연구소 백테스터</strong> — 특정 번호 조합을 역대 당첨번호와 비교해 시뮬레이션합니다. 번호 저장고에 자주 사용하는 번호를 저장하고 관리할 수 있습니다.</li>
 <li><strong>내 주변 판매점 지도</strong> — 현재 위치 기반으로 주변 복권 판매점을 지도에서 확인합니다.</li>
-<li><strong>로또 모임 관리</strong> — 공동 구매 모임을 생성하고 멤버별 지분율에 따라 당첨금을 자동 분배 계산합니다.</li>
 <li><strong>커뮤니티</strong> — 자유게시판·인증게시판에서 다른 사용자들과 당첨 인증, 구매 전략, 번호 분석 정보를 공유합니다.</li>
 </ul>
 
