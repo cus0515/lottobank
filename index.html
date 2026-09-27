@@ -576,7 +576,7 @@ main.chat-hidden .chat-panel { display: none; }
   .ball-context { gap:4px!important; flex-wrap:nowrap!important; overflow-x:auto; -ms-overflow-style:none; scrollbar-width:none; }
   .ball-context::-webkit-scrollbar { display:none; }
   #res-balls { gap:4px!important; flex-wrap:nowrap!important; overflow-x:auto; }
-  #res-balls .ball { width:30px!important; height:30px!important; font-size:15px!important; }
+  #res-balls .ball { width:30px!important; height:30px!important; font-size:12px!important; }
   #res-balls span[style*="font-size:20px"] { font-size:15px !important; margin:0 2px !important; }
   .dna-card .b-num, .dna-card .ball,
   .wisdom-card .b-num, .wisdom-card .ball { width:28px!important; height:28px!important; font-size:11px!important; }
@@ -1216,7 +1216,7 @@ input:focus-visible { outline:none; }
 
 /* Ball context centering for result page */
 #res-balls { display: flex; gap: 7px; justify-content: center; align-items: center; margin: 16px 0; flex-wrap: wrap; }
-#res-balls .ball { width: 38px; height: 38px; font-size: 16px; font-weight: 900; }
+#res-balls .ball { width: 38px; height: 38px; font-size: 14px; font-weight: 900; }
 
 /* ── Task #117: DNA/추천 카드 프리미엄 업그레이드 ── */
 .dna-card .b-num, .dna-card .ball { width:40px!important; height:40px!important; font-size:15px!important; font-weight:900!important; box-shadow:inset -2px -3px 6px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3)!important; }
@@ -5773,9 +5773,174 @@ function applyLogoutUI() {
   const active = document.querySelector('.menu-btn.on');
   if (active) {
     const id = active.id.replace('m-', '');
-    if (id === 'ticket' || id === 'stats') { go('home'); return; }
+    if (id === 'ticket' || id === 'stats' || id === 'admin') { go('home'); return; }
     if (id === 'community') renderCommunity();
     if (id === 'profile') renderProfile();
+  }
+}
+
+// =====================================================
+// 관리자 운영 대시보드
+// =====================================================
+function updateAdminNavVisibility() {
+  const show = window._isAppAdmin === true;
+  const d = show ? '' : 'none';
+  const mBtn = $('m-admin'); if (mBtn) mBtn.style.display = d;
+  const mobBtn = $('mob-btn-admin'); if (mobBtn) mobBtn.style.display = d;
+}
+
+async function renderAdmin() {
+  const el = $('admin-content');
+  if (!el) return;
+  if (!isLoggedIn || !window._isAppAdmin) {
+    el.innerHTML = `<div style="text-align:center;padding:40px 16px;">
+      <div style="font-size:13px;font-weight:800;color:var(--text-dark);">관리자만 볼 수 있는 페이지입니다</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = `<div class="skel-card"><div class="skel skel-row w80"></div><div class="skel skel-row w60"></div><div class="skel skel-row w80"></div></div>`;
+
+  const since7 = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+  const fmtDate = s => { try { return new Date(s).toLocaleDateString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }); } catch(_) { return s || ''; } };
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // 데이터 연동 현황: 로또/연금 회차 캐시 + 자동 뉴스 포스팅 최신 상태
+  const lastWeekday = (targetDow) => { // 0=일 ... 6=토, 오늘 포함 가장 최근 해당 요일
+    const d = new Date();
+    const diff = (d.getDay() - targetDow + 7) % 7;
+    d.setDate(d.getDate() - diff);
+    d.setHours(0,0,0,0);
+    return d;
+  };
+  const parseDrwDate = s => { try { const [y,m,dd] = String(s).split('-').map(Number); return new Date(y, m-1, dd); } catch(_) { return null; } };
+
+  let syncStatus = { lotto: null, pension: null, lottoNews: null, pensionNews: null };
+  try {
+    const [lottoCacheRes, pensionCacheRes] = await Promise.all([
+      fetch('./lotto-cache.json').then(r => r.ok ? r.json() : null).catch(()=>null),
+      fetch('./pension-cache.json').then(r => r.ok ? r.json() : null).catch(()=>null),
+    ]);
+    if (lottoCacheRes) {
+      const expected = lastWeekday(6); // 토요일
+      const actual = parseDrwDate(lottoCacheRes.drwNoDate);
+      const ok = actual && actual >= expected;
+      syncStatus.lotto = { round: lottoCacheRes.drwNo, date: lottoCacheRes.drwNoDate, ok };
+    }
+    if (pensionCacheRes) {
+      const expected = lastWeekday(4); // 목요일
+      const actual = parseDrwDate(pensionCacheRes.drwNoDate);
+      const ok = actual && actual >= expected;
+      syncStatus.pension = { round: pensionCacheRes.drwNo, date: pensionCacheRes.drwNoDate, ok };
+    }
+  } catch(_) {}
+
+  try {
+    const { data: newsPosts } = await sb.from('posts').select('title,created_at').eq('tag','news').order('created_at', { ascending:false }).limit(30);
+    const lottoPost = (newsPosts||[]).find(p => (p.title||'').includes('로또'));
+    const pensionPost = (newsPosts||[]).find(p => (p.title||'').includes('연금'));
+    if (lottoPost) syncStatus.lottoNews = { title: lottoPost.title, date: lottoPost.created_at };
+    if (pensionPost) syncStatus.pensionNews = { title: pensionPost.title, date: pensionPost.created_at };
+  } catch(_) {}
+
+  try {
+    const [
+      { count: memberCount },
+      { count: weeklyMemberCount },
+      { count: ticketCount },
+      { count: weeklyTicketCount },
+      { count: postCount },
+      { data: userStatsRows },
+      { data: recentMembers },
+      { data: recentTickets },
+      { data: recentPosts },
+      { data: feedbackPosts },
+    ] = await Promise.all([
+      sb.from('profiles').select('*', { count:'exact', head:true }),
+      sb.from('profiles').select('*', { count:'exact', head:true }).gte('created_at', since7),
+      sb.from('tickets').select('*', { count:'exact', head:true }),
+      sb.from('tickets').select('*', { count:'exact', head:true }).gte('created_at', since7),
+      sb.from('posts').select('*', { count:'exact', head:true }),
+      sb.from('user_stats').select('user_id,total_wins,rank_1_count,best_rank').order('rank_1_count', { ascending:false }).limit(5),
+      sb.from('profiles').select('id,nickname,created_at').order('created_at', { ascending:false }).limit(10),
+      sb.from('tickets').select('user_id,lottery_type,round_no,result,prize_rank,created_at').order('created_at', { ascending:false }).limit(10),
+      sb.from('posts').select('nickname,tag,title,created_at').order('created_at', { ascending:false }).limit(10),
+      sb.from('posts').select('nickname,title,created_at').eq('tag', 'feedback').order('created_at', { ascending:false }).limit(10),
+    ]);
+    const totalWins = (userStatsRows || []).reduce((s, r) => s + (r.total_wins || 0), 0);
+
+    // 최근 티켓의 닉네임 매핑 (profiles 별도 조회)
+    const ticketUserIds = [...new Set((recentTickets || []).map(t => t.user_id).filter(Boolean))];
+    let nickMap = {};
+    if (ticketUserIds.length) {
+      const { data: nickRows } = await sb.from('profiles').select('id,nickname').in('id', ticketUserIds);
+      (nickRows || []).forEach(r => { nickMap[r.id] = r.nickname; });
+    }
+
+    const statCard = (label, val, color) => `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;text-align:center;">
+      <div style="font-size:10px;color:var(--text-muted);font-weight:700;margin-bottom:4px;">${label}</div>
+      <div style="font-size:19px;font-weight:900;color:${color||'var(--text-dark)'};">${val}</div>
+    </div>`;
+
+    const listCard = (title, rows) => `<div style="background:var(--paper-white);border:1px solid var(--border-dashed);border-radius:10px;padding:12px;margin-bottom:10px;">
+      <div style="font-size:12px;font-weight:900;color:var(--text-dark);margin-bottom:8px;">${title}</div>
+      ${rows.length ? rows.join('') : '<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:10px 0;">데이터 없음</div>'}
+    </div>`;
+
+    const memberRows = (recentMembers || []).map(m => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border-dashed);font-size:11px;">
+      <span style="font-weight:700;">${esc(m.nickname)}</span><span style="color:var(--text-muted);">${fmtDate(m.created_at)}</span>
+    </div>`);
+
+    const resultLabel = { pending:'대기', win:'당첨', lose:'낙첨' };
+    const ticketRows = (recentTickets || []).map(t => `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px dashed var(--border-dashed);font-size:11px;gap:6px;">
+      <span style="font-weight:700;flex-shrink:0;">${esc(nickMap[t.user_id] || '알 수 없음')}</span>
+      <span style="color:var(--text-muted);flex:1;text-align:center;">${t.lottery_type==='pension'?'연금':'로또'} ${t.round_no||''}회</span>
+      <span style="color:${t.prize_rank?'#dc2626':'var(--text-muted)'};font-weight:700;">${t.prize_rank ? t.prize_rank+'등' : (resultLabel[t.result]||t.result||'')}</span>
+      <span style="color:var(--text-muted);flex-shrink:0;">${fmtDate(t.created_at)}</span>
+    </div>`);
+
+    const tagLabel = { news:'소식', free:'자유', recommend:'추천', verify:'인증', feedback:'문의' };
+    const postRows = (recentPosts || []).map(p => `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px dashed var(--border-dashed);font-size:11px;gap:6px;">
+      <span style="background:var(--bg-light,#f1f5f9);border-radius:6px;padding:1px 6px;font-size:9px;font-weight:800;flex-shrink:0;">${tagLabel[p.tag]||p.tag||''}</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.title)}</span>
+      <span style="color:var(--text-muted);flex-shrink:0;">${esc(p.nickname)} · ${fmtDate(p.created_at)}</span>
+    </div>`);
+
+    const feedbackRows = (feedbackPosts || []).map(p => `<div style="padding:6px 0;border-bottom:1px dashed var(--border-dashed);font-size:11px;">
+      <div style="font-weight:700;">${esc(p.title)}</div>
+      <div style="color:var(--text-muted);margin-top:2px;">${esc(p.nickname)} · ${fmtDate(p.created_at)}</div>
+    </div>`);
+
+    const syncRow = (label, ok, detail) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border-dashed);font-size:11px;gap:6px;">
+      <span style="font-weight:700;flex-shrink:0;">${esc(label)}</span>
+      <span style="color:var(--text-muted);flex:1;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(detail)}</span>
+      <span style="flex-shrink:0;font-weight:800;color:${ok===null?'var(--text-muted)':(ok?'#16a34a':'#dc2626')};">${ok===null?'미확인':(ok?'정상':'지연')}</span>
+    </div>`;
+    const syncRows = [
+      syncRow('로또 6/45 회차 캐시', syncStatus.lotto ? syncStatus.lotto.ok : null, syncStatus.lotto ? `${syncStatus.lotto.round}회 (${syncStatus.lotto.date})` : '데이터 없음'),
+      syncRow('연금복권 720+ 회차 캐시', syncStatus.pension ? syncStatus.pension.ok : null, syncStatus.pension ? `${syncStatus.pension.round}회 (${syncStatus.pension.date})` : '데이터 없음'),
+      syncRow('로또 자동 소식 포스팅', syncStatus.lottoNews ? true : null, syncStatus.lottoNews ? fmtDate(syncStatus.lottoNews.date) : '데이터 없음'),
+      syncRow('연금 자동 소식 포스팅', syncStatus.pensionNews ? true : null, syncStatus.pensionNews ? fmtDate(syncStatus.pensionNews.date) : '데이터 없음'),
+    ];
+
+    el.innerHTML = `
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">관리자 전용 — 본인 외에는 접근할 수 없습니다.</div>
+      ${listCard('데이터 연동 현황 (자동화 상태)', syncRows)}
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+        ${statCard('전체 회원', (memberCount||0)+'명', 'var(--lotto-red)')}
+        ${statCard('이번주 신규가입', (weeklyMemberCount||0)+'명', '#6366f1')}
+        ${statCard('전체 QR 인증', (ticketCount||0)+'건')}
+        ${statCard('이번주 QR 인증', (weeklyTicketCount||0)+'건', '#6366f1')}
+        ${statCard('전체 당첨 횟수', totalWins+'회', '#16a34a')}
+        ${statCard('커뮤니티 게시글', (postCount||0)+'개')}
+      </div>
+      ${listCard('최근 가입 회원', memberRows)}
+      ${listCard('최근 QR 인증 등록', ticketRows)}
+      ${listCard('최근 커뮤니티 게시글', postRows)}
+      ${listCard('문의/피드백함', feedbackRows)}
+      <button onclick="renderAdmin()" style="width:100%;padding:9px;border:1px solid var(--border-dashed);border-radius:8px;background:var(--paper-white);color:var(--text-dark);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">새로고침</button>
+    `;
+  } catch (e) {
+    el.innerHTML = `<div style="text-align:center;padding:32px 16px;color:var(--text-muted);font-size:12px;">데이터를 불러오지 못했습니다: ${esc(e.message||e)}</div>`;
   }
 }
 
@@ -6227,31 +6392,10 @@ async function loadGuestStats() {
   const setStat = (id, val) => {
     const element = $(id);
     if (!element) return;
+    element.textContent = val;
     element.classList.remove('stat-anim');
     void element.offsetWidth;
     element.classList.add('stat-anim');
-    // 숫자가 포함된 값이면 0(또는 이전 값)에서 목표값까지 카운트업 애니메이션, 아니면 바로 표시
-    const match = String(val).match(/^([+-]?)([\d,]+(?:\.\d+)?)(.*)$/);
-    if (!match) { element.textContent = val; return; }
-    const [, sign, numStr, suffix] = match;
-    const target = parseFloat(numStr.replace(/,/g, ''));
-    if (!Number.isFinite(target)) { element.textContent = val; return; }
-    const isFloat = numStr.includes('.');
-    const prevNum = parseFloat(String(element.dataset.rawVal || '0').replace(/,/g, '')) || 0;
-    const start = isFloat ? 0 : Math.min(prevNum, target); // 소수(수익률)는 0에서, 정수 카운트는 이전 값부터 자연스럽게
-    element.dataset.rawVal = numStr.replace(/,/g, '');
-    if (element._ltbCountRAF) cancelAnimationFrame(element._ltbCountRAF);
-    const dur = 650, t0 = performance.now();
-    const fmt = n => isFloat ? n.toFixed(1) : Math.round(n).toLocaleString('ko-KR');
-    const tick = now => {
-      const p = Math.min(1, (now - t0) / dur);
-      const eased = 1 - Math.pow(1 - p, 3); // ease-out-cubic
-      const cur = start + (target - start) * eased;
-      element.textContent = sign + fmt(cur) + suffix;
-      if (p < 1) { element._ltbCountRAF = requestAnimationFrame(tick); }
-      else { element.textContent = val; }
-    };
-    element._ltbCountRAF = requestAnimationFrame(tick);
   };
 
   // 공개 집계 RPC를 우선 사용하고, 미적용 DB에서는 기존 공개 테이블로 대체한다.

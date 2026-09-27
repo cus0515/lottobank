@@ -1,0 +1,22 @@
+name: Create Admin Account
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  create-admin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run admin creation script
+        env:
+          SUPABASE_URL: https://wosbpljbdyofavsbrkyn.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python3 scripts/create_admin.py
