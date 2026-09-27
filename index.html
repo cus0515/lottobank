@@ -414,6 +414,8 @@ main.chat-hidden .chat-panel { display: none; }
 .feed-item-badge { border-left-color:#10b981; }
 .feed-item-rank { border-left-color:#3b82f6; }
 .feed-item-pension { border-left-color:#8b5cf6; }
+.feed-item-draw { border-left-color:#0f766e; }
+.feed-item-recommend { border-left-color:#e11d48; }
 @keyframes feedSlide { from { opacity:0;transform:translateY(-8px); } to { opacity:1;transform:none; } }
 .feed-item-new { animation:feedSlide .35s cubic-bezier(.22,1,.36,1); }
 .feed-avatar { width:30px;height:30px;border-radius:50%;background:var(--bg-light);border:1px solid var(--border-dashed);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
@@ -3202,6 +3204,14 @@ async function enrichPensionTicketGameResults(ticket) {
         }).eq('id', ticket.id);
       } else if (error) {
         console.warn('pension result sync:', error.message);
+      } else if (info) {
+        insertActivity('win', {
+          event_key:`verified-win:${ticket.id}:${round}:${info.rank}`,
+          lottery_type:'pension',
+          round,
+          rank:info.rank,
+          win_count:1,
+        });
       }
     });
   }
@@ -3651,6 +3661,15 @@ async function refreshPendingOnlineResults() {
       game_results:gameResults,
     }).eq('id', ticket.id);
     if (updateError) continue;
+    if (bestResult.rank <= 5) {
+      await insertActivity('win', {
+        event_key:`verified-win:${ticket.id}:${ticket.round_no}:${bestResult.rank}`,
+        lottery_type:'lotto',
+        round:Number(ticket.round_no),
+        rank:bestResult.rank,
+        win_count:winning.length,
+      });
+    }
     addedPrize += totalPrize;
     addedWins += winning.length;
     winning.forEach(item => { rankAdds[item.rank] += 1; });
@@ -6349,7 +6368,14 @@ async function saveTicketToDB(parsed, winData, gameResults) {
           .gt('total_prize', (dbStats?.total_prize || 0));
         winRankPos = (wc || 0) + 1;
       } catch(_) {}
-      insertActivity('win', { round: parsed.round, rank: bestResult.rank, prize: totalPrize, rank_pos: winRankPos });
+      insertActivity('win', {
+        event_key:`verified-win:${parsed.key}:${parsed.round}:${bestResult.rank}`,
+        lottery_type:'lotto',
+        round:parsed.round,
+        rank:bestResult.rank,
+        win_count:gameResults.filter(result => result.rank <= 5).length,
+        rank_pos:winRankPos,
+      });
     }
     } catch (derivedError) {
       console.warn('ticket derived data:', derivedError.message);
@@ -10558,6 +10584,14 @@ async function scanCameraLoop() {
 async function insertActivity(type, data = {}) {
   if (!isLoggedIn || !currentUser || !sb) return;
   try {
+    if (data.event_key) {
+      const { data:existing, error:lookupError } = await sb.from('activity_feed')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .contains('data', { event_key:data.event_key })
+        .limit(1);
+      if (!lookupError && existing?.length) return;
+    }
     const nick = window._profileNickname || currentUser.user_metadata?.nickname || currentUser.email?.split('@')[0] || '익명';
     await sb.from('activity_feed').insert({ user_id: currentUser.id, nick, type, data });
   } catch(e) { console.warn('insertActivity:', e.message); }
@@ -10574,46 +10608,73 @@ function relativeTime(isoStr) {
 function feedItemHtml(a, isNew) {
   // DB 컬럼명 정규화 (action_type/nickname 또는 type/nick 둘 다 지원)
   const aType = a.type || a.action_type || '';
-  const aNick = a.nick || a.nickname || '익명';
+  const aNick = escapeStoreText(a.nick || a.nickname || '익명');
   const aData = a.data || {};
-  const isPension = aType==='qr_register' && aData.type==='pension';
-  const typeClass = { qr_register: isPension?'feed-item-pension':'feed-item-qr', win:'feed-item-win', badge:'feed-item-badge', rank_enter:'feed-item-rank' }[aType] || '';
+  const lotteryType = aData.lottery_type || aData.type || 'lotto';
+  const isPension = lotteryType === 'pension';
+  const typeClass = { qr_register: isPension?'feed-item-pension':'feed-item-qr', win:'feed-item-win', badge:'feed-item-badge', rank_enter:'feed-item-rank', draw_result:'feed-item-draw', recommend_result:'feed-item-recommend' }[aType] || '';
   const newClass = isNew ? ' feed-item-new' : '';
   const typeChip = {
-    qr_register: `<span class="feed-type-chip" style="background:#e0edf6;color:#587089;">${svgIcon('qr',10,'currentColor')} ${isPension?'연금복권':'QR 등록'}</span>`,
+    qr_register: `<span class="feed-type-chip" style="background:#e0edf6;color:#587089;">${svgIcon('qr',10,'currentColor')} ${isPension?'연금 QR':'로또 QR'}</span>`,
     win:         `<span class="feed-type-chip" style="background:#fef3c7;color:#92400e;">${svgIcon('trophy',10,'currentColor')} 당첨</span>`,
     badge:       `<span class="feed-type-chip" style="background:#d1fae5;color:#065f46;">${svgIcon('medal',10,'currentColor')} 뱃지</span>`,
     rank_enter:  `<span class="feed-type-chip" style="background:#dbeafe;color:#1e40af;">${svgIcon('ranking',10,'currentColor')} 랭킹</span>`,
+    draw_result: `<span class="feed-type-chip" style="background:#ccfbf1;color:#0f766e;">${svgIcon('activity',10,'currentColor')} 공식 결과</span>`,
+    recommend_result: `<span class="feed-type-chip" style="background:#ffe4e6;color:#be123c;">${svgIcon('radar',10,'currentColor')} 추천 결과</span>`,
   }[aType] || '';
-  const avatarBg = { qr_register:'#ede9fe', win:'#fef3c7', badge:'#d1fae5', rank_enter:'#dbeafe' }[aType] || 'var(--bg-light)';
+  const avatarBg = { qr_register:'#ede9fe', win:'#fef3c7', badge:'#d1fae5', rank_enter:'#dbeafe', draw_result:'#ccfbf1', recommend_result:'#ffe4e6' }[aType] || 'var(--bg-light)';
   const icons = {
     qr_register: isPension ? svgIcon('ticket',15,'#7c3aed') : svgIcon('ticket',15,'#6366f1'),
     win:         svgIcon('trophy',15,'#f59e0b'),
     badge:       svgIcon('medal', 15,'#10b981'),
     rank_enter:  svgIcon('ranking',15,'#3b82f6'),
+    draw_result: svgIcon('activity',15,'#0f766e'),
+    recommend_result: svgIcon('radar',15,'#e11d48'),
   };
   const rankColors = { 1:'#dc2626', 2:'#a855f7', 3:'#10b981', 4:'#3b82f6', 5:'#64748b' };
   const labels = {
     qr_register: d => d.type==='pension' ? `연금복권 720+ 등록 ${d.round ? d.round+'회' : ''}` : `${d.games||1}게임 QR 등록${d.round ? ' '+d.round+'회' : ''}`,
     win: d => {
-      const rc = rankColors[d.rank]||'#64748b';
-      const rankStr = `<span style="color:${rc};font-weight:900;display:inline-flex;align-items:center;gap:3px;">${svgIcon('medal',11,rc)} ${d.rank}등 당첨!</span>`;
-      const prizeStr = d.prize ? ` ${fmtMFull(d.prize)}` : '';
+      const pensionBonus = d.lottery_type === 'pension' && Number(d.rank) === 8;
+      const rc = rankColors[d.rank] || (d.lottery_type === 'pension' ? '#16a34a' : '#64748b');
+      const lotteryLabel = d.lottery_type === 'pension' ? '연금' : '로또';
+      const resultLabel = pensionBonus ? '보너스 당첨!' : `${d.rank}등 당첨!`;
+      const rankStr = `<span style="color:${rc};font-weight:900;display:inline-flex;align-items:center;gap:3px;">${svgIcon('medal',11,rc)} ${lotteryLabel} ${resultLabel}</span>`;
       const roundStr = d.round ? ` · <span style="color:var(--text-muted);font-size:10px;">${d.round}회차</span>` : '';
       const rankPos = d.rank_pos ? ` · <span style="color:#3b82f6;">랭킹 ${d.rank_pos}위 진입</span>` : '';
-      return `${rankStr}${prizeStr}${roundStr}${rankPos}`;
+      return `${rankStr}${roundStr}${rankPos}`;
     },
     badge: d => {
       const rankPos = d.rank_pos ? ` <span style="color:#dc2626;font-weight:700;">→ 랭킹 ${d.rank_pos}위</span>` : '';
       return `<span style="color:#10b981;font-weight:900;display:inline-flex;align-items:center;gap:3px;">${svgIcon('star',11,'#10b981')}${d.badge_name}</span> 뱃지 획득${rankPos}`;
     },
     rank_enter:  d => `<span style="color:#3b82f6;font-weight:700;">${d.category} ${d.pos||''}위</span> 랭킹 진입`,
+    draw_result: d => {
+      const round = Number(d.round) || '-';
+      if (d.lottery_type === 'pension') {
+        return `<b style="color:#0f766e;">제 ${round}회 연금복권</b> · ${Number(d.group)||'-'}조 ${String(d.number||'').padStart(6,'0')} · 보너스 ${String(d.bonus_number||'').padStart(6,'0')}`;
+      }
+      const numbers = (Array.isArray(d.numbers) ? d.numbers : []).map(n=>String(Number(n)).padStart(2,'0')).join(' · ');
+      return `<b style="color:#0f766e;">제 ${round}회 로또</b> · ${numbers}${d.bonus ? ` + ${String(Number(d.bonus)).padStart(2,'0')}` : ''}`;
+    },
+    recommend_result: d => {
+      const name = d.lottery_type === 'pension' ? '연금 720+' : '로또 6/45';
+      const total = Number(d.total_games) || 0;
+      const wins = Number(d.win_count) || 0;
+      const best = d.best_rank === 'bonus' ? '보너스 당첨' : d.best_rank ? `최고 ${d.best_rank}등` : '당첨 게임 없음';
+      return `<b style="color:#be123c;">제 ${Number(d.round)||'-'}회 ${name} 추천</b> · ${best} · ${wins}/${total}게임 당첨`;
+    },
   };
   const icon  = icons[aType] || svgIcon('star',15,'#94a3b8');
   const label = labels[aType] ? labels[aType](aData) : (aType || '활동');
   const time  = relativeTime(a.created_at);
   const canDelete = isLoggedIn && currentUser && (window._isAppAdmin || currentUser.id === a.user_id);
-  return `<div class="feed-item ${typeClass}${newClass}">
+  const feedAction = aType === 'draw_result'
+    ? ` onclick="go('result');setTimeout(()=>switchResultTab('${lotteryType}'),0)" title="회차 결과 보기"`
+    : aType === 'recommend_result'
+      ? ` onclick="go('fortune');setTimeout(()=>{switchFortuneLottery('${lotteryType}');switchFortuneTab('history')},0)" title="추천 이력 보기"`
+      : '';
+  return `<div class="feed-item ${typeClass}${newClass}"${feedAction}${feedAction?' style="cursor:pointer;"':''}>
     <div class="feed-avatar" style="background:${avatarBg};">${icon}</div>
     <div class="feed-body">
       ${typeChip ? `<div>${typeChip}</div>` : ''}
@@ -10646,7 +10707,7 @@ async function renderFeed() {
     }
     const linkedData = (data||[]).map(item => ({ ...item, nick:profileNames[item.user_id] || item.nick || item.nickname }));
     const html = !linkedData.length
-      ? `<div style="text-align:center;padding:20px 8px;font-size:12px;color:#94a3b8;"><div style="margin-bottom:6px;">${svgIcon('activity',28,'#94a3b8')}</div>아직 활동 배치가 없습니다.<br><span style="font-size:11px;">QR 등록이나 당첨 확인 후 활동이 나타납니다</span></div>`
+      ? `<div style="text-align:center;padding:20px 8px;font-size:12px;color:#94a3b8;"><div style="margin-bottom:6px;">${svgIcon('activity',28,'#94a3b8')}</div>아직 공개된 활동이 없습니다.<br><span style="font-size:11px;">QR 등록, 당첨, 공식 결과가 이곳에 표시됩니다</span></div>`
       : linkedData.map(feedItemHtml).join('');
     const el1 = document.getElementById('feed-list');
     const el2 = document.getElementById('feed-list-left');

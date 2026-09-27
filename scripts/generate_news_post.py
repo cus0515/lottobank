@@ -32,6 +32,7 @@ GEMINI_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite']
 BOT_EMAIL = 'news-bot@lottobank.internal'
 BOT_NICKNAME = '로또뱅크 소식봇'
 SITE_URL = 'https://lottobank.pages.dev'
+RECOMMENDATIONS_PATH = 'site-recommendations.json'
 
 
 # ───────────────────────── 공용 유틸 ─────────────────────────
@@ -534,6 +535,293 @@ def static_news_exists(lottery_type, round_no):
     return os.path.exists(os.path.join('news', f'{news_slug(lottery_type, round_no)}.html'))
 
 
+# ───────────────────────── 사이트 추천 기록과 시스템 피드 ─────────────────────────
+
+def _mulberry32(seed):
+    state = seed & 0xffffffff
+
+    def rnd():
+        nonlocal state
+        state = (state + 0x6D2B79F5) & 0xffffffff
+        value = ((state ^ (state >> 15)) * (1 | state)) & 0xffffffff
+        value = ((value + (((value ^ (value >> 7)) * (61 | value)) & 0xffffffff)) ^ value) & 0xffffffff
+        return ((value ^ (value >> 14)) & 0xffffffff) / 4294967296
+
+    return rnd
+
+
+def generate_lotto_recommendation(history):
+    latest = history[-1]
+    next_round = int(latest['drwNo']) + 1
+    latest_numbers = set(map(int, latest.get('numbers') or []))
+    latest_bonus = int(latest.get('bonusNo') or 0)
+    recent = sorted(history, key=lambda row: int(row.get('drwNo', 0)), reverse=True)[:50]
+    frequency = {number: 0 for number in range(1, 46)}
+    last_seen = {number: 0 for number in range(1, 46)}
+    for row in recent:
+        round_no = int(row.get('drwNo', 0))
+        for number in (row.get('numbers') or []) + [row.get('bonusNo')]:
+            number = int(number or 0)
+            if number < 1 or number > 45:
+                continue
+            frequency[number] += 1
+            if not last_seen[number]:
+                last_seen[number] = round_no
+    oldest_round = min((int(row.get('drwNo', 1)) for row in history), default=1)
+    for number in range(1, 46):
+        if not last_seen[number]:
+            last_seen[number] = oldest_round
+    gaps = {number: int(latest['drwNo']) - last_seen[number] for number in range(1, 46)}
+    max_gap = max(gaps.values()) or 1
+    max_frequency = max(frequency.values()) or 1
+    base = [
+        {'n': number, 'gap': gaps[number] / max_gap, 'frq': frequency[number] / max_frequency}
+        for number in range(1, 46)
+        if number not in latest_numbers and number != latest_bonus
+    ]
+    zone_splits = [[2, 2, 2], [2, 2, 2], [3, 2, 1], [1, 2, 3], [2, 3, 1]]
+    weights = [[0.6, 0.4], [0.7, 0.3], [0.5, 0.5], [0.4, 0.6], [0.65, 0.35]]
+    rnd = _mulberry32((next_round * 2654435761) & 0xffffffff)
+    used = {}
+
+    def weighted_pick(items, count):
+        pool = [
+            {'n': item['n'], 'w': max(item['score'] * (0.3 ** used.get(item['n'], 0)), 0.001)}
+            for item in items
+        ]
+        picked = []
+        for _ in range(min(count, len(pool))):
+            remaining = rnd() * sum(item['w'] for item in pool)
+            index = len(pool) - 1
+            for candidate_index, item in enumerate(pool):
+                remaining -= item['w']
+                if remaining <= 0:
+                    index = candidate_index
+                    break
+            chosen = pool.pop(index)
+            picked.append(chosen['n'])
+            used[chosen['n']] = used.get(chosen['n'], 0) + 1
+        return picked
+
+    games = []
+    for (gap_weight, frequency_weight), split in zip(weights, zone_splits):
+        scored = sorted((
+            {'n': item['n'], 'score': item['gap'] * gap_weight + item['frq'] * frequency_weight + 0.02}
+            for item in base
+        ), key=lambda item: item['score'], reverse=True)
+        zones = [
+            [item for item in scored if item['n'] <= 15],
+            [item for item in scored if 16 <= item['n'] <= 30],
+            [item for item in scored if item['n'] >= 31],
+        ]
+        selected = set()
+        for zone, count in zip(zones, split):
+            selected.update(weighted_pick(zone[:max(count * 3, 8)], count))
+        for item in scored:
+            if len(selected) >= 6:
+                break
+            selected.add(item['n'])
+        games.append(sorted(selected))
+    return next_round, games
+
+
+def generate_pension_recommendation(history):
+    latest = history[-1]
+    next_round = int(latest['drwNo']) + 1
+    seed = int(latest.get('number') or 123456)
+    last_group = int(latest.get('group') or 1)
+    group_order = [group for group in range(1, 6) if group != last_group] + [last_group]
+    games = []
+    for index in range(5):
+        number = (seed * (index + 7) * next_round) % 999999
+        games.append({'jo': group_order[index], 'num': str(abs(number)).zfill(6)[:6]})
+    return next_round, games
+
+
+def ensure_next_recommendations():
+    records = load_json(RECOMMENDATIONS_PATH, {'lotto': {}, 'pension': {}}) or {'lotto': {}, 'pension': {}}
+    records.setdefault('lotto', {})
+    records.setdefault('pension', {})
+    changed = False
+    for lottery_type in ('lotto', 'pension'):
+        history = load_json(f'{lottery_type}-history.json', [])
+        if not history:
+            continue
+        if lottery_type == 'lotto':
+            round_no, games = generate_lotto_recommendation(history)
+        else:
+            round_no, games = generate_pension_recommendation(history)
+        key = str(round_no)
+        if key in records[lottery_type]:
+            continue
+        records[lottery_type][key] = {
+            'source_round': int(history[-1]['drwNo']),
+            'created_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
+            'games': games,
+        }
+        changed = True
+    if changed:
+        save_json(RECOMMENDATIONS_PATH, records)
+        print(f'[recommend] {RECOMMENDATIONS_PATH} 다음 회차 추천 저장 완료')
+    return records
+
+
+def lotto_recommendation_result(games, latest):
+    winning = set(map(int, latest.get('numbers') or []))
+    bonus = int(latest.get('bonusNo') or 0)
+    ranks = []
+    for game in games:
+        selected = set(map(int, game))
+        matched = len(selected & winning)
+        if matched == 6:
+            ranks.append(1)
+        elif matched == 5 and bonus in selected:
+            ranks.append(2)
+        elif matched == 5:
+            ranks.append(3)
+        elif matched == 4:
+            ranks.append(4)
+        elif matched == 3:
+            ranks.append(5)
+    return min(ranks) if ranks else None, len(ranks)
+
+
+def pension_recommendation_result(games, latest):
+    winning = str(latest.get('number') or '').zfill(6)
+    bonus = str(latest.get('bonusNumber') or '').zfill(6)
+    winning_group = int(latest.get('group') or 0)
+    order = {'1': 1, '2': 2, 'bonus': 3, '3': 4, '4': 5, '5': 6, '6': 7, '7': 8}
+    ranks = []
+    for game in games:
+        selected = str(game.get('num') or '').zfill(6)
+        group = int(game.get('jo') or 0)
+        rank = None
+        if group == winning_group and selected == winning:
+            rank = '1'
+        elif selected == winning:
+            rank = '2'
+        elif selected == bonus:
+            rank = 'bonus'
+        else:
+            suffix = next((label for digits, label in ((5, '3'), (4, '4'), (3, '5'), (2, '6'), (1, '7'))
+                           if selected[-digits:] == winning[-digits:]), None)
+            rank = suffix
+        if rank:
+            ranks.append(rank)
+    best = min(ranks, key=lambda rank: order[rank]) if ranks else None
+    return best, len(ranks)
+
+
+def feed_event_exists(event_key, user_id=None, event_type=None, round_no=None, rank=None):
+    event_filter = urllib.parse.quote(json.dumps({'event_key': event_key}, separators=(',', ':')))
+    status, matches = sb_call('GET', f'/activity_feed?select=id&data=cs.{event_filter}&limit=1')
+    if status < 400 and isinstance(matches, list) and matches:
+        return True
+    path = '/activity_feed?select=id,user_id,type,data&order=created_at.desc&limit=200'
+    status, rows = sb_call('GET', path)
+    if status >= 400 or not isinstance(rows, list):
+        return False
+    for row in rows:
+        data = row.get('data') or {}
+        if data.get('event_key') == event_key:
+            return True
+        if user_id and event_type and row.get('user_id') == user_id and row.get('type') == event_type:
+            if int(data.get('round') or 0) == int(round_no or 0) and str(data.get('rank')) == str(rank):
+                return True
+    return False
+
+
+def insert_service_feed(user_id, nickname, event_type, data):
+    if feed_event_exists(data['event_key'], user_id, event_type, data.get('round'), data.get('rank')):
+        return False
+    status, result = sb_call('POST', '/activity_feed', {
+        'user_id': user_id,
+        'nick': nickname,
+        'type': event_type,
+        'data': data,
+    }, extra_headers={'Prefer': 'return=minimal'})
+    if status >= 400:
+        raise RuntimeError(f'시스템 피드 등록 실패: {status} {result}')
+    print(f'[feed] {data["event_key"]} 등록 완료')
+    return True
+
+
+def insert_system_feed(bot_user_id, event_type, data):
+    return insert_service_feed(bot_user_id, 'LottoBank 데이터', event_type, data)
+
+
+def publish_verified_wins(lottery_type, latest):
+    round_no = int(latest['drwNo'])
+    query = (f'/tickets?select=id,user_id,round_no,lottery_type,game_numbers,numbers,'
+             f'pension_group,pension_number,prize_rank,prize_amount&round_no=eq.{round_no}'
+             f'&lottery_type=eq.{lottery_type}&limit=1000')
+    status, tickets = sb_call('GET', query)
+    if status >= 400 or not isinstance(tickets, list) or not tickets:
+        return
+    profile_status, profiles = sb_call('GET', '/profiles?select=id,nickname&limit=5000')
+    nicknames = {profile['id']: profile.get('nickname') or '회원' for profile in (profiles or [])} if profile_status < 400 else {}
+    for ticket in tickets:
+        user_id = ticket.get('user_id')
+        ticket_id = ticket.get('id')
+        if not user_id or not ticket_id:
+            continue
+        if lottery_type == 'lotto':
+            games = ticket.get('game_numbers') or ([ticket.get('numbers')] if ticket.get('numbers') else [])
+            best_rank, win_count = lotto_recommendation_result(games, latest)
+        else:
+            games = [{'jo': ticket.get('pension_group'), 'num': ticket.get('pension_number')}]
+            best_rank, win_count = pension_recommendation_result(games, latest)
+        if not best_rank:
+            continue
+        display_rank = 8 if best_rank == 'bonus' else int(best_rank)
+        insert_service_feed(user_id, nicknames.get(user_id, '회원'), 'win', {
+            'event_key': f'verified-win:{ticket_id}:{round_no}:{display_rank}',
+            'lottery_type': lottery_type,
+            'round': round_no,
+            'rank': display_rank,
+            'win_count': win_count,
+            'verified': True,
+        })
+
+
+def update_system_feed():
+    records = ensure_next_recommendations()
+    if not SERVICE_KEY:
+        print('[warn] SUPABASE_SERVICE_ROLE_KEY 없음 — 시스템 피드 등록 건너뜀', file=sys.stderr)
+        return
+    bot_id = ensure_bot_user_id()
+    for lottery_type in ('lotto', 'pension'):
+        history = load_json(f'{lottery_type}-history.json', [])
+        if not history:
+            continue
+        latest = latest_record(lottery_type, history)
+        round_no = int(latest['drwNo'])
+        draw_data = {'event_key': f'draw:{lottery_type}:{round_no}', 'lottery_type': lottery_type, 'round': round_no}
+        if lottery_type == 'lotto':
+            draw_data.update({'numbers': latest.get('numbers') or [], 'bonus': latest.get('bonusNo')})
+        else:
+            draw_data.update({'group': latest.get('group'), 'number': latest.get('number'), 'bonus_number': latest.get('bonusNumber')})
+        insert_system_feed(bot_id, 'draw_result', draw_data)
+        publish_verified_wins(lottery_type, latest)
+
+        recommendation = (records.get(lottery_type) or {}).get(str(round_no))
+        if not recommendation:
+            continue
+        games = recommendation.get('games') or []
+        if lottery_type == 'lotto':
+            best_rank, win_count = lotto_recommendation_result(games, latest)
+        else:
+            best_rank, win_count = pension_recommendation_result(games, latest)
+        insert_system_feed(bot_id, 'recommend_result', {
+            'event_key': f'recommend:{lottery_type}:{round_no}',
+            'lottery_type': lottery_type,
+            'round': round_no,
+            'best_rank': best_rank,
+            'win_count': win_count,
+            'total_games': len(games),
+        })
+
+
 # ───────────────────────── 메인 ─────────────────────────
 
 def run_for(lottery_type):
@@ -581,4 +869,8 @@ if __name__ == '__main__':
                 posted_any = True
         except Exception as e:
             print(f'[error] {lt} 소식 게시 실패: {e}', file=sys.stderr)
+    try:
+        update_system_feed()
+    except Exception as e:
+        print(f'[error] 시스템 피드 갱신 실패: {e}', file=sys.stderr)
     sys.exit(0)
