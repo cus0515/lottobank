@@ -102,4 +102,16 @@
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://lottobank.pages.dev/news/lotto-1243</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>never</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://lottobank.pages.dev/news/pension-334</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>never</changefreq>
+    <priority>0.72</priority>
+  </url>
 </urlset>

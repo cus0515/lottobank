@@ -57,7 +57,7 @@ def build_result(item):
         'rnk4WnNope': int(item.get('rnk4WnNope', 0) or 0),
         'rnk5WnAmt': int(item.get('rnk5WnAmt', 0) or 0),
         'rnk5WnNope': int(item.get('rnk5WnNope', 0) or 0),
-        'totSellamnt': int(item.get('rlvtEpsdSumNtslAmt', 0) or 0),
+        'totSellamnt': int(item.get('wholEpsdSumNtslAmt', 0) or 0),
     }
 
 
@@ -138,7 +138,7 @@ def try_old_api(round_num):
 
 
 def update_history(result):
-    """lotto-history.json(전체 회차 누적 이력)에 새 회차를 추가한다. 이미 있으면 건너뜀."""
+    """lotto-history.json의 새 회차를 추가하거나 기존 회차의 상세 결과를 보강한다."""
     drw_no = result['drwNo']
     try:
         with open(HISTORY_PATH, encoding='utf-8') as f:
@@ -147,24 +147,38 @@ def update_history(result):
         print(f"  ⚠️ {HISTORY_PATH} 없음 — 새로 생성")
         history = []
 
-    existing_nos = {rec.get('drwNo') for rec in history}
-    if drw_no in existing_nos:
-        print(f"  history: {drw_no}회 이미 존재, 건너뜀")
-        return False
-
     numbers = [result['drwtNo1'], result['drwtNo2'], result['drwtNo3'],
                result['drwtNo4'], result['drwtNo5'], result['drwtNo6']]
-    history.append({
+    record = {
         'drwNo': drw_no,
         'drwNoDate': result['drwNoDate'],
         'numbers': numbers,
         'bonusNo': result['bnusNo'],
-    })
+        'firstWinamnt': result.get('firstWinamnt', 0),
+        'firstPrzwnerCo': result.get('firstPrzwnerCo', 0),
+        'rnk2WnAmt': result.get('rnk2WnAmt', 0),
+        'rnk2WnNope': result.get('rnk2WnNope', 0),
+        'rnk3WnAmt': result.get('rnk3WnAmt', 0),
+        'rnk3WnNope': result.get('rnk3WnNope', 0),
+        'rnk4WnAmt': result.get('rnk4WnAmt', 0),
+        'rnk4WnNope': result.get('rnk4WnNope', 0),
+        'rnk5WnAmt': result.get('rnk5WnAmt', 0),
+        'rnk5WnNope': result.get('rnk5WnNope', 0),
+        'totSellamnt': result.get('totSellamnt', 0),
+        'regions': result.get('regions', []),
+    }
+    existing = next((rec for rec in history if rec.get('drwNo') == drw_no), None)
+    if existing:
+        existing.update(record)
+        action = '갱신'
+    else:
+        history.append(record)
+        action = '추가'
     history.sort(key=lambda x: x['drwNo'])
 
     with open(HISTORY_PATH, 'w', encoding='utf-8') as f:
         json.dump(history, f, ensure_ascii=False, separators=(',', ':'))
-    print(f"  ✅ history: {drw_no}회 추가 (총 {len(history)}회차)")
+    print(f"  ✅ history: {drw_no}회 {action} (총 {len(history)}회차)")
     return True
 
 

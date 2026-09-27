@@ -14,6 +14,7 @@ pension-news-state.json 에 마지막으로 게시한 회차를 기록한다(다
 동일하게 커밋됨).
 """
 import json
+import html
 import os
 import random
 import re
@@ -21,6 +22,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 
 SUPABASE_URL = 'https://wosbpljbdyofavsbrkyn.supabase.co'
 SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY', '').strip()
@@ -29,6 +31,7 @@ GEMINI_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite']
 
 BOT_EMAIL = 'news-bot@lottobank.internal'
 BOT_NICKNAME = '로또뱅크 소식봇'
+SITE_URL = 'https://lottobank.pages.dev'
 
 
 # ───────────────────────── 공용 유틸 ─────────────────────────
@@ -55,6 +58,33 @@ def pack_title(title, body):
 
 def money(n):
     return f'{int(n):,}원'
+
+
+def latest_record(lottery_type, history):
+    """이력의 최신 회차에 상세 캐시를 병합해 게시 판단에 필요한 값을 채운다."""
+    latest = dict(history[-1])
+    cache = load_json(f'{lottery_type}-cache.json', {}) or {}
+    if int(cache.get('drwNo', 0) or 0) != int(latest.get('drwNo', 0) or 0):
+        return latest
+    if lottery_type == 'lotto':
+        latest.update({
+            'drwNoDate': cache.get('drwNoDate') or latest.get('drwNoDate'),
+            'numbers': [cache.get(f'drwtNo{i}') for i in range(1, 7)],
+            'bonusNo': cache.get('bnusNo'),
+            'firstWinamnt': cache.get('firstWinamnt', 0),
+            'firstPrzwnerCo': cache.get('firstPrzwnerCo', 0),
+            'totSellamnt': cache.get('totSellamnt', 0),
+            'regions': cache.get('regions', []),
+        })
+    else:
+        latest.update({
+            'drwNoDate': cache.get('drwNoDate') or latest.get('drwNoDate'),
+            'group': cache.get('wnBndNo') or latest.get('group'),
+            'number': cache.get('wnRnkVl') or latest.get('number'),
+            'bonusNumber': cache.get('bnsRnkVl') or latest.get('bonusNumber'),
+            'prizes': cache.get('prizes', []),
+        })
+    return latest
 
 
 # ───────────────────────── Supabase REST ─────────────────────────
@@ -138,13 +168,8 @@ def lotto_hooks(history, latest):
     if winners is not None:
         hooks.append(('winner_count', {'winners': winners, 'amt': latest.get('firstWinamnt') or 0}))
 
-    sales_all = [r.get('totSellamnt') or 0 for r in history if r.get('totSellamnt')]
-    if sales_all and latest.get('totSellamnt'):
-        avg_sales = sum(sales_all) / len(sales_all)
-        hooks.append(('sales', {
-            'amt': latest['totSellamnt'], 'avg': avg_sales,
-            'diff_pct': round((latest['totSellamnt'] - avg_sales) / avg_sales * 100),
-        }))
+    if latest.get('totSellamnt'):
+        hooks.append(('sales', {'amt': latest['totSellamnt']}))
 
     last_seen = {}
     for r in history:
@@ -168,6 +193,25 @@ def lotto_hooks(history, latest):
         odd = sum(1 for n in nums if n % 2)
         if odd in (0, 1, 5, 6):
             hooks.append(('oddeven', {'odd': odd, 'even': 6 - odd}))
+        hooks.append(('number_sum', {'sum': sum(nums)}))
+        zones = [sum(1 for n in nums if lo <= n <= hi) for lo, hi in ((1, 10), (11, 20), (21, 30), (31, 40), (41, 45))]
+        hooks.append(('zones', {'zones': '-'.join(map(str, zones))}))
+        endings = {}
+        for n in nums:
+            endings[n % 10] = endings.get(n % 10, 0) + 1
+        repeated = sorted(k for k, count in endings.items() if count >= 2)
+        if repeated:
+            hooks.append(('same_end', {'digits': ', '.join(map(str, repeated))}))
+
+    previous = next((r for r in reversed(history[:-1]) if r.get('numbers')), None)
+    if previous and nums:
+        overlap = sorted(set(nums) & set(previous.get('numbers') or []))
+        if overlap:
+            hooks.append(('previous_overlap', {'count': len(overlap), 'numbers': ', '.join(map(str, overlap))}))
+
+    regions = latest.get('regions') or []
+    if regions:
+        hooks.append(('regions', {'regions': ', '.join(regions[:5]), 'count': len(regions)}))
 
     if no % 100 == 0 or no % 50 == 0:
         hooks.append(('milestone', {'round': no}))
@@ -187,12 +231,11 @@ LOTTO_TEXT = {
                     else f"1등 {d['winners']}명 공동 당첨 — 각각 {money(d['amt'])}씩."),
     ],
     'sales': [
-        lambda d: (f"이번 회차 총 판매액은 {money(d['amt'])}로 역대 평균보다 {abs(d['diff_pct'])}% "
-                    + ("높았어요." if d['diff_pct'] >= 0 else "낮았어요.")),
-        lambda d: f"총 판매액 {money(d['amt'])} (역대 평균 대비 {'+' if d['diff_pct']>=0 else ''}{d['diff_pct']}%)",
+        lambda d: f"이번 회차 공식 총 판매액은 {money(d['amt'])}입니다.",
+        lambda d: f"공식 집계 기준 총 판매액은 {money(d['amt'])}입니다.",
     ],
     'overdue': [
-        lambda d: f"{d['num']}번, 무려 {d['gap']}회째 당첨/보너스 번호로 안 나오고 있어요. 슬슬 나올 때 되지 않았나요?",
+        lambda d: f"{d['num']}번은 최근 {d['gap']}회 동안 당첨·보너스 번호에 포함되지 않았습니다. 이는 과거 기록이며 다음 회차를 예측하지는 않습니다.",
         lambda d: f"최장 미출현 번호는 {d['num']}번 — {d['gap']}회 동안 잠잠했습니다.",
     ],
     'consecutive': [
@@ -204,6 +247,21 @@ LOTTO_TEXT = {
     ],
     'milestone': [
         lambda d: f"제 {d['round']}회 — 로또 6/45가 어느덧 이 숫자까지 왔네요.",
+    ],
+    'number_sum': [
+        lambda d: f"여섯 당첨번호의 합은 {d['sum']}입니다.",
+    ],
+    'zones': [
+        lambda d: f"번호대 분포는 1~10부터 41~45까지 순서대로 {d['zones']}개입니다.",
+    ],
+    'same_end': [
+        lambda d: f"같은 끝수가 두 번 이상 나온 숫자는 {d['digits']}입니다.",
+    ],
+    'previous_overlap': [
+        lambda d: f"직전 회차와 겹친 번호는 {d['numbers']}로 모두 {d['count']}개입니다.",
+    ],
+    'regions': [
+        lambda d: f"공개된 주요 당첨 지역은 {d['regions']}이며, 전체 지역 정보는 회차 조회에서 확인할 수 있습니다.",
     ],
 }
 
@@ -227,7 +285,7 @@ def build_lotto_post(latest, history):
     if picked and picked[0][0] in ('jackpot_rank', 'milestone'):
         title = f"제 {no}회 로또 6/45 — " + re.sub(r'[.!]$', '', LOTTO_TEXT[picked[0][0]][0](picked[0][1]))[:40]
 
-    body_lines = [f"당첨번호: {' · '.join(str(n) for n in nums)} + 보너스 {bonus}", '']
+    body_lines = [f"당첨번호: {' · '.join(str(n) for n in nums)} + 보너스 {bonus}", '이번 회차 공식 결과와 역대 데이터를 함께 살펴봤습니다.', '']
     body_lines += [f"• {l}" for l in lines]
     body_lines += ['', '내 번호 QR 인증하고 전적 확인은 QR 인증 탭에서!']
     body = '\n'.join(body_lines)
@@ -261,9 +319,17 @@ def pension_hooks(history, latest):
     if len(num) == 6:
         digit_sum = sum(int(c) for c in num)
         hooks.append(('digitsum', {'sum': digit_sum}))
+        odd = sum(1 for c in num if int(c) % 2)
+        hooks.append(('oddeven', {'odd': odd, 'even': 6 - odd}))
         repeats = len(num) - len(set(num))
         if repeats >= 2:
             hooks.append(('repeat', {'count': repeats}))
+
+    previous = next((r for r in reversed(history[:-1]) if r.get('number')), None)
+    if previous and len(num) == 6:
+        same_positions = [str(i + 1) for i, (a, b) in enumerate(zip(num, str(previous.get('number')))) if a == b]
+        if same_positions:
+            hooks.append(('previous_positions', {'positions': ', '.join(same_positions), 'count': len(same_positions)}))
 
     return hooks
 
@@ -284,6 +350,12 @@ PENSION_TEXT = {
     'repeat': [
         lambda d: f"이번 당첨번호엔 같은 숫자가 {d['count']}개 겹쳐 있었어요.",
     ],
+    'oddeven': [
+        lambda d: f"여섯 자리의 홀짝 구성은 홀수 {d['odd']}개, 짝수 {d['even']}개입니다.",
+    ],
+    'previous_positions': [
+        lambda d: f"직전 회차와 같은 숫자가 놓인 자리는 {d['positions']}번째로 모두 {d['count']}곳입니다.",
+    ],
 }
 
 
@@ -298,7 +370,8 @@ def build_pension_post(latest, history):
     lines = [rnd.choice(PENSION_TEXT[key])(data) for key, data in picked if key in PENSION_TEXT]
 
     title = f"제 {no}회 연금복권 720+ 결과 나왔어요"
-    body_lines = [f"당첨번호: {group}조 {num}", '']
+    bonus = latest.get('bonusNumber')
+    body_lines = [f"당첨번호: {group}조 {num}" + (f" · 보너스 {bonus}" if bonus else ''), '이번 회차 공식 결과와 역대 데이터를 함께 살펴봤습니다.', '']
     body_lines += [f"• {l}" for l in lines]
     body_lines += ['', '내 번호 QR 인증하고 전적 확인은 QR 인증 탭에서!']
     body = '\n'.join(body_lines)
@@ -313,8 +386,9 @@ def _build_prompt(title, body, lottery_label):
         f"{lottery_label} 이번 회차 소식 게시글을 다듬어줘.\n\n"
         f"[제목 초안]\n{title}\n\n[본문 초안]\n{body}\n\n"
         "규칙: 사실을 과장하거나 새로운 사실을 지어내지 말 것. 도박을 부추기거나 구매를 권유하는 "
-        "표현은 쓰지 말 것. 정중체(합니다체)로, 친근하고 흥미를 끄는 톤으로. 본문은 4~6줄, "
-        "이모지는 1~2개만. 아래 JSON 형식으로만 답해:\n"
+        "표현은 쓰지 말 것. 정중체(합니다체)로, 친근하고 읽기 쉬운 정보형 문장으로 작성할 것. "
+        "당첨번호 요약, 데이터 관전 포인트, 서비스 확인 경로 순서를 유지할 것. 본문은 5~8줄, "
+        "이모지는 최대 1개만. 아래 JSON 형식으로만 답해:\n"
         '{"title": "...", "body": "..."}'
     )
 
@@ -372,6 +446,94 @@ def polish_text(title, body, lottery_label):
     return title, body
 
 
+# ───────────────────────── 검색 노출용 정적 문서 ─────────────────────────
+
+def news_slug(lottery_type, round_no):
+    return f'{lottery_type}-{round_no}'
+
+
+def render_news_html(lottery_type, latest, title, body):
+    round_no = latest['drwNo']
+    slug = news_slug(lottery_type, round_no)
+    url = f'{SITE_URL}/news/{slug}'
+    label = '로또 6/45' if lottery_type == 'lotto' else '연금복권 720+'
+    published = datetime.now(timezone.utc).date().isoformat()
+    content_lines = [re.sub(r'\s+', ' ', line).strip(' •') for line in body.splitlines() if line.strip()]
+    description = ' '.join(content_lines[:2])[:160]
+    paragraphs = ''.join(
+        f'<p>{html.escape(line.lstrip("• "))}</p>'
+        for line in body.splitlines() if line.strip()
+    )
+    structured = {
+        '@context': 'https://schema.org',
+        '@type': 'NewsArticle',
+        'headline': title,
+        'description': description,
+        'datePublished': published,
+        'dateModified': published,
+        'inLanguage': 'ko-KR',
+        'mainEntityOfPage': url,
+        'author': {'@type': 'Organization', 'name': 'LottoBank'},
+        'publisher': {'@type': 'Organization', 'name': 'LottoBank', 'url': SITE_URL},
+    }
+    return f'''<!-- LottoBank 회차 소식 검색 노출 페이지 -->
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="robots" content="index, follow"><meta name="google-adsense-account" content="ca-pub-3323488098461026">
+<title>{html.escape(title)} | LottoBank</title>
+<meta name="description" content="{html.escape(description, quote=True)}">
+<link rel="canonical" href="{url}"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<script type="application/ld+json">{json.dumps(structured, ensure_ascii=False)}</script>
+<style>body{{margin:0;background:#f6f8fb;color:#0f172a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.8;word-break:keep-all}}nav{{background:#0f172a;padding:12px 18px}}nav a{{color:#fff;font-weight:800;text-decoration:none}}main{{max-width:820px;margin:auto;padding:32px 18px}}article{{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:28px 32px;box-shadow:0 8px 24px rgba(15,23,42,.06)}}.kind{{color:#e11d48;font-size:13px;font-weight:800}}h1{{font-size:27px;line-height:1.35;margin:8px 0 6px}}.meta{{font-size:13px;color:#64748b;margin-bottom:22px}}p{{margin:0 0 12px;color:#334155}}.notice{{margin-top:24px;padding:13px;border-radius:8px;background:#f8fafc;color:#64748b;font-size:13px}}.links{{margin-top:22px;display:flex;gap:14px;flex-wrap:wrap}}.links a{{color:#e11d48;font-weight:700;text-decoration:none}}@media(max-width:600px){{article{{padding:22px 18px}}h1{{font-size:22px}}}}</style>
+</head><body><nav><a href="/">LottoBank</a></nav><main><article>
+<div class="kind">{label} 회차 소식</div><h1>{html.escape(title)}</h1>
+<div class="meta">제 {round_no}회 · {html.escape(str(latest.get('drwNoDate') or published))}</div>
+{paragraphs}
+<div class="notice">당첨 결과의 최종 확인은 동행복권 공식 홈페이지를 이용해 주세요. 과거 통계는 다음 회차 당첨을 예측하지 않습니다.</div>
+<div class="links"><a href="/">LottoBank 홈</a><a href="/{lottery_type}-winning-numbers">회차 조회</a><a href="/?page=community">커뮤니티 소식</a></div>
+</article></main></body></html>'''
+
+
+def update_sitemaps(url):
+    today = datetime.now(timezone.utc).date().isoformat()
+    xml_path = 'sitemap.xml'
+    xml = ''
+    if os.path.exists(xml_path):
+        with open(xml_path, encoding='utf-8') as f:
+            xml = f.read()
+    if url not in xml:
+        entry = (f'  <url>\n    <loc>{url}</loc>\n    <lastmod>{today}</lastmod>\n'
+                 '    <changefreq>never</changefreq>\n    <priority>0.72</priority>\n  </url>\n')
+        xml = xml.replace('</urlset>', entry + '</urlset>')
+        with open(xml_path, 'w', encoding='utf-8') as f:
+            f.write(xml)
+
+    txt_path = 'sitemap.txt'
+    urls = []
+    if os.path.exists(txt_path):
+        with open(txt_path, encoding='utf-8') as f:
+            urls = [line.strip() for line in f if line.strip()]
+    if url not in urls:
+        urls.append(url)
+        with open(txt_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(urls) + '\n')
+
+
+def write_static_news(lottery_type, latest, title, body):
+    slug = news_slug(lottery_type, latest['drwNo'])
+    os.makedirs('news', exist_ok=True)
+    path = os.path.join('news', f'{slug}.html')
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(render_news_html(lottery_type, latest, title, body))
+    update_sitemaps(f'{SITE_URL}/news/{slug}')
+    print(f'[seo] {path} 생성 완료')
+
+
+def static_news_exists(lottery_type, round_no):
+    return os.path.exists(os.path.join('news', f'{news_slug(lottery_type, round_no)}.html'))
+
+
 # ───────────────────────── 메인 ─────────────────────────
 
 def run_for(lottery_type):
@@ -380,10 +542,8 @@ def run_for(lottery_type):
     history = load_json(hist_path, [])
     if not history:
         return False
-    latest = history[-1]
+    latest = latest_record(lottery_type, history)
     state = load_json(state_path, {'lastPostedRound': 0})
-    if latest['drwNo'] <= state.get('lastPostedRound', 0):
-        return False  # 이미 이 회차는 게시함
 
     if lottery_type == 'lotto':
         if not latest.get('firstWinamnt'):
@@ -394,6 +554,11 @@ def run_for(lottery_type):
         title, body = build_pension_post(latest, history)
         label = '연금복권 720+'
 
+    if latest['drwNo'] <= state.get('lastPostedRound', 0):
+        if not static_news_exists(lottery_type, latest['drwNo']):
+            write_static_news(lottery_type, latest, title, body)
+        return False  # 게시 완료 회차도 누락된 검색 노출 문서는 복구
+
     title, body = polish_text(title, body, label)
 
     if not SERVICE_KEY:
@@ -402,6 +567,7 @@ def run_for(lottery_type):
 
     bot_id = ensure_bot_user_id()
     insert_news_post(bot_id, title, body)
+    write_static_news(lottery_type, latest, title, body)
     save_json(state_path, {'lastPostedRound': latest['drwNo']})
     print(f'[ok] {lottery_type} 제 {latest["drwNo"]}회 소식 게시 완료')
     return True

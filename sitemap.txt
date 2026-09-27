@@ -15,3 +15,5 @@ https://lottobank.pages.dev/app-info
 https://lottobank.pages.dev/login-info
 https://lottobank.pages.dev/data-safety
 https://lottobank.pages.dev/support
+https://lottobank.pages.dev/news/lotto-1243
+https://lottobank.pages.dev/news/pension-334

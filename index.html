@@ -487,8 +487,9 @@ main.chat-hidden .chat-panel { display: none; }
 .comment-submit-btn { padding:8px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit; }
 .post-card-stats   { font-size:11px;color:var(--text-muted);display:flex;gap:10px;margin-top:4px;align-items:center; }
 /* ===== 커뮤니티 페이지 ===== */
-.comm-tab-row { display: flex; gap: 6px; margin-bottom: 12px; }
-.comm-tab-btn { padding:6px 16px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s; }
+.comm-tab-row { display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none; }
+.comm-tab-row::-webkit-scrollbar { display:none; }
+.comm-tab-btn { flex:0 0 auto;padding:6px 16px;border:1.5px solid var(--border-dashed);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--paper-white);color:var(--text-muted);font-family:inherit;transition:all .15s;white-space:nowrap;word-break:keep-all; }
 .comm-tab-btn.on { background:var(--lotto-red);color:#fff;border-color:var(--lotto-red);box-shadow:0 2px 8px rgba(225,29,72,.3); }
 .post-write-bar { display: flex; gap: 8px; margin-bottom: 12px; }
 .post-write-input { flex: 1; padding: 9px 12px; border: 1px solid var(--border-dashed); border-radius: 4px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; }
@@ -1387,7 +1388,7 @@ body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .community-skin-row{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .community-skin-btn{border:1px solid var(--border-dashed);border-radius:999px;background:var(--paper-white);color:var(--text-muted);font:800 10px inherit;padding:5px 10px;cursor:pointer;}
 .community-skin-btn.on{border-color:var(--lotto-red);color:var(--lotto-red);background:rgba(225,29,72,.06);}
-@media(max-width:700px){#pg-community,#community-content,.community-board-head{min-width:0;max-width:100%;overflow-x:hidden;box-sizing:border-box}.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;width:100%;overflow-x:hidden;padding-bottom:0}.comm-tab-btn{width:100%;min-width:0;white-space:nowrap;padding:7px 6px;font-size:11px;letter-spacing:-.03em;flex:initial}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold::after{right:-39px;top:7px;font-size:7px;padding:3px 31px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:34px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,minmax(23px,1fr));gap:5px;width:100%;max-width:190px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:4px}.community-pension-group{width:30px;height:30px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:23px!important;height:29px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr);gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
+@media(max-width:700px){#pg-community,#community-content,.community-board-head{min-width:0;max-width:100%;overflow-x:hidden;box-sizing:border-box}.community-board-tools{grid-template-columns:1fr}.community-recommend-grid{grid-template-columns:1fr}.comm-tab-row{display:flex!important;width:100%;overflow-x:auto;padding-bottom:2px}.comm-tab-btn{flex:0 0 auto;width:auto;min-width:78px;padding:7px 10px;font-size:11px;letter-spacing:0}.community-rec-slip{max-width:100%;padding:14px 10px 11px}.community-rec-slip.skin-gold::after{right:-39px;top:7px;font-size:7px;padding:3px 31px}.community-rec-slip.skin-gold .community-rec-amount{padding-right:34px}.community-rec-row{grid-template-columns:1fr;gap:7px}.community-rec-nums{grid-template-columns:repeat(6,minmax(23px,1fr));gap:5px;width:100%;max-width:190px}.community-rec-nums span{height:24px;font-size:11px}.community-pension-rec-row{gap:4px}.community-pension-group{width:30px;height:30px;font-size:12px}.community-rec-slip .community-pension-rec-row .pension-number-ball{width:23px!important;height:29px!important;font-size:14px!important;}.radar-pick-row{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.radar-pick-row.pension{grid-template-columns:42px minmax(0,1fr) 42px}.radar-pick-nums{gap:4px}.radar-pension-group{width:34px;height:24px;font-size:10px}.radar-win-row{grid-template-columns:42px minmax(0,1fr);gap:5px}.radar-history-row{grid-template-columns:42px minmax(0,1fr) 44px;gap:5px}.radar-history-row.pension{grid-template-columns:42px minmax(0,1fr) 44px}.radar-history-nums{grid-template-columns:repeat(6,22px);gap:4px}.radar-history-pension-nums{gap:3px}}
 @media(max-width:700px){
   .ticket-slip,
   .community-verify-slip,
@@ -11396,6 +11397,9 @@ async function renderRank(catId) {
 // =====================================================
 let curCommTab = 'free';
 let commPosts = { news: [], free: [], recommend: [], verify: [], feedback: [] };
+function allCommunityPosts() {
+  return [...(commPosts.news||[]),...(commPosts.free||[]),...(commPosts.recommend||[]),...(commPosts.verify||[]),...(commPosts.feedback||[])];
+}
 let commDisplayLimit = 20;
 let myLikedPostIds = new Set();
 let commChannel = null;
@@ -12034,7 +12038,7 @@ function renderCommunityList() {
 async function likePost(postId, btn) {
   if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
   const already = myLikedPostIds.has(postId);
-  const allPosts = [...(commPosts.free||[]),...(commPosts.recommend||[]),...(commPosts.verify||[]),...(commPosts.feedback||[])];
+  const allPosts = allCommunityPosts();
   const targetPost = allPosts.find(p => String(p.id) === String(postId));
   if (already) {
     await sb.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
@@ -12125,7 +12129,7 @@ let currentPostId = null;
 
 async function openPostDetail(postId) {
   currentPostId = postId;
-  const all = [...(commPosts.free || []), ...(commPosts.recommend || []), ...(commPosts.verify || []), ...(commPosts.feedback || [])];
+  const all = allCommunityPosts();
   const post = all.find(p => String(p.id) === String(postId));
   if (!post) return;
   if (post.tag === 'feedback' && !(isLoggedIn && currentUser && (window._isAppAdmin || post.user_id === currentUser.id))) {
@@ -12194,6 +12198,7 @@ async function deletePost(postId) {
     commPosts.recommend = (commPosts.recommend||[]).filter(p => String(p.id) !== String(postId));
     commPosts.verify = (commPosts.verify||[]).filter(p => String(p.id) !== String(postId));
     commPosts.feedback = (commPosts.feedback||[]).filter(p => String(p.id) !== String(postId));
+    commPosts.news = (commPosts.news||[]).filter(p => String(p.id) !== String(postId));
     closePostDetail();
   } catch(e) {
     toast('❌ 삭제 실패: ' + e.message);
@@ -12252,7 +12257,7 @@ async function submitComment(postId) {
   try {
     await sb.from('comments').insert({ post_id: postId, user_id: currentUser.id, nickname: nick, body });
     // 게시글 comment_count 증가
-    const cur = [...(commPosts.free||[]),...(commPosts.recommend||[]),...(commPosts.verify||[]),...(commPosts.feedback||[])].find(p=>String(p.id)===String(postId));
+    const cur = allCommunityPosts().find(p=>String(p.id)===String(postId));
     if (cur) await sb.from('posts').update({ comment_count: (cur.comment_count||0)+1 }).eq('id', postId);
     if (inp) { inp.value = ''; const cc=$('cmt-char-cnt');if(cc)cc.textContent='0/200'; }
     await loadComments(postId);
@@ -12267,7 +12272,7 @@ async function submitComment(postId) {
 async function likePostDetail(postId) {
   if (!isLoggedIn) { toast('⚠️ 로그인이 필요합니다'); return; }
   const already = myLikedPostIds.has(postId);
-  const all = [...(commPosts.free||[]),...(commPosts.recommend||[]),...(commPosts.verify||[]),...(commPosts.feedback||[])];
+  const all = allCommunityPosts();
   const post = all.find(p=>String(p.id)===String(postId));
   if (!post) return;
   if (already) {

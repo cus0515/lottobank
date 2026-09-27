@@ -73,8 +73,20 @@ def fetch_round(round_num):
         return None
 
 
+def fetch_latest_round_num():
+    """공식 회차 목록에서 현재 공개된 가장 최신 회차를 찾는다."""
+    try:
+        list_data = fetch_json('https://www.dhlottery.co.kr/pt720/selectPstPt720WnList.do')
+        items = (list_data.get('data') or {}).get('result') or list_data.get('result') or []
+        rounds = [int(item.get('psltEpsd', 0)) for item in items]
+        return max(rounds) if rounds else 0
+    except Exception as e:
+        print(f"  최신 회차 조회 실패: {e}")
+        return 0
+
+
 def update_history(result):
-    """pension-history.json(전체 회차 누적 이력)에 새 회차를 추가한다. 이미 있으면 건너뜀."""
+    """pension-history.json의 새 회차를 추가하거나 기존 회차 상세를 보강한다."""
     drw_no = result['drwNo']
     try:
         with open(HISTORY_PATH, encoding='utf-8') as f:
@@ -83,23 +95,26 @@ def update_history(result):
         print(f"  ⚠️ {HISTORY_PATH} 없음 — 새로 생성")
         history = []
 
-    existing_nos = {rec.get('drwNo') for rec in history}
-    if drw_no in existing_nos:
-        print(f"  history: {drw_no}회 이미 존재, 건너뜀")
-        return False
-
-    history.append({
+    record = {
         'drwNo': drw_no,
         'drwNoDate': result['drwNoDate'],
         'group': result['wnBndNo'],
         'number': result['wnRnkVl'],
         'bonusNumber': result['bnsRnkVl'],
-    })
+        'prizes': result.get('prizes', []),
+    }
+    existing = next((rec for rec in history if rec.get('drwNo') == drw_no), None)
+    if existing:
+        existing.update(record)
+        action = '갱신'
+    else:
+        history.append(record)
+        action = '추가'
     history.sort(key=lambda x: x['drwNo'])
 
     with open(HISTORY_PATH, 'w', encoding='utf-8') as f:
         json.dump(history, f, ensure_ascii=False, separators=(',', ':'))
-    print(f"  ✅ history: {drw_no}회 추가 (총 {len(history)}회차)")
+    print(f"  ✅ history: {drw_no}회 {action} (총 {len(history)}회차)")
     return True
 
 
@@ -114,8 +129,10 @@ def main():
         print(f"캐시 없음 — 시드 회차 {SEED_ROUND} 사용")
         current_round = SEED_ROUND
 
-    # 다음 회차 먼저 시도 → 실패 시 현재 회차 갱신
-    for round_num in [current_round + 1, current_round]:
+    latest_round = fetch_latest_round_num()
+    candidates = [latest_round, current_round + 1, current_round]
+    # 오래된 캐시도 한 번에 최신 회차로 이동하고, 목록 조회 실패 시 기존 순차 방식을 사용한다.
+    for round_num in dict.fromkeys(candidates):
         if round_num <= 0:
             continue
         print(f"시도: {round_num}회...")
