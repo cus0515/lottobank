@@ -5826,8 +5826,8 @@ async function renderAdmin() {
   let syncStatus = { lotto: null, pension: null, lottoNews: null, pensionNews: null };
   try {
     const [lottoCacheRes, pensionCacheRes] = await Promise.all([
-      fetch('./lotto-cache.json').then(r => r.ok ? r.json() : null).catch(()=>null),
-      fetch('./pension-cache.json').then(r => r.ok ? r.json() : null).catch(()=>null),
+      fetch('./lotto-cache.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null),
+      fetch('./pension-cache.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null),
     ]);
     if (lottoCacheRes) {
       const expected = lastWeekday(6); // 토요일
