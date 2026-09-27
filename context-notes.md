@@ -788,3 +788,4 @@ Play Console 키 관리 화면에서 앱 서명 키와 업로드 키가 분리�
 - 검색 노출은 사용자 자유글 전체가 아니라 사실 검증이 가능한 공식 회차 소식에 우선 적용한다. 회차별 정적 HTML, canonical, Article JSON-LD, XML/TXT 사이트맵을 함께 만든다.
 - 동행복권 새 API에서 `rlvtEpsdSumNtslAmt`는 전체 판매액이 아니며, 1243회의 공식 전체 판매액은 `wholEpsdSumNtslAmt` 값인 128,926,419,000원이다. 캐시 수집 필드를 바로잡고 과거 값 정합성이 확보되기 전까지 판매액의 역대 평균 비교는 하지 않는다.
 - Python 문법 검사, 로또 자동 게시 모의 실행, 연금 템플릿 및 NewsArticle 생성 검사, `index.html` JavaScript 문법 검사, Vite 프로덕션 빌드가 모두 통과했다.
+- 기능 변경은 커밋 `14b5e5d`로 `main` 브랜치에 푸시했다.
