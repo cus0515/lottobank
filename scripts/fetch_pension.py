@@ -5,6 +5,7 @@ LottoBank — GitHub Actions 연금복권 720+ 캐시 업데이터
 """
 
 import json
+import time
 import urllib.request
 from datetime import datetime, timezone
 
@@ -21,10 +22,18 @@ HISTORY_PATH = 'pension-history.json'
 SEED_ROUND = 320  # 캐시 없을 때 시작 회차
 
 
-def fetch_json(url):
-    req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=12) as r:
-        return json.loads(r.read().decode('utf-8'))
+def fetch_json(url, retries=2, timeout=20):
+    last_err = None
+    for attempt in range(retries + 1):
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return json.loads(r.read().decode('utf-8'))
+        except Exception as e:
+            last_err = e
+            if attempt < retries:
+                time.sleep(1.5)
+    raise last_err
 
 
 def fmt_date(ymd):
@@ -34,65 +43,59 @@ def fmt_date(ymd):
     return ymd or ''
 
 
-def fetch_round(round_num):
-    """pt720 목록 API에서 해당 회차를 찾고, 상세 API로 등위별 당첨 정보를 채운다."""
+def _to_int(v):
     try:
-        list_data = fetch_json('https://www.dhlottery.co.kr/pt720/selectPstPt720WnList.do')
-        items = (list_data.get('data') or {}).get('result') or list_data.get('result') or []
-        def _to_int(v):
-            try:
-                return int(v)
-            except (TypeError, ValueError):
-                return None
-        item = next((r for r in items if _to_int(r.get('psltEpsd')) == round_num), None)
-        if not item:
-            return None
-
-        prizes = []
-        try:
-            info_data = fetch_json(
-                f'https://www.dhlottery.co.kr/pt720/selectPstPt720WnInfo.do?srchPsltEpsd={round_num}'
-            )
-            info_items = (info_data.get('data') or {}).get('result') or info_data.get('result') or []
-            prizes = [{
-                'rank': p.get('wnRnk'),
-                'store': p.get('wnStoreCnt'),
-                'internet': p.get('wnInternetCnt'),
-                'total': p.get('wnTotalCnt'),
-                'totAmt': p.get('totAmt'),
-            } for p in info_items]
-        except Exception as e:
-            print(f"  상세 정보 조회 실패: {e}")
-
-        return {
-            'returnValue': 'success',
-            'drwNo': round_num,
-            'drwNoDate': fmt_date(item.get('psltRflYmd', '')),
-            'wnBndNo': str(item.get('wnBndNo', '')),
-            'wnRnkVl': str(item.get('wnRnkVl', '')),
-            'bnsRnkVl': str(item.get('bnsRnkVl', '')),
-            'prizes': prizes,
-        }
-    except Exception as e:
-        print(f"  pt720 API 실패: {e}")
+        return int(v)
+    except (TypeError, ValueError):
         return None
 
 
-def fetch_latest_round_num():
-    """공식 회차 목록에서 현재 공개된 가장 최신 회차를 찾는다."""
+def fetch_round(items, round_num):
+    """미리 받아온 pt720 목록(items)에서 해당 회차를 찾고, 상세 API로 등위별 당첨 정보를 채운다."""
+    item = next((r for r in items if _to_int(r.get('psltEpsd')) == round_num), None)
+    if not item:
+        return None
+
+    prizes = []
     try:
-        list_data = fetch_json('https://www.dhlottery.co.kr/pt720/selectPstPt720WnList.do')
-        items = (list_data.get('data') or {}).get('result') or list_data.get('result') or []
-        rounds = []
-        for item in items:
-            try:
-                rounds.append(int(item.get('psltEpsd', 0)))
-            except (TypeError, ValueError):
-                continue
-        return max(rounds) if rounds else 0
+        info_data = fetch_json(
+            f'https://www.dhlottery.co.kr/pt720/selectPstPt720WnInfo.do?srchPsltEpsd={round_num}'
+        )
+        info_items = (info_data.get('data') or {}).get('result') or info_data.get('result') or []
+        prizes = [{
+            'rank': p.get('wnRnk'),
+            'store': p.get('wnStoreCnt'),
+            'internet': p.get('wnInternetCnt'),
+            'total': p.get('wnTotalCnt'),
+            'totAmt': p.get('totAmt'),
+        } for p in info_items]
     except Exception as e:
-        print(f"  최신 회차 조회 실패: {e}")
-        return 0
+        print(f"  상세 정보 조회 실패: {e}")
+
+    return {
+        'returnValue': 'success',
+        'drwNo': round_num,
+        'drwNoDate': fmt_date(item.get('psltRflYmd', '')),
+        'wnBndNo': str(item.get('wnBndNo', '')),
+        'wnRnkVl': str(item.get('wnRnkVl', '')),
+        'bnsRnkVl': str(item.get('bnsRnkVl', '')),
+        'prizes': prizes,
+    }
+
+
+def fetch_list_items():
+    """pt720 전체 회차 목록을 한 번만 조회해서 반환한다 (회차마다 재조회하지 않음)."""
+    list_data = fetch_json('https://www.dhlottery.co.kr/pt720/selectPstPt720WnList.do')
+    return (list_data.get('data') or {}).get('result') or list_data.get('result') or []
+
+
+def latest_round_num(items):
+    rounds = []
+    for item in items:
+        n = _to_int(item.get('psltEpsd'))
+        if n is not None:
+            rounds.append(n)
+    return max(rounds) if rounds else 0
 
 
 def update_history(result):
@@ -139,10 +142,15 @@ def main():
         print(f"캐시 없음 — 시드 회차 {SEED_ROUND} 사용")
         current_round = SEED_ROUND
 
-    latest_round = fetch_latest_round_num()
+    try:
+        items = fetch_list_items()
+    except Exception as e:
+        print(f"  목록 조회 실패: {e} — 종료")
+        return
+
+    latest_round = latest_round_num(items)
     print(f"공식 최신 회차: {latest_round}회")
 
-    # 밀린 회차가 있으면 한 번의 실행에서 전부 따라잡는다 (최대 20회차 안전장치).
     target_end = latest_round if latest_round > current_round else current_round + 1
     round_candidates = list(range(current_round + 1, min(target_end, current_round + 20) + 1)) or [current_round + 1]
     if latest_round > 0 and latest_round not in round_candidates:
@@ -154,7 +162,11 @@ def main():
         if round_num <= 0:
             continue
         print(f"시도: {round_num}회...")
-        result = fetch_round(round_num)
+        try:
+            result = fetch_round(items, round_num)
+        except Exception as e:
+            print(f"   pt720 상세 API 실패: {e}")
+            result = None
         if result and result.get('wnRnkVl'):
             last_result = result
             saved_any = True
@@ -162,6 +174,7 @@ def main():
             update_history(result)
         else:
             print(f"   (미발표 또는 조회 실패)")
+        time.sleep(0.8)  # 연속 요청 사이 짧은 대기 (레이트리밋 회피)
 
     if last_result:
         last_result['_cachedAt'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
