@@ -1,18 +1,67 @@
 {
   "returnValue": "success",
-  "drwNo": 321,
-  "drwNoDate": "2026-06-25",
-  "wnBndNo": "5",
-  "wnRnkVl": "686709",
-  "bnsRnkVl": "326599",
+  "drwNo": 322,
+  "drwNoDate": "2026-07-02",
+  "wnBndNo": "2",
+  "wnRnkVl": "119392",
+  "bnsRnkVl": "696967",
   "prizes": [
-    {"rank": 1, "store": 1, "internet": 0, "total": 1, "totAmt": 1680000000},
-    {"rank": 2, "store": 4, "internet": 0, "total": 4, "totAmt": 480000000},
-    {"rank": 3, "store": 45, "internet": 25, "total": 70, "totAmt": 70000000},
-    {"rank": 4, "store": 297, "internet": 293, "total": 590, "totAmt": 59000000},
-    {"rank": 5, "store": 3414, "internet": 3235, "total": 6649, "totAmt": 332450000},
-    {"rank": 6, "store": 30638, "internet": 31394, "total": 62032, "totAmt": 310160000},
-    {"rank": 7, "store": 344320, "internet": 312478, "total": 656798, "totAmt": 656798000},
-    {"rank": 8, "store": 5, "internet": 0, "total": 5, "totAmt": 600000000}
-  ]
+    {
+      "rank": 1,
+      "store": 1,
+      "internet": 1,
+      "total": 2,
+      "totAmt": 3360000000
+    },
+    {
+      "rank": 2,
+      "store": 4,
+      "internet": 4,
+      "total": 8,
+      "totAmt": 960000000
+    },
+    {
+      "rank": 3,
+      "store": 0,
+      "internet": 37,
+      "total": 37,
+      "totAmt": 37000000
+    },
+    {
+      "rank": 4,
+      "store": 314,
+      "internet": 311,
+      "total": 625,
+      "totAmt": 62500000
+    },
+    {
+      "rank": 5,
+      "store": 3624,
+      "internet": 3236,
+      "total": 6860,
+      "totAmt": 343000000
+    },
+    {
+      "rank": 6,
+      "store": 33470,
+      "internet": 30841,
+      "total": 64311,
+      "totAmt": 321555000
+    },
+    {
+      "rank": 7,
+      "store": 346225,
+      "internet": 309902,
+      "total": 656127,
+      "totAmt": 656127000
+    },
+    {
+      "rank": 8,
+      "store": 0,
+      "internet": 1,
+      "total": 1,
+      "totAmt": 120000000
+    }
+  ],
+  "_cachedAt": "2026-09-27T06:25:22Z"
 }
