@@ -12397,11 +12397,11 @@ function updateCommTabCounts() {
   const rBtn = $('ct-recommend');
   const vBtn = $('ct-verify');
   const qBtn = $('ct-feedback');
-  if (nBtn) nBtn.innerHTML = `${svgIcon('bell',11,'currentColor')} 소식 (${(commPosts.news||[]).length})`;
-  if (fBtn) fBtn.textContent = `자유게시판 (${(commPosts.free||[]).length})`;
-  if (rBtn) rBtn.textContent = `추천번호 (${(commPosts.recommend||[]).length})`;
-  if (vBtn) vBtn.textContent = `인증게시판 (${(commPosts.verify||[]).length})`;
-  if (qBtn) qBtn.textContent = `문의/건의 (${(commPosts.feedback||[]).length})`;
+  if (nBtn) nBtn.innerHTML = `${svgIcon('bell',11,'currentColor')} 소식`;
+  if (fBtn) fBtn.textContent = '자유게시판';
+  if (rBtn) rBtn.textContent = '추천번호';
+  if (vBtn) vBtn.textContent = '인증게시판';
+  if (qBtn) qBtn.textContent = '문의/건의';
 }
 
 // QR 당첨 결과를 인증게시판 작성폼에 연결한다.
