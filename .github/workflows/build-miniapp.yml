@@ -1,0 +1,41 @@
+name: Build Toss Mini App (.ait)
+
+on:
+  workflow_dispatch:  # 수동 실행 — index.html 등 웹 변경 후 미니앱(.ait) 재빌드가 필요할 때 실행
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build mini app (vite build -> ait build)
+        run: pnpm run build
+
+      - name: List build output
+        run: |
+          echo "--- repo root .ait files ---"
+          find . -maxdepth 2 -iname "*.ait" -not -path "./node_modules/*" || true
+          echo "--- dist ---"
+          ls -la dist 2>/dev/null || echo "(no dist dir)"
+
+      - name: Upload .ait artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lottobank-ait
+          path: |
+            *.ait
+            dist/**
+          if-no-files-found: warn
