@@ -5,63 +5,6 @@
   "wnBndNo": "2",
   "wnRnkVl": "956029",
   "bnsRnkVl": "022049",
-  "prizes": [
-    {
-      "rank": 1,
-      "store": 0,
-      "internet": 1,
-      "total": 1,
-      "totAmt": 1680000000
-    },
-    {
-      "rank": 2,
-      "store": 0,
-      "internet": 4,
-      "total": 4,
-      "totAmt": 480000000
-    },
-    {
-      "rank": 3,
-      "store": 35,
-      "internet": 36,
-      "total": 71,
-      "totAmt": 71000000
-    },
-    {
-      "rank": 4,
-      "store": 335,
-      "internet": 333,
-      "total": 668,
-      "totAmt": 66800000
-    },
-    {
-      "rank": 5,
-      "store": 3223,
-      "internet": 3193,
-      "total": 6416,
-      "totAmt": 320800000
-    },
-    {
-      "rank": 6,
-      "store": 36239,
-      "internet": 32394,
-      "total": 68633,
-      "totAmt": 343165000
-    },
-    {
-      "rank": 7,
-      "store": 352497,
-      "internet": 315319,
-      "total": 667816,
-      "totAmt": 667816000
-    },
-    {
-      "rank": 8,
-      "store": 0,
-      "internet": 5,
-      "total": 5,
-      "totAmt": 600000000
-    }
-  ],
-  "_cachedAt": "2026-09-27T19:24:50Z"
+  "prizes": [],
+  "_cachedAt": "2026-09-28T05:20:22Z"
 }
