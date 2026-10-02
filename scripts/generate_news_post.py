@@ -196,19 +196,41 @@ def ensure_bot_user_id():
     return user_id
 
 
-def delete_round_news(bot_user_id, lottery_type, round_no):
-    status, posts = sb_call('GET', f'/posts?select=id,title&user_id=eq.{bot_user_id}&tag=eq.news&limit=100')
+def find_round_news(bot_user_id, lottery_type, round_no):
+    status, posts = sb_call(
+        'GET',
+        f'/posts?select=id,title,created_at&user_id=eq.{bot_user_id}'
+        '&tag=eq.news&order=created_at.desc&limit=100',
+    )
     if status >= 400 or not isinstance(posts, list):
         raise RuntimeError(f'기존 소식 조회 실패: {status} {posts}')
     label = '로또' if lottery_type == 'lotto' else '연금복권'
-    targets = [post['id'] for post in posts
-               if f'제 {round_no}회' in str(post.get('title') or '') and label in str(post.get('title') or '')]
-    for post_id in targets:
+    return [post for post in posts
+            if f'제 {round_no}회' in str(post.get('title') or '')
+            and label in str(post.get('title') or '')]
+
+
+def delete_news_posts(posts):
+    for post in posts:
+        post_id = post['id']
         delete_status, result = sb_call('DELETE', f'/posts?id=eq.{post_id}', extra_headers={'Prefer': 'return=minimal'})
         if delete_status >= 400:
             raise RuntimeError(f'기존 소식 삭제 실패: {delete_status} {result}')
+
+
+def delete_round_news(bot_user_id, lottery_type, round_no):
+    targets = find_round_news(bot_user_id, lottery_type, round_no)
+    delete_news_posts(targets)
     if targets:
         print(f'[replace] {lottery_type} 제 {round_no}회 기존 소식 {len(targets)}건 삭제')
+
+
+def dedupe_round_news(bot_user_id, lottery_type, round_no):
+    posts = find_round_news(bot_user_id, lottery_type, round_no)
+    if len(posts) > 1:
+        delete_news_posts(posts[1:])
+        print(f'[dedupe] {lottery_type} 제 {round_no}회 중복 소식 {len(posts) - 1}건 삭제')
+    return bool(posts)
 
 
 def insert_news_post(bot_user_id, title, body):
@@ -1209,6 +1231,9 @@ def run_for(lottery_type):
         and int(state.get('contentVersion', 0) or 0) < content_version
     )
     if latest['drwNo'] <= state.get('lastPostedRound', 0) and not needs_replacement:
+        if SERVICE_KEY:
+            bot_id = ensure_bot_user_id()
+            dedupe_round_news(bot_id, lottery_type, latest['drwNo'])
         if not static_news_exists(lottery_type, latest['drwNo']):
             write_static_news(lottery_type, latest, title, body)
         return False  # 게시 완료 회차도 누락된 검색 노출 문서는 복구
@@ -1220,6 +1245,14 @@ def run_for(lottery_type):
     bot_id = ensure_bot_user_id()
     if needs_replacement:
         delete_round_news(bot_id, lottery_type, latest['drwNo'])
+    elif dedupe_round_news(bot_id, lottery_type, latest['drwNo']):
+        write_static_news(lottery_type, latest, title, body)
+        save_json(state_path, {
+            'lastPostedRound': latest['drwNo'],
+            'contentVersion': content_version,
+        })
+        print(f'[skip] {lottery_type} 제 {latest["drwNo"]}회 소식이 이미 등록됨')
+        return True
     insert_news_post(bot_id, title, body)
     write_static_news(lottery_type, latest, title, body)
     save_json(state_path, {

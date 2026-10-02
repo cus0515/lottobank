@@ -32,6 +32,10 @@ on:
     - cron: '0 12 * * 0,1,2,3,5'
   workflow_dispatch:  # 수동 실행 가능
 
+concurrency:
+  group: update-lotto-pension-cache
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -40,6 +44,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Fetch latest lotto result
         run: python3 scripts/fetch_lotto.py
