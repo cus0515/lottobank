@@ -7,6 +7,42 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="shortcut icon" href="/favicon.svg">
 <script>(function(){const t=localStorage.getItem('ltb-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<script type="module">
+// 토스 미니앱(Apps in Toss) 환경 감지.
+// 웹사이트(lottobank.pages.dev)는 이 파일을 번들링 없이 그대로 서빙하므로,
+// 아래 동적 import는 일반 웹 브라우저에서는 실패하는 게 정상이며 안전하게 무시됩니다.
+// 토스 미니앱 빌드(ait build → vite)에서만 실제 모듈이 해석되어 토스 환경을 감지합니다.
+(async () => {
+  try {
+    const mod = await import('@apps-in-toss/web-framework');
+    window.__LTB_TOSS_ENV__ = mod.getOperationalEnvironment ? mod.getOperationalEnvironment() : null;
+    window.__LTB_TOSS_OPEN_URL__ = mod.openURL || null;
+  } catch (_) {
+    window.__LTB_TOSS_ENV__ = null;
+    window.__LTB_TOSS_OPEN_URL__ = null;
+  }
+  window.__LTB_IS_TOSS__ = window.__LTB_TOSS_ENV__ === 'toss';
+})();
+</script>
+<script>
+// 토스 미니앱 안에서 외부 링크(target="_blank")를 앱 밖 브라우저로 열어줌 (리뷰 거절 사유#1: 외부 링크 미작동 대응)
+document.addEventListener('click', function(e){
+  if (!window.__LTB_IS_TOSS__) return;
+  const a = e.target && e.target.closest ? e.target.closest('a[target="_blank"]') : null;
+  if (a && a.href) {
+    e.preventDefault();
+    if (window.__LTB_TOSS_OPEN_URL__) window.__LTB_TOSS_OPEN_URL__(a.href).catch(function(){});
+  }
+}, true);
+// 토스 미니앱 안에서는 자체 로그인(이메일/비밀번호) 대신 웹사이트로 유도할 때 사용 (리뷰 거절 사유#2 대응)
+function ltbOpenExternal(url) {
+  if (window.__LTB_IS_TOSS__ && window.__LTB_TOSS_OPEN_URL__) {
+    window.__LTB_TOSS_OPEN_URL__(url).catch(function(){ window.open(url, '_blank'); });
+  } else {
+    window.open(url, '_blank');
+  }
+}
+</script>
 <title>LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리</title>
 <meta name="description" content="로또 QR 기반 구매 이력 인증 · 당첨 확인 · 전적 관리 플랫폼. 회차별 당첨번호 조회, 나의 전적 통계, 뱃지, 랭킹을 한 곳에서.">
 <meta name="keywords" content="로또,로또당첨,로또인증,로또전적,QR인증,당첨번호,로또통계,LottoBank">
@@ -5423,6 +5459,13 @@ function updateBadgeUI() {
 let authMode = 'login';
 
 function showAuthModal() {
+  // 토스 미니앱 안에서는 토스 로그인 외 별도 로그인 기능을 제공할 수 없어
+  // 자체(이메일/비밀번호) 로그인 모달을 열지 않고 웹사이트로 안내합니다.
+  if (window.__LTB_IS_TOSS__) {
+    toast('로그인은 웹사이트(lottobank.pages.dev)에서 이용해주세요');
+    ltbOpenExternal('https://lottobank.pages.dev');
+    return;
+  }
   if (isLoggedIn) {
     sb.auth.signOut();
     return;
