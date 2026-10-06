@@ -690,7 +690,8 @@ html[data-miniapp="toss"] .toss-ad-shell.is-ready { display:block; }
 html[data-miniapp="toss"] #dark-toggle-btn { display:none !important; }
 @media (max-width:768px) {
   html[data-miniapp="toss"] #mob-btn-lab { display:none; }
-  html[data-miniapp="toss"] .mob-bottom-nav { left:12px; right:12px; bottom:max(12px,env(safe-area-inset-bottom)); border:1px solid var(--border-dashed); border-radius:18px; padding:7px 4px; overflow:hidden; box-shadow:0 8px 24px rgba(15,23,42,.16); }
+  html[data-miniapp="toss"] .mob-bottom-nav { left:0; right:0; bottom:0; border:0; border-top:1px solid var(--border-dashed); border-radius:0; padding:7px 4px max(7px,env(safe-area-inset-bottom)); overflow:hidden; box-shadow:0 -4px 16px rgba(15,23,42,.1); }
+  html[data-miniapp="toss"] #scroll-top-btn { bottom:calc(76px + env(safe-area-inset-bottom)) !important; }
 }
 .auth-divider { text-align:center; font-size:13px; color:var(--text-muted); margin:14px 0 4px; }
 .auth-switch { background:none; border:none; color:var(--lotto-purple); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
