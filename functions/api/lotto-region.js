@@ -7,7 +7,7 @@ export async function onRequest(context) {
   const cors = {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'no-store',
+    'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
   };
 
   if (!round || round < 1) {

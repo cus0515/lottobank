@@ -9,7 +9,7 @@ export async function onRequest(context) {
   const cors = {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'no-store',
+    'Cache-Control': 'public, max-age=900, stale-while-revalidate=3600',
   };
 
   if (!query || query.length < 2) {

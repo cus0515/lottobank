@@ -2,11 +2,14 @@
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const round = parseInt(url.searchParams.get('round') || '0');
+  const firstDraw = new Date('2020-05-07T19:05:00+09:00');
+  const latestRound = Math.max(1, Math.floor((Date.now() - firstDraw.getTime()) / 604800000) + 1);
+  const cacheSeconds = round < latestRound ? 604800 : 600;
 
   const cors = {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'public, max-age=600',
+    'Cache-Control': `public, max-age=${cacheSeconds}, stale-while-revalidate=86400`,
   };
 
   if (context.request.method === 'OPTIONS') {

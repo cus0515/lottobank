@@ -9,11 +9,14 @@ const GITHUB_CACHE_URL =
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const round = parseInt(url.searchParams.get('round') || '0');
+  const firstDraw = new Date('2002-12-07T20:45:00+09:00');
+  const latestRound = Math.max(1, Math.floor((Date.now() - firstDraw.getTime()) / 604800000) + 1);
+  const cacheSeconds = round < latestRound ? 604800 : 300;
 
   const cors = {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'public, max-age=300',
+    'Cache-Control': `public, max-age=${cacheSeconds}, stale-while-revalidate=86400`,
   };
 
   if (!round || round < 1) {
