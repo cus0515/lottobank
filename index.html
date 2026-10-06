@@ -8,24 +8,30 @@
 <link rel="shortcut icon" href="/favicon.svg">
 <script>(function(){const t=localStorage.getItem('ltb-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 <script type="module">
-// 토스 미니앱(Apps in Toss) 환경 감지.
-// 웹사이트(lottobank.pages.dev)는 이 파일을 번들링 없이 그대로 서빙하므로,
-// 아래 동적 import는 일반 웹 브라우저에서는 실패하는 게 정상이며 안전하게 무시됩니다.
-// 토스 미니앱 빌드(ait build → vite)에서만 실제 모듈이 해석되어 토스 환경을 감지합니다.
-(async () => {
+// 운영 웹과 같은 화면을 사용하는 앱인토스 기능을 초기화합니다.
+window.__LTB_TOSS_READY__ = (async () => {
   try {
     const mod = await import('@apps-in-toss/web-framework');
-    window.__LTB_TOSS_ENV__ = mod.getOperationalEnvironment ? mod.getOperationalEnvironment() : null;
+    window.__LTB_TOSS_ENV__ = mod.Environment?.environment || null;
     window.__LTB_TOSS_OPEN_URL__ = mod.openURL || null;
+    window.__LTB_TOSS_AUTH__ = mod.TossAuth || null;
+    window.__LTB_TOSS_ADS__ = mod.TossAds || null;
+    window.__LTB_TOSS_AD_GROUP_ID__ = import.meta.env?.VITE_TOSS_AD_GROUP_ID || null;
   } catch (_) {
     window.__LTB_TOSS_ENV__ = null;
     window.__LTB_TOSS_OPEN_URL__ = null;
+    window.__LTB_TOSS_AUTH__ = null;
+    window.__LTB_TOSS_ADS__ = null;
+    window.__LTB_TOSS_AD_GROUP_ID__ = null;
   }
-  window.__LTB_IS_TOSS__ = window.__LTB_TOSS_ENV__ === 'toss';
+  window.__LTB_IS_TOSS__ = window.__LTB_TOSS_ENV__ === 'toss' || window.__LTB_TOSS_ENV__ === 'sandbox';
+  if (window.__LTB_IS_TOSS__) document.documentElement.dataset.miniapp = 'toss';
+  window.dispatchEvent(new CustomEvent('lottobank:toss-ready'));
+  return window.__LTB_IS_TOSS__;
 })();
 </script>
 <script>
-// 토스 미니앱 안에서 외부 링크(target="_blank")를 앱 밖 브라우저로 열어줌 (리뷰 거절 사유#1: 외부 링크 미작동 대응)
+// 토스 미니앱에서 꼭 필요한 외부 문서만 시스템 브라우저로 엽니다.
 document.addEventListener('click', function(e){
   if (!window.__LTB_IS_TOSS__) return;
   const a = e.target && e.target.closest ? e.target.closest('a[target="_blank"]') : null;
@@ -34,7 +40,6 @@ document.addEventListener('click', function(e){
     if (window.__LTB_TOSS_OPEN_URL__) window.__LTB_TOSS_OPEN_URL__(a.href).catch(function(){});
   }
 }, true);
-// 토스 미니앱 안에서는 자체 로그인(이메일/비밀번호) 대신 웹사이트로 유도할 때 사용 (리뷰 거절 사유#2 대응)
 function ltbOpenExternal(url) {
   if (window.__LTB_IS_TOSS__ && window.__LTB_TOSS_OPEN_URL__) {
     window.__LTB_TOSS_OPEN_URL__(url).catch(function(){ window.open(url, '_blank'); });
@@ -50,7 +55,17 @@ function ltbOpenExternal(url) {
 <meta name="naver-site-verification" content="92dda36e59dce8e415d0e13470dbed519be59399" />
 <meta name="google-site-verification" content="8mr1QbXEcEhSRqZSfA3MxdXAjWUcsRX8_U_EBgWf7n4" />
 <meta name="google-adsense-account" content="ca-pub-3323488098461026">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3323488098461026" crossorigin="anonymous"></script>
+<script>
+// 일반 웹에서는 AdSense를, 토스 미니앱에서는 TossAds만 사용합니다.
+window.__LTB_TOSS_READY__.then(function(isToss) {
+  if (isToss) return;
+  const script = document.createElement('script');
+  script.async = true;
+  script.crossOrigin = 'anonymous';
+  script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3323488098461026';
+  document.head.appendChild(script);
+});
+</script>
 <link rel="canonical" href="https://lottobank.pages.dev/">
 
 <!-- ── Open Graph (Google·Naver 공통) ── -->
@@ -635,6 +650,9 @@ main.chat-hidden .chat-panel { display: none; }
 .auth-terms-text { min-width:0; flex:1; overflow-wrap:break-word; }
 .auth-submit { width:100%; padding:13px; background:var(--lotto-red); color:#fff; font-size:15px; font-weight:700; border:none; border-radius:7px; cursor:pointer; margin-top:6px; font-family:inherit; }
 .auth-submit:disabled { opacity:0.55; cursor:not-allowed; }
+.toss-ad-shell { display:none; width:100%; min-height:92px; margin-top:12px; overflow:hidden; }
+html[data-miniapp="toss"] .toss-hidden { display:none !important; }
+html[data-miniapp="toss"] .toss-ad-shell.is-ready { display:block; }
 .auth-divider { text-align:center; font-size:13px; color:var(--text-muted); margin:14px 0 4px; }
 .auth-switch { background:none; border:none; color:var(--lotto-purple); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
 .auth-err { color:#dc2626; font-size:12px; font-weight:700; min-height:18px; margin-top:10px; }
@@ -2270,7 +2288,7 @@ textarea {
               <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
               <div style="text-align:center;"><div id="cd-s" style="font-size:16px;font-weight:900;color:var(--lotto-red);line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">초</div></div>
             </div>
-            <a href="https://www.dhlottery.co.kr/lt645/intro" target="_blank" rel="noopener" style="display:block;margin-top:8px;text-align:center;background:var(--lotto-red);color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:5px 0;text-decoration:none;">로또 구매하기</a>
+            <a class="toss-hidden" href="https://www.dhlottery.co.kr/lt645/intro" target="_blank" rel="noopener" style="display:block;margin-top:8px;text-align:center;background:var(--lotto-red);color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:5px 0;text-decoration:none;">로또 구매하기</a>
           </div>
           <!-- 연금복권 -->
           <div>
@@ -2287,7 +2305,7 @@ textarea {
               <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:3px;">:</div>
               <div style="text-align:center;"><div id="pen-cd-s" style="font-size:16px;font-weight:900;color:#16a34a;line-height:1;">-</div><div style="font-size:8px;color:var(--text-muted);margin-top:1px;">초</div></div>
             </div>
-            <a href="https://www.dhlottery.co.kr/pt720/intro" target="_blank" rel="noopener" style="display:block;margin-top:8px;text-align:center;background:#16a34a;color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:5px 0;text-decoration:none;">연금 구매하기</a>
+            <a class="toss-hidden" href="https://www.dhlottery.co.kr/pt720/intro" target="_blank" rel="noopener" style="display:block;margin-top:8px;text-align:center;background:#16a34a;color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:5px 0;text-decoration:none;">연금 구매하기</a>
           </div>
         </div>
       </div>
@@ -2342,7 +2360,7 @@ textarea {
             </div>
           </div>
           <button onclick="showAuthModal()" style="background:var(--lotto-red);color:#fff;border:none;border-radius:8px;padding:10px 0;font-size:12px;font-weight:900;cursor:pointer;width:100%;letter-spacing:.3px;">무료로 시작하기</button>
-          <a href="https://play.google.com/store/apps/details?id=com.lottobank.app" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;background:var(--bg-light);color:var(--text-dark);border:1px solid var(--border-dashed);border-radius:8px;padding:9px 0;font-size:12px;font-weight:800;text-decoration:none;width:100%;">
+          <a class="toss-hidden" href="https://play.google.com/store/apps/details?id=com.lottobank.app" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;background:var(--bg-light);color:var(--text-dark);border:1px solid var(--border-dashed);border-radius:8px;padding:9px 0;font-size:12px;font-weight:800;text-decoration:none;width:100%;">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M2 17v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4"/></svg>
             앱 다운로드
           </a>
@@ -2431,6 +2449,7 @@ textarea {
       <!-- 1. 종합 데스크 -->
       <div id="pg-home" class="page-content">
         <div id="home-live"></div>
+        <div id="toss-ad-shell" class="toss-ad-shell" aria-label="광고"></div>
       </div>
 
       <!-- 2. 회차별 조회 -->
@@ -2799,11 +2818,81 @@ function getLatestPensionRound() {
 // 단일 회차 조회 — Cloudflare Pages Function 프록시 사용
 const apiCache = {};
 const pensionApiCache = {};
+const apiRequests = {};
+const pensionApiRequests = {};
 const LAB_BACKTEST_BATCH = 20;
 const LOTTO_HISTORY_CACHE_KEY = 'lottobank_lotto_history_cache_v1';
 const PENSION_HISTORY_CACHE_KEY = 'lottobank_pension_history_cache_v1';
 let lottoHistoryDiskCache = null;
 let pensionHistoryDiskCache = null;
+let staticHistoryPromise = null;
+
+function normalizeLottoData(data) {
+  if (!data) return null;
+  const nums = Array.isArray(data.numbers)
+    ? data.numbers.map(Number)
+    : [data.drwtNo1, data.drwtNo2, data.drwtNo3, data.drwtNo4, data.drwtNo5, data.drwtNo6].map(Number);
+  if (!Number(data.drwNo) || nums.some(n => !n)) return null;
+  return {
+    round: Number(data.drwNo),
+    date: data.drwNoDate || '',
+    nums,
+    bonus: Number(data.bonusNo || data.bnusNo || 0),
+    prize_1st: Number(data.firstWinamnt || 0),
+    win_count_1st: Number(data.firstPrzwnerCo || 0),
+    prize_2nd: Number(data.rnk2WnAmt || 0),
+    win_count_2nd: Number(data.rnk2WnNope || 0),
+    win_count_3rd: Number(data.rnk3WnNope || 0),
+    win_count_4th: Number(data.rnk4WnNope || 0),
+    win_count_5th: Number(data.rnk5WnNope || 0),
+    auto_1st: Number(data.rnk1AutoNope || 0),
+    manual_1st: Number(data.rnk1ManualNope || 0),
+    auto_2nd: Number(data.rnk2AutoNope || 0),
+    manual_2nd: Number(data.rnk2ManualNope || 0),
+    prize_3rd: Number(data.rnk3WnAmt || 1500000),
+    prize_4th: Number(data.rnk4WnAmt || 50000),
+    prize_5th: Number(data.rnk5WnAmt || 5000),
+    regions: Array.isArray(data.regions) ? data.regions : [],
+    totalSales: Number(data.totSellamnt || 0),
+  };
+}
+
+function normalizePensionData(data) {
+  if (!data || !Number(data.drwNo)) return null;
+  return {
+    returnValue: 'success',
+    drwNo: Number(data.drwNo),
+    drwNoDate: data.drwNoDate || '',
+    wnBndNo: String(data.wnBndNo || data.group || ''),
+    wnRnkVl: String(data.wnRnkVl || data.number || '').padStart(6, '0'),
+    bnsRnkVl: String(data.bnsRnkVl || data.bonusNumber || '').padStart(6, '0'),
+    prizes: Array.isArray(data.prizes) ? data.prizes : [],
+  };
+}
+
+function preloadStaticLotteryData() {
+  if (staticHistoryPromise) return staticHistoryPromise;
+  staticHistoryPromise = Promise.all([
+    fetch('/lotto-history.json', { cache:'force-cache' }).then(r => r.ok ? r.json() : []),
+    fetch('/pension-history.json', { cache:'force-cache' }).then(r => r.ok ? r.json() : []),
+    fetch('/lotto-cache.json', { cache:'no-cache' }).then(r => r.ok ? r.json() : null),
+    fetch('/pension-cache.json', { cache:'no-cache' }).then(r => r.ok ? r.json() : null),
+  ]).then(([lottoRows, pensionRows, lottoLatest, pensionLatest]) => {
+    (Array.isArray(lottoRows) ? lottoRows : []).forEach(row => {
+      const item = normalizeLottoData(row);
+      if (item) apiCache[item.round] = item;
+    });
+    (Array.isArray(pensionRows) ? pensionRows : []).forEach(row => {
+      const item = normalizePensionData(row);
+      if (item) pensionApiCache[item.drwNo] = item;
+    });
+    const lottoItem = normalizeLottoData(lottoLatest);
+    const pensionItem = normalizePensionData(pensionLatest);
+    if (lottoItem) apiCache[lottoItem.round] = lottoItem;
+    if (pensionItem) pensionApiCache[pensionItem.drwNo] = pensionItem;
+  }).catch(() => {});
+  return staticHistoryPromise;
+}
 
 function getLottoHistoryDiskCache() {
   if (lottoHistoryDiskCache) return lottoHistoryDiskCache;
@@ -2847,66 +2936,60 @@ function setPensionHistoryDiskCache(round, data) {
 
 async function fetchPensionRound(round) {
   if (pensionApiCache[round]) return pensionApiCache[round];
+  if (pensionApiRequests[round]) return pensionApiRequests[round];
   const stored = getPensionHistoryDiskCache()[round];
   if (stored?.returnValue === 'success' || stored?.drwNo) {
     pensionApiCache[round] = stored;
     return stored;
   }
-  try {
-    const res = await fetch(apiPath(`/api/pension?round=${round}`), { cache:'no-store' });
-    const data = await res.json();
-    if (!res.ok || data?.returnValue !== 'success') return null;
-    pensionApiCache[round] = data;
-    setPensionHistoryDiskCache(round, data);
-    return data;
-  } catch (_) {
-    return null;
-  }
+  pensionApiRequests[round] = (async () => {
+    try {
+      const res = await fetch(apiPath(`/api/pension?round=${round}`));
+      const data = await res.json();
+      if (!res.ok || data?.returnValue !== 'success') return null;
+      const result = normalizePensionData(data);
+      if (!result) return null;
+      pensionApiCache[round] = result;
+      setPensionHistoryDiskCache(round, result);
+      return result;
+    } catch (_) {
+      return null;
+    } finally {
+      delete pensionApiRequests[round];
+    }
+  })();
+  return pensionApiRequests[round];
 }
 
 async function fetchLotto(round) {
   if (apiCache[round]) return apiCache[round];
+  if (apiRequests[round]) return apiRequests[round];
   const stored = getLottoHistoryDiskCache()[round];
   if (stored?.round && Array.isArray(stored.nums)) {
     apiCache[round] = stored;
     return stored;
   }
-  try {
+  apiRequests[round] = (async () => {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 12000);
-    const res = await fetch(apiPath(`/api/lotto?round=${round}`), { signal: controller.signal });
-    clearTimeout(timer);
-    const data = await res.json();
-    if (data.returnValue !== 'success') return null;
-    const result = {
-      round: data.drwNo,
-      date: data.drwNoDate,
-      nums: [data.drwtNo1, data.drwtNo2, data.drwtNo3, data.drwtNo4, data.drwtNo5, data.drwtNo6],
-      bonus: data.bnusNo,
-      prize_1st: data.firstWinamnt,
-      win_count_1st: data.firstPrzwnerCo,
-      prize_2nd: data.rnk2WnAmt || 0,
-      win_count_2nd: data.rnk2WnNope || 0,
-      win_count_3rd: data.rnk3WnNope || 0,
-      win_count_4th: data.rnk4WnNope || 0,
-      win_count_5th: data.rnk5WnNope || 0,
-      auto_1st: data.rnk1AutoNope || 0,
-      manual_1st: data.rnk1ManualNope || 0,
-      auto_2nd: data.rnk2AutoNope || 0,
-      manual_2nd: data.rnk2ManualNope || 0,
-      prize_3rd: data.rnk3WnAmt || 1500000,
-      prize_4th: data.rnk4WnAmt || 50000,
-      prize_5th: data.rnk5WnAmt || 5000,
-      regions: data.regions || [],
-      totalSales: data.totSellamnt || 0,
-    };
-    apiCache[round] = result;
-    setLottoHistoryDiskCache(round, result);
-    return result;
-  } catch (e) {
-    console.warn('API 오류:', round, e);
-    return null;
-  }
+    try {
+      const res = await fetch(apiPath(`/api/lotto?round=${round}`), { signal: controller.signal });
+      const data = await res.json();
+      if (!res.ok || data.returnValue !== 'success') return null;
+      const result = normalizeLottoData(data);
+      if (!result) return null;
+      apiCache[round] = result;
+      setLottoHistoryDiskCache(round, result);
+      return result;
+    } catch (e) {
+      console.warn('API 오류:', round, e);
+      return null;
+    } finally {
+      clearTimeout(timer);
+      delete apiRequests[round];
+    }
+  })();
+  return apiRequests[round];
 }
 
 // =====================================================
@@ -3989,7 +4072,7 @@ function renderLatestOnLeft(data) {
   }).join('');
   // 홈 패널 수동/자동도 판매소 데이터로 업데이트
   const hr = data.round;
-  fetch(apiPath(`/api/lotto-region?round=${hr}`), {cache:'no-cache'})
+  fetch(apiPath(`/api/lotto-region?round=${hr}`))
     .then(r=>r.json())
     .then(j=>{
       [[j.stores1||[], 1],[j.stores2||[], 2]].forEach(([stores, rank])=>{
@@ -4388,7 +4471,7 @@ function renderPensionResult(d, container, round) {
     _sd.style.cssText = 'margin-top:10px;text-align:left;';
     _sd.innerHTML = '<div style="font-size:11px;color:#94a3b8;padding:4px 0;">판매소 조회 중...</div>';
     container.appendChild(_sd);
-    fetch(apiPath('/api/lotto-region?round='+round+'&type=pension&_='+Date.now()),{cache:'no-store'})
+    fetch(apiPath('/api/lotto-region?round='+round+'&type=pension'))
       .then(r=>r.json()).then(j=>{
         const s1=j.stores1||[],s2=j.stores2||[];
         if(!s1.length&&!s2.length){
@@ -4629,7 +4712,7 @@ $('res-balls').innerHTML = d.nums.map(n => bH(n)).join('') +
     <div id="store-section" style="margin-top:10px;"><div style="font-size:11px;color:#94a3b8;padding:4px 0;"> 판매소 데이터 로딩 중...</div></div>
   `;
   // 1등/2등 판매소 비동기 로드
-  fetch(apiPath(`/api/lotto-region?round=${round}`), {cache: 'no-cache'})
+  fetch(apiPath(`/api/lotto-region?round=${round}`))
     .then(r => r.json())
     .then(j => {
       const s1 = j.stores1 || [];
@@ -5044,7 +5127,7 @@ async function searchStorePicker() {
   window._storeSearchRequest = requestId;
   $('store-picker-list').innerHTML = '<div style="padding:20px 10px;text-align:center;color:var(--text-muted);font-size:12px;">검색 중...</div>';
   try {
-    const res = await fetch(apiPath(`/api/store-search?q=${encodeURIComponent(query)}&_=${Date.now()}`), { cache:'no-store' });
+    const res = await fetch(apiPath(`/api/store-search?q=${encodeURIComponent(query)}`));
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (requestId !== window._storeSearchRequest) return;
@@ -5457,13 +5540,89 @@ function updateBadgeUI() {
 // 인증 (Supabase Auth)
 // =====================================================
 let authMode = 'login';
+let tossLoginPending = false;
+let tossBannerHandle = null;
+
+async function doTossAuth() {
+  if (tossLoginPending) return;
+  tossLoginPending = true;
+  const btn = $('btn-auth');
+  const originalText = btn?.textContent || '토스로 로그인';
+  if (btn) { btn.disabled = true; btn.textContent = '연결 중...'; }
+  try {
+    await window.__LTB_TOSS_READY__;
+    if (!window.__LTB_TOSS_AUTH__?.login) throw new Error('TOSS_LOGIN_UNAVAILABLE');
+    const loginResult = await window.__LTB_TOSS_AUTH__.login();
+    const response = await fetch(apiPath('/api/toss-login'), {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify(loginResult),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.tokenHash) {
+      throw new Error(result.code || 'TOSS_SESSION_FAILED');
+    }
+    const { error } = await sb.auth.verifyOtp({
+      token_hash: result.tokenHash,
+      type: result.verificationType || 'magiclink',
+    });
+    if (error) throw error;
+    toast('토스 로그인이 완료되었습니다.');
+  } catch (error) {
+    console.error('Toss login error:', error);
+    const message = String(error?.message || error);
+    if (/cancel|취소/i.test(message)) toast('로그인을 취소했습니다.');
+    else if (message.includes('TOSS_SERVER_NOT_CONFIGURED')) toast('토스 로그인 서버 설정을 확인해주세요.');
+    else toast('토스 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.');
+  } finally {
+    tossLoginPending = false;
+    if (btn) { btn.disabled = false; btn.textContent = window.__LTB_IS_TOSS__ ? '토스로 로그인' : originalText; }
+  }
+}
+
+async function initializeTossExperience() {
+  const isToss = await window.__LTB_TOSS_READY__;
+  if (!isToss) return;
+  const btn = $('btn-auth');
+  if (btn && !isLoggedIn) btn.textContent = '토스로 로그인';
+
+  const ads = window.__LTB_TOSS_ADS__;
+  const shell = $('toss-ad-shell');
+  const adGroupId = window.__LTB_TOSS_AD_GROUP_ID__ ||
+    (window.__LTB_TOSS_ENV__ === 'sandbox' ? 'ait-ad-test-banner-id' : '');
+  if (!ads || !shell || !adGroupId || !ads.initialize.isSupported() || !ads.attachBanner.isSupported()) return;
+
+  ads.initialize({
+    callbacks: {
+      onInitialized: () => {
+        tossBannerHandle = ads.attachBanner(adGroupId, shell, {
+          theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light',
+          tone: 'grey',
+          variant: 'expanded',
+          callbacks: {
+            onAdRendered: () => shell.classList.add('is-ready'),
+            onNoFill: () => shell.classList.remove('is-ready'),
+            onAdFailedToRender: payload => {
+              shell.classList.remove('is-ready');
+              console.warn('Toss ad render failed:', payload?.error?.message || 'unknown');
+            },
+          },
+        });
+      },
+      onInitializationFailed: error => console.warn('Toss ad initialization failed:', error),
+    },
+  });
+}
+
+window.addEventListener('pagehide', () => {
+  if (tossBannerHandle) tossBannerHandle.destroy();
+  tossBannerHandle = null;
+});
 
 function showAuthModal() {
-  // 토스 미니앱 안에서는 토스 로그인 외 별도 로그인 기능을 제공할 수 없어
-  // 자체(이메일/비밀번호) 로그인 모달을 열지 않고 웹사이트로 안내합니다.
   if (window.__LTB_IS_TOSS__) {
-    toast('로그인은 웹사이트(lottobank.pages.dev)에서 이용해주세요');
-    ltbOpenExternal('https://lottobank.pages.dev');
+    if (isLoggedIn) sb.auth.signOut();
+    else doTossAuth();
     return;
   }
   if (isLoggedIn) {
@@ -5574,7 +5733,7 @@ function openTermsModal(type) {
   if (!modal) return;
   if (type === 'privacy') {
     title.textContent = '개인정보처리방침';
-    body.innerHTML = `LottoBank 개인정보처리방침\n\n1. 수집 항목: 이메일 주소, 닉네임, QR 코드 URL, 구매 이력 데이터\n\n2. 수집 목적: 회원 인증, 전적 관리, 뱃지/랭킹 서비스 제공\n\n3. 보유 기간: 회원 탈퇴 시까지 (관련 법령에 따라 일정 기간 보관)\n\n4. 제3자 제공: 개인정보를 제3자에게 제공하지 않습니다.\n\n5. 보안: Supabase를 통한 암호화 저장, HTTPS 전송 암호화 적용\n\n6. 권리: 언제든지 계정 삭제를 통해 개인정보 삭제를 요청할 수 있습니다.\n\n문의: LottoBank 서비스 팀`.split('\n').map(l => l ? `<p style="margin:0 0 8px;">${l}</p>` : '<br>').join('');
+    body.innerHTML = `LottoBank 개인정보처리방침\n\n1. 수집 항목: 이메일 주소, 닉네임, 토스 로그인 식별값, QR 코드 URL, 구매 이력 데이터\n\n2. 수집 목적: 회원 인증, 전적 관리, 뱃지/랭킹 서비스 제공\n\n3. 보유 기간: 회원 탈퇴 시까지 (관련 법령에 따라 일정 기간 보관)\n\n4. 처리 위탁: Supabase, Cloudflare, Google AdSense, 비바리퍼블리카의 로그인 및 광고 기능을 이용할 수 있습니다.\n\n5. 국외 이전: 인증과 데이터 저장을 위해 Supabase 및 Cloudflare의 국외 서버에서 정보가 처리될 수 있습니다.\n\n6. 보안: 토스 사용자 식별자는 복원할 수 없도록 변환해 저장하며 HTTPS 전송 암호화를 적용합니다.\n\n7. 권리: 언제든지 계정 삭제를 통해 개인정보 삭제를 요청할 수 있습니다.\n\n문의: LottoBank 서비스 팀`.split('\n').map(l => l ? `<p style="margin:0 0 8px;">${l}</p>` : '<br>').join('');
   } else {
     title.textContent = '이용약관';
     body.innerHTML = `제1조 (목적) 본 약관은 LottoBank(이하 "서비스")를 이용함에 있어 회원과 운영자 간의 권리, 의무 및 책임 사항을 규정합니다.\n\n제2조 (서비스 내용) LottoBank는 QR 기반 로또 구매 이력 인증 및 전적 관리 서비스를 제공합니다. 당첨금 수령 및 복권 구매 대행은 제공하지 않습니다.\n\n제3조 (면책) 본 서비스는 동행복권의 공식 서비스가 아닙니다. 당첨 여부는 동행복권 공식 채널을 통해 반드시 확인하시기 바랍니다.\n\n제4조 (개인정보) 수집하는 정보: 이메일, 닉네임, QR 인증 데이터. 수집 목적: 서비스 제공 및 전적 관리. 보유 기간: 회원 탈퇴 시까지.\n\n제5조 (금지 행위) 타인의 QR 코드를 무단 등록하는 행위, 서비스를 상업적으로 무단 이용하는 행위를 금지합니다.\n\n제6조 (서비스 변경) 운영자는 서비스 내용을 변경하거나 중단할 수 있으며, 이 경우 사전 공지합니다.\n\n문의: LottoBank 서비스 팀`.split('\n').map(l => l ? `<p style="margin:0 0 8px;">${l}</p>` : '<br>').join('');
@@ -10026,6 +10185,7 @@ async function init() {
   go('home');
   startDashboardCountdown();
   initAuth();
+  initializeTossExperience();
   subscribeFeed();
   renderFeed();
   loadStorage();
@@ -10036,6 +10196,7 @@ async function init() {
   loadRecentChats();
   subscribeChat();
 
+  await preloadStaticLotteryData();
   latestRound = getLatestRound();
   // api-indicator removed
 
@@ -11395,8 +11556,8 @@ async function fetchNearbyStoreApi(lat, lng) {
   const fallback = [];
   for (const keyword of keywords) {
     try {
-      const url = apiPath(`/api/store-search?q=${encodeURIComponent(keyword)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=1000&_=${Date.now()}`);
-      const res = await fetch(url, { cache:'no-store' });
+      const url = apiPath(`/api/store-search?q=${encodeURIComponent(keyword)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=1000`);
+      const res = await fetch(url);
       if (!res.ok) continue;
       const json = await res.json();
       const rows = (json.stores || [])

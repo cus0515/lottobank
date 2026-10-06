@@ -53,3 +53,21 @@ AdSense 승인 전에는 광고 코드를 넣지 않습니다. 승인 후 발급
 - https://support.google.com/adsense/answer/7584263
 - https://support.google.com/adsense/answer/9261307
 - https://support.google.com/adsense/answer/1346295
+
+## 앱인토스 운영 설정
+
+웹사이트는 기존 이메일 로그인을 유지하고 앱인토스 안에서는 토스 로그인만 제공합니다. 앱인토스 번들은 현재 웹사이트 소스를 Vite로 빌드한 `dist`를 그대로 사용합니다.
+
+1. `toss_auth_setup.sql`을 Supabase SQL Editor에서 한 번 실행합니다.
+2. 앱인토스 콘솔에서 로그인 연동용 mTLS 인증서를 발급합니다.
+3. Cloudflare Pages 프로젝트에 인증서를 `TOSS_MTLS` mTLS 바인딩으로 연결합니다.
+4. Cloudflare Pages 암호화 변수에 `SUPABASE_SECRET_KEY`와 충분히 긴 임의 문자열 `TOSS_IDENTITY_SECRET`을 등록합니다.
+5. 앱인토스 광고 콘솔에서 발급한 배너 광고 그룹 ID를 로컬 빌드 환경의 `VITE_TOSS_AD_GROUP_ID`에 넣습니다.
+6. `pnpm build`로 현재 웹 소스 기반 `lottobank.ait`를 만들고 콘솔 QR 테스트를 완료한 뒤 배포합니다.
+
+SDK 3.x의 API 허용 Origin은 아래 두 주소를 포함해야 합니다.
+
+- `https://lottobank.web.tossmini.com`
+- `https://lottobank.private-web.tossmini.com`
+
+웹에서는 AdSense를 사용하고 앱인토스에서는 TossAds만 사용합니다. 광고 그룹 ID가 없거나 광고 재고가 없으면 광고 영역은 화면에 나타나지 않습니다.

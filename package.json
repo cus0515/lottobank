@@ -6,11 +6,13 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "web:build": "vite build",
-    "build": "ait build"
+    "build": "vite build && ait build"
   },
   "dependencies": {
-    "@apps-in-toss/web-framework": "^2.10.7",
+    "@apps-in-toss/web-framework": "3.7.0",
     "vite": "^7.0.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@apps-in-toss/devtools": "^3.7.0"
+  }
 }
