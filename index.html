@@ -8988,7 +8988,8 @@ function renderFortune() {
     allPicks[nextRound] = { games, date: today };
     localStorage.setItem(PKEY, JSON.stringify(allPicks));
   }
-  syncRadarRecommendation('lotto', nextRound, allPicks[nextRound].games);
+  const recommendationGames = allPicks[nextRound].games;
+  syncRadarRecommendation('lotto', nextRound, recommendationGames);
 
   // ── 기본 통계 ────────────────────────────────────────────
   const sorted = [...nums].sort((a,b)=>a-b);
@@ -9121,9 +9122,8 @@ function renderFortune() {
         <div style="position:absolute;top:0;right:0;background:var(--lotto-red,#e11d48);font-size:9px;font-weight:800;color:#fff;padding:3px 10px;border-radius:0 0 0 8px;letter-spacing:.5px;">자동 저장</div>
         <div style="margin-bottom:12px;">
           <h3 style="margin:0;font-size:15px;font-weight:900;color:var(--text-dark);">⭐ 로또 6/45 제 ${nextRound}회 추천 번호</h3>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">등장 간격(60~70%) + 출현 빈도(30~40%) 가중치 · 저·중·고 구간 균형 · 5가지 조합 제시</div>
         </div>
-        ${games.map((g,i)=>`
+        ${recommendationGames.map((g,i)=>`
           <div class="radar-game-row radar-pick-row" style="animation-delay:${i*65}ms;padding:6px 0;${i<4?'border-bottom:1px dashed var(--border-dashed);':''}">
             <span style="font-size:10px;font-weight:900;color:var(--text-muted);min-width:44px;flex-shrink:0;">게임 ${i+1}</span>
             <div class="radar-pick-nums">${g.map((n,j)=>gBall(n,150+i*65+j*35)).join('')}</div>
