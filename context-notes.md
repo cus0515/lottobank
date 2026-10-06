@@ -863,3 +863,4 @@ Play Console 키 관리 화면에서 앱 서명 키와 업로드 키가 분리�
 - 앱인토스 콘솔의 토스 로그인 등록은 사업자 정산 정보 검토 중이라 현재 비활성화 상태다. 검토 완료 후 로그인 등록과 최종 QR 실기기 검증이 필요하다.
 - 운영 Supabase에는 `toss_auth_identities`가 아직 없고 Supabase 대시보드 세션도 만료돼 SQL 적용 전 로그인이 필요하다.
 - Cloudflare 대시보드 세션도 만료돼 `TOSS_MTLS`, `SUPABASE_SECRET_KEY`, `TOSS_IDENTITY_SECRET` 운영 바인딩은 로그인 후 적용해야 한다.
+- Cloudflare Pages 자체 Git 연동으로 `main` 변경은 이미 운영 배포된다. 별도 GitHub Actions 배포는 `CLOUDFLARE_API_TOKEN`이 없어 계속 실패하므로 자동 푸시 트리거를 제거하고 수동 비상 배포로만 유지한다.

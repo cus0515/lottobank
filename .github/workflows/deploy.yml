@@ -1,8 +1,8 @@
 name: Deploy to Cloudflare Pages
 
+# Cloudflare Pages의 Git 연동이 main 푸시를 자동 배포합니다.
+# 이 워크플로는 API 토큰이 준비된 경우에만 쓰는 수동 비상 배포 경로입니다.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -16,10 +16,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install Wrangler
-        run: npm install -g wrangler@3
+        run: npm install -g wrangler@4
 
       - name: Deploy to Cloudflare Pages
         run: wrangler pages deploy . --project-name=lottobank --branch=main
