@@ -867,3 +867,4 @@ Play Console 키 관리 화면에서 앱 서명 키와 업로드 키가 분리�
 - 토스 mTLS 인증서 `lottobankprod`를 발급해 Cloudflare에 업로드했다. 인증서 ID는 Wrangler 구성의 `TOSS_MTLS` 바인딩으로 관리한다.
 - 토스 배너 광고 그룹 `로또뱅크 홈 배너`를 생성했다. Google 광고 시스템 반영 중이지만 콘솔 그룹 식별자를 앱의 운영 광고 ID로 연결했다.
 - 토스 로그인 등록은 정산 정보 검토가 끝날 때까지 비활성화 상태이므로, 검토 완료 뒤 콘솔 등록과 QR 실기기 로그인 검증이 남는다.
+- Pages의 `production` 환경은 최상위 mTLS 설정을 상속하지 않으므로 인증서 바인딩을 `env.production.mtls_certificates`에 명시했다. 운영 로그인 API가 설정 누락 `503` 대신 입력 검증 `400`을 반환하는 것으로 적용을 확인했다.
