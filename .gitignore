@@ -10,5 +10,6 @@ android-twa/
 node_modules/
 dist/
 .granite/
+.wrangler/
 .pnpm-store/
 __pycache__/

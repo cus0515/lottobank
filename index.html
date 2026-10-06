@@ -16,7 +16,7 @@ window.__LTB_TOSS_READY__ = (async () => {
     window.__LTB_TOSS_OPEN_URL__ = mod.openURL || null;
     window.__LTB_TOSS_AUTH__ = mod.TossAuth || null;
     window.__LTB_TOSS_ADS__ = mod.TossAds || null;
-    window.__LTB_TOSS_AD_GROUP_ID__ = import.meta.env?.VITE_TOSS_AD_GROUP_ID || null;
+    window.__LTB_TOSS_AD_GROUP_ID__ = import.meta.env?.VITE_TOSS_AD_GROUP_ID || 'ait.v2.live.f5f94084a2d3437a';
   } catch (_) {
     window.__LTB_TOSS_ENV__ = null;
     window.__LTB_TOSS_OPEN_URL__ = null;

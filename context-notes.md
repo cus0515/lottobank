@@ -861,6 +861,9 @@ Play Console 키 관리 화면에서 앱 서명 키와 업로드 키가 분리�
 - 앱인토스 SDK는 2.10.7에서 3.7.0으로 올렸고 공식 마이그레이션으로 `apps-in-toss.config.ts`가 현재 웹 빌드 결과물 `dist`를 직접 패키징하도록 변경했다.
 - 앱인토스의 실제 반려 사유는 외부 링크 미동작과 토스 외 자체 로그인 노출 두 건이다. 필요한 외부 링크는 SDK로 열고, 앱인토스 환경에서는 구매·앱 설치 유도 링크와 이메일 로그인 모달을 숨겼다.
 - 앱인토스 콘솔의 토스 로그인 등록은 사업자 정산 정보 검토 중이라 현재 비활성화 상태다. 검토 완료 후 로그인 등록과 최종 QR 실기기 검증이 필요하다.
-- 운영 Supabase에는 `toss_auth_identities`가 아직 없고 Supabase 대시보드 세션도 만료돼 SQL 적용 전 로그인이 필요하다.
-- Cloudflare 대시보드 세션도 만료돼 `TOSS_MTLS`, `SUPABASE_SECRET_KEY`, `TOSS_IDENTITY_SECRET` 운영 바인딩은 로그인 후 적용해야 한다.
-- Cloudflare Pages 자체 Git 연동으로 `main` 변경은 이미 운영 배포된다. 별도 GitHub Actions 배포는 `CLOUDFLARE_API_TOKEN`이 없어 계속 실패하므로 자동 푸시 트리거를 제거하고 수동 비상 배포로만 유지한다.
+- 운영 Supabase에 `toss_auth_identities` 테이블을 만들고 RLS를 활성화했으며 `anon`, `authenticated` 접근을 회수하고 `service_role`만 허용했다.
+- Cloudflare Pages 운영 환경에 `SUPABASE_SECRET_KEY`와 `TOSS_IDENTITY_SECRET`을 암호화 비밀 변수로 저장했다.
+- Cloudflare Pages 자체 Git 연동으로 `main` 변경은 운영에 자동 배포된다. 별도 GitHub Actions 배포는 수동 비상 배포로만 유지한다.
+- 토스 mTLS 인증서 `lottobankprod`를 발급해 Cloudflare에 업로드했다. 인증서 ID는 Wrangler 구성의 `TOSS_MTLS` 바인딩으로 관리한다.
+- 토스 배너 광고 그룹 `로또뱅크 홈 배너`를 생성했다. Google 광고 시스템 반영 중이지만 콘솔 그룹 식별자를 앱의 운영 광고 ID로 연결했다.
+- 토스 로그인 등록은 정산 정보 검토가 끝날 때까지 비활성화 상태이므로, 검토 완료 뒤 콘솔 등록과 QR 실기기 로그인 검증이 남는다.
