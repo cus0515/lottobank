@@ -10,7 +10,11 @@
 <script type="module">
 // 운영 웹과 같은 화면을 사용하는 앱인토스 기능을 초기화합니다.
 window.__LTB_TOSS_READY__ = (async () => {
+  const previewParams = new URLSearchParams(location.search);
+  const isDevPreview = import.meta.env.DEV && previewParams.has('toss-intro-preview');
+  const isDevWebPreview = import.meta.env.DEV && previewParams.has('web-preview');
   try {
+    if (isDevPreview) throw new Error('DEV_TOSS_INTRO_PREVIEW');
     const mod = await import('@apps-in-toss/web-framework');
     window.__LTB_TOSS_ENV__ = mod.Environment?.environment || null;
     window.__LTB_TOSS_OPEN_URL__ = mod.openURL || null;
@@ -24,8 +28,11 @@ window.__LTB_TOSS_READY__ = (async () => {
     window.__LTB_TOSS_ADS__ = null;
     window.__LTB_TOSS_AD_GROUP_ID__ = null;
   }
-  window.__LTB_IS_TOSS__ = window.__LTB_TOSS_ENV__ === 'toss' || window.__LTB_TOSS_ENV__ === 'sandbox';
-  if (window.__LTB_IS_TOSS__) document.documentElement.dataset.miniapp = 'toss';
+  window.__LTB_IS_TOSS__ = !isDevWebPreview && (isDevPreview || window.__LTB_TOSS_ENV__ === 'toss' || window.__LTB_TOSS_ENV__ === 'sandbox');
+  if (window.__LTB_IS_TOSS__) {
+    document.documentElement.removeAttribute('data-theme');
+    document.documentElement.dataset.miniapp = 'toss';
+  }
   window.dispatchEvent(new CustomEvent('lottobank:toss-ready'));
   return window.__LTB_IS_TOSS__;
 })();
@@ -57,14 +64,15 @@ function ltbOpenExternal(url) {
 <meta name="google-adsense-account" content="ca-pub-3323488098461026">
 <script>
 // 일반 웹에서는 AdSense를, 토스 미니앱에서는 TossAds만 사용합니다.
-window.__LTB_TOSS_READY__.then(function(isToss) {
+window.addEventListener('lottobank:toss-ready', function() {
+  const isToss = window.__LTB_IS_TOSS__;
   if (isToss) return;
   const script = document.createElement('script');
   script.async = true;
   script.crossOrigin = 'anonymous';
   script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3323488098461026';
   document.head.appendChild(script);
-});
+}, { once: true });
 </script>
 <link rel="canonical" href="https://lottobank.pages.dev/">
 
@@ -639,9 +647,9 @@ main.chat-hidden .chat-panel { display: none; }
 .auth-box { background:var(--paper-white); border-radius:20px; padding:36px 32px 28px; width:400px; max-width:92vw; max-height:calc(100vh - 24px); overflow-y:auto; box-shadow:0 32px 64px rgba(0,0,0,.28),0 0 0 1px rgba(0,0,0,.06); position:relative; }
 .auth-box h2 { color:var(--lotto-red); font-size:22px; font-weight:900; margin-bottom:6px; }
 .auth-box p.auth-sub { font-size:13px; color:var(--text-muted); margin-bottom:22px; }
-.toss-intro-overlay { position:fixed; inset:0; z-index:10020; display:none; align-items:center; justify-content:center; padding:18px; background:var(--paper-bg); }
+.toss-intro-overlay { position:fixed; inset:0; z-index:2147483000; display:none; align-items:center; justify-content:center; width:100%; height:100dvh; padding:max(18px,env(safe-area-inset-top)) 22px max(18px,env(safe-area-inset-bottom)); overflow-y:auto; overscroll-behavior:contain; background:var(--paper-white,#fff); }
 .toss-intro-overlay.open { display:flex; }
-.toss-intro { width:100%; max-width:420px; color:var(--text-dark); }
+.toss-intro { position:relative; width:100%; max-width:420px; margin:auto; padding:12px 0; color:var(--text-dark); }
 .toss-intro-brand { display:flex; align-items:center; gap:8px; margin-bottom:24px; font-size:19px; font-weight:900; }
 .toss-intro-brand svg { color:var(--lotto-red); }
 .toss-intro h1 { margin:0 0 10px; font-size:27px; line-height:1.3; letter-spacing:0; }
@@ -655,11 +663,15 @@ main.chat-hidden .chat-panel { display: none; }
 .toss-intro-primary,.toss-intro-secondary { width:100%; min-height:48px; border-radius:8px; font:inherit; font-size:14px; font-weight:800; cursor:pointer; }
 .toss-intro-primary { border:0; background:var(--lotto-red); color:#fff; }
 .toss-intro-secondary { border:1px solid var(--border-dashed); background:var(--paper-white); color:var(--text-muted); }
+html[data-toss-intro="open"],html[data-toss-intro="open"] body { height:100%; overflow:hidden!important; }
 @media (max-width:480px) {
-  .toss-intro-overlay { align-items:flex-start; overflow-y:auto; padding:32px 22px 24px; }
-  .toss-intro { max-width:none; }
-  .toss-intro-brand { margin-bottom:30px; }
+  .toss-intro-overlay { align-items:flex-start; padding:max(24px,env(safe-area-inset-top)) 22px max(24px,env(safe-area-inset-bottom)); }
+  .toss-intro { max-width:none; margin:0 auto; padding:0; }
+  .toss-intro-brand { margin-bottom:24px; }
   .toss-intro h1 { font-size:25px; }
+  .toss-intro-lead { margin-bottom:22px; }
+  .toss-intro-features { margin-bottom:22px; }
+  .toss-intro-feature { padding:13px 0; }
 }
 .auth-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted); line-height:1; }
 .auth-field { margin-bottom:14px; }
@@ -675,6 +687,11 @@ main.chat-hidden .chat-panel { display: none; }
 .toss-ad-shell { display:none; width:100%; min-height:92px; margin-top:12px; overflow:hidden; }
 html[data-miniapp="toss"] .toss-hidden { display:none !important; }
 html[data-miniapp="toss"] .toss-ad-shell.is-ready { display:block; }
+html[data-miniapp="toss"] #dark-toggle-btn { display:none !important; }
+@media (max-width:768px) {
+  html[data-miniapp="toss"] #mob-btn-lab { display:none; }
+  html[data-miniapp="toss"] .mob-bottom-nav { left:12px; right:12px; bottom:max(12px,env(safe-area-inset-bottom)); border:1px solid var(--border-dashed); border-radius:18px; padding:7px 4px; overflow:hidden; box-shadow:0 8px 24px rgba(15,23,42,.16); }
+}
 .auth-divider { text-align:center; font-size:13px; color:var(--text-muted); margin:14px 0 4px; }
 .auth-switch { background:none; border:none; color:var(--lotto-purple); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
 .auth-err { color:#dc2626; font-size:12px; font-weight:700; min-height:18px; margin-top:10px; }
@@ -5685,10 +5702,12 @@ function showAuthModal() {
 
 function showTossIntro() {
   if (!window.__LTB_IS_TOSS__ || isLoggedIn) return;
+  document.documentElement.dataset.tossIntro = 'open';
   $('toss-intro')?.classList.add('open');
 }
 
 function closeTossIntro() {
+  delete document.documentElement.dataset.tossIntro;
   $('toss-intro')?.classList.remove('open');
 }
 
