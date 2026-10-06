@@ -3,8 +3,8 @@ name = "lottobank"
 pages_build_output_dir = ""
 compatibility_date = "2026-06-03"
 
-[[mtls_certificates]]
+[env.production]
+
+[[env.production.mtls_certificates]]
 binding = "TOSS_MTLS"
 certificate_id = "681d4330-677d-4c0b-8a22-1fb3b58f9ae0"
-
-[env.production]
