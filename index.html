@@ -2941,10 +2941,10 @@ function normalizePensionData(data) {
 function preloadStaticLotteryData() {
   if (staticHistoryPromise) return staticHistoryPromise;
   staticHistoryPromise = Promise.all([
-    fetch('/lotto-history.json', { cache:'force-cache' }).then(r => r.ok ? r.json() : []),
-    fetch('/pension-history.json', { cache:'force-cache' }).then(r => r.ok ? r.json() : []),
-    fetch('/lotto-cache.json', { cache:'no-cache' }).then(r => r.ok ? r.json() : null),
-    fetch('/pension-cache.json', { cache:'no-cache' }).then(r => r.ok ? r.json() : null),
+    fetch(apiPath('/lotto-history.json'), { cache:'no-cache' }).then(r => r.ok ? r.json() : []),
+    fetch(apiPath('/pension-history.json'), { cache:'no-cache' }).then(r => r.ok ? r.json() : []),
+    fetch(apiPath('/lotto-cache.json'), { cache:'no-store' }).then(r => r.ok ? r.json() : null),
+    fetch(apiPath('/pension-cache.json'), { cache:'no-store' }).then(r => r.ok ? r.json() : null),
   ]).then(([lottoRows, pensionRows, lottoLatest, pensionLatest]) => {
     (Array.isArray(lottoRows) ? lottoRows : []).forEach(row => {
       const item = normalizeLottoData(row);
@@ -2960,6 +2960,21 @@ function preloadStaticLotteryData() {
     if (pensionItem) pensionApiCache[pensionItem.drwNo] = pensionItem;
   }).catch(() => {});
   return staticHistoryPromise;
+}
+
+async function loadLatestPensionData() {
+  await preloadStaticLotteryData();
+  const cachedRounds = Object.keys(pensionApiCache).map(Number).filter(Number.isFinite).sort((a,b) => b-a);
+  if (cachedRounds.length) return pensionApiCache[cachedRounds[0]];
+  try {
+    const response = await fetch(apiPath('/pension-cache.json'), { cache:'no-store' });
+    if (!response.ok) return null;
+    const result = normalizePensionData(await response.json());
+    if (result) pensionApiCache[result.drwNo] = result;
+    return result;
+  } catch (_) {
+    return null;
+  }
 }
 
 function getLottoHistoryDiskCache() {
@@ -6948,8 +6963,9 @@ function go(id) {
   if (id === 'result')    { initRoundSelector(latestRound); switchResultTab(window._curResTab || 'lotto'); }
   if (id === 'ticket')    { chgMode(); switchQrView('register'); }
   if (id === 'fortune') {
-    renderFortune();
-    Promise.all([hydrateRadarRecommendations(), hydrateServerRadarPicks()]).then(() => {
+    const fortuneEl = $('fortune-content');
+    if (fortuneEl) fortuneEl.innerHTML = '<div style="text-align:center;padding:42px 20px;color:var(--text-muted);font-size:12px;font-weight:700;">레이더 데이터를 불러오고 있습니다.</div>';
+    prepareRadarData().finally(() => {
       if ($('pg-fortune')?.style.display !== 'none') renderFortune();
     });
   }
@@ -8629,6 +8645,15 @@ function qrInputPreview(val) {
 // 투자 가이드
 // =====================================================
 async function ensureRecentData() {
+  await preloadStaticLotteryData();
+  const cachedRounds = Object.keys(apiCache).map(Number).filter(Number.isFinite).sort((a,b) => b-a);
+  cachedRounds.slice(0, 50).forEach(round => {
+    if (!recentData[round]) recentData[round] = apiCache[round];
+  });
+  if (!latestData && cachedRounds.length) {
+    latestRound = cachedRounds[0];
+    latestData = apiCache[latestRound];
+  }
   const rounds = Object.keys(recentData).map(Number);
   if (rounds.length >= 20) return;
   if (window._ensureRecentDataPromise) return window._ensureRecentDataPromise;
@@ -8724,10 +8749,10 @@ async function hydrateServerRadarPicks() {
     (data || []).forEach(row => {
       const key = String(row.round_no);
       const date = row.created_at ? new Date(row.created_at).toLocaleDateString('ko-KR') : '';
-      if (row.lottery_type === 'lotto' && !lotto[key]) {
+      if (row.lottery_type === 'lotto' && Array.isArray(row.games) && row.games.length) {
         lotto[key] = { date, games: row.games };
       }
-      if (row.lottery_type === 'pension' && !pension[key]) {
+      if (row.lottery_type === 'pension' && Array.isArray(row.games) && row.games.length) {
         pension[key] = { date, games: row.games };
       }
     });
@@ -8735,6 +8760,25 @@ async function hydrateServerRadarPicks() {
     localStorage.setItem('ltb-pension-picks', JSON.stringify(pension));
     window._serverRadarHydrated = true;
   } catch (_) {}
+}
+
+async function prepareRadarData() {
+  if (window._radarPageLoadPromise) return window._radarPageLoadPromise;
+  window._radarPageLoadPromise = (async () => {
+    await preloadStaticLotteryData();
+    await Promise.all([hydrateRadarRecommendations(), hydrateServerRadarPicks()]);
+    await ensureRecentData();
+  })().finally(() => {
+    window._radarPageLoadPromise = null;
+  });
+  return window._radarPageLoadPromise;
+}
+
+function retryRadarData() {
+  window._radarDataRetryCount = 0;
+  prepareRadarData().finally(() => {
+    if ($('pg-fortune')?.style.display !== 'none') renderFortune();
+  });
 }
 
 function getRadarHitStatsHtml(type, data) {
@@ -8839,8 +8883,10 @@ function renderFortune() {
   const rounds = Object.keys(recentData).map(Number).sort((a,b)=>b-a);
 
   if (!d || rounds.length < 5) {
-    if (!window._radarDataRetrying) {
+    const retryCount = Number(window._radarDataRetryCount || 0);
+    if (!window._radarDataRetrying && retryCount < 1) {
       window._radarDataRetrying = true;
+      window._radarDataRetryCount = retryCount + 1;
       ensureRecentData().finally(() => {
         window._radarDataRetrying = false;
         if ($('pg-fortune')?.style.display !== 'none') renderFortune();
@@ -8855,11 +8901,13 @@ function renderFortune() {
           <animateTransform attributeName="transform" type="rotate" from="0 30 30" to="360 30 30" dur="3s" repeatCount="indefinite"/>
         </path>
       </svg>
-      <div style="font-size:14px;font-weight:800;margin-bottom:6px;">레이더 수신 중...</div>
-      <div style="font-size:11px;opacity:.6;">회차 데이터를 불러오고 있습니다</div>
+      <div style="font-size:14px;font-weight:800;margin-bottom:6px;">${retryCount < 1 ? '레이더 수신 중...' : '회차 데이터를 불러오지 못했습니다'}</div>
+      <div style="font-size:11px;opacity:.6;">${retryCount < 1 ? '회차 데이터를 불러오고 있습니다' : '네트워크 상태를 확인한 뒤 다시 시도해 주세요.'}</div>
+      ${retryCount < 1 ? '' : '<button type="button" onclick="retryRadarData()" style="margin-top:12px;padding:8px 16px;border:0;border-radius:8px;background:var(--lotto-red);color:#fff;font:800 11px inherit;cursor:pointer;">다시 불러오기</button>'}
     </div>`;
     return;
   }
+  window._radarDataRetryCount = 0;
 
   const nums = d.nums;
   const bonus = d.bonus;
@@ -9262,10 +9310,13 @@ function switchRadarType(type) {
   });
   if (type === 'pension') {
     const el = $('radar-sub-pension');
-    if (el && !el.innerHTML.trim()) {
-      el.innerHTML = '<div id="pension-sub-radar"></div>';
-      fetch('./pension-cache.json').then(r=>r.json()).then(data=>renderPensionRadar(data))
-        .catch(()=>renderPensionRadar(null));
+    if (el && (!el.innerHTML.trim() || el.dataset.radarState === 'error')) {
+      el.dataset.radarState = 'loading';
+      el.innerHTML = '<div id="pension-sub-radar"><div style="text-align:center;padding:32px;color:var(--text-muted);font-size:12px;font-weight:700;">연금 레이더 데이터를 불러오고 있습니다.</div></div>';
+      loadLatestPensionData().then(data => {
+        el.dataset.radarState = data ? 'ready' : 'error';
+        renderPensionRadar(data);
+      });
     }
     _seoMeta(
       '연금 720+ 추천 번호 레이더 | 로또뱅크',
@@ -10269,6 +10320,7 @@ document.addEventListener('keydown', function(e) {
 async function init() {
   go('home');
   startDashboardCountdown();
+  const lotteryDataReady = preloadStaticLotteryData();
   await initAuth();
   await initializeTossExperience();
   subscribeFeed();
@@ -10281,7 +10333,7 @@ async function init() {
   loadRecentChats();
   subscribeChat();
 
-  await preloadStaticLotteryData();
+  await lotteryDataReady;
   latestRound = getLatestRound();
   // api-indicator removed
 
@@ -10312,7 +10364,7 @@ async function init() {
     rList();
     const activePage = $('main-content')?.dataset.activePage;
     if (activePage === 'result') initRoundSelector(latestRound);
-    if (activePage === 'fortune') renderFortune();
+    if (activePage === 'fortune') prepareRadarData().finally(() => renderFortune());
 
     for (let r = latestRound - 1; r >= Math.max(1, latestRound - 9); r--) {
       fetchLotto(r).then(d => {
