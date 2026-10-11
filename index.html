@@ -20,12 +20,18 @@ window.__LTB_TOSS_READY__ = (async () => {
     window.__LTB_TOSS_OPEN_URL__ = mod.openURL || null;
     window.__LTB_TOSS_AUTH__ = mod.TossAuth || null;
     window.__LTB_TOSS_ADS__ = mod.TossAds || null;
+    window.__LTB_TOSS_GRANITE_EVENT__ = mod.graniteEvent || null;
+    window.__LTB_TOSS_NAVIGATION_BAR__ = mod.NavigationBar || null;
+    window.__LTB_TOSS_SCREEN__ = mod.Screen || null;
     window.__LTB_TOSS_AD_GROUP_ID__ = 'ait.v2.live.f5f94084a2d3437a';
   } catch (_) {
     window.__LTB_TOSS_ENV__ = null;
     window.__LTB_TOSS_OPEN_URL__ = null;
     window.__LTB_TOSS_AUTH__ = null;
     window.__LTB_TOSS_ADS__ = null;
+    window.__LTB_TOSS_GRANITE_EVENT__ = null;
+    window.__LTB_TOSS_NAVIGATION_BAR__ = null;
+    window.__LTB_TOSS_SCREEN__ = null;
     window.__LTB_TOSS_AD_GROUP_ID__ = null;
   }
   window.__LTB_IS_TOSS__ = !isDevWebPreview && (isDevPreview || window.__LTB_TOSS_ENV__ === 'toss' || window.__LTB_TOSS_ENV__ === 'sandbox');
@@ -686,6 +692,9 @@ html[data-toss-intro="open"],html[data-toss-intro="open"] body { height:100%; ov
 .auth-submit:disabled { opacity:0.55; cursor:not-allowed; }
 .toss-ad-shell { display:none; width:100%; min-height:92px; margin-top:12px; overflow:hidden; }
 html[data-miniapp="toss"] .toss-hidden { display:none !important; }
+html[data-miniapp="toss"] .site-footer,
+html[data-miniapp="toss"] #header-membership-btn,
+html[data-miniapp="toss"] a[href*="play.google.com/store/apps/details?id=com.lottobank.app"] { display:none !important; }
 html[data-miniapp="toss"] .toss-ad-shell.is-ready { display:block; }
 html[data-miniapp="toss"] #dark-toggle-btn { display:none !important; }
 @media (max-width:768px) {
@@ -4280,7 +4289,7 @@ function renderHomeLive() {
         </div>
       </div>
       <button onclick="showAuthModal()" style="width:100%;padding:12px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(220,38,38,.4);letter-spacing:.3px;">🚀 무료로 시작하기</button>
-      <a href="https://play.google.com/store/apps/details?id=com.lottobank.app" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 0;font-size:13px;font-weight:800;text-decoration:none;width:100%;">
+      <a class="toss-hidden" href="https://play.google.com/store/apps/details?id=com.lottobank.app" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 0;font-size:13px;font-weight:800;text-decoration:none;width:100%;">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M2 17v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4"/></svg>
         앱 다운로드
       </a>
@@ -5663,9 +5672,60 @@ async function doTossAuth() {
   }
 }
 
+function handleTossBack() {
+  const termsModal = $('terms-modal');
+  if (termsModal && termsModal.style.display !== 'none') {
+    closeTermsModal();
+    return;
+  }
+  const authModal = $('auth-modal');
+  if (authModal?.classList.contains('open')) {
+    closeAuthModal();
+    return;
+  }
+  const mobileDrawer = $('mob-drawer');
+  if (mobileDrawer?.classList.contains('open')) {
+    closeMobMenu();
+    return;
+  }
+  const activePage = $('main-content')?.dataset.activePage || 'home';
+  if (activePage !== 'home') {
+    if (history.state?.ltbPage === activePage) history.back();
+    else {
+      history.replaceState({ ...(history.state || {}), ltbPage:'home' }, '');
+      go('home', { fromHistory:true });
+    }
+    return;
+  }
+  window.__LTB_TOSS_SCREEN__?.close?.().catch(error => {
+    console.warn('Toss screen close failed:', error);
+  });
+}
+
+function initializeTossNavigation() {
+  const activePage = $('main-content')?.dataset.activePage || 'home';
+  history.replaceState({ ...(history.state || {}), ltbPage:activePage }, '');
+  window.__LTB_TOSS_NAVIGATION_BAR__?.setOptions({
+    withBackButton:true,
+    withHomeButton:false,
+    withTitle:false,
+    theme:'light',
+  }).catch(error => console.warn('Toss navigation bar setup failed:', error));
+  window.__LTB_TOSS_SCREEN__?.setIosSwipeBack?.({ isEnabled:true }).catch(error => {
+    console.warn('Toss swipe back setup failed:', error);
+  });
+  if (!window._ltbTossBackUnsubscribe && window.__LTB_TOSS_GRANITE_EVENT__) {
+    window._ltbTossBackUnsubscribe = window.__LTB_TOSS_GRANITE_EVENT__.addEventListener('backEvent', {
+      onEvent:handleTossBack,
+      onError:error => console.warn('Toss back event failed:', error),
+    });
+  }
+}
+
 async function initializeTossExperience() {
   const isToss = await window.__LTB_TOSS_READY__;
   if (!isToss) return;
+  initializeTossNavigation();
   const btn = $('btn-auth');
   if (btn && !isLoggedIn) btn.textContent = '토스로 로그인';
   if (!isLoggedIn) showTossIntro();
@@ -5700,6 +5760,11 @@ async function initializeTossExperience() {
 window.addEventListener('pagehide', () => {
   if (tossBannerHandle) tossBannerHandle.destroy();
   tossBannerHandle = null;
+});
+
+window.addEventListener('beforeunload', () => {
+  if (window._ltbTossBackUnsubscribe) window._ltbTossBackUnsubscribe();
+  window._ltbTossBackUnsubscribe = null;
 });
 
 function showAuthModal() {
@@ -6911,9 +6976,27 @@ async function rebuildCurrentUserStats() {
 // =====================================================
 // 탭 전환
 // =====================================================
-function go(id) {
+function syncTossHistory(id, options) {
+  if (!window.__LTB_IS_TOSS__ || options.fromHistory) return;
+  const state = { ...(history.state || {}), ltbPage:id };
+  if (options.replaceHistory || !history.state?.ltbPage) history.replaceState(state, '');
+  else if (history.state.ltbPage !== id) history.pushState(state, '');
+}
+
+window.addEventListener('popstate', event => {
+  if (!window.__LTB_IS_TOSS__) return;
+  const page = event.state?.ltbPage;
+  if (page) go(page, { fromHistory:true });
+  else {
+    history.replaceState({ ...(history.state || {}), ltbPage:'home' }, '');
+    go('home', { fromHistory:true });
+  }
+});
+
+function go(id, options = {}) {
   if (id === 'community') id = 'community'; // 커뮤니티 직접 접근 허용
   if (id === 'badge') id = 'profile';
+  if (id === 'subscription' && window.__LTB_IS_TOSS__) id = 'profile';
   // 페이지 이동 시 상단으로 스크롤
   const mc = document.getElementById('main-content');
   if (mc) mc.scrollTop = 0;
@@ -6956,6 +7039,7 @@ function go(id) {
   $('mid-title').innerHTML = titles[id] || '';
   const mainLayout = $('main-content');
   if (mainLayout) mainLayout.dataset.activePage = id;
+  syncTossHistory(id, options);
   // 페이지 타이틀 동적 업데이트
   const _ptt = { result:'당첨 결과 조회', ticket:'QR 인증', stats:'나의 전적', rank:'랭킹', map:'내 주변 판매점', profile:'내 프로필', home:'실시간 피드', lab:'연구소', group:'로또 모임', fortune:'레이더', subscription:'멤버십', skin:'스킨', admin:'운영 관리' };
   document.title = _ptt[id] ? 'LottoBank — ' + _ptt[id] : 'LottoBank — 로또 구매 이력 · 당첨 인증 · 전적 관리';
@@ -7150,6 +7234,7 @@ function getMembershipLabel() {
 }
 
 function renderPlusUpsell(reason) {
+  if (window.__LTB_IS_TOSS__) return '';
   return `<div class="plus-card">
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
       <div>
@@ -7169,6 +7254,7 @@ function renderPlusUpsell(reason) {
 }
 
 function renderGroupUpsell() {
+  if (window.__LTB_IS_TOSS__) return '';
   return `<div class="group-card">
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
       <div>
@@ -10318,7 +10404,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 async function init() {
-  go('home');
+  go('home', { replaceHistory:true });
   startDashboardCountdown();
   const lotteryDataReady = preloadStaticLotteryData();
   await initAuth();
@@ -13172,7 +13258,7 @@ function renderProfile() {
             ${isVipMember() ? 'VIP 플랜 이용 중' : window._membership === 'plus' ? 'Light 플랜 이용 중' : '무료 플랜 이용 중'}
           </div>
         </div>
-        <button onclick="go('subscription')" style="padding:8px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">플랜 보기</button>
+        <button class="toss-hidden" onclick="go('subscription')" style="padding:8px 14px;background:var(--lotto-red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">플랜 보기</button>
       </div>
     </div>
     <div class="profile-block">
