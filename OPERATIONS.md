@@ -28,6 +28,20 @@ select public.bootstrap_app_admin('admin@example.com');
 3. 기능 검증 탭에서 당첨 칭호, 랭킹, 피드 연결을 시험합니다.
 4. 문제가 생기면 전체 데이터 탭에서 해당 테이블과 조건만 지정해 수정합니다.
 
+## 이메일 회원가입 운영 설정
+
+Supabase 기본 메일 서버는 개발 확인용이라 일반 방문자 가입에 사용할 수 없습니다. 운영 전 `Authentication > Emails > SMTP Settings`에서 Resend, Brevo, AWS SES 등 별도 SMTP를 연결합니다.
+
+1. 발신 도메인을 메일 서비스에서 인증합니다.
+2. Supabase에 SMTP 호스트, 포트, 사용자명, 비밀번호와 발신 주소를 등록합니다.
+3. `Authentication > URL Configuration`의 Site URL을 `https://lottobank.pages.dev`로 설정합니다.
+4. Redirect URLs에 `https://lottobank.pages.dev/**`를 허용합니다.
+5. `Authentication > Rate Limits`에서 예상 가입량에 맞게 이메일 발송 한도를 조정합니다.
+6. 팀 계정이 아닌 실제 외부 이메일로 가입, 인증 링크, 로그인, 비밀번호 재설정을 모두 시험합니다.
+7. `supabase/migrations/202610190001_fix_auth_profile_trigger.sql`을 적용해 신규 회원 프로필 생성과 기존 누락 프로필 복구를 완료합니다.
+
+SMTP를 연결하지 않으면 기본 제공자의 프로젝트 전체 시간당 2건 제한과 수신자 제한 때문에 실제 방문자의 가입 메일이 발송되지 않습니다.
+
 ## AdSense 준비
 
 AdSense 승인 전에는 광고 코드를 넣지 않습니다. 승인 후 발급받은 게시자 ID와 광고 단위 ID를 적용합니다.

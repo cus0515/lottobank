@@ -28,7 +28,12 @@ function json(body, status = 200, origin = '') {
 
 async function readJson(response, code) {
   const body = await response.json().catch(() => null);
-  if (!response.ok || !body) throw new Error(code);
+  if (!response.ok || !body) {
+    const upstreamCode = body?.error?.errorCode || body?.code || code;
+    const error = new Error(upstreamCode);
+    error.status = response.status;
+    throw error;
+  }
   return body;
 }
 
@@ -57,6 +62,7 @@ async function supabaseRequest(env, path, init = {}) {
 
 export async function onRequest(context) {
   const origin = context.request.headers.get('Origin') || '';
+  const requestId = crypto.randomUUID();
   if (!isAllowedOrigin(origin)) return json({ code: 'ORIGIN_NOT_ALLOWED' }, 403, origin);
   if (context.request.method === 'OPTIONS') return json({ ok: true }, 200, origin);
   if (context.request.method !== 'POST') return json({ code: 'METHOD_NOT_ALLOWED' }, 405, origin);
@@ -64,7 +70,7 @@ export async function onRequest(context) {
   const env = context.env;
   const supabaseSecret = env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
   if (!env.TOSS_MTLS || !supabaseSecret || !env.TOSS_IDENTITY_SECRET) {
-    return json({ code: 'TOSS_SERVER_NOT_CONFIGURED' }, 503, origin);
+    return json({ code: 'TOSS_SERVER_NOT_CONFIGURED', requestId }, 503, origin);
   }
 
   try {
@@ -72,7 +78,7 @@ export async function onRequest(context) {
     const authorizationCode = String(body?.authorizationCode || '');
     const referrer = String(body?.referrer || '').toUpperCase();
     if (!authorizationCode || authorizationCode.length > 2048 || !['DEFAULT', 'SANDBOX'].includes(referrer)) {
-      return json({ code: 'INVALID_LOGIN_REQUEST' }, 400, origin);
+      return json({ code: 'INVALID_LOGIN_REQUEST', requestId }, 400, origin);
     }
 
     const tokenResponse = await env.TOSS_MTLS.fetch(
@@ -85,7 +91,7 @@ export async function onRequest(context) {
     );
     const tokenEnvelope = await readJson(tokenResponse, 'TOSS_TOKEN_REQUEST_FAILED');
     if (tokenEnvelope.resultType !== 'SUCCESS' || !tokenEnvelope.success?.accessToken) {
-      return json({ code: tokenEnvelope.error?.errorCode || 'TOSS_TOKEN_REJECTED' }, 401, origin);
+      return json({ code: tokenEnvelope.error?.errorCode || 'TOSS_TOKEN_REJECTED', requestId }, 401, origin);
     }
 
     const userResponse = await env.TOSS_MTLS.fetch(
@@ -94,7 +100,7 @@ export async function onRequest(context) {
     );
     const userEnvelope = await readJson(userResponse, 'TOSS_USER_REQUEST_FAILED');
     if (userEnvelope.resultType !== 'SUCCESS' || userEnvelope.success?.userKey == null) {
-      return json({ code: userEnvelope.error?.errorCode || 'TOSS_USER_REJECTED' }, 401, origin);
+      return json({ code: userEnvelope.error?.errorCode || 'TOSS_USER_REJECTED', requestId }, 401, origin);
     }
 
     const identityHash = await hmacHex(String(userEnvelope.success.userKey), env.TOSS_IDENTITY_SECRET);
@@ -127,12 +133,16 @@ export async function onRequest(context) {
     });
     if (!identityResponse.ok) throw new Error('SUPABASE_IDENTITY_FAILED');
 
+    console.log('toss-login:', requestId, 'success');
     return json({
       tokenHash: properties.hashed_token,
       verificationType: properties.verification_type || 'magiclink',
+      requestId,
     }, 200, origin);
   } catch (error) {
-    console.error('toss-login:', error instanceof Error ? error.message : 'unknown');
-    return json({ code: error instanceof Error ? error.message : 'TOSS_LOGIN_FAILED' }, 500, origin);
+    const code = error instanceof Error ? error.message : 'TOSS_LOGIN_FAILED';
+    console.error('toss-login:', requestId, code);
+    const status = Number(error?.status) === 429 ? 429 : 500;
+    return json({ code, requestId }, status, origin);
   }
 }

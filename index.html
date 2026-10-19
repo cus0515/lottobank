@@ -669,6 +669,8 @@ main.chat-hidden .chat-panel { display: none; }
 .toss-intro-primary,.toss-intro-secondary { width:100%; min-height:48px; border-radius:8px; font:inherit; font-size:14px; font-weight:800; cursor:pointer; }
 .toss-intro-primary { border:0; background:var(--lotto-red); color:#fff; }
 .toss-intro-secondary { border:1px solid var(--border-dashed); background:var(--paper-white); color:var(--text-muted); }
+.toss-login-error { display:none; margin:2px 0 0; color:#dc2626; font-size:12px; line-height:1.5; text-align:center; }
+.toss-login-error.show { display:block; }
 html[data-toss-intro="open"],html[data-toss-intro="open"] body { height:100%; overflow:hidden!important; }
 @media (max-width:480px) {
   .toss-intro-overlay { align-items:flex-start; padding:max(24px,env(safe-area-inset-top)) 22px max(24px,env(safe-area-inset-bottom)); }
@@ -2286,6 +2288,7 @@ textarea {
     </div>
     <div class="toss-intro-actions">
       <button id="toss-intro-login" class="toss-intro-primary" onclick="startTossLogin()">토스로 시작하기</button>
+      <p id="toss-login-error" class="toss-login-error" role="alert" aria-live="polite"></p>
       <button class="toss-intro-secondary" onclick="closeTossIntro()">먼저 둘러보기</button>
     </div>
   </section>
@@ -5635,9 +5638,27 @@ let authMode = 'login';
 let tossLoginPending = false;
 let tossBannerHandle = null;
 
+function setTossLoginError(message = '') {
+  const el = $('toss-login-error');
+  if (!el) return;
+  el.textContent = message;
+  el.classList.toggle('show', Boolean(message));
+}
+
+function tossLoginErrorMessage(code) {
+  if (/cancel|취소/i.test(code)) return '로그인을 취소했습니다.';
+  if (code === 'TOSS_LOGIN_UNAVAILABLE') return '토스 로그인을 불러오지 못했습니다. 앱을 다시 열어주세요.';
+  if (code === 'TOSS_SERVER_NOT_CONFIGURED') return '로그인 서버를 점검 중입니다. 잠시 후 다시 시도해주세요.';
+  if (/TOSS_TOKEN|TOSS_USER|INVALID_LOGIN_REQUEST/.test(code)) return '토스 인증 시간이 만료되었습니다. 다시 시도해주세요.';
+  if (/SUPABASE|SESSION/.test(code)) return '계정 연결 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+  if (/rate|429/i.test(code)) return '요청이 많습니다. 잠시 후 다시 시도해주세요.';
+  return '토스 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.';
+}
+
 async function doTossAuth() {
-  if (tossLoginPending) return;
+  if (tossLoginPending) return false;
   tossLoginPending = true;
+  setTossLoginError('');
   const btn = $('toss-intro-login');
   const originalText = btn?.textContent || '토스로 로그인';
   if (btn) { btn.disabled = true; btn.textContent = '연결 중...'; }
@@ -5654,18 +5675,23 @@ async function doTossAuth() {
     if (!response.ok || !result.tokenHash) {
       throw new Error(result.code || 'TOSS_SESSION_FAILED');
     }
-    const { error } = await sb.auth.verifyOtp({
+    const { data, error } = await sb.auth.verifyOtp({
       token_hash: result.tokenHash,
       type: result.verificationType || 'magiclink',
     });
     if (error) throw error;
+    if (!data?.session?.user) throw new Error('SUPABASE_SESSION_MISSING');
+    closeTossIntro();
     toast('토스 로그인이 완료되었습니다.');
+    return true;
   } catch (error) {
     console.error('Toss login error:', error);
-    const message = String(error?.message || error);
-    if (/cancel|취소/i.test(message)) toast('로그인을 취소했습니다.');
-    else if (message.includes('TOSS_SERVER_NOT_CONFIGURED')) toast('토스 로그인 서버 설정을 확인해주세요.');
-    else toast('토스 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    const code = String(error?.message || error);
+    const message = tossLoginErrorMessage(code);
+    showTossIntro();
+    setTossLoginError(message);
+    toast(message);
+    return false;
   } finally {
     tossLoginPending = false;
     if (btn) { btn.disabled = false; btn.textContent = window.__LTB_IS_TOSS__ ? '토스로 로그인' : originalText; }
@@ -5793,20 +5819,22 @@ function closeTossIntro() {
 }
 
 async function startTossLogin() {
-  closeTossIntro();
   await doTossAuth();
 }
 
 // 비밀번호 재설정 이메일 발송
 let _nickCheckTimer = null;
+let _nickCheckSeq = 0;
 async function checkNickAvail(val) {
   const errEl = $('auth-err');
   const trimmed = val.trim();
+  const checkSeq = ++_nickCheckSeq;
   if (trimmed.length < 2) { errEl.textContent = ''; return; }
   clearTimeout(_nickCheckTimer);
   _nickCheckTimer = setTimeout(async () => {
     try {
       const { data } = await sb.from('profiles').select('id').eq('nickname', trimmed).maybeSingle();
+      if (checkSeq !== _nickCheckSeq || authMode !== 'signup' || $('auth-nick').value.trim() !== trimmed) return;
       if (data) {
         errEl.textContent = '❌ 이미 사용 중인 닉네임입니다.';
         errEl.style.color = '#dc2626';
@@ -5835,7 +5863,10 @@ async function forgotPassword() {
     $('auth-success-banner').style.display = 'block';
     if (btn) btn.textContent = '✅ 전송됨';
   } catch(e) {
-    $('auth-err').textContent = '전송 실패: ' + (e.message || '다시 시도해주세요.');
+    const message = String(e?.message || '').toLowerCase();
+    $('auth-err').textContent = message.includes('rate limit') || e?.status === 429
+      ? '메일 발송 요청이 많습니다. 잠시 후 다시 시도해주세요.'
+      : '재설정 메일을 보내지 못했습니다. 잠시 후 다시 시도해주세요.';
     if (btn) { btn.disabled = false; btn.textContent = '비밀번호를 잊으셨나요?'; }
   }
 }
@@ -5965,7 +5996,10 @@ async function doAuth() {
   const email = $('auth-email').value.trim();
   const pass = $('auth-pass').value;
   const nick = $('auth-nick').value.trim();
+  clearTimeout(_nickCheckTimer);
+  _nickCheckSeq += 1;
   $('auth-err').textContent = '';
+  $('auth-err').style.color = '';
 
   if (!email || !pass) { $('auth-err').textContent = '이메일과 비밀번호를 입력해주세요'; return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { $('auth-err').textContent = '올바른 이메일 형식이 아닙니다'; return; }
@@ -5984,6 +6018,7 @@ async function doAuth() {
     if (authMode === 'login') {
       const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
       if (error) throw error;
+      if (!data?.session?.user) throw new Error('로그인 세션을 만들지 못했습니다.');
       closeAuthModal();
       toast('🔓 로그인 완료');
     } else {
@@ -5992,12 +6027,24 @@ async function doAuth() {
       const { data: duplicateNick, error: nickError } = await sb.from('profiles').select('id').eq('nickname', nick).maybeSingle();
       if (nickError) throw nickError;
       if (duplicateNick) throw new Error('nickname already registered');
-      const { error } = await sb.auth.signUp({
+      const { data, error } = await sb.auth.signUp({
         email, password: pass,
-        options: { data: { nickname: nick } }
+        options: {
+          data: { nickname: nick },
+          emailRedirectTo: LOTTOBANK_ORIGIN + '/',
+        }
       });
       if (error) throw error;
+      if (!data?.user) throw new Error('회원 계정을 만들지 못했습니다.');
+      if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        throw new Error('user already registered');
+      }
       localStorage.setItem('ltb_last_signup_mail', String(Date.now()));
+      if (data.session?.user) {
+        closeAuthModal();
+        toast('가입과 로그인이 완료되었습니다.');
+        return;
+      }
       // 가입 후 이메일 인증 안내 배너
       $('auth-title').textContent = '가입 완료!';
       $('auth-sub').textContent = '이메일을 확인해주세요';
@@ -6025,8 +6072,10 @@ async function doAuth() {
       $('auth-err').textContent = '유효하지 않은 이메일 형식입니다';
     else if (msg.includes('email not confirmed'))
       $('auth-err').textContent = '이메일 인증이 필요합니다. 받은편지함을 확인해주세요';
-    else if (msg.includes('rate limit') || msg.includes('too many'))
-      $('auth-err').textContent = '잠시 후 다시 시도해주세요';
+    else if (msg.includes('rate limit') || msg.includes('too many') || e.status === 429)
+      $('auth-err').textContent = authMode === 'signup'
+        ? '인증 메일 요청이 많습니다. 잠시 후 다시 가입해주세요'
+        : '로그인 요청이 많습니다. 잠시 후 다시 시도해주세요';
     else if (msg.includes('network') || msg.includes('fetch'))
       $('auth-err').textContent = '네트워크 오류가 발생했습니다. 연결을 확인해주세요';
     else if (msg.includes('email link') || msg.includes('magic link') || msg.includes('otp'))

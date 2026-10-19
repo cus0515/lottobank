@@ -191,12 +191,27 @@ create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = ''
 as $$
+declare
+  requested_nickname text;
 begin
+  requested_nickname := left(coalesce(
+    nullif(btrim(new.raw_user_meta_data ->> 'nickname'), ''),
+    nullif(split_part(coalesce(new.email, ''), '@', 1), ''),
+    '회원' || substr(replace(new.id::text, '-', ''), 1, 10)
+  ), 12);
+
   insert into public.profiles (id, nickname)
-  values (new.id, coalesce(new.raw_user_meta_data ->> 'nickname', split_part(new.email, '@', 1)))
-  on conflict (id) do nothing;
+  values (new.id, requested_nickname)
+  on conflict do nothing;
+
+  if not found then
+    insert into public.profiles (id, nickname)
+    values (new.id, '회원' || substr(replace(new.id::text, '-', ''), 1, 10))
+    on conflict do nothing;
+  end if;
+
   insert into public.user_stats (user_id) values (new.id) on conflict (user_id) do nothing;
   return new;
 end;
