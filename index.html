@@ -23,6 +23,7 @@ window.__LTB_TOSS_READY__ = (async () => {
     window.__LTB_TOSS_GRANITE_EVENT__ = mod.graniteEvent || null;
     window.__LTB_TOSS_NAVIGATION_BAR__ = mod.NavigationBar || null;
     window.__LTB_TOSS_SCREEN__ = mod.Screen || null;
+    window.__LTB_TOSS_BRAND_DISPLAY_NAME__ = mod.getAppsInTossGlobals?.().brandDisplayName || '로또뱅크';
     window.__LTB_TOSS_AD_GROUP_ID__ = 'ait.v2.live.f5f94084a2d3437a';
   } catch (_) {
     window.__LTB_TOSS_ENV__ = null;
@@ -32,6 +33,7 @@ window.__LTB_TOSS_READY__ = (async () => {
     window.__LTB_TOSS_GRANITE_EVENT__ = null;
     window.__LTB_TOSS_NAVIGATION_BAR__ = null;
     window.__LTB_TOSS_SCREEN__ = null;
+    window.__LTB_TOSS_BRAND_DISPLAY_NAME__ = null;
     window.__LTB_TOSS_AD_GROUP_ID__ = null;
   }
   window.__LTB_IS_TOSS__ = !isDevWebPreview && (isDevPreview || window.__LTB_TOSS_ENV__ === 'toss' || window.__LTB_TOSS_ENV__ === 'sandbox');
@@ -164,6 +166,9 @@ header { background: #ffffff; border-bottom: 3px solid var(--lotto-red); positio
 .auth-zone-wrap { flex: 1; display: flex; justify-content: flex-end; }
 .logo-title { font-weight: 900; color: var(--lotto-red); letter-spacing: -0.5px; display:flex; align-items:center; position:relative; }
 .logo-title .logo-brand { font-size:22px; font-weight:900; line-height:1; }
+.logo-toss-name { display:none; font-size:22px; font-weight:900; line-height:1; color:var(--lotto-red); }
+html[data-miniapp="toss"] .logo-title .logo-brand { display:none; }
+html[data-miniapp="toss"] .logo-title .logo-toss-name { display:inline; }
 .logo-title .logo-tagline { font-size:11px; color:var(--text-muted); font-weight:400; }
 .logo-draw-ball{position:relative;top:6px;flex:0 0 14px;width:14px;height:14px;border-radius:50%;margin:0 11px 0 8px;background:radial-gradient(circle at 32% 25%,#fff 0 15%,#fef08a 16% 45%,#f59e0b 46% 100%);box-shadow:0 2px 6px rgba(245,158,11,.32);animation:logoBallDraw 2.8s ease-in-out infinite;transform-origin:center;display:inline-flex;align-items:center;justify-content:center;color:#7c2d12;font-size:7px;font-weight:900;line-height:1;}
 .logo-draw-ball::after{content:attr(data-num);}
@@ -2159,7 +2164,7 @@ textarea {
   <div class="nav-container">
     <div class="logo-area">
       <div class="logo-title" onclick="go('home')" style="cursor:pointer;letter-spacing:-.3px;" title="홈으로 이동">
-          <span class="logo-brand" style="background:linear-gradient(135deg,#ef4444,#dc2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lotto</span><span class="logo-brand" style="color:var(--text-dark);">Bank</span><span class="logo-draw-ball" data-num="7" aria-hidden="true"></span>
+          <span class="logo-brand" style="background:linear-gradient(135deg,#ef4444,#dc2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lotto</span><span class="logo-brand" style="color:var(--text-dark);">Bank</span><span class="logo-toss-name" data-toss-brand-name>로또뱅크</span><span class="logo-draw-ball" data-num="7" aria-hidden="true"></span>
           <span class="logo-tagline" style="opacity:.5;margin-left:8px;">| 로또 전적 &amp; 인증</span>
         </div>
     </div>
@@ -2268,7 +2273,7 @@ textarea {
   <section class="toss-intro">
     <div class="toss-intro-brand">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-      <span>LottoBank</span>
+      <span data-toss-brand-name>로또뱅크</span>
     </div>
     <h1 id="toss-intro-title">복권 기록을 한곳에서<br>간편하게 관리하세요</h1>
     <p class="toss-intro-lead">QR 인증부터 당첨 확인, 전적과 수익률까지 실제 구매 기록을 기준으로 정리해 드려요.</p>
@@ -5734,7 +5739,7 @@ function initializeTossNavigation() {
   window.__LTB_TOSS_NAVIGATION_BAR__?.setOptions({
     withBackButton:true,
     withHomeButton:false,
-    withTitle:false,
+    withTitle:true,
     theme:'light',
   }).catch(error => console.warn('Toss navigation bar setup failed:', error));
   window.__LTB_TOSS_SCREEN__?.setIosSwipeBack?.({ isEnabled:true }).catch(error => {
@@ -5751,6 +5756,10 @@ function initializeTossNavigation() {
 async function initializeTossExperience() {
   const isToss = await window.__LTB_TOSS_READY__;
   if (!isToss) return;
+  const brandDisplayName = window.__LTB_TOSS_BRAND_DISPLAY_NAME__ || '로또뱅크';
+  document.querySelectorAll('[data-toss-brand-name]').forEach(node => {
+    node.textContent = brandDisplayName;
+  });
   initializeTossNavigation();
   const btn = $('btn-auth');
   if (btn && !isLoggedIn) btn.textContent = '토스로 로그인';
