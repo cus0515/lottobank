@@ -1,67 +1,67 @@
 {
   "returnValue": "success",
-  "drwNo": 337,
-  "drwNoDate": "2026-10-15",
-  "wnBndNo": "3",
-  "wnRnkVl": "668912",
-  "bnsRnkVl": "951744",
+  "drwNo": 338,
+  "drwNoDate": "2026-10-22",
+  "wnBndNo": "1",
+  "wnRnkVl": "354154",
+  "bnsRnkVl": "548210",
   "prizes": [
     {
       "rank": 1,
-      "store": 1,
+      "store": 0,
       "internet": 1,
-      "total": 2,
-      "totAmt": 3360000000
+      "total": 1,
+      "totAmt": 1680000000
     },
     {
       "rank": 2,
-      "store": 4,
+      "store": 0,
       "internet": 4,
-      "total": 8,
-      "totAmt": 960000000
+      "total": 4,
+      "totAmt": 480000000
     },
     {
       "rank": 3,
-      "store": 45,
-      "internet": 22,
-      "total": 67,
-      "totAmt": 67000000
+      "store": 20,
+      "internet": 41,
+      "total": 61,
+      "totAmt": 61000000
     },
     {
       "rank": 4,
-      "store": 330,
-      "internet": 316,
-      "total": 646,
-      "totAmt": 64600000
+      "store": 336,
+      "internet": 277,
+      "total": 613,
+      "totAmt": 61300000
     },
     {
       "rank": 5,
-      "store": 3377,
-      "internet": 3313,
-      "total": 6690,
-      "totAmt": 334500000
+      "store": 3479,
+      "internet": 3169,
+      "total": 6648,
+      "totAmt": 332400000
     },
     {
       "rank": 6,
-      "store": 35090,
-      "internet": 32206,
-      "total": 67296,
-      "totAmt": 336480000
+      "store": 34939,
+      "internet": 30915,
+      "total": 65854,
+      "totAmt": 329270000
     },
     {
       "rank": 7,
-      "store": 342749,
-      "internet": 313754,
-      "total": 656503,
-      "totAmt": 656503000
+      "store": 343334,
+      "internet": 309605,
+      "total": 652939,
+      "totAmt": 652939000
     },
     {
       "rank": 8,
       "store": 5,
-      "internet": 5,
-      "total": 10,
-      "totAmt": 1200000000
+      "internet": 1,
+      "total": 6,
+      "totAmt": 720000000
     }
   ],
-  "_cachedAt": "2026-10-21T17:01:22Z"
+  "_cachedAt": "2026-10-22T16:02:55Z"
 }
