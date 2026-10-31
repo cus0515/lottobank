@@ -168,4 +168,10 @@
     <changefreq>never</changefreq>
     <priority>0.72</priority>
   </url>
+  <url>
+    <loc>https://lottobank.pages.dev/news/lotto-1248</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>never</changefreq>
+    <priority>0.72</priority>
+  </url>
 </urlset>
